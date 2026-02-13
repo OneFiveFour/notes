@@ -80,33 +80,33 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Use Kotest property testing with minimum 100 iterations per property
     - **Validates: Requirements 2.3, 2.4, 2.5, 2.6, 6.2, 6.4, 6.6, 8.1, 8.2, 8.3, 8.4, 8.5**
 
-- [ ] 5. Checkpoint — Verify core networking compiles and tests pass
+- [x] 5. Checkpoint — Verify core networking compiles and tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Implement network data source
-  - [ ] 6.1 Create `NetworkDataSource` interface in `net.onefivefour.notes.data.source.network`
+- [x] 6. Implement network data source
+  - [x] 6.1 Create `NetworkDataSource` interface in `net.onefivefour.notes.data.source.network`
     - Define suspend functions for all five RPC methods: createNote, listNotes, getNote, updateNote, deleteNote
     - Use Wire-generated request/response types as parameters and return types
     - _Requirements: 2.1_
-  - [ ] 6.2 Implement `NetworkDataSourceImpl`
+  - [x] 6.2 Implement `NetworkDataSourceImpl`
     - Delegate each method to `ConnectRpcClient.call()` with correct service paths (`/notes.v1.NotesService/CreateNote`, etc.)
     - Use Wire ADAPTER for serialization/deserialization
     - Unwrap `Result` and throw on failure
     - _Requirements: 2.1, 2.4, 2.5_
 
-- [ ] 7. Implement SQLDelight cache data source
-  - [ ] 7.1 Create SQLDelight schema file at `composeApp/src/commonMain/sqldelight/net/onefivefour/notes/cache/Notes.sq`
+- [x] 7. Implement SQLDelight cache data source
+  - [x] 7.1 Create SQLDelight schema file at `composeApp/src/commonMain/sqldelight/net/onefivefour/notes/cache/Notes.sq`
     - Define `Note` table with filePath (PK), title, content, updatedAt, cachedAt columns
     - Define named queries: insertOrReplace, selectByFilePath, selectByPathPrefix, selectAll, deleteByFilePath, deleteAll
     - _Requirements: 7.1, 7.6_
-  - [ ] 7.2 Create `CacheDataSource` interface in `net.onefivefour.notes.data.source.cache`
+  - [x] 7.2 Create `CacheDataSource` interface in `net.onefivefour.notes.data.source.cache`
     - Define suspend functions: saveNote, saveNotes, getNote, listNotes, deleteNote, clear
     - _Requirements: 7.1, 7.2, 7.3_
-  - [ ] 7.3 Implement `CacheDataSourceImpl` using SQLDelight generated queries
+  - [x] 7.3 Implement `CacheDataSourceImpl` using SQLDelight generated queries
     - Map between domain `Note` and SQLDelight row types
     - Implement path-prefix filtering for listNotes
     - _Requirements: 7.1, 7.2, 7.3, 7.6_
-  - [ ]* 7.4 Write property tests for cache round-trip
+  - [ ] 7.4 Write property tests for cache round-trip
     - **Property 13: Network-to-Cache Persistence** — For any note saved via saveNote, getNote with the same filePath returns an equivalent note
     - **Property 17: Cache Persistence Across Restarts** — For any note stored in cache, re-querying after database re-open preserves all fields
     - Use in-memory SQLDelight driver for tests, Kotest property testing with minimum 100 iterations
