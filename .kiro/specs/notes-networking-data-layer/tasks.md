@@ -21,16 +21,16 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Ensure generated code targets `commonMain` and is compatible with all KMP targets
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
 
-- [ ] 2. Implement domain models and error types
-  - [ ] 2.1 Create domain data models in `commonMain`
+- [x] 2. Implement domain models and error types
+  - [x] 2.1 Create domain data models in `commonMain`
     - Create `Note`, `CreateNoteParams`, `UpdateNoteParams` data classes in `net.onefivefour.notes.data.models`
     - All models must be immutable Kotlin data classes
     - _Requirements: 3.1, 3.2, 3.6_
-  - [ ] 2.2 Create the sealed error type hierarchy
+  - [x] 2.2 Create the sealed error type hierarchy
     - Create `NetworkException` sealed class in `net.onefivefour.notes.network.error`
     - Include `NetworkError`, `ServerError`, `ClientError`, `TimeoutError`, `SerializationError` subtypes
     - _Requirements: 6.1, 6.3_
-  - [ ] 2.3 Create `NetworkConfig` data class
+  - [x] 2.3 Create `NetworkConfig` data class
     - Create in `net.onefivefour.notes.network.config` with baseUrl, requestTimeoutMs, connectTimeoutMs, maxRetries, retryDelayMs
     - Provide `default()` factory with sensible defaults
     - Ensure immutability
