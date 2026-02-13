@@ -51,22 +51,22 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - **Validates: Requirements 3.3, 3.4, 3.5**
 
 - [ ] 4. Implement ConnectRPC client and retry logic
-  - [ ] 4.1 Create `ConnectRpcClient` interface in `net.onefivefour.notes.network.client`
+  - [x] 4.1 Create `ConnectRpcClient` interface in `net.onefivefour.notes.network.client`
     - Define generic `call()` suspend function with path, request, serializer, and deserializer parameters
     - _Requirements: 2.1, 2.3, 2.7, 9.2_
-  - [ ] 4.2 Implement `ConnectRpcClientImpl` using Ktor
+  - [x] 4.2 Implement `ConnectRpcClientImpl` using Ktor
     - Use HTTP POST with `Content-Type: application/proto` and `Connect-Protocol-Version: 1` header
     - Map HTTP status codes to typed `NetworkException` subtypes (4xx → ClientError, 5xx → ServerError)
     - Handle timeout exceptions → `TimeoutError`, deserialization failures → `SerializationError`
     - Accept `NetworkConfig` for base URL and timeout configuration
     - _Requirements: 2.3, 2.4, 2.5, 2.6, 5.5, 6.2, 6.4, 6.6_
-  - [ ] 4.3 Implement `withRetry` utility function
+  - [x] 4.3 Implement `withRetry` utility function
     - Exponential backoff: delayMs * 2^attempt
     - Retry only on `NetworkError`, `ServerError`, `TimeoutError`; do NOT retry on `ClientError`
     - Maximum 3 total attempts (1 initial + 2 retries), configurable via `NetworkConfig`
     - On exhaustion, throw the last error
     - _Requirements: 8.1, 8.2, 8.3, 8.4, 8.5, 8.6_
-  - [ ]* 4.4 Write property tests for ConnectRPC client and retry logic
+  - [x] 4.4 Write property tests for ConnectRPC client and retry logic
     - **Property 1: ConnectRPC Protocol Compliance** — For any RPC request, verify Connect-Protocol-Version header and application/proto content type
     - **Property 2: Protobuf Serialization Round-Trip** — For any valid protobuf message, serialize then deserialize produces equivalent message
     - **Property 3: Base URL Configuration** — For any valid base URL, all request URLs are constructed as baseUrl + servicePath
