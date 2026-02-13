@@ -36,13 +36,13 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Ensure immutability
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.6_
 
-- [-] 3. Implement proto-to-domain mappers
+- [x] 3. Implement proto-to-domain mappers
   - [x] 3.1 Create `NoteMapper` object in `net.onefivefour.notes.data.mapper`
     - Implement `toDomain()` overloads for `notes.v1.Note`, `CreateNoteResponse`, `GetNoteResponse`
     - Implement `toProto()` functions for `CreateNoteParams` → `CreateNoteRequest`, `UpdateNoteParams` → `UpdateNoteRequest`
     - Handle timestamp mapping (Unix milliseconds preservation)
     - _Requirements: 3.3, 3.4, 3.5_
-  - [ ] 3.2 Write property tests for mapper round-trip
+  - [x] 3.2 Write property tests for mapper round-trip
     - **Property 4: Domain-Proto Mapping Round-Trip**
     - **Property 5: Timestamp Mapping Preservation**
     - Generate arbitrary `Note` instances, convert to proto and back, assert equivalence
