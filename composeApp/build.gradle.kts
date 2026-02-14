@@ -105,6 +105,7 @@ kotlin {
         val wasmJsMain by getting {
             dependencies {
                 implementation(libs.ktor.client.js)
+                implementation(libs.sqldelight.driver.js)
             }
         }
     }
