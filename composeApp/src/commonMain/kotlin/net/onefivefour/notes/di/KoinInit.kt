@@ -6,8 +6,12 @@ import org.koin.core.module.Module
 
 expect fun platformModule(): Module
 
-fun initKoin(appModule: Module = Module()): KoinApplication {
+fun initKoin(
+    platformConfiguration: KoinApplication.() -> Unit = {},
+    appModule: Module = Module()
+): KoinApplication {
     return startKoin {
+        platformConfiguration()
         modules(appModule, platformModule())
         modules(appModules)
     }

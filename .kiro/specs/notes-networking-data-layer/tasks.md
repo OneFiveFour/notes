@@ -162,6 +162,12 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - `actual` implementations in each platform source set
     - `initKoin()` function combining app modules and platform module
     - _Requirements: 9.3, 9.5_
+  - [x] 10.4 Wire `initKoin()` into platform entry points
+    - Android: Create `NotesApplication` extending `Application`, call `initKoin()` with `androidContext(this)`, register in `AndroidManifest.xml`
+    - iOS: Call `initKoin()` before returning the `ComposeUIViewController` in `MainViewController.kt`
+    - JVM: Call `initKoin()` at the start of `main()` in `main.kt`
+    - Web (JS/WasmJs): Call `initKoin()` at the start of `main()` in `webMain/main.kt`
+    - _Requirements: 9.3, 9.5_
 
 - [ ] 11. Implement factory functions and test doubles
   - [ ] 11.1 Create `NotesRepositoryFactory` in `net.onefivefour.notes.data.repository`

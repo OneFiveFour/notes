@@ -48,6 +48,7 @@ kotlin {
             implementation(libs.androidx.activity.compose)
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqldelight.driver.android)
+            implementation(libs.koin.android)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -98,6 +99,7 @@ kotlin {
         jvmTest.dependencies {
             implementation(libs.kotest.runner.junit5)
             implementation(libs.sqldelight.driver.jvm)
+            implementation(libs.koin.test)
         }
         jsMain.dependencies {
             implementation(libs.ktor.client.js)
