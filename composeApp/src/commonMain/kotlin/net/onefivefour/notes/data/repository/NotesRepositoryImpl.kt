@@ -1,7 +1,10 @@
 package net.onefivefour.notes.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
@@ -19,7 +22,8 @@ import notes.v1.ListNotesRequest
 internal class NotesRepositoryImpl(
     private val networkDataSource: NetworkDataSource,
     private val cacheDataSource: CacheDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val backgroundScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 ) : NotesRepository {
 
     private val mutex = Mutex()
@@ -42,34 +46,58 @@ internal class NotesRepositoryImpl(
     }
 
     override suspend fun listNotes(path: String): Result<List<Note>> = withContext(dispatcher) {
-        try {
-            val request = ListNotesRequest(path = path)
-            val response = networkDataSource.listNotes(request)
-            val notes = response.notes.map { NoteMapper.toDomain(it) }
-            cacheDataSource.saveNotes(notes)
-            Result.success(notes)
-        } catch (e: NetworkException) {
-            val cached = cacheDataSource.listNotes(path)
-            if (cached.isNotEmpty()) {
-                Result.success(cached)
-            } else {
+        val cached = cacheDataSource.listNotes(path)
+        if (cached.isNotEmpty()) {
+            // Return cached data immediately, refresh in background
+            backgroundScope.launch {
+                try {
+                    val request = ListNotesRequest(path = path)
+                    val response = networkDataSource.listNotes(request)
+                    val notes = response.notes.map { NoteMapper.toDomain(it) }
+                    cacheDataSource.saveNotes(notes)
+                } catch (_: Exception) {
+                    // Background refresh failure is non-fatal
+                }
+            }
+            Result.success(cached)
+        } else {
+            // No cache — go to network directly
+            try {
+                val request = ListNotesRequest(path = path)
+                val response = networkDataSource.listNotes(request)
+                val notes = response.notes.map { NoteMapper.toDomain(it) }
+                cacheDataSource.saveNotes(notes)
+                Result.success(notes)
+            } catch (e: NetworkException) {
                 Result.failure(e)
             }
         }
     }
 
     override suspend fun getNote(filePath: String): Result<Note> = withContext(dispatcher) {
-        try {
-            val request = GetNoteRequest(file_path = filePath)
-            val response = networkDataSource.getNote(request)
-            val note = NoteMapper.toDomain(response)
-            cacheDataSource.saveNote(note)
-            Result.success(note)
-        } catch (e: NetworkException) {
-            val cached = cacheDataSource.getNote(filePath)
-            if (cached != null) {
-                Result.success(cached)
-            } else {
+        val cached = cacheDataSource.getNote(filePath)
+        if (cached != null) {
+            // Return cached data immediately, refresh in background
+            backgroundScope.launch {
+                try {
+                    val request = GetNoteRequest(file_path = filePath)
+                    val response = networkDataSource.getNote(request)
+                    val note = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNote(note)
+                } catch (_: Exception) {
+                    // Background refresh failure is non-fatal
+                }
+            }
+            Result.success(cached)
+        } else {
+            // No cache — go to network directly
+            try {
+                val request = GetNoteRequest(file_path = filePath)
+                val response = networkDataSource.getNote(request)
+                val note = NoteMapper.toDomain(response)
+                cacheDataSource.saveNote(note)
+                Result.success(note)
+            } catch (e: NetworkException) {
                 Result.failure(e)
             }
         }

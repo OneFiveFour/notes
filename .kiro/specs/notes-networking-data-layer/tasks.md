@@ -185,18 +185,18 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Verify call tracking records all invocations
     - _Requirements: 11.2, 11.3, 11.4_
 
-- [ ] 12. Implement cache-first response pattern
-  - [ ] 12.1 Update `NotesRepositoryImpl` to return cached data immediately and refresh in background
+- [x] 12. Implement cache-first response pattern
+  - [x] 12.1 Update `NotesRepositoryImpl` to return cached data immediately and refresh in background
     - For getNote and listNotes: return cached data first if available, then launch background coroutine to fetch from network and update cache
     - Use structured concurrency (coroutineScope) for background refresh
     - Handle cancellation properly — cancel background refresh if parent scope is cancelled
     - _Requirements: 7.7, 10.3, 10.4_
-  - [ ]* 12.2 Write property test for cache-first pattern
+  - [x] 12.2 Write property test for cache-first pattern
     - **Property 18: Cache-First Response Pattern** — For any cached note, getNote returns cached data immediately without waiting for network
     - Use mock NetworkDataSource with artificial delay, verify cached data returned before network completes
     - **Validates: Requirements 7.7**
 
-- [ ] 13. Final checkpoint — Full integration verification
+- [x] 13. Final checkpoint — Full integration verification
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
