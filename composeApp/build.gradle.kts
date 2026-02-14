@@ -97,6 +97,7 @@ kotlin {
         }
         jvmTest.dependencies {
             implementation(libs.kotest.runner.junit5)
+            implementation(libs.sqldelight.driver.jvm)
         }
         jsMain.dependencies {
             implementation(libs.ktor.client.js)

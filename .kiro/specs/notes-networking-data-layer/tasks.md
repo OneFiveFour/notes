@@ -106,19 +106,19 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Map between domain `Note` and SQLDelight row types
     - Implement path-prefix filtering for listNotes
     - _Requirements: 7.1, 7.2, 7.3, 7.6_
-  - [ ] 7.4 Write property tests for cache round-trip
+  - [x] 7.4 Write property tests for cache round-trip
     - **Property 13: Network-to-Cache Persistence** — For any note saved via saveNote, getNote with the same filePath returns an equivalent note
     - **Property 17: Cache Persistence Across Restarts** — For any note stored in cache, re-querying after database re-open preserves all fields
     - Use in-memory SQLDelight driver for tests, Kotest property testing with minimum 100 iterations
     - **Validates: Requirements 7.1, 7.6**
 
-- [ ] 8. Implement repository with offline support
-  - [ ] 8.1 Create `NotesRepository` interface in `net.onefivefour.notes.data.repository`
+- [x] 8. Implement repository with offline support
+  - [x] 8.1 Create `NotesRepository` interface in `net.onefivefour.notes.data.repository`
     - Define suspend functions: createNote, listNotes, getNote, updateNote, deleteNote
     - All return `Result<T>` types
     - Accept `CoroutineDispatcher` parameter for structured concurrency
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.9, 9.1, 10.1, 10.5_
-  - [ ] 8.2 Implement `NotesRepositoryImpl`
+  - [x] 8.2 Implement `NotesRepositoryImpl`
     - Accept `NetworkDataSource`, `CacheDataSource`, and `CoroutineDispatcher` as constructor parameters
     - Use `withContext(dispatcher)` for all operations
     - Use `NoteMapper` for proto-to-domain conversion
@@ -127,11 +127,11 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - For write operations (createNote, updateNote): queue when offline (store in pending operations)
     - Propagate `NetworkException` without catching/wrapping
     - _Requirements: 4.7, 4.8, 4.9, 6.5, 7.1, 7.2, 7.3, 7.4, 7.7, 10.4_
-  - [ ] 8.3 Implement offline operation queue and sync mechanism
+  - [x] 8.3 Implement offline operation queue and sync mechanism
     - Queue createNote/updateNote operations when network is unavailable
     - Sync queued operations in FIFO order when connectivity is restored
     - _Requirements: 7.4, 7.5_
-  - [ ]* 8.4 Write property tests for repository behavior
+  - [ ] 8.4 Write property tests for repository behavior
     - **Property 6: Create-Then-Get Consistency** — For any valid CreateNoteParams, after creating a note, getNote returns matching title/content/path
     - **Property 7: Update-Then-Get Consistency** — For any existing note and valid update, getNote returns updated content with newer timestamp
     - **Property 8: Delete-Then-Get Consistency** — For any existing note, after deleting, getNote fails with an error
