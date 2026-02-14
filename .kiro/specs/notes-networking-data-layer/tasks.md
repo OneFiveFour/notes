@@ -131,7 +131,7 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Queue createNote/updateNote operations when network is unavailable
     - Sync queued operations in FIFO order when connectivity is restored
     - _Requirements: 7.4, 7.5_
-  - [ ] 8.4 Write property tests for repository behavior
+  - [x] 8.4 Write property tests for repository behavior
     - **Property 6: Create-Then-Get Consistency** — For any valid CreateNoteParams, after creating a note, getNote returns matching title/content/path
     - **Property 7: Update-Then-Get Consistency** — For any existing note and valid update, getNote returns updated content with newer timestamp
     - **Property 8: Delete-Then-Get Consistency** — For any existing note, after deleting, getNote fails with an error
