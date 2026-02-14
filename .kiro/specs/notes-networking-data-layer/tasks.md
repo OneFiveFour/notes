@@ -142,22 +142,22 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Use mock NetworkDataSource and in-memory CacheDataSource, Kotest property testing with minimum 100 iterations
     - **Validates: Requirements 4.2, 4.4, 4.5, 4.6, 6.5, 7.2, 7.3, 7.4, 7.5, 10.3**
 
-- [ ] 9. Checkpoint — Verify repository and cache integration
+- [x] 9. Checkpoint — Verify repository and cache integration
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 10. Implement dependency injection with Koin
-  - [ ] 10.1 Create Koin modules in `net.onefivefour.notes.di`
+- [x] 10. Implement dependency injection with Koin
+  - [x] 10.1 Create Koin modules in `net.onefivefour.notes.di`
     - Define `networkModule`: NetworkConfig, HttpClient with timeout config, ConnectRpcClient, NetworkDataSource
     - Define `dataModule`: NotesDatabase, CacheDataSource, NotesRepository
     - Expose combined `appModules` list
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
-  - [ ] 10.2 Create platform-specific SQLDelight driver modules
+  - [x] 10.2 Create platform-specific SQLDelight driver modules
     - `androidMain`: AndroidSqliteDriver
     - `iosMain`: NativeSqliteDriver
     - `jvmMain`: JdbcSqliteDriver
     - `jsMain`/`wasmJsMain`: JS-compatible driver
     - _Requirements: 7.6_
-  - [ ] 10.3 Create `expect`/`actual` platform module and Koin initialization function
+  - [x] 10.3 Create `expect`/`actual` platform module and Koin initialization function
     - `expect fun platformModule(): Module` in commonMain
     - `actual` implementations in each platform source set
     - `initKoin()` function combining app modules and platform module
