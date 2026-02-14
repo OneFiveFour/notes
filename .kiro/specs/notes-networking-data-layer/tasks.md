@@ -169,17 +169,17 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Web (JS/WasmJs): Call `initKoin()` at the start of `main()` in `webMain/main.kt`
     - _Requirements: 9.3, 9.5_
 
-- [ ] 11. Implement factory functions and test doubles
-  - [ ] 11.1 Create `NotesRepositoryFactory` in `net.onefivefour.notes.data.repository`
+- [x] 11. Implement factory functions and test doubles
+  - [x] 11.1 Create `NotesRepositoryFactory` in `net.onefivefour.notes.data.repository`
     - Factory function accepting `NetworkConfig` and `NotesDatabase`, wiring all internal dependencies
     - _Requirements: 9.3_
-  - [ ] 11.2 Create `FakeNotesRepository` for testing
+  - [x] 11.2 Create `FakeNotesRepository` for testing
     - Implement `NotesRepository` interface with in-memory storage
     - Support pre-configuring responses and simulating errors via `setShouldFail()`
     - Track all method calls in a `callLog` list for verification
     - Work synchronously without network calls
     - _Requirements: 11.1, 11.2, 11.3, 11.4, 11.5_
-  - [ ]* 11.3 Write unit tests for FakeNotesRepository
+  - [x] 11.3 Write unit tests for FakeNotesRepository
     - Verify pre-configured responses are returned correctly
     - Verify error simulation works
     - Verify call tracking records all invocations

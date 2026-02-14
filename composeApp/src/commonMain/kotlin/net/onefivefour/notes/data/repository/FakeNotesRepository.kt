@@ -1,0 +1,87 @@
+package net.onefivefour.notes.data.repository
+
+import net.onefivefour.notes.data.models.CreateNoteParams
+import net.onefivefour.notes.data.models.Note
+import net.onefivefour.notes.data.models.UpdateNoteParams
+
+/**
+ * Fake [NotesRepository] for testing. Stores notes in memory,
+ * supports pre-configured error simulation, and tracks all method calls.
+ */
+class FakeNotesRepository : NotesRepository {
+
+    private val notes = mutableMapOf<String, Note>()
+    private var shouldFail: Exception? = null
+
+    /** All method invocations recorded as "methodName(args…)" strings. */
+    val callLog = mutableListOf<String>()
+
+    /**
+     * When set to a non-null exception, every subsequent call will
+     * return [Result.failure] with that exception.
+     * Pass `null` to clear.
+     */
+    fun setShouldFail(exception: Exception?) {
+        shouldFail = exception
+    }
+
+    /** Pre-populate the in-memory store with notes. */
+    fun addNotes(vararg notesToAdd: Note) {
+        notesToAdd.forEach { notes[it.filePath] = it }
+    }
+
+    override suspend fun createNote(params: CreateNoteParams): Result<Note> {
+        callLog.add("createNote(${params.title}, ${params.content}, ${params.path})")
+        shouldFail?.let { return Result.failure(it) }
+
+        val note = Note(
+            filePath = "${params.path}/${params.title}",
+            title = params.title,
+            content = params.content,
+            updatedAt = 0L
+        )
+        notes[note.filePath] = note
+        return Result.success(note)
+    }
+
+    override suspend fun listNotes(path: String): Result<List<Note>> {
+        callLog.add("listNotes($path)")
+        shouldFail?.let { return Result.failure(it) }
+
+        val result = if (path.isEmpty()) {
+            notes.values.toList()
+        } else {
+            notes.values.filter { it.filePath.startsWith(path) }
+        }
+        return Result.success(result)
+    }
+
+    override suspend fun getNote(filePath: String): Result<Note> {
+        callLog.add("getNote($filePath)")
+        shouldFail?.let { return Result.failure(it) }
+
+        val note = notes[filePath]
+            ?: return Result.failure(NoSuchElementException("Note not found: $filePath"))
+        return Result.success(note)
+    }
+
+    override suspend fun updateNote(params: UpdateNoteParams): Result<Note> {
+        callLog.add("updateNote(${params.filePath}, ${params.content})")
+        shouldFail?.let { return Result.failure(it) }
+
+        val existing = notes[params.filePath]
+            ?: return Result.failure(NoSuchElementException("Note not found: ${params.filePath}"))
+
+        val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
+        notes[updated.filePath] = updated
+        return Result.success(updated)
+    }
+
+    override suspend fun deleteNote(filePath: String): Result<Unit> {
+        callLog.add("deleteNote($filePath)")
+        shouldFail?.let { return Result.failure(it) }
+
+        notes.remove(filePath)
+        return Result.success(Unit)
+    }
+}
