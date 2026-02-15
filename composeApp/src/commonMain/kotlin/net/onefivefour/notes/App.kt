@@ -1,49 +1,52 @@
 package net.onefivefour.notes
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import notes.composeapp.generated.resources.Res
-import notes.composeapp.generated.resources.compose_multiplatform
+import net.onefivefour.notes.ui.home.BreadcrumbItem
+import net.onefivefour.notes.ui.home.FileUiModel
+import net.onefivefour.notes.ui.home.FolderUiModel
+import net.onefivefour.notes.ui.home.HomeScreen
+import net.onefivefour.notes.ui.home.HomeScreenUiState
+import net.onefivefour.notes.ui.theme.BeepMeClassicTheme
+import net.onefivefour.notes.ui.theme.BeepMeTheme
+import net.onefivefour.notes.ui.theme.ThemeManager
 
 @Composable
 @Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
-        }
+    val themeManager = remember {
+        ThemeManager(
+            availableThemes = listOf(BeepMeClassicTheme),
+            initialTheme = BeepMeClassicTheme
+        )
+    }
+
+    val sampleUiState = remember {
+        HomeScreenUiState(
+            title = "My Notes",
+            breadcrumbs = listOf(
+                BreadcrumbItem(label = "Home", path = "/"),
+                BreadcrumbItem(label = "My Notes", path = "/my-notes")
+            ),
+            folders = listOf(
+                FolderUiModel(id = "1", name = "Work", itemCount = 5),
+                FolderUiModel(id = "2", name = "Personal", itemCount = 3)
+            ),
+            files = listOf(
+                FileUiModel(id = "1", title = "Meeting Notes", preview = "Discussed project timeline and deliverables...", timestamp = "2 hours ago"),
+                FileUiModel(id = "2", title = "Shopping List", preview = "Milk, eggs, bread, butter...", timestamp = "Yesterday")
+            )
+        )
+    }
+
+    BeepMeTheme(themeManager = themeManager) {
+        HomeScreen(
+            uiState = sampleUiState,
+            onNavigationClick = {},
+            onBreadcrumbClick = {},
+            onFolderClick = {},
+            onFileClick = {}
+        )
     }
 }

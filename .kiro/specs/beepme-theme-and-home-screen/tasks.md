@@ -73,19 +73,19 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
 - [x] 5. Checkpoint - Ensure all theme tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Implement home screen UI models
-  - [ ] 6.1 Create UI state models for the home screen
+- [x] 6. Implement home screen UI models
+  - [x] 6.1 Create UI state models for the home screen
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/HomeScreenUiState.kt`
     - Define HomeScreenUiState, BreadcrumbItem, FolderUiModel, FileUiModel data classes
     - _Requirements: 5.1, 6.1, 7.1, 8.1_
 
-- [ ] 7. Implement home screen header and breadcrumb components
-  - [ ] 7.1 Create `Header` composable
+- [x] 7. Implement home screen header and breadcrumb components
+  - [x] 7.1 Create `Header` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/Header.kt`
     - Display navigation icon and title using titleLarge typography in primary color
     - _Requirements: 5.1, 5.2_
 
-  - [ ] 7.2 Create `BreadcrumbNav` composable
+  - [x] 7.2 Create `BreadcrumbNav` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/BreadcrumbNav.kt`
     - Render path segments in horizontal row using labelMedium typography
     - Last segment in pill-shaped chip (primary background, onPrimary text)
@@ -93,8 +93,8 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Invoke navigation callback on tap of non-current segment
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-- [ ] 8. Implement folder and file item components
-  - [ ] 8.1 Create `FolderCard` composable
+- [x] 8. Implement folder and file item components
+  - [x] 8.1 Create `FolderCard` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/FolderCard.kt`
     - White background, medium shape corners, borderWidth primary-colored border
     - iconMedium × iconMedium icon container with primary background and small shape corners
@@ -102,7 +102,7 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Clickable with onClick callback
     - _Requirements: 7.3, 7.4, 7.5_
 
-  - [ ] 8.2 Create `FileItem` composable
+  - [x] 8.2 Create `FileItem` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/FileItem.kt`
     - White background, medium shape corners, borderWidth secondary-colored border
     - iconSmall × iconSmall icon container with 5% opacity primary background and small shape corners
@@ -110,8 +110,8 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Clickable with onClick callback
     - _Requirements: 8.3, 8.4, 8.5_
 
-- [ ] 9. Compose the HomeScreen
-  - [ ] 9.1 Create `HomeScreen` composable wiring all components together
+- [x] 9. Compose the HomeScreen
+  - [x] 9.1 Create `HomeScreen` composable wiring all components together
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/home/HomeScreen.kt`
     - Use background color from active ColorScheme
     - Arrange Header, BreadcrumbNav, folders grid (2-column), and files list in a vertically scrollable layout
@@ -121,14 +121,14 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Hide "FILES" section when files list is empty
     - _Requirements: 7.1, 7.2, 8.1, 8.2, 9.1, 9.2, 9.3, 9.4_
 
-- [ ] 10. Wire theme into App.kt
-  - [ ] 10.1 Update `App.kt` to use `BeepMeTheme` with `ThemeManager`
+- [x] 10. Wire theme into App.kt
+  - [x] 10.1 Update `App.kt` to use `BeepMeTheme` with `ThemeManager`
     - Replace the existing `MaterialTheme` wrapper in App.kt with `BeepMeTheme`
     - Initialize ThemeManager with BeepMeClassicTheme
     - Wire HomeScreen with sample/placeholder data for initial verification
     - _Requirements: 2.3, 2.4_
 
-- [ ] 11. Final checkpoint - Ensure all tests pass
+- [x] 11. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
