@@ -14,6 +14,7 @@ import net.onefivefour.notes.network.client.ConnectRpcClientImpl
 import net.onefivefour.notes.network.config.NetworkConfig
 import net.onefivefour.notes.ui.theme.ColorTheme
 import net.onefivefour.notes.ui.theme.EchoListClassicTheme
+import net.onefivefour.notes.ui.theme.EchoListTheme2
 import net.onefivefour.notes.ui.theme.ThemeManager
 import org.koin.core.module.Module
 import org.koin.dsl.module
@@ -60,7 +61,10 @@ val dataModule: Module = module {
 val uiModule: Module = module {
     single {
         ThemeManager(
-            availableThemes = listOf(EchoListClassicTheme),
+            availableThemes = listOf(
+                EchoListClassicTheme,
+                EchoListTheme2
+            ),
             initialTheme = EchoListClassicTheme
         )
     }
