@@ -25,8 +25,8 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Define `BeepMeTypography` mapping: titleLarge (Bold 24sp), titleSmall (SemiBold 14sp), labelMedium (Medium 14sp), labelSmall (Medium 10sp), bodySmall (Regular 10sp), bodyMedium (Regular 14sp)
     - _Requirements: 3.1, 3.2_
 
-- [ ] 3. Implement ColorTheme and BeepMe Classic theme
-  - [ ] 3.1 Create `ColorTheme` data class and `BeepMeClassicTheme` definition
+- [x] 3. Implement ColorTheme and BeepMe Classic theme
+  - [x] 3.1 Create `ColorTheme` data class and `BeepMeClassicTheme` definition
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/ColorTheme.kt`
     - Define `ColorTheme` data class with name, lightColorScheme, darkColorScheme
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/BeepMeClassicTheme.kt`
@@ -34,43 +34,43 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Define the BeepMe Classic dark scheme: background #1A1A1A, surface #2C2C2C, primary #8ECAE6, onPrimary #023047, secondary #FFB3B3, onSecondary #780000, onBackground #FFFAF0, onSurface #E0E0E0
     - _Requirements: 1.1, 1.2, 1.3_
 
-  - [ ]* 3.2 Write property test for ColorTheme structural invariant
+  - [x] 3.2 Write property test for ColorTheme structural invariant
     - **Property 1: ColorTheme structural invariant**
     - **Validates: Requirements 1.1**
 
-  - [ ]* 3.3 Write unit tests for BeepMe Classic theme colors
+  - [x] 3.3 Write unit tests for BeepMe Classic theme colors
     - Assert exact hex values for light variant (background, surface, primary, secondary)
     - Assert dark variant has adjusted colors
     - _Requirements: 1.2, 1.3_
 
-- [ ] 4. Implement ThemeManager and BeepMeTheme composable
-  - [ ] 4.1 Create `ThemeManager` class
+- [x] 4. Implement ThemeManager and BeepMeTheme composable
+  - [x] 4.1 Create `ThemeManager` class
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/ThemeManager.kt`
     - Implement with availableThemes list, selectedTheme as StateFlow, and selectTheme() method
     - Ignore selectTheme calls for themes not in the available list
     - _Requirements: 2.1, 2.2_
 
-  - [ ] 4.2 Create `BeepMeTheme` composable
+  - [x] 4.2 Create `BeepMeTheme` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Theme.kt`
     - Resolve light/dark variant based on system dark mode setting
     - Provide BeepMeDimensions via CompositionLocalProvider
     - Apply colorScheme, BeepMeTypography, and BeepMeShapes through MaterialTheme
     - _Requirements: 2.3, 2.4_
 
-  - [ ]* 4.3 Write property test for theme selection updates state
+  - [x] 4.3 Write property test for theme selection updates state
     - **Property 2: Theme selection updates state**
     - **Validates: Requirements 2.1, 2.2**
 
-  - [ ]* 4.4 Write property test for dark mode variant resolution
+  - [x] 4.4 Write property test for dark mode variant resolution
     - **Property 3: Dark mode variant resolution**
     - **Validates: Requirements 2.3**
 
-  - [ ]* 4.5 Write unit tests for ThemeManager edge cases
+  - [x] 4.5 Write unit tests for ThemeManager edge cases
     - Test initialization sets selectedTheme to initial theme
     - Test selecting a theme not in the available list is ignored
     - _Requirements: 2.1, 2.2_
 
-- [ ] 5. Checkpoint - Ensure all theme tests pass
+- [x] 5. Checkpoint - Ensure all theme tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 6. Implement home screen UI models
