@@ -34,11 +34,11 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
 - [x] 3. Checkpoint — Verify build compiles on all targets
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create NoteDetailScreen and its UI state
-  - [ ] 4.1 Create `ui/notedetail/NoteDetailUiState.kt` sealed interface
+- [x] 4. Create NoteDetailScreen and its UI state
+  - [x] 4.1 Create `ui/notedetail/NoteDetailUiState.kt` sealed interface
     - `Loading`, `Success(title, content, lastUpdated)`, `Error(message)` variants
     - _Requirements: 6.1, 6.3_
-  - [ ] 4.2 Create `ui/notedetail/NoteDetailScreen.kt` stateless composable
+  - [x] 4.2 Create `ui/notedetail/NoteDetailScreen.kt` stateless composable
     - Receives `NoteDetailUiState` and `onBackClick` callback
     - Renders note title, content, and timestamp for `Success` state
     - Renders error message for `Error` state
@@ -47,15 +47,15 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
     - Follow EchoList design system: `MaterialTheme.colorScheme`, `EchoListTheme.typography`, `LocalDimensions`, `MaterialTheme.shapes`
     - _Requirements: 6.1, 6.2, 6.3, 8.2_
 
-- [ ] 5. Create ViewModels
-  - [ ] 5.1 Create `ui/home/HomeViewModel.kt`
+- [x] 5. Create ViewModels
+  - [x] 5.1 Create `ui/home/HomeViewModel.kt`
     - Takes `path: String` and `NotesRepository` as constructor parameters
     - Exposes `uiState: StateFlow<HomeScreenUiState>`
     - Loads folder and file data for the given path from the repository in `viewModelScope`
     - Maps domain models to `FolderUiModel`, `FileUiModel`, `BreadcrumbItem`
     - Handles errors by emitting a state with empty lists
     - _Requirements: 7.1_
-  - [ ] 5.2 Create `ui/notedetail/NoteDetailViewModel.kt`
+  - [x] 5.2 Create `ui/notedetail/NoteDetailViewModel.kt`
     - Takes `noteId: String` and `NotesRepository` as constructor parameters
     - Exposes `uiState: StateFlow<NoteDetailUiState>`
     - Loads note by `noteId` from the repository in `viewModelScope`
