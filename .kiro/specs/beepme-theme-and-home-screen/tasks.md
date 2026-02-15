@@ -18,8 +18,8 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - Define `BeepMeShapes` with small = s (8dp) and medium = m (12dp) rounded corners
     - _Requirements: 4.1_
 
-- [ ] 2. Set up typography with Work Sans font
-  - [ ] 2.1 Add Work Sans font files to compose resources and create `BeepMeTypography`
+- [x] 2. Set up typography with Work Sans font
+  - [x] 2.1 Add Work Sans font files to compose resources and create `BeepMeTypography`
     - Add Work Sans font files (Regular, Medium, SemiBold, Bold) to `composeApp/src/commonMain/composeResources/font/`
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Typography.kt`
     - Define `BeepMeTypography` mapping: titleLarge (Bold 24sp), titleSmall (SemiBold 14sp), labelMedium (Medium 14sp), labelSmall (Medium 10sp), bodySmall (Regular 10sp), bodyMedium (Regular 14sp)
