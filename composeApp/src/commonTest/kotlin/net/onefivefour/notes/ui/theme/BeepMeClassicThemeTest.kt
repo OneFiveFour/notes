@@ -5,14 +5,14 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 
 /**
- * Unit tests for BeepMe Classic theme color values.
+ * Unit tests for EchoList Classic theme color values.
  *
  * **Validates: Requirements 1.2, 1.3**
  */
-class BeepMeClassicThemeTest : FunSpec({
+class EchoListClassicThemeTest : FunSpec({
 
-    val light = BeepMeClassicTheme.lightColorScheme
-    val dark = BeepMeClassicTheme.darkColorScheme
+    val light = EchoListClassicTheme.lightColorScheme
+    val dark = EchoListClassicTheme.darkColorScheme
 
     // -- Light variant exact hex values (Requirement 1.2) --
 

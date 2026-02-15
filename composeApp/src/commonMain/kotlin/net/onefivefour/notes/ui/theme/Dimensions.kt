@@ -4,7 +4,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-data class BeepMeDimensions(
+data class Dimensions(
     val xxs: Dp = 2.dp,
     val xs: Dp = 4.dp,
     val s: Dp = 8.dp,
@@ -18,4 +18,4 @@ data class BeepMeDimensions(
     val borderWidth: Dp = 1.dp
 )
 
-val LocalBeepMeDimensions = staticCompositionLocalOf { BeepMeDimensions() }
+val LocalDimensions = staticCompositionLocalOf { Dimensions() }

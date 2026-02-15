@@ -2,12 +2,12 @@
 
 ## Introduction
 
-This document defines the requirements for the BeepMe notes app's Material 3 theme system and home screen implementation. The feature covers two areas: (1) a multi-theme infrastructure supporting selectable color themes with light/dark variants, and (2) a home screen UI matching the Figma design, built on top of that theme system. The implementation targets Kotlin Compose Multiplatform (Android and iOS at minimum).
+This document defines the requirements for the EchoList notes app's Material 3 theme system and home screen implementation. The feature covers two areas: (1) a multi-theme infrastructure supporting selectable color themes with light/dark variants, and (2) a home screen UI matching the Figma design, built on top of that theme system. The implementation targets Kotlin Compose Multiplatform (Android and iOS at minimum).
 
 ## Glossary
 
 - **Theme_System**: The Compose-based infrastructure that provides color schemes, typography, and shape definitions to the entire application via `MaterialTheme`.
-- **Color_Theme**: A named set of color values (e.g. "BeepMe Classic") that defines both a light and a dark `ColorScheme`.
+- **Color_Theme**: A named set of color values (e.g. "EchoList Classic") that defines both a light and a dark `ColorScheme`.
 - **Theme_Selector**: The mechanism that allows the user to choose which Color_Theme is active.
 - **Home_Screen**: The main screen of the app displaying folders and files for the current navigation path.
 - **Header**: The top section of the Home_Screen containing a navigation icon and the current folder title.
@@ -26,8 +26,8 @@ This document defines the requirements for the BeepMe notes app's Material 3 the
 #### Acceptance Criteria
 
 1. THE Theme_System SHALL define a Color_Theme data structure containing a unique name, a light ColorScheme, and a dark ColorScheme.
-2. THE Theme_System SHALL provide a "BeepMe Classic" Color_Theme using background #FFFAF0, surface White, primary #023047, and secondary #780000 for the light variant.
-3. THE Theme_System SHALL provide a dark variant for the "BeepMe Classic" Color_Theme with appropriately adjusted colors for dark mode readability.
+2. THE Theme_System SHALL provide a "EchoList Classic" Color_Theme using background #FFFAF0, surface White, primary #023047, and secondary #780000 for the light variant.
+3. THE Theme_System SHALL provide a dark variant for the "EchoList Classic" Color_Theme with appropriately adjusted colors for dark mode readability.
 4. WHEN a new Color_Theme is added to the Theme_System, THE Theme_System SHALL require only the definition of a name, a light ColorScheme, and a dark ColorScheme with no changes to existing code.
 
 ### Requirement 2: Theme Selection and Application

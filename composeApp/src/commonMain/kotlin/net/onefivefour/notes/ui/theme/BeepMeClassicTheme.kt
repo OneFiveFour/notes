@@ -4,8 +4,8 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 
-val BeepMeClassicTheme = ColorTheme(
-    name = "BeepMe Classic",
+val EchoListClassicTheme = ColorTheme(
+    name = "EchoList Classic",
     lightColorScheme = lightColorScheme(
         background = Color(0xFFFFFAF0),
         surface = Color.White,

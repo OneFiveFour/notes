@@ -67,7 +67,7 @@ class DarkModeResolutionPropertyTest : FunSpec({
         )
     }
 
-    // -- Resolution helper matching BeepMeTheme logic --
+    // -- Resolution helper matching EchoListTheme logic --
 
     fun resolveColorScheme(theme: ColorTheme, isDarkMode: Boolean): ColorScheme {
         return if (isDarkMode) theme.darkColorScheme else theme.lightColorScheme

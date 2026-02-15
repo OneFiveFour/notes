@@ -20,7 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import net.onefivefour.notes.ui.theme.LocalBeepMeDimensions
+import net.onefivefour.notes.ui.theme.LocalDimensions
 
 @Composable
 fun FileItem(
@@ -28,7 +28,7 @@ fun FileItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalBeepMeDimensions.current
+    val dimensions = LocalDimensions.current
     val primaryColor = MaterialTheme.colorScheme.primary
     val secondaryColor = MaterialTheme.colorScheme.secondary
     val mediumShape = MaterialTheme.shapes.medium

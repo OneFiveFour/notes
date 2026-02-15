@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -23,11 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewLightDark
-import net.onefivefour.notes.ui.theme.BeepMeClassicTheme
-import net.onefivefour.notes.ui.theme.BeepMeTheme
-import net.onefivefour.notes.ui.theme.LocalBeepMeDimensions
-import net.onefivefour.notes.ui.theme.ThemeManager
+import net.onefivefour.notes.ui.theme.EchoListTheme
+import net.onefivefour.notes.ui.theme.LocalDimensions
 
 @Composable
 fun FolderCard(
@@ -35,7 +31,7 @@ fun FolderCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalBeepMeDimensions.current
+    val dimensions = LocalDimensions.current
     val primaryColor = MaterialTheme.colorScheme.primary
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
     val mediumShape = MaterialTheme.shapes.medium
@@ -88,7 +84,7 @@ fun FolderCard(
 @Preview
 @Composable
 fun FolderCardPreview() {
-    BeepMeTheme {
+    EchoListTheme {
         FolderCard(
             folder = FolderUiModel(
                 id = "Work",

@@ -19,15 +19,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.notes.ui.theme.BeepMeClassicTheme
-import net.onefivefour.notes.ui.theme.BeepMeTheme
-import net.onefivefour.notes.ui.theme.LocalBeepMeDimensions
-import net.onefivefour.notes.ui.theme.ThemeManager
+import net.onefivefour.notes.ui.theme.EchoListTheme
+import net.onefivefour.notes.ui.theme.LocalDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,26 +36,23 @@ fun HomeScreen(
     onFileClick: (fileId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalBeepMeDimensions.current
-    val primaryColor = MaterialTheme.colorScheme.primary
-
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = dimensions.l)
+            .background(EchoListTheme.materialColors.background)
+            .padding(horizontal = EchoListTheme.dimensions.l)
             .verticalScroll(rememberScrollState())
     ) {
 
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.background
+                containerColor = EchoListTheme.materialColors.background
             ),
             title  = {
                 Text(
                     text = uiState.title,
-                    style = MaterialTheme.typography.titleLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    style = EchoListTheme.typography.titleLarge,
+                    color = EchoListTheme.materialColors.primary
                 )
             },
             navigationIcon = {
@@ -66,7 +60,7 @@ fun HomeScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Navigate back",
-                        tint = primaryColor
+                        tint = EchoListTheme.materialColors.primary
                     )
                 }
             }
@@ -78,21 +72,21 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth()
         )
 
-        Spacer(modifier = Modifier.height(dimensions.l))
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.l))
 
         // FOLDERS section
         if (uiState.folders.isNotEmpty()) {
             Text(
                 text = "FOLDERS",
                 style = MaterialTheme.typography.labelSmall,
-                color = primaryColor
+                color = EchoListTheme.materialColors.primary
             )
-            Spacer(modifier = Modifier.height(dimensions.s))
+            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
             val folderRows = uiState.folders.chunked(2)
             folderRows.forEachIndexed { index, row ->
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(dimensions.s)
+                    horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
                 ) {
                     row.forEach { folder ->
                         FolderCard(
@@ -107,10 +101,10 @@ fun HomeScreen(
                     }
                 }
                 if (index < folderRows.lastIndex) {
-                    Spacer(modifier = Modifier.height(dimensions.s))
+                    Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
                 }
             }
-            Spacer(modifier = Modifier.height(dimensions.l))
+            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.l))
         }
 
         // FILES section
@@ -118,9 +112,9 @@ fun HomeScreen(
             Text(
                 text = "FILES",
                 style = MaterialTheme.typography.labelSmall,
-                color = primaryColor
+                color = EchoListTheme.materialColors.primary
             )
-            Spacer(modifier = Modifier.height(dimensions.s))
+            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
             uiState.files.forEachIndexed { index, file ->
                 FileItem(
                     file = file,
@@ -128,7 +122,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 if (index < uiState.files.lastIndex) {
-                    Spacer(modifier = Modifier.height(dimensions.s))
+                    Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
                 }
             }
         }
@@ -153,7 +147,7 @@ fun HomeScreenPreview() {
             FileUiModel(id = "2", title = "Shopping List", preview = "Milk, eggs, bread, butter...", timestamp = "Yesterday")
         )
     )
-    BeepMeTheme {
+    EchoListTheme {
         HomeScreen(
             uiState = uiState,
             onNavigationClick = { },

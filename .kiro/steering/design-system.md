@@ -1,8 +1,8 @@
-# BeepMe Design System Rules
+# EchoList Design System Rules
 
 ## Figma Reference
 
-- File: BeepMe (key: `n7TqZmCTgWuaCqlzhrwEBf`)
+- File: EchoList (key: `n7TqZmCTgWuaCqlzhrwEBf`)
 - Home Screen Frame: node-id `4024:3`
 - Only this frame is relevant — other screens in the Figma file belong to other apps.
 
@@ -22,7 +22,7 @@
 ```
 composeApp/src/commonMain/kotlin/net/onefivefour/notes/
 ├── ui/
-│   ├── theme/          # Theme system (ColorTheme, ThemeManager, BeepMeTheme, Typography, Shapes, Dimensions)
+│   ├── theme/          # Theme system (ColorTheme, ThemeManager, EchoListTheme, Typography, Shapes, Dimensions)
 │   └── home/           # Home screen composables (HomeScreen, Header, BreadcrumbNav, FolderCard, FileItem)
 ├── data/               # Data layer (models, repository, sources)
 ├── di/                 # Koin modules
@@ -31,7 +31,7 @@ composeApp/src/commonMain/kotlin/net/onefivefour/notes/
 
 ## Color Tokens
 
-### BeepMe Classic — Light
+### EchoList Classic — Light
 | Role         | Value     |
 |--------------|-----------|
 | background   | #FFFAF0   |
@@ -43,7 +43,7 @@ composeApp/src/commonMain/kotlin/net/onefivefour/notes/
 | onBackground | #023047   |
 | onSurface    | #023047   |
 
-### BeepMe Classic — Dark
+### EchoList Classic — Dark
 | Role         | Value     |
 |--------------|-----------|
 | background   | #1A1A1A   |
@@ -68,7 +68,7 @@ Font family: Work Sans (bundled in `composeResources/font/`)
 | bodySmall       | Regular 400| 10sp  |
 | bodyMedium      | Regular 400| 14sp  |
 
-## Spacing & Sizing Tokens (BeepMeDimensions)
+## Spacing & Sizing Tokens (EchoListDimensions)
 
 | Token       | Value |
 |-------------|-------|
@@ -84,7 +84,7 @@ Font family: Work Sans (bundled in `composeResources/font/`)
 | iconMedium  | 40dp  |
 | borderWidth | 1dp   |
 
-Accessed via `LocalBeepMeDimensions.current` inside composables.
+Accessed via `LocalEchoListDimensions.current` inside composables.
 
 ## Shapes
 
@@ -98,7 +98,7 @@ Accessed via `LocalBeepMeDimensions.current` inside composables.
 - All composables are stateless — they receive UI state and emit callbacks
 - Use `MaterialTheme.colorScheme` for all color references
 - Use `MaterialTheme.typography` for all text styles
-- Use `LocalBeepMeDimensions.current` for spacing and sizing
+- Use `LocalEchoListDimensions.current` for spacing and sizing
 - Use `MaterialTheme.shapes` for corner rounding
 - Folder cards use primary-colored borders; file items use secondary-colored borders
 - Icon containers in folder cards: primary background, small shape
@@ -108,7 +108,7 @@ Accessed via `LocalBeepMeDimensions.current` inside composables.
 
 - `ColorTheme` data class holds name + light/dark `ColorScheme`
 - `ThemeManager` holds available themes and selected theme as `StateFlow`
-- `BeepMeTheme` composable resolves light/dark variant and applies via `MaterialTheme`
+- `EchoListTheme` composable resolves light/dark variant and applies via `MaterialTheme`
 - Adding a new theme = creating a new `ColorTheme` instance, no other code changes
 
 ## Figma-to-Code Guidelines
@@ -116,7 +116,7 @@ Accessed via `LocalBeepMeDimensions.current` inside composables.
 - Figma MCP outputs React + Tailwind — always convert to Kotlin Compose with MaterialTheme tokens
 - Never install Tailwind or any web dependencies
 - Map Tailwind colors to `MaterialTheme.colorScheme` roles
-- Map Tailwind spacing to `BeepMeDimensions` tokens
+- Map Tailwind spacing to `EchoListDimensions` tokens
 - Map Tailwind font classes to `MaterialTheme.typography` styles
 - Reuse existing composables instead of duplicating
 - Strive for 1:1 visual parity with the Figma design

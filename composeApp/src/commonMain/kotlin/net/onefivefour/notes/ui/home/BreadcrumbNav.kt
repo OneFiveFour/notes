@@ -11,8 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.dp
-import net.onefivefour.notes.ui.theme.LocalBeepMeDimensions
+import net.onefivefour.notes.ui.theme.LocalDimensions
 
 @Composable
 fun BreadcrumbNav(
@@ -20,7 +19,7 @@ fun BreadcrumbNav(
     onBreadcrumbClick: (path: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalBeepMeDimensions.current
+    val dimensions = LocalDimensions.current
     val primaryColor = MaterialTheme.colorScheme.primary
     val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
 

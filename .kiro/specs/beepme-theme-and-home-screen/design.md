@@ -1,13 +1,13 @@
-# Design Document: BeepMe Theme and Home Screen
+# Design Document: EchoList Theme and Home Screen
 
 ## Overview
 
-This design covers two interconnected areas of the BeepMe notes app:
+This design covers two interconnected areas of the EchoList notes app:
 
 1. A Material 3 theme system that supports multiple selectable color themes, each with light and dark variants, built on Compose Multiplatform's `MaterialTheme`.
 2. A home screen UI matching the Figma design, consuming the theme system for all visual styling.
 
-The theme system is designed as a registry of `ColorTheme` objects. Each theme bundles a name, a light `ColorScheme`, and a dark `ColorScheme`. A `ThemeManager` holds the currently selected theme as observable state. The top-level `BeepMeTheme` composable resolves the correct variant based on system dark mode and applies it alongside shared typography and shapes via `MaterialTheme`.
+The theme system is designed as a registry of `ColorTheme` objects. Each theme bundles a name, a light `ColorScheme`, and a dark `ColorScheme`. A `ThemeManager` holds the currently selected theme as observable state. The top-level `EchoListTheme` composable resolves the correct variant based on system dark mode and applies it alongside shared typography and shapes via `MaterialTheme`.
 
 The home screen is a stateless composable that receives UI state (folders, files, breadcrumb path) and emits callbacks for user interactions. It composes the Header, BreadcrumbNav, FoldersGrid, FilesList sections in a scrollable column.
 
@@ -19,8 +19,8 @@ graph TD
         CT[ColorTheme data class]
         TR[ThemeRegistry - list of available themes]
         TM[ThemeManager - holds selected theme as State]
-        DM[BeepMeDimensions - spacing/sizing tokens]
-        BMT[BeepMeTheme composable]
+        DM[EchoListDimensions - spacing/sizing tokens]
+        BMT[EchoListTheme composable]
     end
 
     subgraph Home Screen Layer
@@ -51,7 +51,7 @@ graph TD
     FL --> FI
 ```
 
-The theme layer is independent of the home screen. Any screen in the app wraps its content in `BeepMeTheme` and gets access to colors, typography, and shapes via `MaterialTheme`.
+The theme layer is independent of the home screen. Any screen in the app wraps its content in `EchoListTheme` and gets access to colors, typography, and shapes via `MaterialTheme`.
 
 ## Components and Interfaces
 
@@ -69,9 +69,9 @@ data class ColorTheme(
 
 A pure data holder. Adding a new theme means creating a new `ColorTheme` instance — no code changes elsewhere.
 
-#### `BeepMeClassicTheme`
+#### `EchoListClassicTheme`
 
-Defines the "BeepMe Classic" `ColorTheme`:
+Defines the "EchoList Classic" `ColorTheme`:
 
 | Role | Light | Dark |
 |------|-------|------|
@@ -101,30 +101,30 @@ class ThemeManager(
 
 Holds the list of available themes and the currently selected one as a `StateFlow`. The UI observes `selectedTheme` and recomposes when it changes.
 
-#### `BeepMeTheme` Composable
+#### `EchoListTheme` Composable
 
 ```kotlin
 @Composable
-fun BeepMeTheme(
+fun EchoListTheme(
     themeManager: ThemeManager,
-    dimensions: BeepMeDimensions = BeepMeDimensions(),
+    dimensions: EchoListDimensions = EchoListDimensions(),
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
     val colorTheme by themeManager.selectedTheme.collectAsState()
     val colorScheme = if (darkTheme) colorTheme.darkColorScheme else colorTheme.lightColorScheme
-    CompositionLocalProvider(LocalBeepMeDimensions provides dimensions) {
+    CompositionLocalProvider(LocalEchoListDimensions provides dimensions) {
         MaterialTheme(
             colorScheme = colorScheme,
-            typography = BeepMeTypography,
-            shapes = BeepMeShapes,
+            typography = EchoListTypography,
+            shapes = EchoListShapes,
             content = content
         )
     }
 }
 ```
 
-#### `BeepMeTypography`
+#### `EchoListTypography`
 
 A `Typography` instance using Work Sans:
 
@@ -139,12 +139,12 @@ A `Typography` instance using Work Sans:
 
 Work Sans font files are bundled as Compose Multiplatform resources in `composeResources/font/`.
 
-#### `BeepMeDimensions`
+#### `EchoListDimensions`
 
 A custom dimensions object providing named spacing and sizing tokens, accessible via a `CompositionLocal` so all composables can read them from the theme.
 
 ```kotlin
-data class BeepMeDimensions(
+data class EchoListDimensions(
     val xxs: Dp = 2.dp,
     val xs: Dp = 4.dp,
     val s: Dp = 8.dp,
@@ -159,19 +159,19 @@ data class BeepMeDimensions(
     val borderWidth: Dp = 1.dp
 )
 
-val LocalBeepMeDimensions = staticCompositionLocalOf { BeepMeDimensions() }
+val LocalEchoListDimensions = staticCompositionLocalOf { EchoListDimensions() }
 ```
 
-Accessed in composables via `LocalBeepMeDimensions.current`. The `BeepMeTheme` composable provides this via `CompositionLocalProvider`.
+Accessed in composables via `LocalEchoListDimensions.current`. The `EchoListTheme` composable provides this via `CompositionLocalProvider`.
 
-#### `BeepMeShapes`
+#### `EchoListShapes`
 
 Uses dimension tokens for corner radii:
 
 ```kotlin
-val BeepMeShapes = Shapes(
-    small = RoundedCornerShape(BeepMeDimensions().s),   // 8dp
-    medium = RoundedCornerShape(BeepMeDimensions().m)    // 12dp
+val EchoListShapes = Shapes(
+    small = RoundedCornerShape(EchoListDimensions().s),   // 8dp
+    medium = RoundedCornerShape(EchoListDimensions().m)    // 12dp
 )
 ```
 
@@ -354,9 +354,9 @@ Use **Kotest Property** (already in the project's `commonTest` dependencies) for
 
 | Property | Test Description | Tag |
 |----------|-----------------|-----|
-| Property 1 | Generate random ColorTheme instances and verify structural invariants | Feature: beepme-theme-and-home-screen, Property 1: ColorTheme structural invariant |
-| Property 2 | Generate random theme lists and selection sequences, verify state updates | Feature: beepme-theme-and-home-screen, Property 2: Theme selection updates state |
-| Property 3 | Generate random ColorThemes and boolean flags, verify variant resolution | Feature: beepme-theme-and-home-screen, Property 3: Dark mode variant resolution |
+| Property 1 | Generate random ColorTheme instances and verify structural invariants | Feature: echoList-theme-and-home-screen, Property 1: ColorTheme structural invariant |
+| Property 2 | Generate random theme lists and selection sequences, verify state updates | Feature: echoList-theme-and-home-screen, Property 2: Theme selection updates state |
+| Property 3 | Generate random ColorThemes and boolean flags, verify variant resolution | Feature: echoList-theme-and-home-screen, Property 3: Dark mode variant resolution |
 
 Each property test must be implemented as a single Kotest property test using `checkAll` with custom `Arb` generators for `ColorScheme` and `ColorTheme`.
 
@@ -364,8 +364,8 @@ Each property test must be implemented as a single Kotest property test using `c
 
 Unit tests complement property tests for specific examples and edge cases:
 
-- **BeepMe Classic light colors**: Assert exact hex values for background, surface, primary, secondary.
-- **BeepMe Classic dark colors**: Assert the dark variant has adjusted colors.
+- **EchoList Classic light colors**: Assert exact hex values for background, surface, primary, secondary.
+- **EchoList Classic dark colors**: Assert the dark variant has adjusted colors.
 - **Typography mapping**: Assert each typography slot has the correct font weight and size.
 - **Shapes**: Assert small = 8dp, medium = 12dp.
 - **ThemeManager initialization**: Assert selectedTheme equals the initial theme.

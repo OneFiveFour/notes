@@ -2,6 +2,7 @@ package net.onefivefour.notes.ui.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -22,40 +23,42 @@ val WorkSansFontFamily: FontFamily
         Font(Res.font.work_sans_bold, FontWeight.Bold)
     )
 
-val BeepMeTypography: Typography
-    @Composable
-    get() {
-        val workSans = WorkSansFontFamily
-        return Typography(
-            titleLarge = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
-            titleSmall = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp
-            ),
-            labelMedium = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 14.sp
-            ),
-            labelSmall = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.Medium,
-                fontSize = 10.sp
-            ),
-            bodySmall = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 10.sp
-            ),
-            bodyMedium = TextStyle(
-                fontFamily = workSans,
-                fontWeight = FontWeight.Normal,
-                fontSize = 14.sp
-            )
+@Composable
+fun material3Typography(): Typography {
+    return Typography(
+        titleLarge = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Bold,
+            fontSize = 24.sp
+        ),
+        titleSmall = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 14.sp
+        ),
+        labelMedium = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp
+        ),
+        labelSmall = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 10.sp
+        ),
+        bodySmall = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 10.sp
+        ),
+        bodyMedium = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Normal,
+            fontSize = 14.sp
         )
-    }
+    )
+}
+
+internal val LocalTypography = staticCompositionLocalOf<Typography> {
+    error("Typography not provided")
+}

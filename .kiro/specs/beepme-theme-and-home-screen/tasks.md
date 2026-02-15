@@ -1,4 +1,4 @@
-# Implementation Plan: BeepMe Theme and Home Screen
+# Implementation Plan: EchoList Theme and Home Screen
 
 ## Overview
 
@@ -7,54 +7,54 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
 ## Tasks
 
 - [x] 1. Set up theme package and dimensions
-  - [x] 1.1 Create `BeepMeDimensions` data class and `LocalBeepMeDimensions` CompositionLocal
+  - [x] 1.1 Create `EchoListDimensions` data class and `LocalEchoListDimensions` CompositionLocal
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Dimensions.kt`
-    - Define `BeepMeDimensions` with tokens: xxs (2dp), xs (4dp), s (8dp), m (12dp), l (16dp), xl (24dp), xxl (32dp), xxxl (40dp), iconSmall (36dp), iconMedium (40dp), borderWidth (1dp)
-    - Define `LocalBeepMeDimensions = staticCompositionLocalOf { BeepMeDimensions() }`
+    - Define `EchoListDimensions` with tokens: xxs (2dp), xs (4dp), s (8dp), m (12dp), l (16dp), xl (24dp), xxl (32dp), xxxl (40dp), iconSmall (36dp), iconMedium (40dp), borderWidth (1dp)
+    - Define `LocalEchoListDimensions = staticCompositionLocalOf { EchoListDimensions() }`
     - _Requirements: 4.1, 4.2_
 
-  - [x] 1.2 Create `BeepMeShapes` using dimension tokens
+  - [x] 1.2 Create `EchoListShapes` using dimension tokens
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Shape.kt`
-    - Define `BeepMeShapes` with small = s (8dp) and medium = m (12dp) rounded corners
+    - Define `EchoListShapes` with small = s (8dp) and medium = m (12dp) rounded corners
     - _Requirements: 4.1_
 
 - [x] 2. Set up typography with Work Sans font
-  - [x] 2.1 Add Work Sans font files to compose resources and create `BeepMeTypography`
+  - [x] 2.1 Add Work Sans font files to compose resources and create `EchoListTypography`
     - Add Work Sans font files (Regular, Medium, SemiBold, Bold) to `composeApp/src/commonMain/composeResources/font/`
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Typography.kt`
-    - Define `BeepMeTypography` mapping: titleLarge (Bold 24sp), titleSmall (SemiBold 14sp), labelMedium (Medium 14sp), labelSmall (Medium 10sp), bodySmall (Regular 10sp), bodyMedium (Regular 14sp)
+    - Define `EchoListTypography` mapping: titleLarge (Bold 24sp), titleSmall (SemiBold 14sp), labelMedium (Medium 14sp), labelSmall (Medium 10sp), bodySmall (Regular 10sp), bodyMedium (Regular 14sp)
     - _Requirements: 3.1, 3.2_
 
-- [x] 3. Implement ColorTheme and BeepMe Classic theme
-  - [x] 3.1 Create `ColorTheme` data class and `BeepMeClassicTheme` definition
+- [x] 3. Implement ColorTheme and EchoList Classic theme
+  - [x] 3.1 Create `ColorTheme` data class and `EchoListClassicTheme` definition
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/ColorTheme.kt`
     - Define `ColorTheme` data class with name, lightColorScheme, darkColorScheme
-    - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/BeepMeClassicTheme.kt`
-    - Define the BeepMe Classic light scheme: background #FFFAF0, surface White, primary #023047, onPrimary White, secondary #780000, onSecondary White, onBackground #023047, onSurface #023047
-    - Define the BeepMe Classic dark scheme: background #1A1A1A, surface #2C2C2C, primary #8ECAE6, onPrimary #023047, secondary #FFB3B3, onSecondary #780000, onBackground #FFFAF0, onSurface #E0E0E0
+    - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/EchoListClassicTheme.kt`
+    - Define the EchoList Classic light scheme: background #FFFAF0, surface White, primary #023047, onPrimary White, secondary #780000, onSecondary White, onBackground #023047, onSurface #023047
+    - Define the EchoList Classic dark scheme: background #1A1A1A, surface #2C2C2C, primary #8ECAE6, onPrimary #023047, secondary #FFB3B3, onSecondary #780000, onBackground #FFFAF0, onSurface #E0E0E0
     - _Requirements: 1.1, 1.2, 1.3_
 
   - [x] 3.2 Write property test for ColorTheme structural invariant
     - **Property 1: ColorTheme structural invariant**
     - **Validates: Requirements 1.1**
 
-  - [x] 3.3 Write unit tests for BeepMe Classic theme colors
+  - [x] 3.3 Write unit tests for EchoList Classic theme colors
     - Assert exact hex values for light variant (background, surface, primary, secondary)
     - Assert dark variant has adjusted colors
     - _Requirements: 1.2, 1.3_
 
-- [x] 4. Implement ThemeManager and BeepMeTheme composable
+- [x] 4. Implement ThemeManager and EchoListTheme composable
   - [x] 4.1 Create `ThemeManager` class
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/ThemeManager.kt`
     - Implement with availableThemes list, selectedTheme as StateFlow, and selectTheme() method
     - Ignore selectTheme calls for themes not in the available list
     - _Requirements: 2.1, 2.2_
 
-  - [x] 4.2 Create `BeepMeTheme` composable
+  - [x] 4.2 Create `EchoListTheme` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Theme.kt`
     - Resolve light/dark variant based on system dark mode setting
-    - Provide BeepMeDimensions via CompositionLocalProvider
-    - Apply colorScheme, BeepMeTypography, and BeepMeShapes through MaterialTheme
+    - Provide EchoListDimensions via CompositionLocalProvider
+    - Apply colorScheme, EchoListTypography, and EchoListShapes through MaterialTheme
     - _Requirements: 2.3, 2.4_
 
   - [x] 4.3 Write property test for theme selection updates state
@@ -122,9 +122,9 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - _Requirements: 7.1, 7.2, 8.1, 8.2, 9.1, 9.2, 9.3, 9.4_
 
 - [x] 10. Wire theme into App.kt
-  - [x] 10.1 Update `App.kt` to use `BeepMeTheme` with `ThemeManager`
-    - Replace the existing `MaterialTheme` wrapper in App.kt with `BeepMeTheme`
-    - Initialize ThemeManager with BeepMeClassicTheme
+  - [x] 10.1 Update `App.kt` to use `EchoListTheme` with `ThemeManager`
+    - Replace the existing `MaterialTheme` wrapper in App.kt with `EchoListTheme`
+    - Initialize ThemeManager with EchoListClassicTheme
     - Wire HomeScreen with sample/placeholder data for initial verification
     - _Requirements: 2.3, 2.4_
 
