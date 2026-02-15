@@ -17,21 +17,21 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
     - Add both as `commonMain` dependencies in `build.gradle.kts`
     - _Requirements: 1.2, 1.3, 1.4_
 
-- [ ] 2. Define route keys and serialization configuration
-  - [ ] 2.1 Create `ui/navigation/Routes.kt` with `HomeRoute`, `NoteDetailRoute`, `navKeySerializersModule`, and `echoListSavedStateConfig`
+- [x] 2. Define route keys and serialization configuration
+  - [x] 2.1 Create `ui/navigation/Routes.kt` with `HomeRoute`, `NoteDetailRoute`, `navKeySerializersModule`, and `echoListSavedStateConfig`
     - `HomeRoute(path: String = "/")` implementing `NavKey` with `@Serializable`
     - `NoteDetailRoute(noteId: String)` implementing `NavKey` with `@Serializable`
     - Polymorphic `SerializersModule` registering both subtypes
     - `SavedStateConfiguration` using the serializers module
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
-  - [ ]* 2.2 Write property test for route serialization round-trip
+  - [x] 2.2 Write property test for route serialization round-trip
     - **Property 1: Route serialization round-trip**
     - Use Kotest `checkAll` with `Arb.string()` to generate random `HomeRoute` and `NoteDetailRoute` instances
     - Verify `Json.decodeFromString(Json.encodeToString(route)) == route` using polymorphic serialization
     - Minimum 100 iterations
     - **Validates: Requirements 2.3, 2.4**
 
-- [ ] 3. Checkpoint — Verify build compiles on all targets
+- [x] 3. Checkpoint — Verify build compiles on all targets
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Create NoteDetailScreen and its UI state
