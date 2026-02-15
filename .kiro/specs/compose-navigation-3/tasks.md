@@ -61,14 +61,14 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
     - Loads note by `noteId` from the repository in `viewModelScope`
     - Emits `Success` with mapped data or `Error` if note not found or exception occurs
     - _Requirements: 7.2, 6.3_
-  - [ ]* 5.3 Write property test for missing note error state
+  - [x] 5.3 Write property test for missing note error state
     - **Property 5: Missing note produces error state**
     - Use Kotest `checkAll` with `Arb.string()` to generate random noteIds
     - Use a mock repository that returns null/throws for any noteId
     - Verify the ViewModel emits `NoteDetailUiState.Error` with a non-empty message
     - Minimum 100 iterations
     - **Validates: Requirements 6.3**
-  - [ ]* 5.4 Write unit tests for HomeViewModel and NoteDetailViewModel
+  - [x] 5.4 Write unit tests for HomeViewModel and NoteDetailViewModel
     - Test HomeViewModel emits correct UI state for a known path with mock data
     - Test NoteDetailViewModel emits Success for a valid noteId
     - Test NoteDetailViewModel emits Error for an invalid noteId
