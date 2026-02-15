@@ -75,6 +75,7 @@ kotlin {
 
             // Koin
             implementation(libs.koin.core)
+            implementation(libs.koin.compose)
 
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)

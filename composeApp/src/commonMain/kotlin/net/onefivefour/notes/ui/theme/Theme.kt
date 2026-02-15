@@ -10,15 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import net.onefivefour.notes.ui.theme.EchoListTheme.dimensions
-import net.onefivefour.notes.ui.theme.EchoListTheme.materialColors
-import net.onefivefour.notes.ui.theme.EchoListTheme.shapes
-import net.onefivefour.notes.ui.theme.EchoListTheme.typography
-
-val themeManager = ThemeManager(
-    availableThemes = listOf(EchoListClassicTheme),
-    initialTheme = EchoListClassicTheme
-)
+import org.koin.compose.koinInject
 
 object EchoListTheme {
     val materialColors: ColorScheme
@@ -44,6 +36,7 @@ fun EchoListTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val themeManager = koinInject<ThemeManager>()
     val colorTheme by themeManager.selectedTheme.collectAsState()
     val colorScheme = if (darkTheme) colorTheme.darkColorScheme else colorTheme.lightColorScheme
 

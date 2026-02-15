@@ -8,9 +8,7 @@ import net.onefivefour.notes.ui.home.FileUiModel
 import net.onefivefour.notes.ui.home.FolderUiModel
 import net.onefivefour.notes.ui.home.HomeScreen
 import net.onefivefour.notes.ui.home.HomeScreenUiState
-import net.onefivefour.notes.ui.theme.EchoListClassicTheme
 import net.onefivefour.notes.ui.theme.EchoListTheme
-import net.onefivefour.notes.ui.theme.ThemeManager
 
 @Composable
 @Preview
