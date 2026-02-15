@@ -15,13 +15,6 @@ import net.onefivefour.notes.ui.theme.ThemeManager
 @Composable
 @Preview
 fun App() {
-    val themeManager = remember {
-        ThemeManager(
-            availableThemes = listOf(BeepMeClassicTheme),
-            initialTheme = BeepMeClassicTheme
-        )
-    }
-
     val sampleUiState = remember {
         HomeScreenUiState(
             title = "My Notes",
@@ -40,7 +33,7 @@ fun App() {
         )
     }
 
-    BeepMeTheme(themeManager = themeManager) {
+    BeepMeTheme {
         HomeScreen(
             uiState = sampleUiState,
             onNavigationClick = {},

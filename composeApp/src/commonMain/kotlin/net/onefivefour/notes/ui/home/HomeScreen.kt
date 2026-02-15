@@ -11,12 +11,25 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
+import net.onefivefour.notes.ui.theme.BeepMeClassicTheme
+import net.onefivefour.notes.ui.theme.BeepMeTheme
 import net.onefivefour.notes.ui.theme.LocalBeepMeDimensions
+import net.onefivefour.notes.ui.theme.ThemeManager
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
@@ -36,13 +49,28 @@ fun HomeScreen(
             .padding(horizontal = dimensions.l)
             .verticalScroll(rememberScrollState())
     ) {
-        Header(
-            title = uiState.title,
-            onNavigationClick = onNavigationClick,
-            modifier = Modifier.fillMaxWidth()
-        )
 
-        Spacer(modifier = Modifier.height(dimensions.s))
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.background
+            ),
+            title  = {
+                Text(
+                    text = uiState.title,
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            navigationIcon = {
+                IconButton(onClick = onNavigationClick) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = "Navigate back",
+                        tint = primaryColor
+                    )
+                }
+            }
+        )
 
         BreadcrumbNav(
             breadcrumbs = uiState.breadcrumbs,
@@ -104,5 +132,34 @@ fun HomeScreen(
                 }
             }
         }
+    }
+}
+
+@Preview
+@Composable
+fun HomeScreenPreview() {
+    val uiState = HomeScreenUiState(
+        title = "My Notes",
+        breadcrumbs = listOf(
+            BreadcrumbItem(label = "Home", path = "/"),
+            BreadcrumbItem(label = "My Notes", path = "/my-notes")
+        ),
+        folders = listOf(
+            FolderUiModel(id = "1", name = "Work", itemCount = 5),
+            FolderUiModel(id = "2", name = "Personal", itemCount = 3)
+        ),
+        files = listOf(
+            FileUiModel(id = "1", title = "Meeting Notes", preview = "Discussed project timeline and deliverables...", timestamp = "2 hours ago"),
+            FileUiModel(id = "2", title = "Shopping List", preview = "Milk, eggs, bread, butter...", timestamp = "Yesterday")
+        )
+    )
+    BeepMeTheme {
+        HomeScreen(
+            uiState = uiState,
+            onNavigationClick = { },
+            onBreadcrumbClick = { },
+            onFolderClick = { },
+            onFileClick = { },
+        )
     }
 }

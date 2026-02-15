@@ -7,9 +7,13 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
+val themeManager = ThemeManager(
+    availableThemes = listOf(BeepMeClassicTheme),
+    initialTheme = BeepMeClassicTheme
+)
+
 @Composable
 fun BeepMeTheme(
-    themeManager: ThemeManager,
     dimensions: BeepMeDimensions = BeepMeDimensions(),
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
