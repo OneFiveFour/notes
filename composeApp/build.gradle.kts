@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.composeHotReload)
     alias(libs.plugins.wire)
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlinSerialization)
 }
 
 kotlin {
@@ -61,6 +62,10 @@ kotlin {
             implementation(libs.androidx.lifecycle.viewmodelCompose)
             implementation(libs.androidx.lifecycle.runtimeCompose)
 
+            // Navigation 3
+            implementation(libs.navigation3.ui)
+            implementation(libs.androidx.lifecycle.viewmodelNavigation3)
+
             // Wire protobuf runtime
             implementation(libs.wire.runtime)
 
@@ -76,6 +81,9 @@ kotlin {
             // Koin
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+
+            // Kotlinx Serialization
+            implementation(libs.kotlinx.serialization.json)
 
             // Coroutines
             implementation(libs.kotlinx.coroutines.core)

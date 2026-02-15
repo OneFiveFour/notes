@@ -6,12 +6,12 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
 
 ## Tasks
 
-- [-] 1. Add Navigation 3 and kotlinx-serialization dependencies
-  - [-] 1.1 Add the `kotlinx-serialization` plugin to `composeApp/build.gradle.kts` and the root `build.gradle.kts` (or settings plugin block)
+- [x] 1. Add Navigation 3 and kotlinx-serialization dependencies
+  - [x] 1.1 Add the `kotlinx-serialization` plugin to `composeApp/build.gradle.kts` and the root `build.gradle.kts` (or settings plugin block)
     - Add `kotlin("plugin.serialization")` plugin entry and version catalog reference
     - Add `kotlinx-serialization-json` library to version catalog and `commonMain` dependencies
     - _Requirements: 1.1_
-  - [ ] 1.2 Add Navigation 3 libraries to the version catalog and `commonMain` dependencies
+  - [x] 1.2 Add Navigation 3 libraries to the version catalog and `commonMain` dependencies
     - Add `navigation3-ui` (version `1.0.0-alpha05`) to `libs.versions.toml`
     - Add `lifecycle-viewmodel-navigation3` to `libs.versions.toml`
     - Add both as `commonMain` dependencies in `build.gradle.kts`
