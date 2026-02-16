@@ -74,15 +74,15 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
     - Test NoteDetailViewModel emits Error for an invalid noteId
     - _Requirements: 7.1, 7.2, 6.3_
 
-- [ ] 6. Register ViewModels in Koin
-  - [ ] 6.1 Update `di/AppModules.kt` to add a `navigationModule` with ViewModel factories
+- [x] 6. Register ViewModels in Koin
+  - [x] 6.1 Update `di/AppModules.kt` to add a `navigationModule` with ViewModel factories
     - Register `HomeViewModel` with `path` parameter
     - Register `NoteDetailViewModel` with `noteId` parameter
     - Add `navigationModule` to `appModules` list
     - _Requirements: 7.1, 7.2, 7.3_
 
-- [ ] 7. Refactor App.kt to use NavDisplay
-  - [ ] 7.1 Refactor `App.kt` to host `NavDisplay` with back stack and destination mappings
+- [x] 7. Refactor App.kt to use NavDisplay
+  - [x] 7.1 Refactor `App.kt` to host `NavDisplay` with back stack and destination mappings
     - Create back stack with `rememberNavBackStack(echoListSavedStateConfig, HomeRoute())`
     - Set up `NavDisplay` with `onBack` handler
     - Wire `HomeRoute` entry to `HomeViewModel` + `HomeScreen` with navigation callbacks
@@ -94,7 +94,7 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
     - Remove hardcoded sample data
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 8.1, 8.3_
 
-- [ ] 8. Checkpoint — Verify full navigation flow
+- [x] 8. Checkpoint — Verify full navigation flow
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 9. Back stack navigation property tests

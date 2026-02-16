@@ -16,7 +16,10 @@ import net.onefivefour.notes.ui.theme.ColorTheme
 import net.onefivefour.notes.ui.theme.EchoListClassicTheme
 import net.onefivefour.notes.ui.theme.EchoListTheme2
 import net.onefivefour.notes.ui.theme.ThemeManager
+import net.onefivefour.notes.ui.home.HomeViewModel
+import net.onefivefour.notes.ui.notedetail.NoteDetailViewModel
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val networkModule: Module = module {
@@ -70,4 +73,19 @@ val uiModule: Module = module {
     }
 }
 
-val appModules: List<Module> = listOf(networkModule, dataModule, uiModule)
+val navigationModule: Module = module {
+    viewModel { params ->
+        HomeViewModel(
+            path = params.get(),
+            repository = get()
+        )
+    }
+    viewModel { params ->
+        NoteDetailViewModel(
+            noteId = params.get(),
+            repository = get()
+        )
+    }
+}
+
+val appModules: List<Module> = listOf(networkModule, dataModule, uiModule, navigationModule)
