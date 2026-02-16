@@ -97,27 +97,27 @@ Incrementally integrate Compose Navigation 3 into EchoList by first adding build
 - [x] 8. Checkpoint — Verify full navigation flow
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 9. Back stack navigation property tests
-  - [ ]* 9.1 Write property test for push navigation
+- [x] 9. Back stack navigation property tests
+  - [x] 9.1 Write property test for push navigation
     - **Property 2: Push navigation grows the back stack**
     - Use Kotest `checkAll` with `Arb` for non-empty list of `NavKey` and a single `NavKey`
     - Verify stack size increases by one, top entry matches pushed key, previous entries unchanged
     - Minimum 100 iterations
     - **Validates: Requirements 4.1, 4.2**
-  - [ ]* 9.2 Write property test for breadcrumb navigation
+  - [x] 9.2 Write property test for breadcrumb navigation
     - **Property 3: Breadcrumb navigation truncates the back stack**
     - Generate back stacks with known `HomeRoute` entries, pick a random path to navigate to
     - Verify stack is truncated to the matching entry, entries before it are unchanged
     - Minimum 100 iterations
     - **Validates: Requirements 4.3**
-  - [ ]* 9.3 Write property test for back navigation
+  - [x] 9.3 Write property test for back navigation
     - **Property 4: Back navigation removes the top entry**
     - Generate back stacks of varying sizes (> 1 for normal case, == 1 for edge case)
     - Verify size decreases by one for multi-entry stacks, remains unchanged for single-entry stacks
     - Minimum 100 iterations
     - **Validates: Requirements 5.1, 5.2, 5.3**
 
-- [ ] 10. Final checkpoint — Ensure all tests pass
+- [x] 10. Final checkpoint — Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
