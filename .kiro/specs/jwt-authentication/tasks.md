@@ -12,17 +12,17 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
   - [x] 1.2 Update `wire {}` block in `composeApp/build.gradle.kts` to prune `auth.v1.AuthService` (keep messages, skip gRPC stubs)
     - _Requirements: 2.1_
 
-- [ ] 2. Implement SecureStorage expect/actual
-  - [ ] 2.1 Create `expect class SecureStorage` in `commonMain` with `get(key)`, `put(key, value)`, `delete(key)` and `StorageKeys` object
+- [x] 2. Implement SecureStorage expect/actual
+  - [x] 2.1 Create `expect class SecureStorage` in `commonMain` with `get(key)`, `put(key, value)`, `delete(key)` and `StorageKeys` object
     - _Requirements: 3.1_
-  - [ ] 2.2 Create `actual class SecureStorage` in `androidMain` using EncryptedSharedPreferences
+  - [x] 2.2 Create `actual class SecureStorage` in `androidMain` using EncryptedSharedPreferences
     - Add `androidx.security:security-crypto` dependency to `androidMain.dependencies`
     - _Requirements: 3.2_
-  - [ ] 2.3 Create `actual class SecureStorage` in `jsMain` and `wasmJsMain` using `localStorage`
+  - [x] 2.3 Create `actual class SecureStorage` in `jsMain` and `wasmJsMain` using `localStorage`
     - _Requirements: 3.3_
-  - [ ] 2.4 Create an in-memory `FakeSecureStorage` in `commonTest` for testing
+  - [x] 2.4 Create an in-memory `FakeSecureStorage` in `commonTest` for testing
     - _Requirements: 3.1_
-  - [ ]* 2.5 Write property test for SecureStorage round-trip
+  - [x] 2.5 Write property test for SecureStorage round-trip
     - **Property 7: SecureStorage put/get/delete round-trip**
     - Use `FakeSecureStorage` with `Arb.string()` for keys and values
     - Test all three sub-properties: put/get, put/delete/get, put/put/get

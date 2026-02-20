@@ -50,6 +50,7 @@ kotlin {
             implementation(libs.ktor.client.okhttp)
             implementation(libs.sqldelight.driver.android)
             implementation(libs.koin.android)
+            implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
