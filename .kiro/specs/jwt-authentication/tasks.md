@@ -43,27 +43,27 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Verify the request path and protobuf fields match provided username/password
     - **Validates: Requirements 2.1**
 
-- [ ] 4. Checkpoint
+- [x] 4. Checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement AuthInterceptor as Ktor plugin
-  - [ ] 5.1 Create `AuthInterceptor` Ktor client plugin in `commonMain/network/auth/`
+- [x] 5. Implement AuthInterceptor as Ktor plugin
+  - [x] 5.1 Create `AuthInterceptor` Ktor client plugin in `commonMain/network/auth/`
     - Attach Bearer token on non-auth endpoints from `SecureStorage`
     - Handle 401 responses: acquire mutex, call `AuthRepository.refreshToken()`, store new token, retry original request
     - On refresh failure: call `AuthRepository.clearAuth()`, emit `AuthEvent.ReAuthRequired` via `MutableSharedFlow`
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 5.1, 5.2_
-  - [ ] 5.2 Update `networkModule` in `AppModules.kt` to install `AuthInterceptor` on the `HttpClient`
+  - [x] 5.2 Update `networkModule` in `AppModules.kt` to install `AuthInterceptor` on the `HttpClient`
     - _Requirements: 5.1_
-  - [ ]* 5.3 Write property test for Bearer token attachment
+  - [x] 5.3 Write property test for Bearer token attachment
     - **Property 10: Bearer token attachment on non-auth endpoints**
     - Generate arbitrary non-auth paths and token strings, verify Authorization header
     - Use `ktor-client-mock` to inspect outgoing headers
     - **Validates: Requirements 5.1**
-  - [ ]* 5.4 Write property test for 401 refresh-store-retry flow
+  - [x] 5.4 Write property test for 401 refresh-store-retry flow
     - **Property 8: 401 triggers refresh-store-retry**
     - Mock 401 response then successful refresh, verify token stored and request retried
     - **Validates: Requirements 4.1, 4.2, 4.3**
-  - [ ]* 5.5 Write property test for refresh failure clears auth
+  - [x] 5.5 Write property test for refresh failure clears auth
     - **Property 9: Refresh failure clears auth**
     - Mock 401 then failed refresh, verify tokens cleared and ReAuthRequired emitted
     - **Validates: Requirements 4.4**

@@ -3,6 +3,10 @@ package net.onefivefour.notes.di
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
+import net.onefivefour.notes.data.repository.AuthRepository
+import net.onefivefour.notes.network.auth.AuthEvent
+import net.onefivefour.notes.network.auth.AuthInterceptor
 import net.onefivefour.notes.data.repository.NotesRepository
 import net.onefivefour.notes.data.repository.NotesRepositoryImpl
 import net.onefivefour.notes.data.source.cache.CacheDataSource
@@ -27,10 +31,16 @@ val networkModule: Module = module {
 
     single {
         val config: NetworkConfig = get()
+        val authRepository: AuthRepository = get()
+        val authEventFlow: MutableSharedFlow<AuthEvent> = get()
         HttpClient {
             install(HttpTimeout) {
                 requestTimeoutMillis = config.requestTimeoutMs
                 connectTimeoutMillis = config.connectTimeoutMs
+            }
+            install(AuthInterceptor) {
+                this.authRepository = authRepository
+                this.authEventFlow = authEventFlow
             }
         }
     }
