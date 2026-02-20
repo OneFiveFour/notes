@@ -180,6 +180,7 @@ wire {
     }
     // Exclude gRPC service generation — we use ConnectRPC instead
     prune("notes.v1.NotesService")
+    prune("auth.v1.AuthService")
 }
 
 // SQLDelight database configuration
