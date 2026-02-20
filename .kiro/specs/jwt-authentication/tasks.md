@@ -68,30 +68,30 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Mock 401 then failed refresh, verify tokens cleared and ReAuthRequired emitted
     - **Validates: Requirements 4.4**
 
-- [ ] 6. Implement LoginViewModel and LoginScreen UI
-  - [ ] 6.1 Create `LoginViewModel` in `commonMain/ui/login/`
+- [x] 6. Implement LoginViewModel and LoginScreen UI
+  - [x] 6.1 Create `LoginViewModel` in `commonMain/ui/login/`
     - Define `LoginUiState` data class with field values, field errors, loading, and general error
     - Read stored backend URL from `SecureStorage` on init for prefill
     - Implement field change handlers and `onLoginClick` with blank-field validation
     - Call `AuthRepository.login()` and update state on success/failure
     - _Requirements: 1.2, 1.3, 1.4, 1.5, 1.6, 2.4, 2.5, 7.2_
-  - [ ]* 6.2 Write property test for blank field validation
+  - [x] 6.2 Write property test for blank field validation
     - **Property 1: Blank field validation rejects submission**
     - Generate whitespace-only strings for each field, verify field error is set
     - **Validates: Requirements 1.3, 1.4, 1.5**
-  - [ ]* 6.3 Write property test for backend URL prefill
+  - [x] 6.3 Write property test for backend URL prefill
     - **Property 2: Backend URL prefill round-trip**
     - Generate arbitrary URL strings, store in FakeSecureStorage, verify UiState.backendUrl
     - **Validates: Requirements 1.2, 7.2**
-  - [ ]* 6.4 Write property test for loading state on valid submission
+  - [x] 6.4 Write property test for loading state on valid submission
     - **Property 3: Valid submission triggers loading state**
     - Generate non-blank field triples, call onLoginClick, verify isLoading = true
     - **Validates: Requirements 1.6**
-  - [ ]* 6.5 Write property test for error surfacing
+  - [x] 6.5 Write property test for error surfacing
     - **Property 6: Login errors surface to UI**
     - Generate various error results, verify UiState.error is non-null and isLoading is false
     - **Validates: Requirements 2.4**
-  - [ ] 6.6 Create `LoginScreen` composable in `commonMain/ui/login/`
+  - [x] 6.6 Create `LoginScreen` composable in `commonMain/ui/login/`
     - Stateless composable receiving `LoginUiState` and callbacks
     - Centered column with app title (titleLarge), three OutlinedTextFields, field error labels, login Button, general error text
     - Password field with `PasswordVisualTransformation`
