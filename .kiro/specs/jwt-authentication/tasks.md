@@ -28,17 +28,17 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Test all three sub-properties: put/get, put/delete/get, put/put/get
     - **Validates: Requirements 3.4, 3.5, 3.6**
 
-- [ ] 3. Implement AuthRepository
-  - [ ] 3.1 Create `AuthRepository` interface and `AuthRepositoryImpl` in `commonMain/data/repository/`
+- [x] 3. Implement AuthRepository
+  - [x] 3.1 Create `AuthRepository` interface and `AuthRepositoryImpl` in `commonMain/data/repository/`
     - Implement `login(baseUrl, username, password)` using a temporary `HttpClient` + `ConnectRpcClient` for the user-provided URL
     - Implement `refreshToken()` using the stored base URL and refresh token
     - Implement `isAuthenticated()`, `clearAuth()`, `getAccessToken()`, `getBaseUrl()` backed by `SecureStorage`
     - _Requirements: 2.1, 2.2, 2.3, 4.1, 7.1_
-  - [ ]* 3.2 Write property test for successful login persists credentials
+  - [x] 3.2 Write property test for successful login persists credentials
     - **Property 5: Successful login persists all credentials**
     - Mock `ConnectRpcClient` to return generated token pairs, verify all three storage keys
     - **Validates: Requirements 2.2, 2.3, 7.1**
-  - [ ]* 3.3 Write property test for login request construction
+  - [x] 3.3 Write property test for login request construction
     - **Property 4: Login request construction**
     - Verify the request path and protobuf fields match provided username/password
     - **Validates: Requirements 2.1**
