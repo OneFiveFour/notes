@@ -2,6 +2,7 @@ package net.onefivefour.notes.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +19,9 @@ class LoginViewModel(
 
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
+
+    private val _loginSuccess = MutableSharedFlow<Unit>()
+    val loginSuccess: MutableSharedFlow<Unit> = _loginSuccess
 
     init {
         val storedUrl = secureStorage.get(StorageKeys.BACKEND_URL)
@@ -68,6 +72,7 @@ class LoginViewModel(
             result.fold(
                 onSuccess = {
                     _uiState.update { it.copy(isLoading = false) }
+                    _loginSuccess.emit(Unit)
                 },
                 onFailure = { throwable ->
                     _uiState.update {

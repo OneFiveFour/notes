@@ -20,7 +20,9 @@ import net.onefivefour.notes.ui.theme.ColorTheme
 import net.onefivefour.notes.ui.theme.EchoListClassicTheme
 import net.onefivefour.notes.ui.theme.EchoListTheme2
 import net.onefivefour.notes.ui.theme.ThemeManager
+import net.onefivefour.notes.ui.AuthViewModel
 import net.onefivefour.notes.ui.home.HomeViewModel
+import net.onefivefour.notes.ui.login.LoginViewModel
 import net.onefivefour.notes.ui.notedetail.NoteDetailViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
@@ -84,6 +86,18 @@ val uiModule: Module = module {
 }
 
 val navigationModule: Module = module {
+    viewModel {
+        AuthViewModel(
+            secureStorage = get(),
+            authEvents = get()
+        )
+    }
+    viewModel {
+        LoginViewModel(
+            authRepository = get(),
+            secureStorage = get()
+        )
+    }
     viewModel { params ->
         HomeViewModel(
             path = params.get(),

@@ -99,17 +99,17 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - All styling via `MaterialTheme.colorScheme`, `MaterialTheme.typography`, `MaterialTheme.shapes`, `LocalEchoListDimensions.current`
     - _Requirements: 1.1, 1.6, 1.7, 2.5_
 
-- [ ] 7. Implement AuthState and navigation gating
-  - [ ] 7.1 Create `AuthViewModel` in `commonMain/ui/` with `AuthState` sealed interface
+- [x] 7. Implement AuthState and navigation gating
+  - [x] 7.1 Create `AuthViewModel` in `commonMain/ui/` with `AuthState` sealed interface
     - Check `SecureStorage` for access token on init → `Authenticated` or `Unauthenticated`
     - Collect `AuthEvent.ReAuthRequired` from SharedFlow → transition to `Unauthenticated`
     - Expose `authState: StateFlow<AuthState>`
     - _Requirements: 6.1, 6.2, 6.4_
-  - [ ] 7.2 Create `LoginRoute` in `Routes.kt` and update `App.kt` navigation
+  - [x] 7.2 Create `LoginRoute` in `Routes.kt` and update `App.kt` navigation
     - Add `AuthState`-based branching: `Loading` → empty/splash, `Unauthenticated` → LoginScreen, `Authenticated` → existing NavDisplay
     - On successful login, transition AuthState to Authenticated
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
-  - [ ]* 7.3 Write property test for AuthState reflects storage
+  - [x] 7.3 Write property test for AuthState reflects storage
     - **Property 11: AuthState reflects storage**
     - Generate storage states with/without access token, verify AuthState
     - **Validates: Requirements 6.1, 6.2**
