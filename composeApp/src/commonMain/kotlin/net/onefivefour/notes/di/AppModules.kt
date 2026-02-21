@@ -5,6 +5,7 @@ import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import net.onefivefour.notes.data.repository.AuthRepository
+import net.onefivefour.notes.data.repository.AuthRepositoryImpl
 import net.onefivefour.notes.network.auth.AuthEvent
 import net.onefivefour.notes.network.auth.AuthInterceptor
 import net.onefivefour.notes.data.repository.NotesRepository
@@ -15,9 +16,7 @@ import net.onefivefour.notes.data.source.network.NetworkDataSource
 import net.onefivefour.notes.data.source.network.NetworkDataSourceImpl
 import net.onefivefour.notes.network.client.ConnectRpcClient
 import net.onefivefour.notes.network.client.ConnectRpcClientImpl
-import net.onefivefour.notes.network.config.NetworkConfig
 import net.onefivefour.notes.network.config.NetworkConfigProvider
-import net.onefivefour.notes.ui.theme.ColorTheme
 import net.onefivefour.notes.ui.theme.EchoListClassicTheme
 import net.onefivefour.notes.ui.theme.EchoListTheme2
 import net.onefivefour.notes.ui.theme.ThemeManager
@@ -28,6 +27,13 @@ import net.onefivefour.notes.ui.notedetail.NoteDetailViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+
+val authModule: Module = module {
+    single { MutableSharedFlow<AuthEvent>() }
+    single<AuthRepository> { AuthRepositoryImpl(secureStorage = get()) }
+    viewModel { AuthViewModel(secureStorage = get(), authEvents = get()) }
+    viewModel { LoginViewModel(authRepository = get(), secureStorage = get(), networkConfigProvider = get()) }
+}
 
 val networkModule: Module = module {
     single { NetworkConfigProvider(secureStorage = get()) }
@@ -88,19 +94,6 @@ val uiModule: Module = module {
 }
 
 val navigationModule: Module = module {
-    viewModel {
-        AuthViewModel(
-            secureStorage = get(),
-            authEvents = get()
-        )
-    }
-    viewModel {
-        LoginViewModel(
-            authRepository = get(),
-            secureStorage = get(),
-            networkConfigProvider = get()
-        )
-    }
     viewModel { params ->
         HomeViewModel(
             path = params.get(),
@@ -115,4 +108,4 @@ val navigationModule: Module = module {
     }
 }
 
-val appModules: List<Module> = listOf(networkModule, dataModule, uiModule, navigationModule)
+val appModules: List<Module> = listOf(authModule, networkModule, dataModule, uiModule, navigationModule)

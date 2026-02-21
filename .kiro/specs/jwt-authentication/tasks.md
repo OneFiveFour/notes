@@ -125,8 +125,8 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Generate arbitrary URL strings, verify config update after login
     - **Validates: Requirements 8.1, 8.2**
 
-- [ ] 9. Wire Koin DI modules
-  - [ ] 9.1 Create `authModule` in `AppModules.kt` with all auth-related bindings
+- [x] 9. Wire Koin DI modules
+  - [x] 9.1 Create `authModule` in `AppModules.kt` with all auth-related bindings
     - `SecureStorage`, `AuthRepository`, `MutableSharedFlow<AuthEvent>`, `AuthViewModel`, `LoginViewModel`
     - Add `authModule` to `appModules` list
     - Update `networkModule` to install `AuthInterceptor` and depend on auth bindings

@@ -3,6 +3,8 @@ package net.onefivefour.notes.di
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.native.NativeSqliteDriver
 import net.onefivefour.notes.cache.NotesDatabase
+import net.onefivefour.notes.data.source.IosSecureStorage
+import net.onefivefour.notes.data.source.SecureStorage
 import org.koin.dsl.module
 
 val databaseModule = module {
@@ -16,4 +18,6 @@ val databaseModule = module {
     single {
         NotesDatabase(driver = get())
     }
+
+    single<SecureStorage> { IosSecureStorage() }
 }
