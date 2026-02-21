@@ -114,13 +114,13 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Generate storage states with/without access token, verify AuthState
     - **Validates: Requirements 6.1, 6.2**
 
-- [ ] 8. Implement dynamic NetworkConfig from backend URL
-  - [ ] 8.1 Update `NetworkConfig` and `networkModule` to use stored backend URL from `SecureStorage`
+- [x] 8. Implement dynamic NetworkConfig from backend URL
+  - [x] 8.1 Update `NetworkConfig` and `networkModule` to use stored backend URL from `SecureStorage`
     - Make `NetworkConfig` base URL mutable or re-create on login
     - On app startup with stored URL + tokens, initialize with stored URL
     - On login success, update config with user-provided URL
     - _Requirements: 8.1, 8.2_
-  - [ ]* 8.2 Write property test for NetworkConfig URL
+  - [x] 8.2 Write property test for NetworkConfig URL
     - **Property 12: NetworkConfig uses correct backend URL**
     - Generate arbitrary URL strings, verify config update after login
     - **Validates: Requirements 8.1, 8.2**

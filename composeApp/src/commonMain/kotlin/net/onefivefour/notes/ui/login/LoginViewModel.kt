@@ -11,10 +11,12 @@ import kotlinx.coroutines.launch
 import net.onefivefour.notes.data.repository.AuthRepository
 import net.onefivefour.notes.data.source.SecureStorage
 import net.onefivefour.notes.data.source.StorageKeys
+import net.onefivefour.notes.network.config.NetworkConfigProvider
 
 class LoginViewModel(
     private val authRepository: AuthRepository,
-    private val secureStorage: SecureStorage
+    private val secureStorage: SecureStorage,
+    private val networkConfigProvider: NetworkConfigProvider? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -71,6 +73,7 @@ class LoginViewModel(
             )
             result.fold(
                 onSuccess = {
+                    networkConfigProvider?.updateBaseUrl(current.backendUrl.trim())
                     _uiState.update { it.copy(isLoading = false) }
                     _loginSuccess.emit(Unit)
                 },

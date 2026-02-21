@@ -16,6 +16,7 @@ import net.onefivefour.notes.data.source.network.NetworkDataSourceImpl
 import net.onefivefour.notes.network.client.ConnectRpcClient
 import net.onefivefour.notes.network.client.ConnectRpcClientImpl
 import net.onefivefour.notes.network.config.NetworkConfig
+import net.onefivefour.notes.network.config.NetworkConfigProvider
 import net.onefivefour.notes.ui.theme.ColorTheme
 import net.onefivefour.notes.ui.theme.EchoListClassicTheme
 import net.onefivefour.notes.ui.theme.EchoListTheme2
@@ -29,16 +30,16 @@ import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 
 val networkModule: Module = module {
-    single { NetworkConfig.default(baseUrl = "http://localhost:8080") }
+    single { NetworkConfigProvider(secureStorage = get()) }
 
     single {
-        val config: NetworkConfig = get()
+        val configProvider: NetworkConfigProvider = get()
         val authRepository: AuthRepository = get()
         val authEventFlow: MutableSharedFlow<AuthEvent> = get()
         HttpClient {
             install(HttpTimeout) {
-                requestTimeoutMillis = config.requestTimeoutMs
-                connectTimeoutMillis = config.connectTimeoutMs
+                requestTimeoutMillis = configProvider.config.requestTimeoutMs
+                connectTimeoutMillis = configProvider.config.connectTimeoutMs
             }
             install(AuthInterceptor) {
                 this.authRepository = authRepository
@@ -48,9 +49,10 @@ val networkModule: Module = module {
     }
 
     single<ConnectRpcClient> {
+        val configProvider: NetworkConfigProvider = get()
         ConnectRpcClientImpl(
             httpClient = get(),
-            config = get()
+            configProvider = configProvider
         )
     }
 
@@ -95,7 +97,8 @@ val navigationModule: Module = module {
     viewModel {
         LoginViewModel(
             authRepository = get(),
-            secureStorage = get()
+            secureStorage = get(),
+            networkConfigProvider = get()
         )
     }
     viewModel { params ->
