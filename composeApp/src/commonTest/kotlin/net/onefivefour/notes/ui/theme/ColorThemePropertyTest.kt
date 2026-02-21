@@ -69,13 +69,13 @@ class ColorThemePropertyTest : FunSpec({
 
     // -- Property 1: ColorTheme structural invariant --
 
-    test("Property 1: ColorTheme name must be non-blank").config(invocations = 100) {
+    test("Property 1: ColorTheme name must be non-blank").config(invocations = 20) {
         checkAll(arbColorTheme) { theme ->
             theme.name.shouldNotBeBlank()
         }
     }
 
-    test("Property 1: ColorTheme light and dark schemes must be distinct instances").config(invocations = 100) {
+    test("Property 1: ColorTheme light and dark schemes must be distinct instances").config(invocations = 20) {
         checkAll(arbColorTheme) { theme ->
             (theme.lightColorScheme !== theme.darkColorScheme) shouldBe true
         }

@@ -132,7 +132,7 @@ Incrementally add JWT authentication to the EchoList app: protobuf definitions, 
     - Update `networkModule` to install `AuthInterceptor` and depend on auth bindings
     - _Requirements: 2.1, 3.1, 4.1, 5.1, 6.1_
 
-- [ ] 10. Final checkpoint
+- [x] 10. Final checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

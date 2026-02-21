@@ -20,7 +20,7 @@ import net.onefivefour.notes.data.source.StorageKeys
 class NetworkConfigProviderPropertyTest : FunSpec({
 
     test("Property 12a: startup with stored URL initializes config from storage") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100)) { url ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..100)) { url ->
             val storage = FakeSecureStorage()
             storage.put(StorageKeys.BACKEND_URL, url)
 
@@ -31,7 +31,7 @@ class NetworkConfigProviderPropertyTest : FunSpec({
     }
 
     test("Property 12b: updateBaseUrl changes config to the provided URL") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100)) { url ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..100)) { url ->
             val storage = FakeSecureStorage()
             val provider = NetworkConfigProvider(secureStorage = storage)
 

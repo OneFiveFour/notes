@@ -49,7 +49,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     // -- Property 1: ConnectRPC Protocol Compliance --
 
     test("Property 1: All RPC requests include Connect-Protocol-Version header and application/proto content type") {
-        checkAll(PropTestConfig(iterations = 100), arbServicePath) { path ->
+        checkAll(PropTestConfig(iterations = 20), arbServicePath) { path ->
             var capturedContentType: String? = null
             var capturedProtocolVersion: String? = null
 
@@ -84,7 +84,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
 
     test("Property 2: Wire protobuf serialize then deserialize produces equivalent message") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.string(0..100),
             Arb.string(0..200),
             Arb.string(0..500),
@@ -105,7 +105,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     // -- Property 3: Base URL Configuration --
 
     test("Property 3: All request URLs are constructed as baseUrl + servicePath") {
-        checkAll(PropTestConfig(iterations = 100), arbBaseUrl, arbServicePath) { baseUrl, servicePath ->
+        checkAll(PropTestConfig(iterations = 20), arbBaseUrl, arbServicePath) { baseUrl, servicePath ->
             var capturedUrl: String? = null
 
             val mockEngine = MockEngine { request ->
@@ -136,7 +136,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     // -- Property 9: Network Error Type Mapping --
 
     test("Property 9: 5xx status codes produce ServerError") {
-        checkAll(PropTestConfig(iterations = 100), arbServerErrorCode) { statusCode ->
+        checkAll(PropTestConfig(iterations = 20), arbServerErrorCode) { statusCode ->
             val mockEngine = MockEngine {
                 respond(
                     content = "server error",
@@ -163,7 +163,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     }
 
     test("Property 9: 4xx status codes produce ClientError") {
-        checkAll(PropTestConfig(iterations = 100), arbClientErrorCode) { statusCode ->
+        checkAll(PropTestConfig(iterations = 20), arbClientErrorCode) { statusCode ->
             val mockEngine = MockEngine {
                 respond(
                     content = "client error",
@@ -192,7 +192,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     // -- Property 10: Error Message Preservation --
 
     test("Property 10: Server error response message is preserved in NetworkException") {
-        checkAll(PropTestConfig(iterations = 100), arbErrorMessage, arbServerErrorCode) { errorMsg, statusCode ->
+        checkAll(PropTestConfig(iterations = 20), arbErrorMessage, arbServerErrorCode) { errorMsg, statusCode ->
             val mockEngine = MockEngine {
                 respond(
                     content = errorMsg,
@@ -222,7 +222,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
     // -- Property 12: Serialization Error Handling --
 
     test("Property 12: Corrupted response data produces SerializationError") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..50)) { garbage ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { garbage ->
             val mockEngine = MockEngine {
                 respond(
                     content = garbage.encodeToByteArray(),

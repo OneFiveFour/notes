@@ -12,7 +12,11 @@ class KoinModuleVerificationTest : FunSpec({
             extraTypes = listOf(
                 // HttpClientEngine is provided internally by Ktor at runtime,
                 // not through Koin. It's selected based on the platform.
-                io.ktor.client.engine.HttpClientEngine::class
+                io.ktor.client.engine.HttpClientEngine::class,
+                // These are provided by authModule at runtime
+                net.onefivefour.notes.data.source.SecureStorage::class,
+                net.onefivefour.notes.data.repository.AuthRepository::class,
+                kotlinx.coroutines.flow.MutableSharedFlow::class
             )
         )
     }

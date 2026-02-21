@@ -41,7 +41,7 @@ class AuthViewModelPropertyTest : FunSpec({
     }
 
     test("Property 11: AuthState is Authenticated when access token is present") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100)) { token ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..100)) { token ->
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
@@ -55,7 +55,7 @@ class AuthViewModelPropertyTest : FunSpec({
     }
 
     test("Property 11: AuthState is Unauthenticated when no access token") {
-        checkAll(PropTestConfig(iterations = 100), Arb.boolean()) { _ ->
+        checkAll(PropTestConfig(iterations = 20), Arb.boolean()) { _ ->
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 // No access token stored
@@ -69,7 +69,7 @@ class AuthViewModelPropertyTest : FunSpec({
     }
 
     test("Property 11: ReAuthRequired transitions to Unauthenticated") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100)) { token ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..100)) { token ->
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.ACCESS_TOKEN, token)

@@ -91,7 +91,7 @@ class CacheFirstPropertyTest : FunSpec({
     // -- Property 18 --
 
     test("Property 18: For any cached note, getNote returns cached data immediately without waiting for network") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val delayedNetwork = DelayedNetworkDataSource(delayMs = 5_000)

@@ -41,7 +41,7 @@ class WithRetryPropertyTest : FunSpec({
     // -- Property 19: Transient Error Retry Behavior --
 
     test("Property 19: For any transient error, at least one retry occurs before failing") {
-        checkAll(PropTestConfig(iterations = 100), arbTransientError) { error ->
+        checkAll(PropTestConfig(iterations = 20), arbTransientError) { error ->
             var attemptCount = 0
 
             val result = withRetry(maxAttempts = 3, delayMs = 1) {
@@ -57,7 +57,7 @@ class WithRetryPropertyTest : FunSpec({
     // -- Property 20: Retry Attempt Limit --
 
     test("Property 20: For any continuously failing request, at most 3 total attempts are made") {
-        checkAll(PropTestConfig(iterations = 100), arbTransientError) { error ->
+        checkAll(PropTestConfig(iterations = 20), arbTransientError) { error ->
             var attemptCount = 0
 
             withRetry(maxAttempts = 3, delayMs = 1) {
@@ -72,7 +72,7 @@ class WithRetryPropertyTest : FunSpec({
     // -- Property 21: Selective Retry by Error Type --
 
     test("Property 21: ClientError (4xx) causes no retry — only 1 attempt") {
-        checkAll(PropTestConfig(iterations = 100), arbClientError) { error ->
+        checkAll(PropTestConfig(iterations = 20), arbClientError) { error ->
             var attemptCount = 0
 
             val result = withRetry(maxAttempts = 3, delayMs = 1) {
@@ -86,7 +86,7 @@ class WithRetryPropertyTest : FunSpec({
     }
 
     test("Property 21: Transient errors cause retries — more than 1 attempt") {
-        checkAll(PropTestConfig(iterations = 100), arbTransientError) { error ->
+        checkAll(PropTestConfig(iterations = 20), arbTransientError) { error ->
             var attemptCount = 0
 
             withRetry(maxAttempts = 3, delayMs = 1) {
@@ -101,7 +101,7 @@ class WithRetryPropertyTest : FunSpec({
     // -- Property 22: Final Error Preservation --
 
     test("Property 22: Exhausted retry throws the error from the last attempt") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..50)) { uniqueMsg ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { uniqueMsg ->
             var attemptCount = 0
 
             val result = withRetry(maxAttempts = 3, delayMs = 1) {

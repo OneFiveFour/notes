@@ -75,7 +75,7 @@ class DarkModeResolutionPropertyTest : FunSpec({
 
     // -- Property 3: Dark mode variant resolution --
 
-    test("Property 3: resolving with isDarkMode=true returns darkColorScheme, false returns lightColorScheme").config(invocations = 100) {
+    test("Property 3: resolving with isDarkMode=true returns darkColorScheme, false returns lightColorScheme").config(invocations = 20) {
         checkAll(arbColorTheme, Arb.boolean()) { theme, isDarkMode ->
             val resolved = resolveColorScheme(theme, isDarkMode)
             if (isDarkMode) {

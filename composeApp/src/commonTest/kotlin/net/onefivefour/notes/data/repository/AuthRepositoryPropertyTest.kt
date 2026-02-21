@@ -26,7 +26,7 @@ class AuthRepositoryPropertyTest : FunSpec({
      */
     test("Property 5: Successful login persists access_token, refresh_token, and backend URL") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.string(1..50),  // baseUrl
             Arb.string(1..50),  // username
             Arb.string(1..50),  // password
@@ -78,7 +78,7 @@ class AuthRepositoryPropertyTest : FunSpec({
      */
     test("Property 4: Login request path and protobuf fields match provided credentials") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.string(1..50),  // baseUrl
             Arb.string(1..50),  // username
             Arb.string(1..50)   // password

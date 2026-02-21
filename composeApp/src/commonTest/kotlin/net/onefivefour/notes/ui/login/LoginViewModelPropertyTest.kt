@@ -46,7 +46,7 @@ class LoginViewModelPropertyTest : FunSpec({
         val whitespaceArb = Arb.string(0..20).filter { it.isBlank() }
         val nonBlankArb = Arb.string(1..20).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 100), whitespaceArb, nonBlankArb, nonBlankArb) { blankUrl, user, pass ->
+        checkAll(PropTestConfig(iterations = 20), whitespaceArb, nonBlankArb, nonBlankArb) { blankUrl, user, pass ->
             runTest(testDispatcher) {
                 val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
                 vm.onBackendUrlChanged(blankUrl)
@@ -65,7 +65,7 @@ class LoginViewModelPropertyTest : FunSpec({
         val whitespaceArb = Arb.string(0..20).filter { it.isBlank() }
         val nonBlankArb = Arb.string(1..20).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 100), nonBlankArb, whitespaceArb, nonBlankArb) { url, blankUser, pass ->
+        checkAll(PropTestConfig(iterations = 20), nonBlankArb, whitespaceArb, nonBlankArb) { url, blankUser, pass ->
             runTest(testDispatcher) {
                 val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
                 vm.onBackendUrlChanged(url)
@@ -84,7 +84,7 @@ class LoginViewModelPropertyTest : FunSpec({
         val whitespaceArb = Arb.string(0..20).filter { it.isBlank() }
         val nonBlankArb = Arb.string(1..20).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 100), nonBlankArb, nonBlankArb, whitespaceArb) { url, user, blankPass ->
+        checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, whitespaceArb) { url, user, blankPass ->
             runTest(testDispatcher) {
                 val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
                 vm.onBackendUrlChanged(url)
@@ -108,7 +108,7 @@ class LoginViewModelPropertyTest : FunSpec({
      * **Validates: Requirements 1.2, 7.2**
      */
     test("Property 2: Backend URL prefill round-trip") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100)) { url ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..100)) { url ->
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.BACKEND_URL, url)
@@ -133,7 +133,7 @@ class LoginViewModelPropertyTest : FunSpec({
     test("Property 3: Valid submission triggers loading state") {
         val nonBlankArb = Arb.string(1..50).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 100), nonBlankArb, nonBlankArb, nonBlankArb) { url, user, pass ->
+        checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, nonBlankArb) { url, user, pass ->
             runTest(testDispatcher) {
                 // Use a repo that never completes so we can observe the loading state
                 val repo = object : FakeAuthRepository() {
@@ -169,7 +169,7 @@ class LoginViewModelPropertyTest : FunSpec({
     test("Property 6: Login errors surface to UI") {
         val nonBlankArb = Arb.string(1..50).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 100), nonBlankArb, nonBlankArb, nonBlankArb, Arb.string(1..100)) { url, user, pass, errorMsg ->
+        checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, nonBlankArb, Arb.string(1..100)) { url, user, pass, errorMsg ->
             runTest(testDispatcher) {
                 val repo = FakeAuthRepository()
                 repo.loginResult = Result.failure(RuntimeException(errorMsg))

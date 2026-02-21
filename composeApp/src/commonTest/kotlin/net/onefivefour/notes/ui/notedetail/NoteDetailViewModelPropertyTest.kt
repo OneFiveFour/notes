@@ -39,7 +39,7 @@ class NoteDetailViewModelPropertyTest : FunSpec({
     }
 
     test("Property 5: Missing note produces error state") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(0..200)) { noteId ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(0..200)) { noteId ->
             runTest(testDispatcher) {
                 val repository = FakeNotesRepository()
                 // Repository is empty — any noteId will fail

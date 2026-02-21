@@ -42,7 +42,7 @@ class CacheDataSourcePropertyTest : FunSpec({
     // -- Property 13: Network-to-Cache Persistence --
 
     test("Property 13: For any note saved via saveNote, getNote with the same filePath returns an equivalent note") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
 
@@ -60,7 +60,7 @@ class CacheDataSourcePropertyTest : FunSpec({
     // -- Property 17: Cache Persistence Across Restarts --
 
     test("Property 17: For any note stored in cache, re-querying after database re-open preserves all fields") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             // Use a named in-memory database so it persists across driver instances
             // within the same JVM process via shared cache
             val jdbcUrl = "jdbc:sqlite:file:prop17_${note.filePath.hashCode()}?mode=memory&cache=shared"

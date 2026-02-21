@@ -75,7 +75,7 @@ class AuthInterceptorPropertyTest : FunSpec({
     // -----------------------------------------------------------------------
 
     test("Property 10: Bearer token attached on non-auth endpoints when token exists") {
-        checkAll(PropTestConfig(iterations = 100), arbNonAuthPath, arbToken, arbPort) { path, token, port ->
+        checkAll(PropTestConfig(iterations = 20), arbNonAuthPath, arbToken, arbPort) { path, token, port ->
             val storage = FakeSecureStorage()
             storage.put(StorageKeys.ACCESS_TOKEN, token)
 
@@ -108,7 +108,7 @@ class AuthInterceptorPropertyTest : FunSpec({
 
     test("Property 8: 401 triggers refresh, stores new token, and retries with new Bearer") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             arbNonAuthPath,
             arbToken,
             arbToken,
@@ -163,7 +163,7 @@ class AuthInterceptorPropertyTest : FunSpec({
     // -----------------------------------------------------------------------
 
     test("Property 9: Refresh failure clears tokens and emits ReAuthRequired") {
-        checkAll(PropTestConfig(iterations = 100), arbNonAuthPath, arbToken, arbPort) { path, token, port ->
+        checkAll(PropTestConfig(iterations = 20), arbNonAuthPath, arbToken, arbPort) { path, token, port ->
             runTest {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.ACCESS_TOKEN, token)

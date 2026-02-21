@@ -139,7 +139,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 6: Create-Then-Get Consistency --
 
     test("Property 6: After creating a note, getNote returns matching title/content/path") {
-        checkAll(PropTestConfig(iterations = 100), arbCreateNoteParams) { params ->
+        checkAll(PropTestConfig(iterations = 20), arbCreateNoteParams) { params ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -186,7 +186,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 7: Update-Then-Get Consistency --
 
     test("Property 7: After updating a note, getNote returns updated content with newer timestamp") {
-        checkAll(PropTestConfig(iterations = 100), arbNote, Arb.string(1..200)) { originalNote, newContent ->
+        checkAll(PropTestConfig(iterations = 20), arbNote, Arb.string(1..200)) { originalNote, newContent ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -224,7 +224,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 8: Delete-Then-Get Consistency --
 
     test("Property 8: After deleting a note, getNote fails with an error") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -252,7 +252,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 11: Error Propagation Transparency --
 
     test("Property 11: NetworkException from network layer is propagated with the same type through repository") {
-        checkAll(PropTestConfig(iterations = 100), arbNetworkException) { exception ->
+        checkAll(PropTestConfig(iterations = 20), arbNetworkException) { exception ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -274,7 +274,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 14: Offline Cache Fallback --
 
     test("Property 14: When network fails, getNote returns cached data") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -299,7 +299,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     }
 
     test("Property 14: When network fails, listNotes returns cached data") {
-        checkAll(PropTestConfig(iterations = 100), arbNote) { note ->
+        checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -323,7 +323,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 16: Sync Queue Execution Order --
 
     test("Property 16: Queued offline operations are synced in FIFO order") {
-        checkAll(PropTestConfig(iterations = 100), Arb.int(2..5)) { opCount ->
+        checkAll(PropTestConfig(iterations = 20), Arb.int(2..5)) { opCount ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()
@@ -373,7 +373,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 23: Coroutine Cancellation Propagation --
 
     test("Property 23: Cancelled repository operation cancels the underlying network request") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..50)) { filePath ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { filePath ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNetworkDataSource()

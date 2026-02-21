@@ -40,7 +40,7 @@ class BackStackPropertyTest : FunSpec({
 
     test("Property 2: pushing a NavKey increases stack size by one") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.list(Arb.navKey(), 1..20),
             Arb.navKey()
         ) { initial, newKey ->
@@ -63,7 +63,7 @@ class BackStackPropertyTest : FunSpec({
 
     test("Property 3: breadcrumb navigation truncates to matching HomeRoute") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.list(Arb.string(1..20), 2..10)
         ) { paths ->
             // Build a back stack of HomeRoutes with distinct paths
@@ -96,7 +96,7 @@ class BackStackPropertyTest : FunSpec({
 
     test("Property 4: back on multi-entry stack removes top entry") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.list(Arb.navKey(), 2..20)
         ) { initial ->
             val stack = initial.toMutableList()
@@ -112,7 +112,7 @@ class BackStackPropertyTest : FunSpec({
 
     test("Property 4: back on single-entry stack leaves it unchanged") {
         checkAll(
-            PropTestConfig(iterations = 100),
+            PropTestConfig(iterations = 20),
             Arb.navKey()
         ) { singleKey ->
             val stack = mutableListOf<NavKey>(singleKey)

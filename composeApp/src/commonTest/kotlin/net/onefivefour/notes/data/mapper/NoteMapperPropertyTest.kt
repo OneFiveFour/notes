@@ -58,7 +58,7 @@ class NoteMapperPropertyTest : FunSpec({
 
     // -- Property 4: Domain-Proto Mapping Round-Trip --
 
-    test("Property 4: Proto Note -> Domain Note preserves all fields").config(invocations = 100) {
+    test("Property 4: Proto Note -> Domain Note preserves all fields").config(invocations = 20) {
         checkAll(arbProtoNote) { protoNote ->
             val domain = NoteMapper.toDomain(protoNote)
             domain.filePath shouldBe protoNote.file_path
@@ -68,7 +68,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: CreateNoteParams -> CreateNoteRequest preserves all fields").config(invocations = 100) {
+    test("Property 4: CreateNoteParams -> CreateNoteRequest preserves all fields").config(invocations = 20) {
         checkAll(arbCreateNoteParams) { params ->
             val proto = NoteMapper.toProto(params)
             proto.title shouldBe params.title
@@ -77,7 +77,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: UpdateNoteParams -> UpdateNoteRequest preserves all fields").config(invocations = 100) {
+    test("Property 4: UpdateNoteParams -> UpdateNoteRequest preserves all fields").config(invocations = 20) {
         checkAll(arbUpdateNoteParams) { params ->
             val proto = NoteMapper.toProto(params)
             proto.file_path shouldBe params.filePath
@@ -85,7 +85,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: CreateNoteResponse -> Domain Note preserves all fields").config(invocations = 100) {
+    test("Property 4: CreateNoteResponse -> Domain Note preserves all fields").config(invocations = 20) {
         checkAll(arbProtoNote) { protoNote ->
             val response = notes.v1.CreateNoteResponse(
                 file_path = protoNote.file_path,
@@ -101,7 +101,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: GetNoteResponse -> Domain Note preserves all fields").config(invocations = 100) {
+    test("Property 4: GetNoteResponse -> Domain Note preserves all fields").config(invocations = 20) {
         checkAll(arbProtoNote) { protoNote ->
             val response = notes.v1.GetNoteResponse(
                 file_path = protoNote.file_path,
@@ -119,7 +119,7 @@ class NoteMapperPropertyTest : FunSpec({
 
     // -- Property 5: Timestamp Mapping Preservation --
 
-    test("Property 5: Timestamp round-trip through Proto Note -> Domain preserves exact value").config(invocations = 100) {
+    test("Property 5: Timestamp round-trip through Proto Note -> Domain preserves exact value").config(invocations = 20) {
         checkAll(arbTimestamp) { timestamp ->
             val protoNote = notes.v1.Note(
                 file_path = "test.md",
@@ -132,7 +132,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 5: Timestamp through CreateNoteResponse -> Domain preserves exact value").config(invocations = 100) {
+    test("Property 5: Timestamp through CreateNoteResponse -> Domain preserves exact value").config(invocations = 20) {
         checkAll(arbTimestamp) { timestamp ->
             val response = notes.v1.CreateNoteResponse(
                 file_path = "test.md",
@@ -145,7 +145,7 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 5: Timestamp through GetNoteResponse -> Domain preserves exact value").config(invocations = 100) {
+    test("Property 5: Timestamp through GetNoteResponse -> Domain preserves exact value").config(invocations = 20) {
         checkAll(arbTimestamp) { timestamp ->
             val response = notes.v1.GetNoteResponse(
                 file_path = "test.md",

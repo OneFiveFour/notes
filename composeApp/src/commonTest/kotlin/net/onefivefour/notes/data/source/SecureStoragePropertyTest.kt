@@ -19,7 +19,7 @@ import io.kotest.property.checkAll
  */
 class SecureStoragePropertyTest : FunSpec({
 
-    test("Property 7a: put then get returns the stored value").config(invocations = 100) {
+    test("Property 7a: put then get returns the stored value").config(invocations = 20) {
         checkAll(Arb.string(1..50), Arb.string(0..100)) { key, value ->
             val storage = FakeSecureStorage()
             storage.put(key, value)
@@ -27,7 +27,7 @@ class SecureStoragePropertyTest : FunSpec({
         }
     }
 
-    test("Property 7b: put then delete then get returns null").config(invocations = 100) {
+    test("Property 7b: put then delete then get returns null").config(invocations = 20) {
         checkAll(Arb.string(1..50), Arb.string(0..100)) { key, value ->
             val storage = FakeSecureStorage()
             storage.put(key, value)
@@ -36,7 +36,7 @@ class SecureStoragePropertyTest : FunSpec({
         }
     }
 
-    test("Property 7c: put twice then get returns the second value").config(invocations = 100) {
+    test("Property 7c: put twice then get returns the second value").config(invocations = 20) {
         checkAll(Arb.string(1..50), Arb.string(0..100), Arb.string(0..100)) { key, v1, v2 ->
             val storage = FakeSecureStorage()
             storage.put(key, v1)

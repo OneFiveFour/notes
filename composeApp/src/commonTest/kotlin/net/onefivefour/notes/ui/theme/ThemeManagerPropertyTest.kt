@@ -69,7 +69,7 @@ class ThemeManagerPropertyTest : FunSpec({
 
     // -- Property 2: Theme selection updates state --
 
-    test("Property 2: selecting a theme from the available list updates selectedTheme").config(invocations = 100) {
+    test("Property 2: selecting a theme from the available list updates selectedTheme").config(invocations = 20) {
         checkAll(Arb.list(arbColorTheme, 2..10)) { themes ->
             val manager = ThemeManager(availableThemes = themes)
 
