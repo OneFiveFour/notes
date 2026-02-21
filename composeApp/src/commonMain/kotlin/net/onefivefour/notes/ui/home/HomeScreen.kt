@@ -24,7 +24,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.notes.ui.theme.EchoListTheme
-import net.onefivefour.notes.ui.theme.LocalDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +47,7 @@ fun HomeScreen(
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = EchoListTheme.materialColors.background
             ),
-            title  = {
+            title = {
                 Text(
                     text = uiState.title,
                     style = EchoListTheme.typography.titleLarge,
@@ -77,55 +76,51 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.l))
 
         // FOLDERS section
-        if (uiState.folders.isNotEmpty()) {
-            Text(
-                text = "FOLDERS",
-                style = MaterialTheme.typography.labelSmall,
-                color = EchoListTheme.materialColors.primary
-            )
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
-            val folderRows = uiState.folders.chunked(2)
-            folderRows.forEachIndexed { index, row ->
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
-                ) {
-                    row.forEach { folder ->
-                        FolderCard(
-                            folder = folder,
-                            onClick = { onFolderClick(folder.id) },
-                            modifier = Modifier.weight(1f)
-                        )
-                    }
-                    // Fill empty space if odd number of folders
-                    if (row.size == 1) {
-                        Spacer(modifier = Modifier.weight(1f))
-                    }
+        Text(
+            text = "FOLDERS",
+            style = MaterialTheme.typography.labelSmall,
+            color = EchoListTheme.materialColors.primary
+        )
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
+        val folderRows = uiState.folders.chunked(2)
+        folderRows.forEachIndexed { index, row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
+            ) {
+                row.forEach { folder ->
+                    FolderCard(
+                        folder = folder,
+                        onClick = { onFolderClick(folder.id) },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-                if (index < folderRows.lastIndex) {
-                    Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
+                // Fill empty space if odd number of folders
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
                 }
             }
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.l))
+            if (index < folderRows.lastIndex) {
+                Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
+            }
         }
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.l))
 
         // FILES section
-        if (uiState.files.isNotEmpty()) {
-            Text(
-                text = "FILES",
-                style = MaterialTheme.typography.labelSmall,
-                color = EchoListTheme.materialColors.primary
+        Text(
+            text = "FILES",
+            style = MaterialTheme.typography.labelSmall,
+            color = EchoListTheme.materialColors.primary
+        )
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
+        uiState.files.forEachIndexed { index, file ->
+            FileItem(
+                file = file,
+                onClick = { onFileClick(file.id) },
+                modifier = Modifier.fillMaxWidth()
             )
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
-            uiState.files.forEachIndexed { index, file ->
-                FileItem(
-                    file = file,
-                    onClick = { onFileClick(file.id) },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (index < uiState.files.lastIndex) {
-                    Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
-                }
+            if (index < uiState.files.lastIndex) {
+                Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
             }
         }
     }
@@ -145,8 +140,18 @@ fun HomeScreenPreview() {
             FolderUiModel(id = "2", name = "Personal", itemCount = 3)
         ),
         files = listOf(
-            FileUiModel(id = "1", title = "Meeting Notes", preview = "Discussed project timeline and deliverables...", timestamp = "2 hours ago"),
-            FileUiModel(id = "2", title = "Shopping List", preview = "Milk, eggs, bread, butter...", timestamp = "Yesterday")
+            FileUiModel(
+                id = "1",
+                title = "Meeting Notes",
+                preview = "Discussed project timeline and deliverables...",
+                timestamp = "2 hours ago"
+            ),
+            FileUiModel(
+                id = "2",
+                title = "Shopping List",
+                preview = "Milk, eggs, bread, butter...",
+                timestamp = "Yesterday"
+            )
         )
     )
     EchoListTheme {

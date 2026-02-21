@@ -11,6 +11,7 @@ import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import org.koin.compose.koinInject
+import org.koin.mp.KoinPlatform
 
 object EchoListTheme {
     val materialColors: ColorScheme
@@ -34,10 +35,19 @@ object EchoListTheme {
 @Composable
 fun EchoListTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
+    themeManager: ThemeManager? = null,
     content: @Composable () -> Unit
 ) {
-    val themeManager = koinInject<ThemeManager>()
-    val colorTheme by themeManager.selectedTheme.collectAsState()
+    val isKoinStarted = runCatching { KoinPlatform.getKoin() }.isSuccess
+    val resolvedThemeManager = themeManager ?: if (isKoinStarted) {
+        koinInject<ThemeManager>()
+    } else {
+        ThemeManager(
+            availableThemes = listOf(EchoListClassicTheme),
+            initialTheme = EchoListClassicTheme
+        )
+    }
+    val colorTheme by resolvedThemeManager.selectedTheme.collectAsState()
     val colorScheme = if (darkTheme) colorTheme.darkColorScheme else colorTheme.lightColorScheme
 
     val typography = material3Typography()
