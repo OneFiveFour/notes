@@ -108,4 +108,10 @@ val navigationModule: Module = module {
     }
 }
 
-val appModules: List<Module> = listOf(authModule, networkModule, dataModule, uiModule, navigationModule)
+val appModules: List<Module> = listOf(
+    authModule,
+    networkModule,
+    dataModule,
+    uiModule,
+    navigationModule
+)

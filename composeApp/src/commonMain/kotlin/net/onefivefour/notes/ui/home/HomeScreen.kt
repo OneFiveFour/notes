@@ -30,7 +30,7 @@ import net.onefivefour.notes.ui.theme.LocalDimensions
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
-    onNavigationClick: () -> Unit,
+    onNavigationClick: (() -> Unit)?,
     onBreadcrumbClick: (path: String) -> Unit,
     onFolderClick: (folderId: String) -> Unit,
     onFileClick: (fileId: String) -> Unit,
@@ -56,12 +56,14 @@ fun HomeScreen(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = onNavigationClick) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Navigate back",
-                        tint = EchoListTheme.materialColors.primary
-                    )
+                if (onNavigationClick != null) {
+                    IconButton(onClick = onNavigationClick) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = "Navigate back",
+                            tint = EchoListTheme.materialColors.primary
+                        )
+                    }
                 }
             }
         )

@@ -3,10 +3,14 @@ package net.onefivefour.notes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigationevent.NavigationEventInfo
+import androidx.navigationevent.compose.NavigationBackHandler
+import androidx.navigationevent.compose.rememberNavigationEventState
 import net.onefivefour.notes.ui.AuthState
 import net.onefivefour.notes.ui.AuthViewModel
 import net.onefivefour.notes.ui.home.HomeScreen
@@ -22,6 +26,7 @@ import net.onefivefour.notes.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun App() {
     EchoListTheme {
@@ -55,16 +60,22 @@ fun App() {
             AuthState.Authenticated -> {
                 val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
 
+                NavigationBackHandler(
+                    state = rememberNavigationEventState(NavigationEventInfo.None),
+                    isBackEnabled = backStack.size > 1,
+                    onBackCompleted = { backStack.removeLastOrNull() }
+                )
+
                 NavDisplay(
                     backStack = backStack,
                     onBack = { backStack.removeLastOrNull() },
                     entryProvider = entryProvider {
                         entry<HomeRoute> { route ->
-                            val viewModel = koinViewModel<HomeViewModel> { parametersOf(route.path) }
+                            val viewModel = koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
                             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
                             HomeScreen(
                                 uiState = uiState,
-                                onNavigationClick = { backStack.removeLastOrNull() },
+                                onNavigationClick = if (backStack.size > 1) {{ backStack.removeLastOrNull() }} else null,
                                 onBreadcrumbClick = { path ->
                                     val index = backStack.indexOfLast { it is HomeRoute && it.path == path }
                                     if (index >= 0) {
