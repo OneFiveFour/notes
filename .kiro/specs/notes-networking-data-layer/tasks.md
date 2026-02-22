@@ -23,21 +23,21 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
 
 - [x] 2. Implement domain models and error types
   - [x] 2.1 Create domain data models in `commonMain`
-    - Create `Note`, `CreateNoteParams`, `UpdateNoteParams` data classes in `net.onefivefour.notes.data.models`
+    - Create `Note`, `CreateNoteParams`, `UpdateNoteParams` data classes in `net.onefivefour.echolist.data.models`
     - All models must be immutable Kotlin data classes
     - _Requirements: 3.1, 3.2, 3.6_
   - [x] 2.2 Create the sealed error type hierarchy
-    - Create `NetworkException` sealed class in `net.onefivefour.notes.network.error`
+    - Create `NetworkException` sealed class in `net.onefivefour.echolist.network.error`
     - Include `NetworkError`, `ServerError`, `ClientError`, `TimeoutError`, `SerializationError` subtypes
     - _Requirements: 6.1, 6.3_
   - [x] 2.3 Create `NetworkConfig` data class
-    - Create in `net.onefivefour.notes.network.config` with baseUrl, requestTimeoutMs, connectTimeoutMs, maxRetries, retryDelayMs
+    - Create in `net.onefivefour.echolist.network.config` with baseUrl, requestTimeoutMs, connectTimeoutMs, maxRetries, retryDelayMs
     - Provide `default()` factory with sensible defaults
     - Ensure immutability
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.6_
 
 - [x] 3. Implement proto-to-domain mappers
-  - [x] 3.1 Create `NoteMapper` object in `net.onefivefour.notes.data.mapper`
+  - [x] 3.1 Create `NoteMapper` object in `net.onefivefour.echolist.data.mapper`
     - Implement `toDomain()` overloads for `notes.v1.Note`, `CreateNoteResponse`, `GetNoteResponse`
     - Implement `toProto()` functions for `CreateNoteParams` → `CreateNoteRequest`, `UpdateNoteParams` → `UpdateNoteRequest`
     - Handle timestamp mapping (Unix milliseconds preservation)
@@ -51,7 +51,7 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - **Validates: Requirements 3.3, 3.4, 3.5**
 
 - [ ] 4. Implement ConnectRPC client and retry logic
-  - [x] 4.1 Create `ConnectRpcClient` interface in `net.onefivefour.notes.network.client`
+  - [x] 4.1 Create `ConnectRpcClient` interface in `net.onefivefour.echolist.network.client`
     - Define generic `call()` suspend function with path, request, serializer, and deserializer parameters
     - _Requirements: 2.1, 2.3, 2.7, 9.2_
   - [x] 4.2 Implement `ConnectRpcClientImpl` using Ktor
@@ -84,7 +84,7 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 6. Implement network data source
-  - [x] 6.1 Create `NetworkDataSource` interface in `net.onefivefour.notes.data.source.network`
+  - [x] 6.1 Create `NetworkDataSource` interface in `net.onefivefour.echolist.data.source.network`
     - Define suspend functions for all five RPC methods: createNote, listNotes, getNote, updateNote, deleteNote
     - Use Wire-generated request/response types as parameters and return types
     - _Requirements: 2.1_
@@ -99,7 +99,7 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - Define `Note` table with filePath (PK), title, content, updatedAt, cachedAt columns
     - Define named queries: insertOrReplace, selectByFilePath, selectByPathPrefix, selectAll, deleteByFilePath, deleteAll
     - _Requirements: 7.1, 7.6_
-  - [x] 7.2 Create `CacheDataSource` interface in `net.onefivefour.notes.data.source.cache`
+  - [x] 7.2 Create `CacheDataSource` interface in `net.onefivefour.echolist.data.source.cache`
     - Define suspend functions: saveNote, saveNotes, getNote, listNotes, deleteNote, clear
     - _Requirements: 7.1, 7.2, 7.3_
   - [x] 7.3 Implement `CacheDataSourceImpl` using SQLDelight generated queries
@@ -113,7 +113,7 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - **Validates: Requirements 7.1, 7.6**
 
 - [x] 8. Implement repository with offline support
-  - [x] 8.1 Create `NotesRepository` interface in `net.onefivefour.notes.data.repository`
+  - [x] 8.1 Create `NotesRepository` interface in `net.onefivefour.echolist.data.repository`
     - Define suspend functions: createNote, listNotes, getNote, updateNote, deleteNote
     - All return `Result<T>` types
     - Accept `CoroutineDispatcher` parameter for structured concurrency
@@ -146,9 +146,9 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 10. Implement dependency injection with Koin
-  - [x] 10.1 Create Koin modules in `net.onefivefour.notes.di`
+  - [x] 10.1 Create Koin modules in `net.onefivefour.echolist.di`
     - Define `networkModule`: NetworkConfig, HttpClient with timeout config, ConnectRpcClient, NetworkDataSource
-    - Define `dataModule`: NotesDatabase, CacheDataSource, NotesRepository
+    - Define `dataModule`: EchoListDatabase, CacheDataSource, NotesRepository
     - Expose combined `appModules` list
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5_
   - [x] 10.2 Create platform-specific SQLDelight driver modules
@@ -163,15 +163,15 @@ Implement a Kotlin Multiplatform networking and data layer for a notes applicati
     - `initKoin()` function combining app modules and platform module
     - _Requirements: 9.3, 9.5_
   - [x] 10.4 Wire `initKoin()` into platform entry points
-    - Android: Create `NotesApplication` extending `Application`, call `initKoin()` with `androidContext(this)`, register in `AndroidManifest.xml`
+    - Android: Create `EchoListApplication` extending `Application`, call `initKoin()` with `androidContext(this)`, register in `AndroidManifest.xml`
     - iOS: Call `initKoin()` before returning the `ComposeUIViewController` in `MainViewController.kt`
     - JVM: Call `initKoin()` at the start of `main()` in `main.kt`
     - Web (JS/WasmJs): Call `initKoin()` at the start of `main()` in `webMain/main.kt`
     - _Requirements: 9.3, 9.5_
 
 - [x] 11. Implement factory functions and test doubles
-  - [x] 11.1 Create `NotesRepositoryFactory` in `net.onefivefour.notes.data.repository`
-    - Factory function accepting `NetworkConfig` and `NotesDatabase`, wiring all internal dependencies
+  - [x] 11.1 Create `NotesRepositoryFactory` in `net.onefivefour.echolist.data.repository`
+    - Factory function accepting `NetworkConfig` and `EchoListDatabase`, wiring all internal dependencies
     - _Requirements: 9.3_
   - [x] 11.2 Create `FakeNotesRepository` for testing
     - Implement `NotesRepository` interface with in-memory storage

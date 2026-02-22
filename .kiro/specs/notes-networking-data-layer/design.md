@@ -66,7 +66,7 @@ composeApp/src/
 Domain models are immutable data classes independent of protobuf:
 
 ```kotlin
-package net.onefivefour.notes.data.models
+package net.onefivefour.echolist.data.models
 
 data class Note(
     val filePath: String,
@@ -90,7 +90,7 @@ data class UpdateNoteParams(
 ### 2. Repository Interface
 
 ```kotlin
-package net.onefivefour.notes.data.repository
+package net.onefivefour.echolist.data.repository
 
 interface NotesRepository {
     suspend fun createNote(params: CreateNoteParams): Result<Note>
@@ -104,7 +104,7 @@ interface NotesRepository {
 ### 3. Network Configuration
 
 ```kotlin
-package net.onefivefour.notes.network.config
+package net.onefivefour.echolist.network.config
 
 data class NetworkConfig(
     val baseUrl: String,
@@ -122,7 +122,7 @@ data class NetworkConfig(
 ### 4. Error Types
 
 ```kotlin
-package net.onefivefour.notes.network.error
+package net.onefivefour.echolist.network.error
 
 sealed class NetworkException(message: String, cause: Throwable? = null) : Exception(message, cause) {
     class NetworkError(message: String, cause: Throwable? = null) : NetworkException(message, cause)
@@ -136,7 +136,7 @@ sealed class NetworkException(message: String, cause: Throwable? = null) : Excep
 ### 5. ConnectRPC Client Interface
 
 ```kotlin
-package net.onefivefour.notes.network.client
+package net.onefivefour.echolist.network.client
 
 interface ConnectRpcClient {
     suspend fun <Req, Res> call(
@@ -151,7 +151,7 @@ interface ConnectRpcClient {
 ### 6. Network Data Source
 
 ```kotlin
-package net.onefivefour.notes.data.source.network
+package net.onefivefour.echolist.data.source.network
 
 internal interface NetworkDataSource {
     suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse
@@ -165,7 +165,7 @@ internal interface NetworkDataSource {
 ### 7. Cache Data Source
 
 ```kotlin
-package net.onefivefour.notes.data.source.cache
+package net.onefivefour.echolist.data.source.cache
 
 internal interface CacheDataSource {
     suspend fun saveNote(note: Note)
@@ -180,7 +180,7 @@ internal interface CacheDataSource {
 ### 8. Mappers
 
 ```kotlin
-package net.onefivefour.notes.data.mapper
+package net.onefivefour.echolist.data.mapper
 
 internal object NoteMapper {
     fun toDomain(proto: notes.v1.Note): Note {
@@ -280,7 +280,7 @@ DELETE FROM Note;
 ConnectRPC uses HTTP POST with specific headers:
 
 ```kotlin
-package net.onefivefour.notes.network.client
+package net.onefivefour.echolist.network.client
 
 internal class ConnectRpcClientImpl(
     private val httpClient: HttpClient,
@@ -335,7 +335,7 @@ internal class ConnectRpcClientImpl(
 ### Retry Logic
 
 ```kotlin
-package net.onefivefour.notes.network.client
+package net.onefivefour.echolist.network.client
 
 internal suspend fun <T> withRetry(
     maxRetries: Int,
@@ -377,7 +377,7 @@ internal suspend fun <T> withRetry(
 ### Network Data Source Implementation
 
 ```kotlin
-package net.onefivefour.notes.data.source.network
+package net.onefivefour.echolist.data.source.network
 
 internal class NetworkDataSourceImpl(
     private val client: ConnectRpcClient
@@ -408,10 +408,10 @@ internal class NetworkDataSourceImpl(
 ### Cache Data Source Implementation
 
 ```kotlin
-package net.onefivefour.notes.data.source.cache
+package net.onefivefour.echolist.data.source.cache
 
 internal class CacheDataSourceImpl(
-    private val database: NotesDatabase
+    private val database: EchoListDatabase
 ) : CacheDataSource {
     
     private val queries = database.notesQueries
@@ -455,7 +455,7 @@ internal class CacheDataSourceImpl(
 ### Repository Implementation
 
 ```kotlin
-package net.onefivefour.notes.data.repository
+package net.onefivefour.echolist.data.repository
 
 class NotesRepositoryImpl(
     private val networkDataSource: NetworkDataSource,
@@ -576,7 +576,7 @@ The system uses Koin for dependency injection, which provides excellent KMP supp
 #### Koin Module Definition
 
 ```kotlin
-package net.onefivefour.notes.di
+package net.onefivefour.echolist.di
 
 import io.ktor.client.*
 import io.ktor.client.plugins.*
@@ -619,7 +619,7 @@ val networkModule = module {
 val dataModule = module {
     // SQLDelight Database (platform-specific driver provided separately)
     single {
-        NotesDatabase(driver = get())
+        EchoListDatabase(driver = get())
     }
     
     // Cache Data Source
@@ -649,7 +649,7 @@ val appModules = listOf(networkModule, dataModule)
 val androidDatabaseModule = module {
     single<SqlDriver> {
         AndroidSqliteDriver(
-            schema = NotesDatabase.Schema,
+            schema = EchoListDatabase.Schema,
             context = get(),
             name = "notes.db"
         )
@@ -663,7 +663,7 @@ val androidDatabaseModule = module {
 val iosDatabaseModule = module {
     single<SqlDriver> {
         NativeSqliteDriver(
-            schema = NotesDatabase.Schema,
+            schema = EchoListDatabase.Schema,
             name = "notes.db"
         )
     }
@@ -677,7 +677,7 @@ val jvmDatabaseModule = module {
     single<SqlDriver> {
         JdbcSqliteDriver(
             url = "jdbc:sqlite:notes.db"
-        ).also { NotesDatabase.Schema.create(it) }
+        ).also { EchoListDatabase.Schema.create(it) }
     }
 }
 ```
@@ -688,7 +688,7 @@ val jvmDatabaseModule = module {
 val jsDatabaseModule = module {
     single<SqlDriver> {
         // Use in-memory or IndexedDB-backed driver
-        JsDriver(NotesDatabase.Schema)
+        JsDriver(EchoListDatabase.Schema)
     }
 }
 ```
@@ -771,12 +771,12 @@ class NotesRepositoryTest : KoinTest {
 For cases where DI is not desired, factory functions are also provided:
 
 ```kotlin
-package net.onefivefour.notes.data.repository
+package net.onefivefour.echolist.data.repository
 
 object NotesRepositoryFactory {
     fun create(
         config: NetworkConfig,
-        database: NotesDatabase
+        database: EchoListDatabase
     ): NotesRepository {
         val httpClient = HttpClient {
             install(HttpTimeout) {

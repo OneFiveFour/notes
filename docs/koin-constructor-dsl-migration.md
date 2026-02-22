@@ -16,7 +16,7 @@ The `AppModules.kt` uses lambda-based definitions. Four implementation classes a
 |---|---|---|---|
 | `ConnectRpcClientImpl` | `network/client/ConnectRpcClientImpl.kt` | `internal` | `HttpClient`, `NetworkConfig` |
 | `NetworkDataSourceImpl` | `data/source/network/NetworkDataSourceImpl.kt` | `internal` | `ConnectRpcClient` |
-| `CacheDataSourceImpl` | `data/source/cache/CacheDataSourceImpl.kt` | `internal` | `NotesDatabase`, `() -> Long` (default) |
+| `CacheDataSourceImpl` | `data/source/cache/CacheDataSourceImpl.kt` | `internal` | `EchoListDatabase`, `() -> Long` (default) |
 | `NotesRepositoryImpl` | `data/repository/NotesRepositoryImpl.kt` | `internal` | `NetworkDataSource`, `CacheDataSource`, `CoroutineDispatcher` (default) |
 
 ### Definitions That Stay Lambda-Based
@@ -130,7 +130,7 @@ class KoinModuleVerificationTest : FunSpec({
     test("dataModule - all dependencies are satisfied") {
         dataModule.verify(
             extraTypes = listOf(
-                net.onefivefour.notes.cache.NotesDatabase::class
+                net.onefivefour.echolist.cache.EchoListDatabase::class
             )
         )
     }
@@ -142,7 +142,7 @@ If `verify()` complains about default parameters (like `CacheDataSourceImpl`'s `
 ```kotlin
 dataModule.verify(
     extraTypes = listOf(
-        net.onefivefour.notes.cache.NotesDatabase::class,
+        net.onefivefour.echolist.cache.EchoListDatabase::class,
         kotlin.coroutines.CoroutineContext::class,  // for dispatcher default
         Function0::class                             // for () -> Long default
     )

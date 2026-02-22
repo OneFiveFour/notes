@@ -127,11 +127,11 @@ kotlin {
 }
 
 android {
-    namespace = "net.onefivefour.notes"
+    namespace = "net.onefivefour.echolist"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "net.onefivefour.notes"
+        applicationId = "net.onefivefour.echolist"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1
@@ -159,11 +159,11 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "net.onefivefour.notes.MainKt"
+        mainClass = "net.onefivefour.echolist.MainKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
-            packageName = "net.onefivefour.notes"
+            packageName = "net.onefivefour.echolist"
             packageVersion = "1.0.0"
         }
     }
@@ -187,8 +187,8 @@ wire {
 // SQLDelight database configuration
 sqldelight {
     databases {
-        create("NotesDatabase") {
-            packageName.set("net.onefivefour.notes.cache")
+        create("EchoListDatabase") {
+            packageName.set("net.onefivefour.echolist.cache")
         }
     }
 }

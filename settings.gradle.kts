@@ -1,4 +1,4 @@
-rootProject.name = "Notes"
+rootProject.name = "EchoList"
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 pluginManagement {

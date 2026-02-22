@@ -64,7 +64,7 @@ The navigation flow is unidirectional: user actions in destination composables e
 All routes live in a new file `navigation/Routes.kt` under the `ui` package:
 
 ```kotlin
-package net.onefivefour.notes.ui.navigation
+package net.onefivefour.echolist.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
@@ -91,7 +91,7 @@ val navKeySerializersModule = SerializersModule {
 A top-level configuration object used when creating the back stack, ensuring cross-platform state restoration:
 
 ```kotlin
-package net.onefivefour.notes.ui.navigation
+package net.onefivefour.echolist.ui.navigation
 
 import androidx.navigation3.runtime.SavedStateConfiguration
 
@@ -152,7 +152,7 @@ fun App() {
 A new ViewModel that replaces the sample data currently hardcoded in `App.kt`. It loads folder and file data for a given path from the repository:
 
 ```kotlin
-package net.onefivefour.notes.ui.home
+package net.onefivefour.echolist.ui.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -160,7 +160,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.onefivefour.notes.data.repository.NotesRepository
+import net.onefivefour.echolist.data.repository.NotesRepository
 
 class HomeViewModel(
     private val path: String,
@@ -184,7 +184,7 @@ class HomeViewModel(
 Loads a single note by ID and exposes its UI state:
 
 ```kotlin
-package net.onefivefour.notes.ui.notedetail
+package net.onefivefour.echolist.ui.notedetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -192,7 +192,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.onefivefour.notes.data.repository.NotesRepository
+import net.onefivefour.echolist.data.repository.NotesRepository
 
 class NoteDetailViewModel(
     private val noteId: String,
@@ -216,7 +216,7 @@ class NoteDetailViewModel(
 A new stateless composable following the existing pattern:
 
 ```kotlin
-package net.onefivefour.notes.ui.notedetail
+package net.onefivefour.echolist.ui.notedetail
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -236,7 +236,7 @@ fun NoteDetailScreen(
 ### NoteDetailUiState
 
 ```kotlin
-package net.onefivefour.notes.ui.notedetail
+package net.onefivefour.echolist.ui.notedetail
 
 sealed interface NoteDetailUiState {
     data object Loading : NoteDetailUiState
