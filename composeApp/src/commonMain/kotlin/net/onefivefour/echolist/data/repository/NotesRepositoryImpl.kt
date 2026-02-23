@@ -14,14 +14,14 @@ import net.onefivefour.echolist.data.models.ListNotesResult
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.models.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
-import net.onefivefour.echolist.data.source.network.NetworkDataSource
+import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.network.error.NetworkException
 import notes.v1.DeleteNoteRequest
 import notes.v1.GetNoteRequest
 import notes.v1.ListNotesRequest
 
 internal class NotesRepositoryImpl(
-    private val networkDataSource: NetworkDataSource,
+    private val noteRemoteDataSource: NoteRemoteDataSource,
     private val cacheDataSource: CacheDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val backgroundScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
@@ -33,7 +33,7 @@ internal class NotesRepositoryImpl(
     override suspend fun createNote(params: CreateNoteParams): Result<Note> = withContext(dispatcher) {
         try {
             val request = NoteMapper.toProto(params)
-            val response = networkDataSource.createNote(request)
+            val response = noteRemoteDataSource.createNote(request)
             val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
             Result.success(note)
@@ -54,7 +54,7 @@ internal class NotesRepositoryImpl(
             backgroundScope.launch {
                 try {
                     val request = ListNotesRequest(path = path)
-                    val response = networkDataSource.listNotes(request)
+                    val response = noteRemoteDataSource.listNotes(request)
                     val result = NoteMapper.toDomain(response)
                     cacheDataSource.saveNotes(result.notes)
                     cacheDataSource.saveEntries(path, result.entries)
@@ -67,7 +67,7 @@ internal class NotesRepositoryImpl(
             // No cache — go to network directly
             try {
                 val request = ListNotesRequest(path = path)
-                val response = networkDataSource.listNotes(request)
+                val response = noteRemoteDataSource.listNotes(request)
                 val result = NoteMapper.toDomain(response)
                 cacheDataSource.saveNotes(result.notes)
                 cacheDataSource.saveEntries(path, result.entries)
@@ -85,7 +85,7 @@ internal class NotesRepositoryImpl(
             backgroundScope.launch {
                 try {
                     val request = GetNoteRequest(file_path = filePath)
-                    val response = networkDataSource.getNote(request)
+                    val response = noteRemoteDataSource.getNote(request)
                     val note = NoteMapper.toDomain(response)
                     cacheDataSource.saveNote(note)
                 } catch (_: Exception) {
@@ -97,7 +97,7 @@ internal class NotesRepositoryImpl(
             // No cache — go to network directly
             try {
                 val request = GetNoteRequest(file_path = filePath)
-                val response = networkDataSource.getNote(request)
+                val response = noteRemoteDataSource.getNote(request)
                 val note = NoteMapper.toDomain(response)
                 cacheDataSource.saveNote(note)
                 Result.success(note)
@@ -110,9 +110,9 @@ internal class NotesRepositoryImpl(
     override suspend fun updateNote(params: UpdateNoteParams): Result<Note> = withContext(dispatcher) {
         try {
             val request = NoteMapper.toProto(params)
-            val response = networkDataSource.updateNote(request)
+            val response = noteRemoteDataSource.updateNote(request)
             // Fetch the full updated note from network
-            val getResponse = networkDataSource.getNote(GetNoteRequest(file_path = params.filePath))
+            val getResponse = noteRemoteDataSource.getNote(GetNoteRequest(file_path = params.filePath))
             val note = NoteMapper.toDomain(getResponse)
             cacheDataSource.saveNote(note)
             Result.success(note)
@@ -128,7 +128,7 @@ internal class NotesRepositoryImpl(
     override suspend fun deleteNote(filePath: String): Result<Unit> = withContext(dispatcher) {
         try {
             val request = DeleteNoteRequest(file_path = filePath)
-            networkDataSource.deleteNote(request)
+            noteRemoteDataSource.deleteNote(request)
             cacheDataSource.deleteNote(filePath)
             Result.success(Unit)
         } catch (e: NetworkException) {
@@ -156,14 +156,14 @@ internal class NotesRepositoryImpl(
             when (op) {
                 is PendingOperation.Create -> {
                     val request = NoteMapper.toProto(op.params)
-                    val response = networkDataSource.createNote(request)
+                    val response = noteRemoteDataSource.createNote(request)
                     val note = NoteMapper.toDomain(response)
                     cacheDataSource.saveNote(note)
                 }
                 is PendingOperation.Update -> {
                     val request = NoteMapper.toProto(op.params)
-                    networkDataSource.updateNote(request)
-                    val getResponse = networkDataSource.getNote(
+                    noteRemoteDataSource.updateNote(request)
+                    val getResponse = noteRemoteDataSource.getNote(
                         GetNoteRequest(file_path = op.params.filePath)
                     )
                     val note = NoteMapper.toDomain(getResponse)

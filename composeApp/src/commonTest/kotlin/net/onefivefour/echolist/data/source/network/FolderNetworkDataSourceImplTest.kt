@@ -8,7 +8,6 @@ import folder.v1.RenameFolderRequest
 import folder.v1.RenameFolderResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -67,7 +66,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = CreateFolderResponse(entries = entries)
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             dataSource.createFolder(CreateFolderRequest(domain = "notes", parent_path = "", name = "test"))
 
@@ -79,7 +78,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = CreateFolderResponse(entries = entries)
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             val result = dataSource.createFolder(
                 CreateFolderRequest(domain = "notes", parent_path = "", name = "test")
@@ -95,7 +94,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     test("createFolder propagates network errors") {
         val error = NetworkException.ServerError(500, "internal error")
         val client = FailingClient(error)
-        val dataSource = FolderNetworkDataSourceImpl(client)
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
             dataSource.createFolder(CreateFolderRequest(domain = "d", parent_path = "", name = "n"))
@@ -111,7 +110,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = RenameFolderResponse(entries = entries)
             val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             dataSource.renameFolder(
                 RenameFolderRequest(domain = "notes", folder_path = "old/", new_name = "new")
@@ -125,7 +124,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = RenameFolderResponse(entries = entries)
             val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             val result = dataSource.renameFolder(
                 RenameFolderRequest(domain = "notes", folder_path = "old/", new_name = "new")
@@ -141,7 +140,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     test("renameFolder propagates network errors") {
         val error = NetworkException.ClientError(404, "not found")
         val client = FailingClient(error)
-        val dataSource = FolderNetworkDataSourceImpl(client)
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
             dataSource.renameFolder(
@@ -159,7 +158,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = DeleteFolderResponse(entries = entries)
             val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             dataSource.deleteFolder(DeleteFolderRequest(domain = "notes", folder_path = "old/"))
 
@@ -171,7 +170,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = DeleteFolderResponse(entries = entries)
             val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderNetworkDataSourceImpl(client)
+            val dataSource = FolderRemoteDataSourceImpl(client)
 
             val result = dataSource.deleteFolder(
                 DeleteFolderRequest(domain = "notes", folder_path = "old/")
@@ -187,7 +186,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     test("deleteFolder propagates network errors") {
         val error = NetworkException.NetworkError("connection refused")
         val client = FailingClient(error)
-        val dataSource = FolderNetworkDataSourceImpl(client)
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
             dataSource.deleteFolder(DeleteFolderRequest(domain = "d", folder_path = "p/"))

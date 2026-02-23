@@ -7,7 +7,7 @@ import folder.v1.DeleteFolderResponse
 import folder.v1.RenameFolderRequest
 import folder.v1.RenameFolderResponse
 
-internal class FakeFolderNetworkDataSource : FolderNetworkDataSource {
+internal class FakeFolderRemoteDataSource : FolderRemoteDataSource {
 
     var createFolderResult: Result<CreateFolderResponse> = Result.success(CreateFolderResponse())
     var renameFolderResult: Result<RenameFolderResponse> = Result.success(RenameFolderResponse())

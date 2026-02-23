@@ -8,9 +8,9 @@ import folder.v1.RenameFolderRequest
 import folder.v1.RenameFolderResponse
 import net.onefivefour.echolist.network.client.ConnectRpcClient
 
-internal class FolderNetworkDataSourceImpl(
+internal class FolderRemoteDataSourceImpl(
     private val client: ConnectRpcClient
-) : FolderNetworkDataSource {
+) : FolderRemoteDataSource {
 
     override suspend fun createFolder(request: CreateFolderRequest): CreateFolderResponse {
         return client.call(

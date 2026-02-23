@@ -4,7 +4,6 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
-import io.kotest.matchers.types.shouldBeInstanceOf
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.arbitrary
@@ -16,17 +15,15 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.supervisorScope
-import kotlinx.coroutines.test.StandardTestDispatcher
 import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.data.models.CreateNoteParams
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.models.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.data.source.network.NetworkDataSource
+import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.network.error.NetworkException
 import notes.v1.CreateNoteRequest
 import notes.v1.CreateNoteResponse
@@ -38,8 +35,6 @@ import notes.v1.ListNotesRequest
 import notes.v1.ListNotesResponse
 import notes.v1.UpdateNoteRequest
 import notes.v1.UpdateNoteResponse
-import kotlin.coroutines.coroutineContext
-import kotlinx.coroutines.ensureActive
 
 /**
  * Property-based tests for NotesRepositoryImpl behavior.
@@ -89,7 +84,7 @@ class NotesRepositoryPropertyTest : FunSpec({
      * A mock NetworkDataSource that returns pre-configured responses.
      * Tracks calls and can be configured to throw exceptions.
      */
-    class MockNetworkDataSource : NetworkDataSource {
+    class MockNoteRemoteDataSource : NoteRemoteDataSource {
         var createNoteHandler: suspend (CreateNoteRequest) -> CreateNoteResponse = { req ->
             CreateNoteResponse(
                 file_path = "${req.path}/${req.title}.md",
@@ -142,7 +137,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbCreateNoteParams) { params ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             val createdFilePath = "${params.path}/${params.title}.md"
             val createdTimestamp = System.currentTimeMillis()
@@ -189,7 +184,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNote, Arb.string(1..200)) { originalNote, newContent ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             val updatedTimestamp = originalNote.updatedAt + 1000
 
@@ -227,7 +222,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             mockNetwork.deleteNoteHandler = { DeleteNoteResponse() }
             mockNetwork.getNoteHandler = { req ->
@@ -255,7 +250,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNetworkException) { exception ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             // Make getNote throw the exception and ensure no cache fallback
             mockNetwork.getNoteHandler = { throw exception }
@@ -277,7 +272,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             // Seed cache
             cache.saveNote(note)
@@ -302,7 +297,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             // Seed cache
             cache.saveNote(note)
@@ -326,7 +321,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), Arb.int(2..5)) { opCount ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             // First: network fails so operations get queued
             mockNetwork.createNoteHandler = { throw NetworkException.NetworkError("offline") }
@@ -376,7 +371,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { filePath ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val mockNetwork = MockNetworkDataSource()
+            val mockNetwork = MockNoteRemoteDataSource()
 
             var networkCallStarted = false
             var networkCallCancelled = false

@@ -15,7 +15,7 @@ import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.data.source.network.NetworkDataSource
+import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import notes.v1.CreateNoteRequest
 import notes.v1.CreateNoteResponse
 import notes.v1.DeleteNoteRequest
@@ -61,7 +61,7 @@ class CacheFirstPropertyTest : FunSpec({
      * allowing us to verify the repository returns cached data before the
      * network call completes.
      */
-    class DelayedNetworkDataSource(private val delayMs: Long) : NetworkDataSource {
+    class DelayedNoteRemoteDataSource(private val delayMs: Long) : NoteRemoteDataSource {
         val networkCompleted = AtomicBoolean(false)
 
         override suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse {
@@ -94,7 +94,7 @@ class CacheFirstPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
-            val delayedNetwork = DelayedNetworkDataSource(delayMs = 5_000)
+            val delayedNetwork = DelayedNoteRemoteDataSource(delayMs = 5_000)
 
             // Seed cache with the note
             cache.saveNote(note)

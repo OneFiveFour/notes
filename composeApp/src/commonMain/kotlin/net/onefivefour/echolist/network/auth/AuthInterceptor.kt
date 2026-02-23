@@ -19,13 +19,13 @@ class AuthInterceptorConfig {
     lateinit var authEventFlow: MutableSharedFlow<AuthEvent>
 }
 
-private val AUTH_ENDPOINTS = setOf(
+private val PUBLIC_AUTH_ENDPOINTS = setOf(
     "/auth.v1.AuthService/Login",
     "/auth.v1.AuthService/RefreshToken"
 )
 
 private fun isAuthEndpoint(path: String): Boolean {
-    return AUTH_ENDPOINTS.any { path.endsWith(it) }
+    return PUBLIC_AUTH_ENDPOINTS.any { path.endsWith(it) }
 }
 
 /**

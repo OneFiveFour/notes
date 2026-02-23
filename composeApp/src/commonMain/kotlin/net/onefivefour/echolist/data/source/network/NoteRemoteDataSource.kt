@@ -11,7 +11,7 @@ import notes.v1.ListNotesResponse
 import notes.v1.UpdateNoteRequest
 import notes.v1.UpdateNoteResponse
 
-internal interface NetworkDataSource {
+internal interface NoteRemoteDataSource {
     suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse
     suspend fun listNotes(request: ListNotesRequest): ListNotesResponse
     suspend fun getNote(request: GetNoteRequest): GetNoteResponse

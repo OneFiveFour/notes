@@ -2,7 +2,7 @@ package net.onefivefour.echolist.data.mapper
 
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.FolderEntry
+import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.RenameFolderParams
 import folder.v1.CreateFolderRequest
 import folder.v1.CreateFolderResponse
@@ -18,17 +18,17 @@ internal object FolderMapper {
 
     // Proto -> Domain
 
-    fun toDomain(proto: folder.v1.FolderEntry): FolderEntry = FolderEntry(
+    fun toDomain(proto: folder.v1.FolderEntry): Folder = Folder(
         path = proto.path
     )
 
-    fun toDomain(proto: CreateFolderResponse): List<FolderEntry> =
+    fun toDomain(proto: CreateFolderResponse): List<Folder> =
         proto.entries.map { toDomain(it) }
 
-    fun toDomain(proto: RenameFolderResponse): List<FolderEntry> =
+    fun toDomain(proto: RenameFolderResponse): List<Folder> =
         proto.entries.map { toDomain(it) }
 
-    fun toDomain(proto: DeleteFolderResponse): List<FolderEntry> =
+    fun toDomain(proto: DeleteFolderResponse): List<Folder> =
         proto.entries.map { toDomain(it) }
 
     // Domain -> Proto

@@ -1,0 +1,21 @@
+CREATE TABLE Folder (
+    parentPath TEXT NOT NULL,
+    entryPath TEXT NOT NULL,
+    cachedAt INTEGER NOT NULL,
+    PRIMARY KEY (parentPath, entryPath)
+);
+
+CREATE INDEX entry_parent_index ON Folder(parentPath);
+
+insertOrReplace:
+INSERT OR REPLACE INTO Folder(parentPath, entryPath, cachedAt)
+VALUES (?, ?, ?);
+
+selectByParentPath:
+SELECT entryPath FROM Folder WHERE parentPath = ?;
+
+deleteByParentPath:
+DELETE FROM Folder WHERE parentPath = ?;
+
+deleteAll:
+DELETE FROM Folder;

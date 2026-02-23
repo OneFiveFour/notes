@@ -16,7 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
 import net.onefivefour.echolist.data.models.RenameFolderParams
-import net.onefivefour.echolist.data.source.network.FakeFolderNetworkDataSource
+import net.onefivefour.echolist.data.source.network.FakeFolderRemoteDataSource
 import net.onefivefour.echolist.network.error.NetworkException
 
 class FolderRepositoryImplTest : FunSpec({
@@ -54,7 +54,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("createFolder returns mapped folder entries on success").config(invocations = 20) {
         checkAll(arbCreateFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
@@ -71,7 +71,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("createFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbCreateFolderParams) { params ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
             repo.createFolder(params)
@@ -83,7 +83,7 @@ class FolderRepositoryImplTest : FunSpec({
     }
 
     test("createFolder returns failure when network throws") {
-        val fake = FakeFolderNetworkDataSource()
+        val fake = FakeFolderRemoteDataSource()
         fake.createFolderResult = Result.failure(NetworkException.ServerError(500, "boom"))
         val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
@@ -97,7 +97,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("renameFolder returns mapped folder entries on success").config(invocations = 20) {
         checkAll(arbRenameFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             fake.renameFolderResult = Result.success(RenameFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
@@ -114,7 +114,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("renameFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbRenameFolderParams) { params ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
             repo.renameFolder(params)
@@ -126,7 +126,7 @@ class FolderRepositoryImplTest : FunSpec({
     }
 
     test("renameFolder returns failure when network throws") {
-        val fake = FakeFolderNetworkDataSource()
+        val fake = FakeFolderRemoteDataSource()
         fake.renameFolderResult = Result.failure(NetworkException.ClientError(404, "not found"))
         val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
@@ -140,7 +140,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("deleteFolder returns mapped folder entries on success").config(invocations = 20) {
         checkAll(arbDeleteFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             fake.deleteFolderResult = Result.success(DeleteFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
@@ -157,7 +157,7 @@ class FolderRepositoryImplTest : FunSpec({
 
     test("deleteFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbDeleteFolderParams) { params ->
-            val fake = FakeFolderNetworkDataSource()
+            val fake = FakeFolderRemoteDataSource()
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 
             repo.deleteFolder(params)
@@ -168,7 +168,7 @@ class FolderRepositoryImplTest : FunSpec({
     }
 
     test("deleteFolder returns failure when network throws") {
-        val fake = FakeFolderNetworkDataSource()
+        val fake = FakeFolderRemoteDataSource()
         fake.deleteFolderResult = Result.failure(NetworkException.NetworkError("timeout"))
         val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
 

@@ -42,21 +42,21 @@ fun App() {
             }
 
             AuthState.Unauthenticated -> {
-                val loginVm = koinViewModel<LoginViewModel>()
-                val loginState by loginVm.uiState.collectAsStateWithLifecycle()
+                val loginViewModel = koinViewModel<LoginViewModel>()
+                val loginState by loginViewModel.uiState.collectAsStateWithLifecycle()
 
                 LaunchedEffect(Unit) {
-                    loginVm.loginSuccess.collect {
+                    loginViewModel.loginSuccess.collect {
                         authViewModel.onAuthenticated()
                     }
                 }
 
                 LoginScreen(
                     uiState = loginState,
-                    onBackendUrlChanged = loginVm::onBackendUrlChanged,
-                    onUsernameChanged = loginVm::onUsernameChanged,
-                    onPasswordChanged = loginVm::onPasswordChanged,
-                    onLoginClick = loginVm::onLoginClick
+                    onBackendUrlChanged = loginViewModel::onBackendUrlChanged,
+                    onUsernameChanged = loginViewModel::onUsernameChanged,
+                    onPasswordChanged = loginViewModel::onPasswordChanged,
+                    onLoginClick = loginViewModel::onLoginClick
                 )
             }
 
@@ -77,10 +77,10 @@ fun App() {
                     predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
                     entryProvider = entryProvider {
                         entry<HomeRoute> { route ->
-                            val viewModel = koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
-                            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                            val homeViewModel = koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
+                            val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                             HomeScreen(
-                                uiState = uiState,
+                                uiState = homeUiState,
                                 onNavigationClick = if (backStack.size > 1) {{ backStack.removeLastOrNull() }} else null,
                                 onBreadcrumbClick = { path ->
                                     val index = backStack.indexOfLast { it is HomeRoute && it.path == path }
@@ -96,10 +96,10 @@ fun App() {
                         }
 
                         entry<NoteDetailRoute> { route ->
-                            val viewModel = koinViewModel<NoteDetailViewModel> { parametersOf(route.noteId) }
-                            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+                            val noteDetailViewModel = koinViewModel<NoteDetailViewModel> { parametersOf(route.noteId) }
+                            val noteDetailUiState by noteDetailViewModel.uiState.collectAsStateWithLifecycle()
                             NoteDetailScreen(
-                                uiState = uiState,
+                                uiState = noteDetailUiState,
                                 onBackClick = { backStack.removeLastOrNull() }
                             )
                         }

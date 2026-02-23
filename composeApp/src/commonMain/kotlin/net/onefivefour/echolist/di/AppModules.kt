@@ -14,10 +14,10 @@ import net.onefivefour.echolist.data.repository.FolderRepository
 import net.onefivefour.echolist.data.repository.FolderRepositoryImpl
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.data.source.network.FolderNetworkDataSource
-import net.onefivefour.echolist.data.source.network.FolderNetworkDataSourceImpl
-import net.onefivefour.echolist.data.source.network.NetworkDataSource
-import net.onefivefour.echolist.data.source.network.NetworkDataSourceImpl
+import net.onefivefour.echolist.data.source.network.FolderRemoteDataSource
+import net.onefivefour.echolist.data.source.network.FolderRemoteDataSourceImpl
+import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
+import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.network.client.ConnectRpcClient
 import net.onefivefour.echolist.network.client.ConnectRpcClientImpl
 import net.onefivefour.echolist.network.config.NetworkConfigProvider
@@ -66,12 +66,12 @@ val networkModule: Module = module {
         )
     }
 
-    single<NetworkDataSource> {
-        NetworkDataSourceImpl(client = get())
+    single<NoteRemoteDataSource> {
+        NoteRemoteDataSourceImpl(client = get())
     }
 
-    single<FolderNetworkDataSource> {
-        FolderNetworkDataSourceImpl(client = get())
+    single<FolderRemoteDataSource> {
+        FolderRemoteDataSourceImpl(client = get())
     }
 }
 
@@ -82,7 +82,7 @@ val dataModule: Module = module {
 
     single<NotesRepository> {
         NotesRepositoryImpl(
-            networkDataSource = get(),
+            noteRemoteDataSource = get(),
             cacheDataSource = get(),
             dispatcher = Dispatchers.Default
         )

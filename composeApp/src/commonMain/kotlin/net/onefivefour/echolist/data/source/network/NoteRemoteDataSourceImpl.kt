@@ -12,9 +12,9 @@ import notes.v1.ListNotesResponse
 import notes.v1.UpdateNoteRequest
 import notes.v1.UpdateNoteResponse
 
-internal class NetworkDataSourceImpl(
+internal class NoteRemoteDataSourceImpl(
     private val client: ConnectRpcClient
-) : NetworkDataSource {
+) : NoteRemoteDataSource {
 
     override suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse {
         return client.call(

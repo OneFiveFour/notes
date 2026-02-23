@@ -11,8 +11,8 @@ import net.onefivefour.echolist.data.source.StorageKeys
  * layer at the user-provided backend.
  */
 class NetworkConfigProvider(
-    private val secureStorage: SecureStorage,
-    private val defaultBaseUrl: String = DEFAULT_BASE_URL
+    secureStorage: SecureStorage,
+    defaultBaseUrl: String = DEFAULT_BASE_URL
 ) {
 
     companion object {

@@ -7,7 +7,7 @@ import folder.v1.DeleteFolderResponse
 import folder.v1.RenameFolderRequest
 import folder.v1.RenameFolderResponse
 
-internal interface FolderNetworkDataSource {
+internal interface FolderRemoteDataSource {
     suspend fun createFolder(request: CreateFolderRequest): CreateFolderResponse
     suspend fun renameFolder(request: RenameFolderRequest): RenameFolderResponse
     suspend fun deleteFolder(request: DeleteFolderRequest): DeleteFolderResponse
