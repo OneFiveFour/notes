@@ -8,10 +8,11 @@ internal class CacheDataSourceImpl(
     private val currentTimeMillis: () -> Long = { currentEpochMillis() }
 ) : CacheDataSource {
 
-    private val queries get() = database.notesQueries
+    private val noteQueries get() = database.notesQueries
+    private val entryQueries get() = database.folderEntriesQueries
 
     override suspend fun saveNote(note: Note) {
-        queries.insertOrReplace(
+        noteQueries.insertOrReplace(
             filePath = note.filePath,
             title = note.title,
             content = note.content,
@@ -23,7 +24,7 @@ internal class CacheDataSourceImpl(
     override suspend fun saveNotes(notes: List<Note>) {
         database.transaction {
             notes.forEach { note ->
-                queries.insertOrReplace(
+                noteQueries.insertOrReplace(
                     filePath = note.filePath,
                     title = note.title,
                     content = note.content,
@@ -35,23 +36,44 @@ internal class CacheDataSourceImpl(
     }
 
     override suspend fun getNote(filePath: String): Note? {
-        return queries.selectByFilePath(filePath).executeAsOneOrNull()?.toDomain()
+        return noteQueries.selectByFilePath(filePath).executeAsOneOrNull()?.toDomain()
     }
 
     override suspend fun listNotes(path: String): List<Note> {
         return if (path.isEmpty()) {
-            queries.selectAll().executeAsList().map { it.toDomain() }
+            noteQueries.selectAll().executeAsList().map { it.toDomain() }
         } else {
-            queries.selectByPathPrefix(path).executeAsList().map { it.toDomain() }
+            noteQueries.selectByPathPrefix(path).executeAsList().map { it.toDomain() }
         }
     }
 
     override suspend fun deleteNote(filePath: String) {
-        queries.deleteByFilePath(filePath)
+        noteQueries.deleteByFilePath(filePath)
+    }
+
+    override suspend fun saveEntries(parentPath: String, entries: List<String>) {
+        database.transaction {
+            entryQueries.deleteByParentPath(parentPath)
+            val now = currentTimeMillis()
+            entries.forEach { entryPath ->
+                entryQueries.insertOrReplace(
+                    parentPath = parentPath,
+                    entryPath = entryPath,
+                    cachedAt = now
+                )
+            }
+        }
+    }
+
+    override suspend fun listEntries(parentPath: String): List<String> {
+        return entryQueries.selectByParentPath(parentPath).executeAsList()
     }
 
     override suspend fun clear() {
-        queries.deleteAll()
+        database.transaction {
+            noteQueries.deleteAll()
+            entryQueries.deleteAll()
+        }
     }
 }
 

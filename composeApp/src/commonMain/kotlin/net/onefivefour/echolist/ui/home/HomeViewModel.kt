@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.onefivefour.echolist.data.models.ListNotesResult
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.NotesRepository
 
@@ -33,12 +34,12 @@ class HomeViewModel(
     private suspend fun loadData() {
         val result = repository.listNotes(path)
         result.fold(
-            onSuccess = { notes ->
+            onSuccess = { listResult ->
                 _uiState.value = HomeScreenUiState(
                     title = titleFromPath(path),
                     breadcrumbs = buildBreadcrumbs(path),
-                    folders = extractFolders(notes, path),
-                    files = extractFiles(notes, path)
+                    folders = extractFolders(listResult.entries, listResult.notes),
+                    files = extractFiles(listResult.entries, listResult.notes)
                 )
             },
             onFailure = {
@@ -73,49 +74,41 @@ private fun buildBreadcrumbs(path: String): List<BreadcrumbItem> {
 }
 
 /**
- * Extracts distinct immediate subdirectories from the notes list.
- * A note at path "current/sub/file.md" when current path is "current"
- * means "sub" is a folder.
+ * Extracts folders from the entries list.
+ * Folder entries end with "/". For each folder entry, count how many notes
+ * have file paths starting with that folder path.
  */
-private fun extractFolders(notes: List<Note>, currentPath: String): List<FolderUiModel> {
-    val prefix = if (currentPath == "/") "/" else "$currentPath/"
-    val folderMap = mutableMapOf<String, Int>()
-
-    for (note in notes) {
-        val relativePath = note.filePath.removePrefix(prefix)
-        if (relativePath == note.filePath && currentPath != "/" && currentPath.isNotEmpty()) continue
-        if (relativePath.contains('/')) {
-            val folderName = relativePath.substringBefore('/')
-            folderMap[folderName] = (folderMap[folderName] ?: 0) + 1
+private fun extractFolders(entries: List<String>, notes: List<Note>): List<FolderUiModel> {
+    return entries
+        .filter { it.endsWith("/") }
+        .map { folderPath ->
+            val name = folderPath.trimEnd('/').substringAfterLast('/')
+            val itemCount = notes.count { it.filePath.startsWith(folderPath) }
+            FolderUiModel(
+                id = folderPath,
+                name = name,
+                itemCount = itemCount
+            )
         }
-    }
-
-    return folderMap.map { (name, count) ->
-        val folderPath = if (currentPath == "/") "/$name" else "$currentPath/$name"
-        FolderUiModel(id = folderPath, name = name, itemCount = count)
-    }
 }
 
 /**
- * Extracts notes that are direct children of the current path (no subdirectory).
+ * Extracts files from the entries list.
+ * File entries don't end with "/". Matches each entry to its Note for title/content.
  */
-private fun extractFiles(notes: List<Note>, currentPath: String): List<FileUiModel> {
-    val prefix = if (currentPath == "/") "/" else "$currentPath/"
-
-    return notes.filter { note ->
-        val relativePath = note.filePath.removePrefix(prefix)
-        relativePath != note.filePath || currentPath == "/" || currentPath.isEmpty()
-    }.filter { note ->
-        val relativePath = note.filePath.removePrefix(prefix)
-        !relativePath.contains('/')
-    }.map { note ->
-        FileUiModel(
-            id = note.filePath,
-            title = note.title,
-            preview = note.content.take(100),
-            timestamp = formatTimestamp(note.updatedAt)
-        )
-    }
+private fun extractFiles(entries: List<String>, notes: List<Note>): List<FileUiModel> {
+    val notesByPath = notes.associateBy { it.filePath }
+    return entries
+        .filter { !it.endsWith("/") }
+        .mapNotNull { filePath ->
+            val note = notesByPath[filePath] ?: return@mapNotNull null
+            FileUiModel(
+                id = note.filePath,
+                title = note.title,
+                preview = note.content.take(100),
+                timestamp = formatTimestamp(note.updatedAt)
+            )
+        }
 }
 
 private fun formatTimestamp(epochMillis: Long): String {

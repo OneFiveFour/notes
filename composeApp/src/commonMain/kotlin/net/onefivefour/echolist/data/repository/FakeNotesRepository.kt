@@ -1,6 +1,7 @@
 package net.onefivefour.echolist.data.repository
 
 import net.onefivefour.echolist.data.models.CreateNoteParams
+import net.onefivefour.echolist.data.models.ListNotesResult
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.models.UpdateNoteParams
 
@@ -25,9 +26,16 @@ class FakeNotesRepository : NotesRepository {
         shouldFail = exception
     }
 
+    private val entries = mutableListOf<String>()
+
     /** Pre-populate the in-memory store with notes. */
     fun addNotes(vararg notesToAdd: Note) {
         notesToAdd.forEach { notes[it.filePath] = it }
+    }
+
+    /** Pre-populate the entries list. */
+    fun addEntries(vararg entriesToAdd: String) {
+        entries.addAll(entriesToAdd)
     }
 
     override suspend fun createNote(params: CreateNoteParams): Result<Note> {
@@ -44,16 +52,16 @@ class FakeNotesRepository : NotesRepository {
         return Result.success(note)
     }
 
-    override suspend fun listNotes(path: String): Result<List<Note>> {
+    override suspend fun listNotes(path: String): Result<ListNotesResult> {
         callLog.add("listNotes($path)")
         shouldFail?.let { return Result.failure(it) }
 
-        val result = if (path.isEmpty()) {
+        val filteredNotes = if (path.isEmpty()) {
             notes.values.toList()
         } else {
             notes.values.filter { it.filePath.startsWith(path) }
         }
-        return Result.success(result)
+        return Result.success(ListNotesResult(notes = filteredNotes, entries = entries.toList()))
     }
 
     override suspend fun getNote(filePath: String): Result<Note> {

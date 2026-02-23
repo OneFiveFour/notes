@@ -23,8 +23,8 @@ class FolderRepositoryImplTest : FunSpec({
 
     // -- Generators --
 
-    val arbDirectoryEntry = arbitrary {
-        folder.v1.DirectoryEntry(path = Arb.string(1..100).bind())
+    val arbFolderEntry = arbitrary {
+        folder.v1.FolderEntry(path = Arb.string(1..100).bind())
     }
 
     val arbCreateFolderParams = arbitrary {
@@ -52,8 +52,8 @@ class FolderRepositoryImplTest : FunSpec({
 
     // -- CreateFolder --
 
-    test("createFolder returns mapped directory entries on success").config(invocations = 20) {
-        checkAll(arbCreateFolderParams, Arb.list(arbDirectoryEntry, 0..5)) { params, entries ->
+    test("createFolder returns mapped folder entries on success").config(invocations = 20) {
+        checkAll(arbCreateFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
             val fake = FakeFolderNetworkDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
@@ -95,8 +95,8 @@ class FolderRepositoryImplTest : FunSpec({
 
     // -- RenameFolder --
 
-    test("renameFolder returns mapped directory entries on success").config(invocations = 20) {
-        checkAll(arbRenameFolderParams, Arb.list(arbDirectoryEntry, 0..5)) { params, entries ->
+    test("renameFolder returns mapped folder entries on success").config(invocations = 20) {
+        checkAll(arbRenameFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
             val fake = FakeFolderNetworkDataSource()
             fake.renameFolderResult = Result.success(RenameFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)
@@ -138,8 +138,8 @@ class FolderRepositoryImplTest : FunSpec({
 
     // -- DeleteFolder --
 
-    test("deleteFolder returns mapped directory entries on success").config(invocations = 20) {
-        checkAll(arbDeleteFolderParams, Arb.list(arbDirectoryEntry, 0..5)) { params, entries ->
+    test("deleteFolder returns mapped folder entries on success").config(invocations = 20) {
+        checkAll(arbDeleteFolderParams, Arb.list(arbFolderEntry, 0..5)) { params, entries ->
             val fake = FakeFolderNetworkDataSource()
             fake.deleteFolderResult = Result.success(DeleteFolderResponse(entries = entries))
             val repo = FolderRepositoryImpl(fake, Dispatchers.Unconfined)

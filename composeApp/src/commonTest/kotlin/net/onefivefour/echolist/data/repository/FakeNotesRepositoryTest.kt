@@ -32,7 +32,7 @@ class FakeNotesRepositoryTest {
         val result = repo.listNotes()
 
         assertTrue(result.isSuccess)
-        assertEquals(2, result.getOrNull()?.size)
+        assertEquals(2, result.getOrNull()?.notes?.size)
     }
 
     @Test

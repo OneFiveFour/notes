@@ -18,8 +18,8 @@ class FolderMapperPropertyTest : FunSpec({
 
     val arbPath = Arb.string(1..100)
 
-    val arbDirectoryEntry = arbitrary {
-        folder.v1.DirectoryEntry(path = arbPath.bind())
+    val arbFolderEntry = arbitrary {
+        folder.v1.FolderEntry(path = arbPath.bind())
     }
 
     val arbCreateFolderParams = arbitrary {
@@ -47,15 +47,15 @@ class FolderMapperPropertyTest : FunSpec({
 
     // -- Proto -> Domain --
 
-    test("DirectoryEntry proto -> domain preserves path").config(invocations = 20) {
-        checkAll(arbDirectoryEntry) { proto ->
+    test("FolderEntry proto -> domain preserves path").config(invocations = 20) {
+        checkAll(arbFolderEntry) { proto ->
             val domain = FolderMapper.toDomain(proto)
             domain.path shouldBe proto.path
         }
     }
 
     test("CreateFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..10)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
             val response = folder.v1.CreateFolderResponse(entries = entries)
             val domain = FolderMapper.toDomain(response)
             domain shouldHaveSize entries.size
@@ -66,7 +66,7 @@ class FolderMapperPropertyTest : FunSpec({
     }
 
     test("RenameFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..10)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
             val response = folder.v1.RenameFolderResponse(entries = entries)
             val domain = FolderMapper.toDomain(response)
             domain shouldHaveSize entries.size
@@ -77,7 +77,7 @@ class FolderMapperPropertyTest : FunSpec({
     }
 
     test("DeleteFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..10)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
             val response = folder.v1.DeleteFolderResponse(entries = entries)
             val domain = FolderMapper.toDomain(response)
             domain shouldHaveSize entries.size

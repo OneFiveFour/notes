@@ -315,8 +315,8 @@ class NotesRepositoryPropertyTest : FunSpec({
             val result = repo.listNotes("")
             result.isSuccess shouldBe true
 
-            val notes = result.getOrThrow()
-            notes.any { it.filePath == note.filePath } shouldBe true
+            val listResult = result.getOrThrow()
+            listResult.notes.any { it.filePath == note.filePath } shouldBe true
         }
     }
 

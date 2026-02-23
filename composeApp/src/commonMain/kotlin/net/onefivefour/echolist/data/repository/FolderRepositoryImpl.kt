@@ -6,7 +6,7 @@ import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.FolderMapper
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.DirectoryEntry
+import net.onefivefour.echolist.data.models.FolderEntry
 import net.onefivefour.echolist.data.models.RenameFolderParams
 import net.onefivefour.echolist.data.source.network.FolderNetworkDataSource
 
@@ -15,7 +15,7 @@ internal class FolderRepositoryImpl(
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : FolderRepository {
 
-    override suspend fun createFolder(params: CreateFolderParams): Result<List<DirectoryEntry>> =
+    override suspend fun createFolder(params: CreateFolderParams): Result<List<FolderEntry>> =
         withContext(dispatcher) {
             try {
                 val request = FolderMapper.toProto(params)
@@ -26,7 +26,7 @@ internal class FolderRepositoryImpl(
             }
         }
 
-    override suspend fun renameFolder(params: RenameFolderParams): Result<List<DirectoryEntry>> =
+    override suspend fun renameFolder(params: RenameFolderParams): Result<List<FolderEntry>> =
         withContext(dispatcher) {
             try {
                 val request = FolderMapper.toProto(params)
@@ -37,7 +37,7 @@ internal class FolderRepositoryImpl(
             }
         }
 
-    override suspend fun deleteFolder(params: DeleteFolderParams): Result<List<DirectoryEntry>> =
+    override suspend fun deleteFolder(params: DeleteFolderParams): Result<List<FolderEntry>> =
         withContext(dispatcher) {
             try {
                 val request = FolderMapper.toProto(params)

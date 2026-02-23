@@ -22,8 +22,8 @@ class FolderNetworkDataSourceImplTest : FunSpec({
 
     // -- Generators --
 
-    val arbDirectoryEntry = arbitrary {
-        folder.v1.DirectoryEntry(path = Arb.string(1..100).bind())
+    val arbFolderEntry = arbitrary {
+        folder.v1.FolderEntry(path = Arb.string(1..100).bind())
     }
 
     // -- Helpers --
@@ -64,7 +64,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     // -- CreateFolder --
 
     test("createFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = CreateFolderResponse(entries = entries)
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
@@ -76,7 +76,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     }
 
     test("createFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = CreateFolderResponse(entries = entries)
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
@@ -108,7 +108,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     // -- RenameFolder --
 
     test("renameFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = RenameFolderResponse(entries = entries)
             val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
@@ -122,7 +122,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     }
 
     test("renameFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = RenameFolderResponse(entries = entries)
             val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
@@ -156,7 +156,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     // -- DeleteFolder --
 
     test("deleteFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = DeleteFolderResponse(entries = entries)
             val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
@@ -168,7 +168,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
     }
 
     test("deleteFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbDirectoryEntry, 0..5)) { entries ->
+        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
             val response = DeleteFolderResponse(entries = entries)
             val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderNetworkDataSourceImpl(client)
