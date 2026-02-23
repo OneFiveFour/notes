@@ -10,8 +10,12 @@ import net.onefivefour.echolist.network.auth.AuthEvent
 import net.onefivefour.echolist.network.auth.AuthInterceptor
 import net.onefivefour.echolist.data.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
+import net.onefivefour.echolist.data.repository.FolderRepository
+import net.onefivefour.echolist.data.repository.FolderRepositoryImpl
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
+import net.onefivefour.echolist.data.source.network.FolderNetworkDataSource
+import net.onefivefour.echolist.data.source.network.FolderNetworkDataSourceImpl
 import net.onefivefour.echolist.data.source.network.NetworkDataSource
 import net.onefivefour.echolist.data.source.network.NetworkDataSourceImpl
 import net.onefivefour.echolist.network.client.ConnectRpcClient
@@ -65,6 +69,10 @@ val networkModule: Module = module {
     single<NetworkDataSource> {
         NetworkDataSourceImpl(client = get())
     }
+
+    single<FolderNetworkDataSource> {
+        FolderNetworkDataSourceImpl(client = get())
+    }
 }
 
 val dataModule: Module = module {
@@ -76,6 +84,13 @@ val dataModule: Module = module {
         NotesRepositoryImpl(
             networkDataSource = get(),
             cacheDataSource = get(),
+            dispatcher = Dispatchers.Default
+        )
+    }
+
+    single<FolderRepository> {
+        FolderRepositoryImpl(
+            networkDataSource = get(),
             dispatcher = Dispatchers.Default
         )
     }
