@@ -14,8 +14,8 @@ import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.network.config.NetworkConfigProvider
 
 class LoginViewModel(
+    secureStorage: SecureStorage,
     private val authRepository: AuthRepository,
-    private val secureStorage: SecureStorage,
     private val networkConfigProvider: NetworkConfigProvider? = null
 ) : ViewModel() {
 

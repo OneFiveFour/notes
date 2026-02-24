@@ -42,6 +42,7 @@ fun EchoListTheme(
     val resolvedThemeManager = themeManager ?: if (isKoinStarted) {
         koinInject<ThemeManager>()
     } else {
+        // use default theme for previews where we cannot use Koin
         ThemeManager(
             availableThemes = listOf(EchoListClassicTheme),
             initialTheme = EchoListClassicTheme
@@ -59,7 +60,7 @@ fun EchoListTheme(
         MaterialTheme(
             colorScheme = colorScheme,
             typography = typography,
-            shapes = LocalShapes.current,
+            shapes = EchoListTheme.shapes,
             content = content
         )
     }
