@@ -103,13 +103,13 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
     - **Validates: Requirements 1.4**
     - Use `checkAll` with varying folder counts to verify row padding logic
 
-- [ ] 7. Update Koin DI wiring
-  - [ ] 7.1 Update `navigationModule` in `AppModules.kt`
+- [x] 7. Update Koin DI wiring
+  - [x] 7.1 Update `navigationModule` in `AppModules.kt`
     - Update `HomeViewModel` factory to inject `FolderRepository` alongside `NotesRepository`
     - _Requirements: 4.1_
 
-- [ ] 8. Wire ViewModel to HomeScreen in navigation
-  - [ ] 8.1 Connect ViewModel callbacks to HomeScreen at the call site
+- [x] 8. Wire ViewModel to HomeScreen in navigation
+  - [x] 8.1 Connect ViewModel callbacks to HomeScreen at the call site
     - Pass `uiState.inlineCreationState` to HomeScreen
     - Wire `onAddFolderClick` → `viewModel.onAddFolderClicked()`
     - Wire `onInlineNameChanged` → `viewModel.onInlineNameChanged()`
@@ -117,7 +117,7 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
     - Wire `onInlineCancel` → `viewModel.onInlineCancel()`
     - _Requirements: 2.1, 2.5, 3.2, 4.1_
 
-- [ ] 9. Final checkpoint - Ensure all tests pass
+- [x] 9. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

@@ -92,10 +92,10 @@ fun App() {
                                 },
                                 onFolderClick = { folderId -> backStack.add(HomeRoute(folderId)) },
                                 onFileClick = { fileId -> backStack.add(NoteDetailRoute(fileId)) },
-                                onAddFolderClick = { },
-                                onInlineNameChanged = { },
-                                onInlineConfirm = { },
-                                onInlineCancel = { }
+                                onAddFolderClick = homeViewModel::onAddFolderClicked,
+                                onInlineNameChanged = homeViewModel::onInlineNameChanged,
+                                onInlineConfirm = homeViewModel::onInlineConfirm,
+                                onInlineCancel = homeViewModel::onInlineCancel
                             )
                         }
 

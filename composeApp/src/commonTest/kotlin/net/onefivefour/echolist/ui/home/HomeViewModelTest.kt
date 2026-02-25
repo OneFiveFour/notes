@@ -37,6 +37,7 @@ class HomeViewModelTest {
             Note("/notes/hello.md", "Hello", "Hello content", 60_000L),
             Note("/readme.md", "Readme", "Readme content", 120_000L)
         )
+        repo.addEntries("notes/", "/readme.md")
 
         val viewModel = HomeViewModel("/", repo, FakeFolderRepository())
         advanceUntilIdle()
