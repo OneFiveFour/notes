@@ -91,7 +91,11 @@ fun App() {
                                     }
                                 },
                                 onFolderClick = { folderId -> backStack.add(HomeRoute(folderId)) },
-                                onFileClick = { fileId -> backStack.add(NoteDetailRoute(fileId)) }
+                                onFileClick = { fileId -> backStack.add(NoteDetailRoute(fileId)) },
+                                onAddFolderClick = { },
+                                onInlineNameChanged = { },
+                                onInlineConfirm = { },
+                                onInlineCancel = { }
                             )
                         }
 

@@ -84,8 +84,8 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
     - Accept item-type-agnostic parameters: `icon`, `placeholder`, `onConfirm`, `onCancel`, `onValueChange`, `value`, `isLoading`, `errorMessage`
     - _Requirements: 2.2, 2.3, 2.4, 2.6, 4.2, 4.5, 5.1, 5.3_
 
-- [ ] 6. Update HomeScreen to integrate AddItemButton and InlineItemEditor
-  - [ ] 6.1 Modify `HomeScreen.kt` folder grid logic
+- [x] 6. Update HomeScreen to integrate AddItemButton and InlineItemEditor
+  - [x] 6.1 Modify `HomeScreen.kt` folder grid logic
     - When `inlineCreationState` is `Hidden`: append `AddItemButton` as the last grid item after all `FolderCard` items
     - When `inlineCreationState` is `Editing`, `Saving`, or `Error`: replace the `AddItemButton` cell with `InlineItemEditor`
     - Maintain 2-column layout: pad odd-count rows with a `Spacer`
@@ -93,12 +93,12 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
     - Add new callback parameters: `onAddFolderClick`, `onInlineNameChanged`, `onInlineConfirm`, `onInlineCancel`
     - _Requirements: 1.1, 1.4, 2.1, 2.5, 2.6_
 
-  - [ ] 6.2 Write property test: AddButton is always last grid item (Property 1)
+  - [x] 6.2 Write property test: AddButton is always last grid item (Property 1)
     - **Property 1: AddButton is always the last grid item**
     - **Validates: Requirements 1.1**
     - Use `checkAll` with `Arb.list(arbFolderUiModel, 0..20)` to verify grid item ordering
 
-  - [ ] 6.3 Write property test: Grid rows padded to 2 columns (Property 2)
+  - [x] 6.3 Write property test: Grid rows padded to 2 columns (Property 2)
     - **Property 2: Grid rows are always padded to 2 columns**
     - **Validates: Requirements 1.4**
     - Use `checkAll` with varying folder counts to verify row padding logic

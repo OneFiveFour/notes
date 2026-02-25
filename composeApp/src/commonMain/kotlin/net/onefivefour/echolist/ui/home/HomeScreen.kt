@@ -8,11 +8,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -25,6 +27,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
+/**
+ * Sealed type representing the different cell types in the folder grid.
+ */
+internal sealed interface FolderGridCell {
+    data class Folder(val folder: FolderUiModel) : FolderGridCell
+    data object AddButton : FolderGridCell
+    data class InlineEditor(val state: InlineCreationState) : FolderGridCell
+}
+
+/**
+ * Builds the list of grid cells for the folder section.
+ * All folders come first, followed by either the AddButton or InlineEditor.
+ */
+internal fun buildFolderGridItems(
+    folders: List<FolderUiModel>,
+    inlineCreationState: InlineCreationState
+): List<FolderGridCell> = buildList {
+    folders.forEach { folder ->
+        add(FolderGridCell.Folder(folder))
+    }
+    when (inlineCreationState) {
+        is InlineCreationState.Hidden -> add(FolderGridCell.AddButton)
+        is InlineCreationState.Editing -> add(FolderGridCell.InlineEditor(inlineCreationState))
+        is InlineCreationState.Saving -> add(FolderGridCell.InlineEditor(inlineCreationState))
+        is InlineCreationState.Error -> add(FolderGridCell.InlineEditor(inlineCreationState))
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -33,6 +63,10 @@ fun HomeScreen(
     onBreadcrumbClick: (path: String) -> Unit,
     onFolderClick: (folderId: String) -> Unit,
     onFileClick: (fileId: String) -> Unit,
+    onAddFolderClick: () -> Unit,
+    onInlineNameChanged: (String) -> Unit,
+    onInlineConfirm: () -> Unit,
+    onInlineCancel: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -40,6 +74,7 @@ fun HomeScreen(
             .fillMaxSize()
             .background(EchoListTheme.materialColors.background)
             .padding(horizontal = EchoListTheme.dimensions.l)
+            .imePadding()
             .verticalScroll(rememberScrollState())
     ) {
 
@@ -82,25 +117,58 @@ fun HomeScreen(
             color = EchoListTheme.materialColors.primary
         )
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
-        val folderRows = uiState.folders.chunked(2)
-        folderRows.forEachIndexed { index, row ->
+
+        // Build grid items: all folders + trailing AddButton or InlineEditor
+        val gridItems = buildFolderGridItems(uiState.folders, uiState.inlineCreationState)
+
+        val gridRows = gridItems.chunked(2)
+        gridRows.forEachIndexed { index, row ->
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
             ) {
-                row.forEach { folder ->
-                    FolderCard(
-                        folder = folder,
-                        onClick = { onFolderClick(folder.id) },
-                        modifier = Modifier.weight(1f)
-                    )
+                row.forEach { cell ->
+                    when (cell) {
+                        is FolderGridCell.Folder -> {
+                            FolderCard(
+                                folder = cell.folder,
+                                onClick = { onFolderClick(cell.folder.id) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        is FolderGridCell.AddButton -> {
+                            AddItemButton(
+                                onClick = onAddFolderClick,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        is FolderGridCell.InlineEditor -> {
+                            val state = cell.state
+                            InlineItemEditor(
+                                value = when (state) {
+                                    is InlineCreationState.Editing -> state.name
+                                    is InlineCreationState.Saving -> state.name
+                                    is InlineCreationState.Error -> state.name
+                                    else -> ""
+                                },
+                                onValueChange = onInlineNameChanged,
+                                onConfirm = onInlineConfirm,
+                                onCancel = onInlineCancel,
+                                isLoading = state is InlineCreationState.Saving,
+                                errorMessage = (state as? InlineCreationState.Error)?.message,
+                                icon = Icons.Default.Folder,
+                                placeholder = "Folder name",
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
                 }
-                // Fill empty space if odd number of folders
+                // Pad odd-count rows with a Spacer
                 if (row.size == 1) {
                     Spacer(modifier = Modifier.weight(1f))
                 }
             }
-            if (index < folderRows.lastIndex) {
+            if (index < gridRows.lastIndex) {
                 Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
             }
         }
@@ -161,6 +229,10 @@ fun HomeScreenPreview() {
             onBreadcrumbClick = { },
             onFolderClick = { },
             onFileClick = { },
+            onAddFolderClick = { },
+            onInlineNameChanged = { },
+            onInlineConfirm = { },
+            onInlineCancel = { },
         )
     }
 }
