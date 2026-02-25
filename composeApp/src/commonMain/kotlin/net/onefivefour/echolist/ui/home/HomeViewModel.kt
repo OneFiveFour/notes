@@ -5,14 +5,19 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.models.ListNotesResult
+import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.Note
+import net.onefivefour.echolist.data.repository.FolderRepository
 import net.onefivefour.echolist.data.repository.NotesRepository
+
+private const val DOMAIN = "notes"
 
 class HomeViewModel(
     private val path: String,
-    private val repository: NotesRepository
+    private val notesRepository: NotesRepository,
+    private val folderRepository: FolderRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -31,24 +36,77 @@ class HomeViewModel(
         }
     }
 
+    fun onAddFolderClicked() {
+        _uiState.update { it.copy(inlineCreationState = InlineCreationState.Editing()) }
+    }
+
+    fun onInlineNameChanged(name: String) {
+        val current = _uiState.value.inlineCreationState
+        if (current is InlineCreationState.Editing) {
+            _uiState.update { it.copy(inlineCreationState = InlineCreationState.Editing(name)) }
+        }
+    }
+
+    fun onInlineConfirm() {
+        val current = _uiState.value.inlineCreationState
+        if (current !is InlineCreationState.Editing) return
+
+        val trimmedName = current.name.trim()
+        if (trimmedName.isBlank()) return
+
+        _uiState.update { it.copy(inlineCreationState = InlineCreationState.Saving(trimmedName)) }
+
+        viewModelScope.launch {
+            val params = CreateFolderParams(
+                domain = DOMAIN,
+                parentPath = path,
+                name = trimmedName
+            )
+            folderRepository.createFolder(params).fold(
+                onSuccess = {
+                    loadData()
+                    _uiState.update { it.copy(inlineCreationState = InlineCreationState.Hidden) }
+                },
+                onFailure = { error ->
+                    _uiState.update {
+                        it.copy(
+                            inlineCreationState = InlineCreationState.Error(
+                                name = trimmedName,
+                                message = error.message ?: "Folder creation failed"
+                            )
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    fun onInlineCancel() {
+        _uiState.update { it.copy(inlineCreationState = InlineCreationState.Hidden) }
+    }
+
     private suspend fun loadData() {
-        val result = repository.listNotes(path)
+        val result = notesRepository.listNotes(path)
         result.fold(
             onSuccess = { listResult ->
-                _uiState.value = HomeScreenUiState(
-                    title = titleFromPath(path),
-                    breadcrumbs = buildBreadcrumbs(path),
-                    folders = extractFolders(listResult.entries, listResult.notes),
-                    files = extractFiles(listResult.entries, listResult.notes)
-                )
+                _uiState.update { current ->
+                    current.copy(
+                        title = titleFromPath(path),
+                        breadcrumbs = buildBreadcrumbs(path),
+                        folders = extractFolders(listResult.entries, listResult.notes),
+                        files = extractFiles(listResult.entries, listResult.notes)
+                    )
+                }
             },
             onFailure = {
-                _uiState.value = HomeScreenUiState(
-                    title = titleFromPath(path),
-                    breadcrumbs = buildBreadcrumbs(path),
-                    folders = emptyList(),
-                    files = emptyList()
-                )
+                _uiState.update { current ->
+                    current.copy(
+                        title = titleFromPath(path),
+                        breadcrumbs = buildBreadcrumbs(path),
+                        folders = emptyList(),
+                        files = emptyList()
+                    )
+                }
             }
         )
     }

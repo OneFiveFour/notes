@@ -12,57 +12,57 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
     - Add `inlineCreationState: InlineCreationState = InlineCreationState.Hidden` field to `HomeScreenUiState`
     - _Requirements: 2.1, 4.2, 4.5, 5.2_
 
-- [ ] 2. Extend HomeViewModel with inline creation logic
-  - [ ] 2.1 Add `FolderRepository` as a constructor dependency to `HomeViewModel`
+- [x] 2. Extend HomeViewModel with inline creation logic
+  - [x] 2.1 Add `FolderRepository` as a constructor dependency to `HomeViewModel`
     - Accept `FolderRepository` alongside the existing `NotesRepository` parameter
     - Store the current `path` for use in `CreateFolderParams`
     - _Requirements: 4.1, 5.2_
 
-  - [ ] 2.2 Implement `onAddFolderClicked()`, `onInlineNameChanged()`, `onInlineConfirm()`, and `onInlineCancel()`
+  - [x] 2.2 Implement `onAddFolderClicked()`, `onInlineNameChanged()`, `onInlineConfirm()`, and `onInlineCancel()`
     - `onAddFolderClicked()` transitions `inlineCreationState` from `Hidden` to `Editing("")`
     - `onInlineNameChanged(name)` updates the name in `Editing` state
     - `onInlineConfirm()` validates the name is non-blank, transitions to `Saving`, calls `FolderRepository.createFolder` with correct `CreateFolderParams`, reloads via `NotesRepository.listNotes` on success, transitions to `Error` on failure
     - `onInlineCancel()` transitions state back to `Hidden`
     - _Requirements: 2.1, 2.5, 3.1, 3.2, 4.1, 4.2, 4.3, 4.4, 4.5_
 
-  - [ ] 2.3 Write property test: Hidden to Editing transition (Property 3)
+  - [x] 2.3 Write property test: Hidden to Editing transition (Property 3)
     - **Property 3: Tapping add transitions state from Hidden to Editing**
     - **Validates: Requirements 2.1**
     - Create `HomeViewModelPropertyTest.kt` in `commonTest/.../ui/home/`
     - Create `FakeFolderRepository` test double in `commonTest`
     - Use `checkAll` with arbitrary `HomeScreenUiState` where `inlineCreationState` is `Hidden`
 
-  - [ ] 2.4 Write property test: Cancel restores Hidden (Property 4)
+  - [x] 2.4 Write property test: Cancel restores Hidden (Property 4)
     - **Property 4: Cancel restores Hidden without modifying folders**
     - **Validates: Requirements 2.5**
     - Use `checkAll` with arbitrary `InlineCreationState` variants (`Editing`, `Error`)
 
-  - [ ] 2.5 Write property test: Whitespace-only names rejected (Property 5)
+  - [x] 2.5 Write property test: Whitespace-only names rejected (Property 5)
     - **Property 5: Whitespace-only names are rejected**
     - **Validates: Requirements 3.1**
     - Use `checkAll` with `Arb.string` filtered to whitespace-only strings
 
-  - [ ] 2.6 Write property test: Non-blank names transition to Saving (Property 6)
+  - [x] 2.6 Write property test: Non-blank names transition to Saving (Property 6)
     - **Property 6: Non-blank names transition to Saving**
     - **Validates: Requirements 3.2, 4.2**
     - Use `checkAll` with `Arb.string` filtered to non-blank strings
 
-  - [ ] 2.7 Write property test: CreateFolderParams correctness (Property 7)
+  - [x] 2.7 Write property test: CreateFolderParams correctness (Property 7)
     - **Property 7: CreateFolderParams are constructed correctly**
     - **Validates: Requirements 4.1**
     - Verify `parentPath` equals current path and `name` equals confirmed folder name
 
-  - [ ] 2.8 Write property test: Successful creation resets state (Property 8)
+  - [x] 2.8 Write property test: Successful creation resets state (Property 8)
     - **Property 8: Successful creation resets state and includes new folder**
     - **Validates: Requirements 4.3, 4.4**
     - Use fake repositories returning success, verify `Hidden` state and updated folder list
 
-  - [ ] 2.9 Write property test: Failed creation transitions to Error (Property 9)
+  - [x] 2.9 Write property test: Failed creation transitions to Error (Property 9)
     - **Property 9: Failed creation transitions to Error with name preserved**
     - **Validates: Requirements 4.5**
     - Use fake repository returning failure, verify `Error` state with preserved name
 
-- [ ] 3. Checkpoint - Verify ViewModel logic
+- [x] 3. Checkpoint - Verify ViewModel logic
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 4. Create AddItemButton composable

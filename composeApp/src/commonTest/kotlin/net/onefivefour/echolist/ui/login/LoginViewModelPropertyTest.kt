@@ -48,7 +48,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), whitespaceArb, nonBlankArb, nonBlankArb) { blankUrl, user, pass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
+                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
                 vm.onBackendUrlChanged(blankUrl)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
@@ -67,7 +67,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, whitespaceArb, nonBlankArb) { url, blankUser, pass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
+                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(blankUser)
                 vm.onPasswordChanged(pass)
@@ -86,7 +86,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, whitespaceArb) { url, user, blankPass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeAuthRepository(), FakeSecureStorage())
+                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(blankPass)
@@ -113,7 +113,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.BACKEND_URL, url)
 
-                val vm = LoginViewModel(FakeAuthRepository(), storage)
+                val vm = LoginViewModel(storage, FakeAuthRepository())
                 advanceUntilIdle()
 
                 vm.uiState.value.backendUrl shouldBe url
@@ -143,7 +143,7 @@ class LoginViewModelPropertyTest : FunSpec({
                     }
                 }
 
-                val vm = LoginViewModel(repo, FakeSecureStorage())
+                val vm = LoginViewModel(FakeSecureStorage(), repo)
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
@@ -174,7 +174,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 val repo = FakeAuthRepository()
                 repo.loginResult = Result.failure(RuntimeException(errorMsg))
 
-                val vm = LoginViewModel(repo, FakeSecureStorage())
+                val vm = LoginViewModel(FakeSecureStorage(), repo)
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)

@@ -9,7 +9,7 @@ internal class CacheDataSourceImpl(
 ) : CacheDataSource {
 
     private val noteQueries get() = database.notesQueries
-    private val entryQueries get() = database.folderEntriesQueries
+    private val entryQueries get() = database.folderQueries
 
     override suspend fun saveNote(note: Note) {
         noteQueries.insertOrReplace(
