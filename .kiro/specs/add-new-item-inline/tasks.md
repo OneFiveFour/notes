@@ -65,15 +65,15 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
 - [x] 3. Checkpoint - Verify ViewModel logic
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create AddItemButton composable
-  - [ ] 4.1 Create `AddItemButton.kt` in `ui/home/`
+- [x] 4. Create AddItemButton composable
+  - [x] 4.1 Create `AddItemButton.kt` in `ui/home/`
     - Outlined card matching `FolderCard` dimensions: medium shape, primary-colored border, surface background
     - Centered `Icons.Default.Add` icon in primary color
     - Accept `onClick` and `modifier` parameters
     - _Requirements: 1.1, 1.2, 1.3_
 
-- [ ] 5. Create InlineItemEditor composable
-  - [ ] 5.1 Create `InlineItemEditor.kt` in `ui/home/`
+- [x] 5. Create InlineItemEditor composable
+  - [x] 5.1 Create `InlineItemEditor.kt` in `ui/home/`
     - Same outer shape as `FolderCard`: medium shape, primary border, surface background
     - Left icon container with primary background and small shape
     - `BasicTextField` styled with `MaterialTheme.typography.titleSmall`, auto-focused via `FocusRequester`
