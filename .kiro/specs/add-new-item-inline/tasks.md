@@ -6,8 +6,8 @@ Implement inline folder creation on the HomeScreen. The work proceeds bottom-up:
 
 ## Tasks
 
-- [-] 1. Add InlineCreationState and update HomeScreenUiState
-  - [-] 1.1 Define the `InlineCreationState` sealed interface in `HomeScreenUiState.kt`
+- [x] 1. Add InlineCreationState and update HomeScreenUiState
+  - [x] 1.1 Define the `InlineCreationState` sealed interface in `HomeScreenUiState.kt`
     - Add `Hidden`, `Editing(name)`, `Saving(name)`, and `Error(name, message)` variants
     - Add `inlineCreationState: InlineCreationState = InlineCreationState.Hidden` field to `HomeScreenUiState`
     - _Requirements: 2.1, 4.2, 4.5, 5.2_

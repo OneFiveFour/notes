@@ -1,10 +1,18 @@
 package net.onefivefour.echolist.ui.home
 
+sealed interface InlineCreationState {
+    data object Hidden : InlineCreationState
+    data class Editing(val name: String = "") : InlineCreationState
+    data class Saving(val name: String) : InlineCreationState
+    data class Error(val name: String, val message: String) : InlineCreationState
+}
+
 data class HomeScreenUiState(
     val title: String,
     val breadcrumbs: List<BreadcrumbItem>,
     val folders: List<FolderUiModel>,
-    val files: List<FileUiModel>
+    val files: List<FileUiModel>,
+    val inlineCreationState: InlineCreationState = InlineCreationState.Hidden
 )
 
 data class BreadcrumbItem(
