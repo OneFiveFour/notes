@@ -6,21 +6,21 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
 
 ## Tasks
 
-- [ ] 1. Define new unified routes and update serialization module
-  - [ ] 1.1 Replace old route definitions with `EditNoteRoute` and `EditTaskListRoute` in `Routes.kt`
+- [x] 1. Define new unified routes and update serialization module
+  - [x] 1.1 Replace old route definitions with `EditNoteRoute` and `EditTaskListRoute` in `Routes.kt`
     - Remove `NoteDetailRoute`, `NoteCreateRoute`, and `TasklistDetailRoute` data classes
     - Add `EditNoteRoute(noteId: String? = null) : NavKey` data class with `@Serializable`
     - Add `EditTaskListRoute(taskListId: String? = null) : NavKey` data class with `@Serializable`
     - Update `navKeySerializersModule` to register `EditNoteRoute` and `EditTaskListRoute` instead of the old routes
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3_
 
-  - [ ]* 1.2 Write property test for `EditNoteRoute` serialization round-trip
+  - [x] 1.2 Write property test for `EditNoteRoute` serialization round-trip
     - **Property 1: Route serialization round-trip (EditNoteRoute)**
     - Update `RouteSerializationPropertyTest.kt`: remove `NoteDetailRoute`, `NoteCreateRoute` tests; add `EditNoteRoute` round-trip tests with `Arb.string().orNull()` for `noteId`
     - Test both concrete type and polymorphic `NavKey` serialization
     - **Validates: Requirements 1.4, 7.1**
 
-  - [ ]* 1.3 Write property test for `EditTaskListRoute` serialization round-trip
+  - [x] 1.3 Write property test for `EditTaskListRoute` serialization round-trip
     - **Property 1: Route serialization round-trip (EditTaskListRoute)**
     - Update `RouteSerializationPropertyTest.kt`: remove `TasklistDetailRoute` tests; add `EditTaskListRoute` round-trip tests with `Arb.string().orNull()` for `taskListId`
     - Test both concrete type and polymorphic `NavKey` serialization
@@ -63,18 +63,18 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Change `onFileClick` to push `EditNoteRoute(noteId = fileId)`
     - _Requirements: 5.4, 5.5, 5.6, 5.7_
 
-  - [ ]* 4.3 Write property tests for create actions pushing null-ID routes
+  - [ ] 4.3 Write property tests for create actions pushing null-ID routes
     - **Property 3: Create actions push null-ID routes**
     - Update `NavigationPropertyTest.kt`: replace `NoteCreateRoute` with `EditNoteRoute(noteId = null)`, `TasklistDetailRoute` with `EditTaskListRoute(taskListId = null)`
     - Update `Arb.navKey()` and `Arb.detailRoute()` generators to use new routes
     - **Validates: Requirements 5.4, 5.5, 7.4, 7.5, 7.6**
 
-  - [ ]* 4.4 Write property test for file click pushing `EditNoteRoute` with file ID
+  - [ ] 4.4 Write property test for file click pushing `EditNoteRoute` with file ID
     - **Property 4: File click pushes EditNoteRoute with file ID**
     - Add test in `NavigationPropertyTest.kt`: generate random back stacks and non-empty file ID strings, invoke file-click action, assert `EditNoteRoute(noteId = fileId)` on top
     - **Validates: Requirements 5.6**
 
-  - [ ]* 4.5 Write property test for back navigation popping top entry
+  - [ ] 4.5 Write property test for back navigation popping top entry
     - **Property 5: Back navigation pops top entry**
     - Update existing back-navigation test in `NavigationPropertyTest.kt` to use `EditNoteRoute`/`EditTaskListRoute` as detail routes
     - **Validates: Requirements 5.7**
