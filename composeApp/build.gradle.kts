@@ -183,6 +183,7 @@ wire {
     prune("notes.v1.NoteService")
     prune("auth.v1.AuthService")
     prune("folder.v1.FolderService")
+    prune("tasks.v1.TaskListService")
 }
 
 // SQLDelight database configuration

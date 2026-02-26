@@ -1,0 +1,20 @@
+package net.onefivefour.echolist.data.source.network
+
+import tasks.v1.CreateTaskListRequest
+import tasks.v1.CreateTaskListResponse
+import tasks.v1.DeleteTaskListRequest
+import tasks.v1.DeleteTaskListResponse
+import tasks.v1.GetTaskListRequest
+import tasks.v1.GetTaskListResponse
+import tasks.v1.ListTaskListsRequest
+import tasks.v1.ListTaskListsResponse
+import tasks.v1.UpdateTaskListRequest
+import tasks.v1.UpdateTaskListResponse
+
+internal interface TaskListRemoteDataSource {
+    suspend fun createTaskList(request: CreateTaskListRequest): CreateTaskListResponse
+    suspend fun getTaskList(request: GetTaskListRequest): GetTaskListResponse
+    suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse
+    suspend fun updateTaskList(request: UpdateTaskListRequest): UpdateTaskListResponse
+    suspend fun deleteTaskList(request: DeleteTaskListRequest): DeleteTaskListResponse
+}

@@ -49,29 +49,29 @@
 - [x] 10.2 Update `NotesRepositoryImpl.syncPendingOperations` to also use the mapped Note from `UpdateNoteResponse` directly
 
 ## Task 11: Create TaskList Proto Definition
-- [ ] 11.1 Create `proto/tasks.proto` with the TaskListService definition, SubTask, MainTask, and all request/response messages per Requirement 8
-- [ ] 11.2 Run Wire code generation
+- [x] 11.1 Create `proto/tasks.proto` with the TaskListService definition, SubTask, MainTask, and all request/response messages per Requirement 8
+- [x] 11.2 Run Wire code generation
 
 ## Task 12: Create TaskList Domain Models
-- [ ] 12.1 Create `SubTask.kt` data class with `description: String` and `done: Boolean` (Req 9.1)
-- [ ] 12.2 Create `MainTask.kt` data class with `description`, `done`, `dueDate`, `recurrence`, `subTasks: List<SubTask>` (Req 9.2)
-- [ ] 12.3 Create `TaskList.kt` data class with `filePath`, `name`, `tasks: List<MainTask>`, `updatedAt` (Req 9.3)
-- [ ] 12.4 Create `TaskListEntry.kt` data class with `filePath`, `name`, `updatedAt` (Req 9.4)
-- [ ] 12.5 Create `ListTaskListsResult.kt` data class with `taskLists: List<TaskListEntry>` and `entries: List<String>` (Req 9.5)
-- [ ] 12.6 Create `CreateTaskListParams.kt` data class with `name`, `path`, `tasks: List<MainTask>` (Req 9.6)
-- [ ] 12.7 Create `UpdateTaskListParams.kt` data class with `filePath` and `tasks: List<MainTask>` (Req 9.7)
+- [x] 12.1 Create `SubTask.kt` data class with `description: String` and `done: Boolean` (Req 9.1)
+- [x] 12.2 Create `MainTask.kt` data class with `description`, `done`, `dueDate`, `recurrence`, `subTasks: List<SubTask>` (Req 9.2)
+- [x] 12.3 Create `TaskList.kt` data class with `filePath`, `name`, `tasks: List<MainTask>`, `updatedAt` (Req 9.3)
+- [x] 12.4 Create `TaskListEntry.kt` data class with `filePath`, `name`, `updatedAt` (Req 9.4)
+- [x] 12.5 Create `ListTaskListsResult.kt` data class with `taskLists: List<TaskListEntry>` and `entries: List<String>` (Req 9.5)
+- [x] 12.6 Create `CreateTaskListParams.kt` data class with `name`, `path`, `tasks: List<MainTask>` (Req 9.6)
+- [x] 12.7 Create `UpdateTaskListParams.kt` data class with `filePath` and `tasks: List<MainTask>` (Req 9.7)
 
 ## Task 13: Create TaskListMapper
-- [ ] 13.1 Create `TaskListMapper` object with proto→domain mappings for SubTask, MainTask, CreateTaskListResponse, GetTaskListResponse, ListTaskListsResponse, UpdateTaskListResponse (Req 10.1–10.6)
-- [ ] 13.2 Add domain→proto mappings for CreateTaskListParams and UpdateTaskListParams including nested MainTask/SubTask conversion (Req 10.7–10.8)
+- [x] 13.1 Create `TaskListMapper` object with proto→domain mappings for SubTask, MainTask, CreateTaskListResponse, GetTaskListResponse, ListTaskListsResponse, UpdateTaskListResponse (Req 10.1–10.6)
+- [x] 13.2 Add domain→proto mappings for CreateTaskListParams and UpdateTaskListParams including nested MainTask/SubTask conversion (Req 10.7–10.8)
 
 ## Task 14: Create TaskListRemoteDataSource
-- [ ] 14.1 Create `TaskListRemoteDataSource` interface with createTaskList, getTaskList, listTaskLists, updateTaskList, deleteTaskList methods (Req 11.1)
-- [ ] 14.2 Create `TaskListRemoteDataSourceImpl` using ConnectRpcClient with paths `/tasks.v1.TaskListService/{RpcName}` (Req 11.2–11.6)
+- [x] 14.1 Create `TaskListRemoteDataSource` interface with createTaskList, getTaskList, listTaskLists, updateTaskList, deleteTaskList methods (Req 11.1)
+- [x] 14.2 Create `TaskListRemoteDataSourceImpl` using ConnectRpcClient with paths `/tasks.v1.TaskListService/{RpcName}` (Req 11.2–11.6)
 
 ## Task 15: Create TaskListRepository
-- [ ] 15.1 Create `TaskListRepository` interface with all 5 CRUD methods and correct return types (Req 12.1–12.6)
-- [ ] 15.2 Create `TaskListRepositoryImpl` following the same pattern as `FolderRepositoryImpl` — try/catch with `Result.success`/`Result.failure` (Req 12.7)
+- [x] 15.1 Create `TaskListRepository` interface with all 5 CRUD methods and correct return types (Req 12.1–12.6)
+- [x] 15.2 Create `TaskListRepositoryImpl` following the same pattern as `FolderRepositoryImpl` — try/catch with `Result.success`/`Result.failure` (Req 12.7)
 
 ## Task 16: Update Koin DI Modules
 - [ ] 16.1 Add `TaskListRemoteDataSource` → `TaskListRemoteDataSourceImpl` binding in `networkModule` (Req 13.1)
