@@ -6,6 +6,9 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -21,10 +24,14 @@ import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginScreen
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import net.onefivefour.echolist.ui.navigation.HomeRoute
+import net.onefivefour.echolist.ui.navigation.NoteCreateRoute
 import net.onefivefour.echolist.ui.navigation.NoteDetailRoute
+import net.onefivefour.echolist.ui.navigation.TasklistDetailRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
+import net.onefivefour.echolist.ui.notecreate.NoteCreateScreen
 import net.onefivefour.echolist.ui.notedetail.NoteDetailScreen
 import net.onefivefour.echolist.ui.notedetail.NoteDetailViewModel
+import net.onefivefour.echolist.ui.tasklistdetail.TasklistDetailScreen
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -95,7 +102,9 @@ fun App() {
                                 onAddFolderClick = homeViewModel::onAddFolderClicked,
                                 onInlineNameChanged = homeViewModel::onInlineNameChanged,
                                 onInlineConfirm = homeViewModel::onInlineConfirm,
-                                onInlineCancel = homeViewModel::onInlineCancel
+                                onInlineCancel = homeViewModel::onInlineCancel,
+                                onAddNoteClick = { backStack.add(NoteCreateRoute) },
+                                onAddTasklistClick = { backStack.add(TasklistDetailRoute) }
                             )
                         }
 
@@ -104,6 +113,26 @@ fun App() {
                             val noteDetailUiState by noteDetailViewModel.uiState.collectAsStateWithLifecycle()
                             NoteDetailScreen(
                                 uiState = noteDetailUiState,
+                                onBackClick = { backStack.removeLastOrNull() }
+                            )
+                        }
+
+                        entry<NoteCreateRoute> {
+                            var text by remember { mutableStateOf("") }
+                            NoteCreateScreen(
+                                text = text,
+                                onTextChanged = { text = it },
+                                onSaveClick = { /* no-op */ },
+                                onBackClick = { backStack.removeLastOrNull() }
+                            )
+                        }
+
+                        entry<TasklistDetailRoute> {
+                            var text by remember { mutableStateOf("") }
+                            TasklistDetailScreen(
+                                text = text,
+                                onTextChanged = { text = it },
+                                onSaveClick = { /* no-op */ },
                                 onBackClick = { backStack.removeLastOrNull() }
                             )
                         }

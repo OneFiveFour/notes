@@ -55,6 +55,23 @@ internal fun buildFolderGridItems(
     }
 }
 
+/**
+ * Sealed type representing the different cell types in the file grid.
+ */
+internal sealed interface FileGridCell {
+    data class File(val file: FileUiModel) : FileGridCell
+    data object AddButton : FileGridCell
+}
+
+/**
+ * Builds the list of grid cells for the file section.
+ * All files come first, followed by the AddButton.
+ */
+internal fun buildFileGridItems(files: List<FileUiModel>): List<FileGridCell> = buildList {
+    files.forEach { file -> add(FileGridCell.File(file)) }
+    add(FileGridCell.AddButton)
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
@@ -67,6 +84,8 @@ fun HomeScreen(
     onInlineNameChanged: (String) -> Unit,
     onInlineConfirm: () -> Unit,
     onInlineCancel: () -> Unit,
+    onAddNoteClick: () -> Unit,
+    onAddTasklistClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -181,13 +200,38 @@ fun HomeScreen(
             color = EchoListTheme.materialColors.primary
         )
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
-        uiState.files.forEachIndexed { index, file ->
-            FileItem(
-                file = file,
-                onClick = { onFileClick(file.id) },
-                modifier = Modifier.fillMaxWidth()
-            )
-            if (index < uiState.files.lastIndex) {
+
+        val fileGridItems = buildFileGridItems(uiState.files)
+        val fileGridRows = fileGridItems.chunked(2)
+        fileGridRows.forEachIndexed { index, row ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
+            ) {
+                row.forEach { cell ->
+                    when (cell) {
+                        is FileGridCell.File -> {
+                            FileItem(
+                                file = cell.file,
+                                onClick = { onFileClick(cell.file.id) },
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                        is FileGridCell.AddButton -> {
+                            AddFileButton(
+                                onAddNoteClick = onAddNoteClick,
+                                onAddTasklistClick = onAddTasklistClick,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+                    }
+                }
+                // Pad odd-count rows with a Spacer
+                if (row.size == 1) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
+            if (index < fileGridRows.lastIndex) {
                 Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
             }
         }
@@ -233,6 +277,8 @@ fun HomeScreenPreview() {
             onInlineNameChanged = { },
             onInlineConfirm = { },
             onInlineCancel = { },
+            onAddNoteClick = { },
+            onAddTasklistClick = { },
         )
     }
 }

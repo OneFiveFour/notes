@@ -15,11 +15,19 @@ data class HomeRoute(val path: String = "/") : NavKey
 @Serializable
 data class NoteDetailRoute(val noteId: String) : NavKey
 
+@Serializable
+data object NoteCreateRoute : NavKey
+
+@Serializable
+data object TasklistDetailRoute : NavKey
+
 val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(LoginRoute::class, LoginRoute.serializer())
         subclass(HomeRoute::class, HomeRoute.serializer())
         subclass(NoteDetailRoute::class, NoteDetailRoute.serializer())
+        subclass(NoteCreateRoute::class, NoteCreateRoute.serializer())
+        subclass(TasklistDetailRoute::class, TasklistDetailRoute.serializer())
     }
 }
 

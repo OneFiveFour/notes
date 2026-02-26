@@ -60,4 +60,35 @@ class RouteSerializationPropertyTest : FunSpec({
             decoded shouldBe route
         }
     }
+
+    // Feature: file-add-button, Property 5: Route serialization round-trip
+    // **Validates: Requirements 3.1, 4.1**
+
+    test("Property 5: NoteCreateRoute serialization round-trip") {
+        val route = NoteCreateRoute
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<NoteCreateRoute>(), route)
+        val decoded = json.decodeFromString(kotlinx.serialization.serializer<NoteCreateRoute>(), encoded)
+        decoded shouldBe route
+    }
+
+    test("Property 5: TasklistDetailRoute serialization round-trip") {
+        val route = TasklistDetailRoute
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<TasklistDetailRoute>(), route)
+        val decoded = json.decodeFromString(kotlinx.serialization.serializer<TasklistDetailRoute>(), encoded)
+        decoded shouldBe route
+    }
+
+    test("Property 5: Polymorphic NavKey serialization round-trip for NoteCreateRoute") {
+        val route: NavKey = NoteCreateRoute
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
+        val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
+        decoded shouldBe route
+    }
+
+    test("Property 5: Polymorphic NavKey serialization round-trip for TasklistDetailRoute") {
+        val route: NavKey = TasklistDetailRoute
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
+        val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
+        decoded shouldBe route
+    }
 })
