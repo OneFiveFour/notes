@@ -9,6 +9,7 @@ import notes.v1.CreateNoteResponse
 import notes.v1.GetNoteResponse
 import notes.v1.ListNotesResponse
 import notes.v1.UpdateNoteRequest
+import notes.v1.UpdateNoteResponse
 
 /**
  * Maps between Wire-generated proto models and domain models.
@@ -25,19 +26,11 @@ internal object NoteMapper {
         updatedAt = proto.updated_at
     )
 
-    fun toDomain(proto: CreateNoteResponse): Note = Note(
-        filePath = proto.file_path,
-        title = proto.title,
-        content = proto.content,
-        updatedAt = proto.updated_at
-    )
+    fun toDomain(proto: CreateNoteResponse): Note = toDomain(proto.note!!)
 
-    fun toDomain(proto: GetNoteResponse): Note = Note(
-        filePath = proto.file_path,
-        title = proto.title,
-        content = proto.content,
-        updatedAt = proto.updated_at
-    )
+    fun toDomain(proto: GetNoteResponse): Note = toDomain(proto.note!!)
+
+    fun toDomain(proto: UpdateNoteResponse): Note = toDomain(proto.note!!)
 
     fun toDomain(proto: ListNotesResponse): ListNotesResult = ListNotesResult(
         notes = proto.notes.map { toDomain(it) },

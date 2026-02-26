@@ -33,20 +33,20 @@
 - [x] 6.3 Update any `deleteFolder` calls to use `DeleteFolderParams` without domain and handle `Result<Unit>` return
 
 ## Task 7: Update Note Proto Definition
-- [ ] 7.1 Replace `proto/notes.proto` with the new proto definition: rename service to NoteService, wrap CreateNoteResponse/GetNoteResponse/UpdateNoteResponse in nested `note` field of type Note, make DeleteNoteResponse empty (Req 5)
-- [ ] 7.2 Run Wire code generation
+- [x] 7.1 Replace `proto/notes.proto` with the new proto definition: rename service to NoteService, wrap CreateNoteResponse/GetNoteResponse/UpdateNoteResponse in nested `note` field of type Note, make DeleteNoteResponse empty (Req 5)
+- [x] 7.2 Run Wire code generation
 
 ## Task 8: Update NoteMapper
-- [ ] 8.1 Update `NoteMapper.toDomain(CreateNoteResponse)` to extract from nested `note` field (Req 6.1)
-- [ ] 8.2 Update `NoteMapper.toDomain(GetNoteResponse)` to extract from nested `note` field (Req 6.2)
-- [ ] 8.3 Add `NoteMapper.toDomain(UpdateNoteResponse)` to extract full Note from nested `note` field (Req 6.3)
+- [x] 8.1 Update `NoteMapper.toDomain(CreateNoteResponse)` to extract from nested `note` field (Req 6.1)
+- [x] 8.2 Update `NoteMapper.toDomain(GetNoteResponse)` to extract from nested `note` field (Req 6.2)
+- [x] 8.3 Add `NoteMapper.toDomain(UpdateNoteResponse)` to extract full Note from nested `note` field (Req 6.3)
 
 ## Task 9: Update NoteRemoteDataSourceImpl Service Path
-- [ ] 9.1 Change all service paths in `NoteRemoteDataSourceImpl` from `/notes.v1.NotesService/` to `/notes.v1.NoteService/` (Req 7.1)
+- [x] 9.1 Change all service paths in `NoteRemoteDataSourceImpl` from `/notes.v1.NotesService/` to `/notes.v1.NoteService/` (Req 7.1)
 
 ## Task 10: Update NotesRepositoryImpl for UpdateNote
-- [ ] 10.1 Update `NotesRepositoryImpl.updateNote` to use the mapped Note directly from `UpdateNoteResponse` instead of issuing a separate `getNote` call (Req 6.5)
-- [ ] 10.2 Update `NotesRepositoryImpl.syncPendingOperations` to also use the mapped Note from `UpdateNoteResponse` directly
+- [x] 10.1 Update `NotesRepositoryImpl.updateNote` to use the mapped Note directly from `UpdateNoteResponse` instead of issuing a separate `getNote` call (Req 6.5)
+- [x] 10.2 Update `NotesRepositoryImpl.syncPendingOperations` to also use the mapped Note from `UpdateNoteResponse` directly
 
 ## Task 11: Create TaskList Proto Definition
 - [ ] 11.1 Create `proto/tasks.proto` with the TaskListService definition, SubTask, MainTask, and all request/response messages per Requirement 8

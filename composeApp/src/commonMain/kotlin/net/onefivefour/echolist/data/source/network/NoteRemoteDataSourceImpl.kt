@@ -18,7 +18,7 @@ internal class NoteRemoteDataSourceImpl(
 
     override suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse {
         return client.call(
-            path = "/notes.v1.NotesService/CreateNote",
+            path = "/notes.v1.NoteService/CreateNote",
             request = request,
             requestSerializer = { CreateNoteRequest.ADAPTER.encode(it) },
             responseDeserializer = { CreateNoteResponse.ADAPTER.decode(it) }
@@ -27,7 +27,7 @@ internal class NoteRemoteDataSourceImpl(
 
     override suspend fun listNotes(request: ListNotesRequest): ListNotesResponse {
         return client.call(
-            path = "/notes.v1.NotesService/ListNotes",
+            path = "/notes.v1.NoteService/ListNotes",
             request = request,
             requestSerializer = { ListNotesRequest.ADAPTER.encode(it) },
             responseDeserializer = { ListNotesResponse.ADAPTER.decode(it) }
@@ -36,7 +36,7 @@ internal class NoteRemoteDataSourceImpl(
 
     override suspend fun getNote(request: GetNoteRequest): GetNoteResponse {
         return client.call(
-            path = "/notes.v1.NotesService/GetNote",
+            path = "/notes.v1.NoteService/GetNote",
             request = request,
             requestSerializer = { GetNoteRequest.ADAPTER.encode(it) },
             responseDeserializer = { GetNoteResponse.ADAPTER.decode(it) }
@@ -45,7 +45,7 @@ internal class NoteRemoteDataSourceImpl(
 
     override suspend fun updateNote(request: UpdateNoteRequest): UpdateNoteResponse {
         return client.call(
-            path = "/notes.v1.NotesService/UpdateNote",
+            path = "/notes.v1.NoteService/UpdateNote",
             request = request,
             requestSerializer = { UpdateNoteRequest.ADAPTER.encode(it) },
             responseDeserializer = { UpdateNoteResponse.ADAPTER.decode(it) }
@@ -54,7 +54,7 @@ internal class NoteRemoteDataSourceImpl(
 
     override suspend fun deleteNote(request: DeleteNoteRequest): DeleteNoteResponse {
         return client.call(
-            path = "/notes.v1.NotesService/DeleteNote",
+            path = "/notes.v1.NoteService/DeleteNote",
             request = request,
             requestSerializer = { DeleteNoteRequest.ADAPTER.encode(it) },
             responseDeserializer = { DeleteNoteResponse.ADAPTER.decode(it) }

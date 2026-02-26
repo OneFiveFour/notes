@@ -180,7 +180,7 @@ wire {
         srcDir("${rootProject.projectDir}/proto")
     }
     // Exclude gRPC service generation — we use ConnectRPC instead
-    prune("notes.v1.NotesService")
+    prune("notes.v1.NoteService")
     prune("auth.v1.AuthService")
     prune("folder.v1.FolderService")
 }

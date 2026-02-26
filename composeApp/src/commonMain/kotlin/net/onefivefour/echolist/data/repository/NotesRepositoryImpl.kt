@@ -111,9 +111,7 @@ internal class NotesRepositoryImpl(
         try {
             val request = NoteMapper.toProto(params)
             val response = noteRemoteDataSource.updateNote(request)
-            // Fetch the full updated note from network
-            val getResponse = noteRemoteDataSource.getNote(GetNoteRequest(file_path = params.filePath))
-            val note = NoteMapper.toDomain(getResponse)
+            val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
             Result.success(note)
         } catch (e: NetworkException) {
@@ -162,11 +160,8 @@ internal class NotesRepositoryImpl(
                 }
                 is PendingOperation.Update -> {
                     val request = NoteMapper.toProto(op.params)
-                    noteRemoteDataSource.updateNote(request)
-                    val getResponse = noteRemoteDataSource.getNote(
-                        GetNoteRequest(file_path = op.params.filePath)
-                    )
-                    val note = NoteMapper.toDomain(getResponse)
+                    val response = noteRemoteDataSource.updateNote(request)
+                    val note = NoteMapper.toDomain(response)
                     cacheDataSource.saveNote(note)
                 }
             }
