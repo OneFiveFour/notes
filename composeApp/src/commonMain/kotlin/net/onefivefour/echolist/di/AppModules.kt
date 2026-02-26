@@ -31,7 +31,6 @@ import net.onefivefour.echolist.ui.theme.ThemeManager
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
-import net.onefivefour.echolist.ui.notedetail.NoteDetailViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
@@ -129,12 +128,6 @@ val navigationModule: Module = module {
             path = params.get(),
             notesRepository = get(),
             folderRepository = get()
-        )
-    }
-    viewModel { params ->
-        NoteDetailViewModel(
-            noteId = params.get(),
-            repository = get()
         )
     }
 }

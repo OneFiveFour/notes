@@ -79,11 +79,11 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Update existing back-navigation test in `NavigationPropertyTest.kt` to use `EditNoteRoute`/`EditTaskListRoute` as detail routes
     - **Validates: Requirements 5.7**
 
-- [ ] 5. Checkpoint - Ensure navigation tests pass
+- [x] 5. Checkpoint - Ensure navigation tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 6. Remove old screens, routes, view models, and tests
-  - [ ] 6.1 Delete old screen and view model files
+- [x] 6. Remove old screens, routes, view models, and tests
+  - [x] 6.1 Delete old screen and view model files
     - Delete `composeApp/src/commonMain/kotlin/net/onefivefour/echolist/ui/notecreate/NoteCreateScreen.kt`
     - Delete `composeApp/src/commonMain/kotlin/net/onefivefour/echolist/ui/notedetail/NoteDetailScreen.kt`
     - Delete `composeApp/src/commonMain/kotlin/net/onefivefour/echolist/ui/notedetail/NoteDetailUiState.kt`
@@ -92,16 +92,16 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Remove any Koin module registrations for `NoteDetailViewModel`
     - _Requirements: 6.1, 6.2, 6.3, 6.4_
 
-  - [ ] 6.2 Delete old test files referencing removed components
+  - [x] 6.2 Delete old test files referencing removed components
     - Delete `composeApp/src/commonTest/kotlin/net/onefivefour/echolist/ui/notedetail/NoteDetailViewModelPropertyTest.kt`
     - Delete `composeApp/src/commonTest/kotlin/net/onefivefour/echolist/ui/notedetail/NoteDetailViewModelTest.kt`
     - _Requirements: 6.4_
 
-  - [ ] 6.3 Update `SaveButtonNoOpPropertyTest.kt` references
+  - [x] 6.3 Update `SaveButtonNoOpPropertyTest.kt` references
     - Update test descriptions from `NoteCreateScreen`/`TasklistDetailScreen` to `EditNoteScreen`/`EditTaskListScreen`
     - _Requirements: 7.3_
 
-- [ ] 7. Final checkpoint - Ensure all tests pass
+- [x] 7. Final checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes

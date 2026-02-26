@@ -10,7 +10,7 @@ import io.kotest.property.checkAll
 /**
  * Feature: file-add-button, Property 3: Save button is a no-op (idempotence)
  *
- * For any text content in the NoteCreateScreen or TasklistDetailScreen,
+ * For any text content in the EditNoteScreen or EditTaskListScreen,
  * invoking the save callback should not change the text state.
  * The text before and after the save action should be identical.
  *
@@ -18,7 +18,7 @@ import io.kotest.property.checkAll
  */
 class SaveButtonNoOpPropertyTest : FunSpec({
 
-    test("Property 3: Save button is a no-op for NoteCreateScreen") {
+    test("Property 3: Save button is a no-op for EditNoteScreen") {
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..200)) { text ->
             var currentText = text
             val onSaveClick: () -> Unit = { /* no-op, mirrors App.kt wiring */ }
@@ -27,7 +27,7 @@ class SaveButtonNoOpPropertyTest : FunSpec({
         }
     }
 
-    test("Property 3: Save button is a no-op for TasklistDetailScreen") {
+    test("Property 3: Save button is a no-op for EditTaskListScreen") {
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..200)) { text ->
             var currentText = text
             val onSaveClick: () -> Unit = { /* no-op, mirrors App.kt wiring */ }
