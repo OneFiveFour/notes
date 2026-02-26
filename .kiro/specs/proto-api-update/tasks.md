@@ -74,9 +74,9 @@
 - [x] 15.2 Create `TaskListRepositoryImpl` following the same pattern as `FolderRepositoryImpl` — try/catch with `Result.success`/`Result.failure` (Req 12.7)
 
 ## Task 16: Update Koin DI Modules
-- [ ] 16.1 Add `TaskListRemoteDataSource` → `TaskListRemoteDataSourceImpl` binding in `networkModule` (Req 13.1)
-- [ ] 16.2 Add `TaskListRepository` → `TaskListRepositoryImpl` binding in `dataModule` (Req 13.2)
-- [ ] 16.3 Verify existing `FolderRepository` and `FolderRemoteDataSource` bindings compile with updated types (Req 13.3–13.4)
+- [x] 16.1 Add `TaskListRemoteDataSource` → `TaskListRemoteDataSourceImpl` binding in `networkModule` (Req 13.1)
+- [x] 16.2 Add `TaskListRepository` → `TaskListRepositoryImpl` binding in `dataModule` (Req 13.2)
+- [x] 16.3 Verify existing `FolderRepository` and `FolderRemoteDataSource` bindings compile with updated types (Req 13.3–13.4)
 
 ## Task 17: Property-Based Tests — Folder Mapper
 - [ ] 17.1 Write property test for FolderMapper domain→proto field preservation (Property 1): for any CreateFolderParams, UpdateFolderParams, DeleteFolderParams, mapping to proto preserves all fields
