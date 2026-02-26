@@ -29,8 +29,8 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
 - [x] 2. Checkpoint - Ensure route serialization tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. Create unified edit screens
-  - [ ] 3.1 Create `EditNoteScreen` composable
+- [x] 3. Create unified edit screens
+  - [x] 3.1 Create `EditNoteScreen` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/echolist/ui/editnote/EditNoteScreen.kt`
     - Stateless composable accepting `noteId: String?`, `text: String`, `onTextChanged: (String) -> Unit`, `onSaveClick: () -> Unit`, `onBackClick: () -> Unit`, `modifier: Modifier`
     - Display title "New Note" when `noteId == null`, "Edit Note" when non-null
@@ -39,7 +39,7 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Reference existing `NoteCreateScreen.kt` for layout structure
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6_
 
-  - [ ] 3.2 Create `EditTaskListScreen` composable
+  - [x] 3.2 Create `EditTaskListScreen` composable
     - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/echolist/ui/edittasklist/EditTaskListScreen.kt`
     - Stateless composable accepting `taskListId: String?`, `text: String`, `onTextChanged: (String) -> Unit`, `onSaveClick: () -> Unit`, `onBackClick: () -> Unit`, `modifier: Modifier`
     - Display title "New Tasklist" when `taskListId == null`, "Edit Tasklist" when non-null
