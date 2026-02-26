@@ -1,36 +1,36 @@
 # Implementation Tasks
 
 ## Task 1: Update Folder Proto Definition
-- [ ] 1.1 Replace `proto/folder.proto` with the new proto definition: remove domain fields, rename FolderEntry to Folder (with path + name), add GetFolder and ListFolders RPCs, rename RenameFolder to UpdateFolder, make DeleteFolderResponse empty, update all request/response messages per Requirement 2
-- [ ] 1.2 Run Wire code generation to produce updated proto classes (`./gradlew generateProtos` or equivalent)
+- [x] 1.1 Replace `proto/folder.proto` with the new proto definition: remove domain fields, rename FolderEntry to Folder (with path + name), add GetFolder and ListFolders RPCs, rename RenameFolder to UpdateFolder, make DeleteFolderResponse empty, update all request/response messages per Requirement 2
+- [x] 1.2 Run Wire code generation to produce updated proto classes (`./gradlew generateProtos` or equivalent)
 
 ## Task 2: Update Folder Domain Models
-- [ ] 2.1 Update `Folder.kt` to add `name: String` field (Req 3.1)
-- [ ] 2.2 Update `CreateFolderParams.kt` to remove `domain` field, keeping only `parentPath` and `name` (Req 1.1)
-- [ ] 2.3 Update `DeleteFolderParams.kt` to remove `domain` field, keeping only `folderPath` (Req 1.2)
-- [ ] 2.4 Replace `RenameFolderParams.kt` with `UpdateFolderParams.kt` containing `folderPath` and `newName` (Req 1.3)
+- [x] 2.1 Update `Folder.kt` to add `name: String` field (Req 3.1)
+- [x] 2.2 Update `CreateFolderParams.kt` to remove `domain` field, keeping only `parentPath` and `name` (Req 1.1)
+- [x] 2.3 Update `DeleteFolderParams.kt` to remove `domain` field, keeping only `folderPath` (Req 1.2)
+- [x] 2.4 Replace `RenameFolderParams.kt` with `UpdateFolderParams.kt` containing `folderPath` and `newName` (Req 1.3)
 
 ## Task 3: Update FolderMapper
-- [ ] 3.1 Rewrite `FolderMapper` to map proto `Folder` → domain `Folder` (path + name) (Req 3.2)
-- [ ] 3.2 Add mapping for `CreateFolderResponse` → single domain `Folder` (Req 3.3)
-- [ ] 3.3 Add mapping for `GetFolderResponse` → single domain `Folder` (Req 3.4)
-- [ ] 3.4 Add mapping for `ListFoldersResponse` → `List<Folder>` (Req 3.5)
-- [ ] 3.5 Add mapping for `UpdateFolderResponse` → single domain `Folder` (Req 3.6)
-- [ ] 3.6 Update domain→proto mappings: `CreateFolderParams` → `CreateFolderRequest` without domain (Req 1.4), `UpdateFolderParams` → `UpdateFolderRequest` (Req 1.5), `DeleteFolderParams` → `DeleteFolderRequest` without domain (Req 1.6)
-- [ ] 3.7 Remove old `RenameFolderRequest`/`RenameFolderResponse`/`DeleteFolderResponse` list mappings
+- [x] 3.1 Rewrite `FolderMapper` to map proto `Folder` → domain `Folder` (path + name) (Req 3.2)
+- [x] 3.2 Add mapping for `CreateFolderResponse` → single domain `Folder` (Req 3.3)
+- [x] 3.3 Add mapping for `GetFolderResponse` → single domain `Folder` (Req 3.4)
+- [x] 3.4 Add mapping for `ListFoldersResponse` → `List<Folder>` (Req 3.5)
+- [x] 3.5 Add mapping for `UpdateFolderResponse` → single domain `Folder` (Req 3.6)
+- [x] 3.6 Update domain→proto mappings: `CreateFolderParams` → `CreateFolderRequest` without domain (Req 1.4), `UpdateFolderParams` → `UpdateFolderRequest` (Req 1.5), `DeleteFolderParams` → `DeleteFolderRequest` without domain (Req 1.6)
+- [x] 3.7 Remove old `RenameFolderRequest`/`RenameFolderResponse`/`DeleteFolderResponse` list mappings
 
 ## Task 4: Update FolderRemoteDataSource
-- [ ] 4.1 Update `FolderRemoteDataSource` interface: replace `renameFolder` with `updateFolder`, add `getFolder` and `listFolders` methods (Req 4.1)
-- [ ] 4.2 Update `FolderRemoteDataSourceImpl`: implement all 5 methods with correct service paths `/folder.v1.FolderService/{RpcName}` and updated request/response types (Req 4.2–4.6)
+- [x] 4.1 Update `FolderRemoteDataSource` interface: replace `renameFolder` with `updateFolder`, add `getFolder` and `listFolders` methods (Req 4.1)
+- [x] 4.2 Update `FolderRemoteDataSourceImpl`: implement all 5 methods with correct service paths `/folder.v1.FolderService/{RpcName}` and updated request/response types (Req 4.2–4.6)
 
 ## Task 5: Update FolderRepository
-- [ ] 5.1 Update `FolderRepository` interface: replace `renameFolder` with `updateFolder`, add `getFolder` and `listFolders`, change return types — `createFolder` returns `Result<Folder>`, `updateFolder` returns `Result<Folder>`, `deleteFolder` returns `Result<Unit>` (Req 4.7–4.10)
-- [ ] 5.2 Update `FolderRepositoryImpl`: implement all 5 methods using updated mapper and data source, `deleteFolder` returns `Result.success(Unit)` (Req 4.8–4.10)
+- [x] 5.1 Update `FolderRepository` interface: replace `renameFolder` with `updateFolder`, add `getFolder` and `listFolders`, change return types — `createFolder` returns `Result<Folder>`, `updateFolder` returns `Result<Folder>`, `deleteFolder` returns `Result<Unit>` (Req 4.7–4.10)
+- [x] 5.2 Update `FolderRepositoryImpl`: implement all 5 methods using updated mapper and data source, `deleteFolder` returns `Result.success(Unit)` (Req 4.8–4.10)
 
 ## Task 6: Update HomeViewModel for Domain Removal
-- [ ] 6.1 Update `HomeViewModel` to construct `CreateFolderParams` without domain field (Req 1.7)
-- [ ] 6.2 Update any `renameFolder` calls to use `updateFolder` with `UpdateFolderParams`
-- [ ] 6.3 Update any `deleteFolder` calls to use `DeleteFolderParams` without domain and handle `Result<Unit>` return
+- [x] 6.1 Update `HomeViewModel` to construct `CreateFolderParams` without domain field (Req 1.7)
+- [x] 6.2 Update any `renameFolder` calls to use `updateFolder` with `UpdateFolderParams`
+- [x] 6.3 Update any `deleteFolder` calls to use `DeleteFolderParams` without domain and handle `Result<Unit>` return
 
 ## Task 7: Update Note Proto Definition
 - [ ] 7.1 Replace `proto/notes.proto` with the new proto definition: rename service to NoteService, wrap CreateNoteResponse/GetNoteResponse/UpdateNoteResponse in nested `note` field of type Note, make DeleteNoteResponse empty (Req 5)

@@ -4,8 +4,12 @@ import folder.v1.CreateFolderRequest
 import folder.v1.CreateFolderResponse
 import folder.v1.DeleteFolderRequest
 import folder.v1.DeleteFolderResponse
-import folder.v1.RenameFolderRequest
-import folder.v1.RenameFolderResponse
+import folder.v1.GetFolderRequest
+import folder.v1.GetFolderResponse
+import folder.v1.ListFoldersRequest
+import folder.v1.ListFoldersResponse
+import folder.v1.UpdateFolderRequest
+import folder.v1.UpdateFolderResponse
 import net.onefivefour.echolist.network.client.ConnectRpcClient
 
 internal class FolderRemoteDataSourceImpl(
@@ -21,12 +25,30 @@ internal class FolderRemoteDataSourceImpl(
         ).getOrThrow()
     }
 
-    override suspend fun renameFolder(request: RenameFolderRequest): RenameFolderResponse {
+    override suspend fun getFolder(request: GetFolderRequest): GetFolderResponse {
         return client.call(
-            path = "/folder.v1.FolderService/RenameFolder",
+            path = "/folder.v1.FolderService/GetFolder",
             request = request,
-            requestSerializer = { RenameFolderRequest.ADAPTER.encode(it) },
-            responseDeserializer = { RenameFolderResponse.ADAPTER.decode(it) }
+            requestSerializer = { GetFolderRequest.ADAPTER.encode(it) },
+            responseDeserializer = { GetFolderResponse.ADAPTER.decode(it) }
+        ).getOrThrow()
+    }
+
+    override suspend fun listFolders(request: ListFoldersRequest): ListFoldersResponse {
+        return client.call(
+            path = "/folder.v1.FolderService/ListFolders",
+            request = request,
+            requestSerializer = { ListFoldersRequest.ADAPTER.encode(it) },
+            responseDeserializer = { ListFoldersResponse.ADAPTER.decode(it) }
+        ).getOrThrow()
+    }
+
+    override suspend fun updateFolder(request: UpdateFolderRequest): UpdateFolderResponse {
+        return client.call(
+            path = "/folder.v1.FolderService/UpdateFolder",
+            request = request,
+            requestSerializer = { UpdateFolderRequest.ADAPTER.encode(it) },
+            responseDeserializer = { UpdateFolderResponse.ADAPTER.decode(it) }
         ).getOrThrow()
     }
 

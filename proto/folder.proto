@@ -6,39 +6,54 @@ option go_package = "gen/folder;folder";
 
 service FolderService {
   rpc CreateFolder (CreateFolderRequest) returns (CreateFolderResponse);
-  rpc RenameFolder (RenameFolderRequest) returns (RenameFolderResponse);
+  rpc GetFolder (GetFolderRequest) returns (GetFolderResponse);
+  rpc ListFolders (ListFoldersRequest) returns (ListFoldersResponse);
+  rpc UpdateFolder (UpdateFolderRequest) returns (UpdateFolderResponse);
   rpc DeleteFolder (DeleteFolderRequest) returns (DeleteFolderResponse);
 }
 
-message CreateFolderRequest {
-  string domain = 1;      // domain root, e.g. "notes" or "tasks"
-  string parent_path = 2; // relative path within root, empty = root
-  string name = 3;        // new folder name
+message Folder {
+  string path = 1;
+  string name = 2;
 }
 
-message FolderEntry {
-  string path = 1; // relative path; folders end with "/"
+message CreateFolderRequest {
+  string parent_path = 1;
+  string name = 2;
 }
 
 message CreateFolderResponse {
-  repeated FolderEntry entries = 1;
+  Folder folder = 1;
 }
 
-message RenameFolderRequest {
-  string domain = 1;
-  string folder_path = 2; // relative path to existing folder
-  string new_name = 3;
+message GetFolderRequest {
+  string folder_path = 1;
 }
 
-message RenameFolderResponse {
-  repeated FolderEntry entries = 1;
+message GetFolderResponse {
+  Folder folder = 1;
+}
+
+message ListFoldersRequest {
+  string parent_path = 1;
+}
+
+message ListFoldersResponse {
+  repeated Folder folders = 1;
+}
+
+message UpdateFolderRequest {
+  string folder_path = 1;
+  string new_name = 2;
+}
+
+message UpdateFolderResponse {
+  Folder folder = 1;
 }
 
 message DeleteFolderRequest {
-  string domain = 1;
-  string folder_path = 2;
+  string folder_path = 1;
 }
 
 message DeleteFolderResponse {
-  repeated FolderEntry entries = 1;
 }

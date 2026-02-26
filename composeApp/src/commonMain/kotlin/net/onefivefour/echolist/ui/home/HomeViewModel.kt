@@ -12,8 +12,6 @@ import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.FolderRepository
 import net.onefivefour.echolist.data.repository.NotesRepository
 
-private const val DOMAIN = "notes"
-
 class HomeViewModel(
     private val path: String,
     private val notesRepository: NotesRepository,
@@ -58,7 +56,6 @@ class HomeViewModel(
 
         viewModelScope.launch {
             val params = CreateFolderParams(
-                domain = DOMAIN,
                 parentPath = path,
                 name = trimmedName
             )
