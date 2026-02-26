@@ -21,14 +21,14 @@ private fun Arb.Companion.homeRoute(): Arb<HomeRoute> =
 private fun Arb.Companion.navKey(): Arb<NavKey> =
     Arb.choice(
         Arb.homeRoute(),
-        Arb.of(NoteCreateRoute),
-        Arb.of(TasklistDetailRoute)
+        Arb.of(EditNoteRoute()),
+        Arb.of(EditTaskListRoute())
     )
 
 private fun Arb.Companion.detailRoute(): Arb<NavKey> =
     Arb.choice(
-        Arb.of(NoteCreateRoute),
-        Arb.of(TasklistDetailRoute)
+        Arb.of(EditNoteRoute()),
+        Arb.of(EditTaskListRoute())
     )
 
 /**
@@ -54,11 +54,11 @@ class NavigationPropertyTest : FunSpec({
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            // Simulate: onAddNoteClick = { backStack.add(NoteCreateRoute) }
-            backStack.add(NoteCreateRoute)
+            // Simulate: onAddNoteClick = { backStack.add(EditNoteRoute()) }
+            backStack.add(EditNoteRoute())
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe NoteCreateRoute
+            backStack.last() shouldBe EditNoteRoute()
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }
@@ -72,11 +72,11 @@ class NavigationPropertyTest : FunSpec({
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            // Simulate: onAddTasklistClick = { backStack.add(TasklistDetailRoute) }
-            backStack.add(TasklistDetailRoute)
+            // Simulate: onAddTasklistClick = { backStack.add(EditTaskListRoute()) }
+            backStack.add(EditTaskListRoute())
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe TasklistDetailRoute
+            backStack.last() shouldBe EditTaskListRoute()
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }

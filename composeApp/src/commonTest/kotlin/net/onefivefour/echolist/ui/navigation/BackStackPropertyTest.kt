@@ -18,11 +18,11 @@ import io.kotest.property.checkAll
 private fun Arb.Companion.homeRoute(): Arb<HomeRoute> =
     Arb.string(0..50).map { HomeRoute(it) }
 
-private fun Arb.Companion.noteDetailRoute(): Arb<NoteDetailRoute> =
-    Arb.string(1..50).map { NoteDetailRoute(it) }
+private fun Arb.Companion.editNoteRoute(): Arb<EditNoteRoute> =
+    Arb.string(1..50).map { EditNoteRoute(it) }
 
 private fun Arb.Companion.navKey(): Arb<NavKey> =
-    Arb.choice(Arb.homeRoute(), Arb.noteDetailRoute())
+    Arb.choice(Arb.homeRoute(), Arb.editNoteRoute())
 
 /**
  * Feature: compose-navigation-3, Properties 2, 3, 4: Back stack navigation

@@ -24,9 +24,8 @@ import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginScreen
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import net.onefivefour.echolist.ui.navigation.HomeRoute
-import net.onefivefour.echolist.ui.navigation.NoteCreateRoute
-import net.onefivefour.echolist.ui.navigation.NoteDetailRoute
-import net.onefivefour.echolist.ui.navigation.TasklistDetailRoute
+import net.onefivefour.echolist.ui.navigation.EditNoteRoute
+import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
 import net.onefivefour.echolist.ui.notecreate.NoteCreateScreen
 import net.onefivefour.echolist.ui.notedetail.NoteDetailScreen
@@ -98,36 +97,36 @@ fun App() {
                                     }
                                 },
                                 onFolderClick = { folderId -> backStack.add(HomeRoute(folderId)) },
-                                onFileClick = { fileId -> backStack.add(NoteDetailRoute(fileId)) },
+                                onFileClick = { fileId -> backStack.add(EditNoteRoute(noteId = fileId)) },
                                 onAddFolderClick = homeViewModel::onAddFolderClicked,
                                 onInlineNameChanged = homeViewModel::onInlineNameChanged,
                                 onInlineConfirm = homeViewModel::onInlineConfirm,
                                 onInlineCancel = homeViewModel::onInlineCancel,
-                                onAddNoteClick = { backStack.add(NoteCreateRoute) },
-                                onAddTasklistClick = { backStack.add(TasklistDetailRoute) }
+                                onAddNoteClick = { backStack.add(EditNoteRoute()) },
+                                onAddTasklistClick = { backStack.add(EditTaskListRoute()) }
                             )
                         }
 
-                        entry<NoteDetailRoute> { route ->
-                            val noteDetailViewModel = koinViewModel<NoteDetailViewModel> { parametersOf(route.noteId) }
-                            val noteDetailUiState by noteDetailViewModel.uiState.collectAsStateWithLifecycle()
-                            NoteDetailScreen(
-                                uiState = noteDetailUiState,
-                                onBackClick = { backStack.removeLastOrNull() }
-                            )
+                        entry<EditNoteRoute> { route ->
+                            if (route.noteId != null) {
+                                val noteDetailViewModel = koinViewModel<NoteDetailViewModel> { parametersOf(route.noteId) }
+                                val noteDetailUiState by noteDetailViewModel.uiState.collectAsStateWithLifecycle()
+                                NoteDetailScreen(
+                                    uiState = noteDetailUiState,
+                                    onBackClick = { backStack.removeLastOrNull() }
+                                )
+                            } else {
+                                var text by remember { mutableStateOf("") }
+                                NoteCreateScreen(
+                                    text = text,
+                                    onTextChanged = { text = it },
+                                    onSaveClick = { /* no-op */ },
+                                    onBackClick = { backStack.removeLastOrNull() }
+                                )
+                            }
                         }
 
-                        entry<NoteCreateRoute> {
-                            var text by remember { mutableStateOf("") }
-                            NoteCreateScreen(
-                                text = text,
-                                onTextChanged = { text = it },
-                                onSaveClick = { /* no-op */ },
-                                onBackClick = { backStack.removeLastOrNull() }
-                            )
-                        }
-
-                        entry<TasklistDetailRoute> {
+                        entry<EditTaskListRoute> {
                             var text by remember { mutableStateOf("") }
                             TasklistDetailScreen(
                                 text = text,

@@ -26,7 +26,7 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Test both concrete type and polymorphic `NavKey` serialization
     - **Validates: Requirements 2.4, 7.2, 7.3**
 
-- [ ] 2. Checkpoint - Ensure route serialization tests pass
+- [x] 2. Checkpoint - Ensure route serialization tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 3. Create unified edit screens
