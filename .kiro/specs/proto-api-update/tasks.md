@@ -79,16 +79,16 @@
 - [x] 16.3 Verify existing `FolderRepository` and `FolderRemoteDataSource` bindings compile with updated types (Req 13.3–13.4)
 
 ## Task 17: Property-Based Tests — Folder Mapper
-- [ ] 17.1 Write property test for FolderMapper domain→proto field preservation (Property 1): for any CreateFolderParams, UpdateFolderParams, DeleteFolderParams, mapping to proto preserves all fields
-- [ ] 17.2 Write property test for FolderMapper proto→domain field preservation (Property 2): for any proto Folder, CreateFolderResponse, GetFolderResponse, ListFoldersResponse, UpdateFolderResponse, mapping to domain preserves path and name
+- [x] 17.1 Write property test for FolderMapper domain→proto field preservation (Property 1): for any CreateFolderParams, UpdateFolderParams, DeleteFolderParams, mapping to proto preserves all fields
+- [x] 17.2 Write property test for FolderMapper proto→domain field preservation (Property 2): for any proto Folder, CreateFolderResponse, GetFolderResponse, ListFoldersResponse, UpdateFolderResponse, mapping to domain preserves path and name
 
 ## Task 18: Property-Based Tests — Note Mapper
-- [ ] 18.1 Write property test for NoteMapper response→domain field preservation (Property 3): for any CreateNoteResponse, GetNoteResponse, UpdateNoteResponse with nested Note, mapping preserves all fields; for ListNotesResponse, mapping preserves notes count, entries count, and all field values
+- [x] 18.1 Write property test for NoteMapper response→domain field preservation (Property 3): for any CreateNoteResponse, GetNoteResponse, UpdateNoteResponse with nested Note, mapping preserves all fields; for ListNotesResponse, mapping preserves notes count, entries count, and all field values
 
 ## Task 19: Property-Based Tests — TaskList Mapper
-- [ ] 19.1 Write property test for TaskListMapper proto→domain field preservation (Property 4): for any proto MainTask with nested SubTasks, and any response type, mapping preserves all fields recursively
-- [ ] 19.2 Write property test for TaskListMapper domain→proto field preservation (Property 5): for any CreateTaskListParams or UpdateTaskListParams with nested MainTask/SubTask, mapping preserves all fields
-- [ ] 19.3 Write property test for TaskList mapping round-trip (Property 6): for any valid TaskList domain object, mapping to proto and back produces an equivalent object
+- [x] 19.1 Write property test for TaskListMapper proto→domain field preservation (Property 4): for any proto MainTask with nested SubTasks, and any response type, mapping preserves all fields recursively
+- [x] 19.2 Write property test for TaskListMapper domain→proto field preservation (Property 5): for any CreateTaskListParams or UpdateTaskListParams with nested MainTask/SubTask, mapping preserves all fields
+- [x] 19.3 Write property test for TaskList mapping round-trip (Property 6): for any valid TaskList domain object, mapping to proto and back produces an equivalent object
 
 ## Task 20: Property-Based Tests — TaskListRepository Error Propagation
-- [ ] 20.1 Write property test for TaskListRepository error propagation (Property 7): for any exception thrown by TaskListRemoteDataSource, every TaskListRepositoryImpl method returns Result.failure with that exact exception
+- [x] 20.1 Write property test for TaskListRepository error propagation (Property 7): for any exception thrown by TaskListRemoteDataSource, every TaskListRepositoryImpl method returns Result.failure with that exact exception

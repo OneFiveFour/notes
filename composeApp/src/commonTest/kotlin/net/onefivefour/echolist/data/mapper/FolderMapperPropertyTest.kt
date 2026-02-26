@@ -4,35 +4,36 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.arbitrary
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.RenameFolderParams
+import net.onefivefour.echolist.data.models.UpdateFolderParams
 
+/**
+ * Feature: proto-api-update
+ * Property 1: Folder mapper domain-to-proto field preservation
+ * Property 2: Folder mapper proto-to-domain field preservation
+ *
+ * Validates: Requirements 1.4, 1.5, 1.6, 3.2, 3.3, 3.4, 3.5, 3.6
+ */
 class FolderMapperPropertyTest : FunSpec({
 
     // -- Generators --
 
-    val arbPath = Arb.string(1..100)
-
-    val arbFolderEntry = arbitrary {
-        folder.v1.FolderEntry(path = arbPath.bind())
-    }
-
     val arbCreateFolderParams = arbitrary {
         CreateFolderParams(
-            domain = Arb.string(1..50).bind(),
             parentPath = Arb.string(0..100).bind(),
             name = Arb.string(1..100).bind()
         )
     }
 
-    val arbRenameFolderParams = arbitrary {
-        RenameFolderParams(
-            domain = Arb.string(1..50).bind(),
+    val arbUpdateFolderParams = arbitrary {
+        UpdateFolderParams(
             folderPath = Arb.string(1..100).bind(),
             newName = Arb.string(1..100).bind()
         )
@@ -40,78 +41,88 @@ class FolderMapperPropertyTest : FunSpec({
 
     val arbDeleteFolderParams = arbitrary {
         DeleteFolderParams(
-            domain = Arb.string(1..50).bind(),
             folderPath = Arb.string(1..100).bind()
         )
     }
 
-    // -- Proto -> Domain --
-
-    test("FolderEntry proto -> domain preserves path").config(invocations = 20) {
-        checkAll(arbFolderEntry) { proto ->
-            val domain = FolderMapper.toDomain(proto)
-            domain.path shouldBe proto.path
-        }
+    val arbProtoFolder = arbitrary {
+        folder.v1.Folder(
+            path = Arb.string(1..100).bind(),
+            name = Arb.string(1..100).bind()
+        )
     }
 
-    test("CreateFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
-            val response = folder.v1.CreateFolderResponse(entries = entries)
-            val domain = FolderMapper.toDomain(response)
-            domain shouldHaveSize entries.size
-            domain.zip(entries).forEach { (d, p) ->
-                d.path shouldBe p.path
-            }
-        }
-    }
+    // -- Property 1: Domain -> Proto field preservation --
 
-    test("RenameFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
-            val response = folder.v1.RenameFolderResponse(entries = entries)
-            val domain = FolderMapper.toDomain(response)
-            domain shouldHaveSize entries.size
-            domain.zip(entries).forEach { (d, p) ->
-                d.path shouldBe p.path
-            }
-        }
-    }
-
-    test("DeleteFolderResponse -> domain preserves all entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..10)) { entries ->
-            val response = folder.v1.DeleteFolderResponse(entries = entries)
-            val domain = FolderMapper.toDomain(response)
-            domain shouldHaveSize entries.size
-            domain.zip(entries).forEach { (d, p) ->
-                d.path shouldBe p.path
-            }
-        }
-    }
-
-    // -- Domain -> Proto --
-
-    test("CreateFolderParams -> CreateFolderRequest preserves all fields").config(invocations = 20) {
-        checkAll(arbCreateFolderParams) { params ->
+    test("Feature: proto-api-update, Property 1: CreateFolderParams -> CreateFolderRequest preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbCreateFolderParams) { params ->
             val proto = FolderMapper.toProto(params)
-            proto.domain shouldBe params.domain
             proto.parent_path shouldBe params.parentPath
             proto.name shouldBe params.name
         }
     }
 
-    test("RenameFolderParams -> RenameFolderRequest preserves all fields").config(invocations = 20) {
-        checkAll(arbRenameFolderParams) { params ->
+    test("Feature: proto-api-update, Property 1: UpdateFolderParams -> UpdateFolderRequest preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbUpdateFolderParams) { params ->
             val proto = FolderMapper.toProto(params)
-            proto.domain shouldBe params.domain
             proto.folder_path shouldBe params.folderPath
             proto.new_name shouldBe params.newName
         }
     }
 
-    test("DeleteFolderParams -> DeleteFolderRequest preserves all fields").config(invocations = 20) {
-        checkAll(arbDeleteFolderParams) { params ->
+    test("Feature: proto-api-update, Property 1: DeleteFolderParams -> DeleteFolderRequest preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbDeleteFolderParams) { params ->
             val proto = FolderMapper.toProto(params)
-            proto.domain shouldBe params.domain
             proto.folder_path shouldBe params.folderPath
+        }
+    }
+
+    // -- Property 2: Proto -> Domain field preservation --
+
+    test("Feature: proto-api-update, Property 2: proto Folder -> domain Folder preserves path and name") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoFolder) { proto ->
+            val domain = FolderMapper.toDomain(proto)
+            domain.path shouldBe proto.path
+            domain.name shouldBe proto.name
+        }
+    }
+
+    test("Feature: proto-api-update, Property 2: CreateFolderResponse -> domain Folder preserves path and name") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoFolder) { protoFolder ->
+            val response = folder.v1.CreateFolderResponse(folder = protoFolder)
+            val domain = FolderMapper.toDomain(response)
+            domain.path shouldBe protoFolder.path
+            domain.name shouldBe protoFolder.name
+        }
+    }
+
+    test("Feature: proto-api-update, Property 2: GetFolderResponse -> domain Folder preserves path and name") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoFolder) { protoFolder ->
+            val response = folder.v1.GetFolderResponse(folder = protoFolder)
+            val domain = FolderMapper.toDomain(response)
+            domain.path shouldBe protoFolder.path
+            domain.name shouldBe protoFolder.name
+        }
+    }
+
+    test("Feature: proto-api-update, Property 2: ListFoldersResponse -> domain list preserves all folders") {
+        checkAll(PropTestConfig(iterations = 100), Arb.list(arbProtoFolder, 0..10)) { protoFolders ->
+            val response = folder.v1.ListFoldersResponse(folders = protoFolders)
+            val domainList = FolderMapper.toDomain(response)
+            domainList shouldHaveSize protoFolders.size
+            domainList.zip(protoFolders).forEach { (domain, proto) ->
+                domain.path shouldBe proto.path
+                domain.name shouldBe proto.name
+            }
+        }
+    }
+
+    test("Feature: proto-api-update, Property 2: UpdateFolderResponse -> domain Folder preserves path and name") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoFolder) { protoFolder ->
+            val response = folder.v1.UpdateFolderResponse(folder = protoFolder)
+            val domain = FolderMapper.toDomain(response)
+            domain.path shouldBe protoFolder.path
+            domain.name shouldBe protoFolder.name
         }
     }
 })

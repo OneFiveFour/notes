@@ -74,10 +74,12 @@ class CacheFirstPropertyTest : FunSpec({
             delay(delayMs)
             networkCompleted.set(true)
             return GetNoteResponse(
-                file_path = request.file_path,
-                title = "network-title",
-                content = "network-content",
-                updated_at = System.currentTimeMillis()
+                note = notes.v1.Note(
+                    file_path = request.file_path,
+                    title = "network-title",
+                    content = "network-content",
+                    updated_at = System.currentTimeMillis()
+                )
             )
         }
         override suspend fun updateNote(request: UpdateNoteRequest): UpdateNoteResponse {

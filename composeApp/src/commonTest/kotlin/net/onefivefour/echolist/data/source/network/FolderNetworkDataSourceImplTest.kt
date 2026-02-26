@@ -4,8 +4,12 @@ import folder.v1.CreateFolderRequest
 import folder.v1.CreateFolderResponse
 import folder.v1.DeleteFolderRequest
 import folder.v1.DeleteFolderResponse
-import folder.v1.RenameFolderRequest
-import folder.v1.RenameFolderResponse
+import folder.v1.GetFolderRequest
+import folder.v1.GetFolderResponse
+import folder.v1.ListFoldersRequest
+import folder.v1.ListFoldersResponse
+import folder.v1.UpdateFolderRequest
+import folder.v1.UpdateFolderResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -21,15 +25,15 @@ class FolderNetworkDataSourceImplTest : FunSpec({
 
     // -- Generators --
 
-    val arbFolderEntry = arbitrary {
-        folder.v1.FolderEntry(path = Arb.string(1..100).bind())
+    val arbProtoFolder = arbitrary {
+        folder.v1.Folder(
+            path = Arb.string(1..100).bind(),
+            name = Arb.string(1..100).bind()
+        )
     }
 
     // -- Helpers --
 
-    /**
-     * A [ConnectRpcClient] that captures the path and returns a pre-built response.
-     */
     class CapturingClient(
         private val responseBytes: ByteArray
     ) : ConnectRpcClient {
@@ -46,9 +50,6 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         }
     }
 
-    /**
-     * A [ConnectRpcClient] that always fails with the given exception.
-     */
     class FailingClient(
         private val exception: Exception
     ) : ConnectRpcClient {
@@ -62,32 +63,25 @@ class FolderNetworkDataSourceImplTest : FunSpec({
 
     // -- CreateFolder --
 
-    test("createFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = CreateFolderResponse(entries = entries)
-            val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderRemoteDataSourceImpl(client)
+    test("createFolder calls correct RPC path") {
+        val response = CreateFolderResponse(folder = folder.v1.Folder(path = "/test/", name = "test"))
+        val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
-            dataSource.createFolder(CreateFolderRequest(domain = "notes", parent_path = "", name = "test"))
+        dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "test"))
 
-            client.capturedPath shouldBe "/folder.v1.FolderService/CreateFolder"
-        }
+        client.capturedPath shouldBe "/folder.v1.FolderService/CreateFolder"
     }
 
-    test("createFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = CreateFolderResponse(entries = entries)
+    test("createFolder deserializes response").config(invocations = 20) {
+        checkAll(arbProtoFolder) { protoFolder ->
+            val response = CreateFolderResponse(folder = protoFolder)
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
             val dataSource = FolderRemoteDataSourceImpl(client)
 
-            val result = dataSource.createFolder(
-                CreateFolderRequest(domain = "notes", parent_path = "", name = "test")
-            )
+            val result = dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "test"))
 
-            result.entries.size shouldBe entries.size
-            result.entries.zip(entries).forEach { (actual, expected) ->
-                actual.path shouldBe expected.path
-            }
+            result.folder shouldBe protoFolder
         }
     }
 
@@ -97,55 +91,72 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
-            dataSource.createFolder(CreateFolderRequest(domain = "d", parent_path = "", name = "n"))
+            dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "n"))
         }
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ServerError>()
     }
 
-    // -- RenameFolder --
+    // -- GetFolder --
 
-    test("renameFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = RenameFolderResponse(entries = entries)
-            val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderRemoteDataSourceImpl(client)
+    test("getFolder calls correct RPC path") {
+        val response = GetFolderResponse(folder = folder.v1.Folder(path = "/test/", name = "test"))
+        val client = CapturingClient(GetFolderResponse.ADAPTER.encode(response))
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
-            dataSource.renameFolder(
-                RenameFolderRequest(domain = "notes", folder_path = "old/", new_name = "new")
-            )
+        dataSource.getFolder(GetFolderRequest(folder_path = "/test/"))
 
-            client.capturedPath shouldBe "/folder.v1.FolderService/RenameFolder"
-        }
+        client.capturedPath shouldBe "/folder.v1.FolderService/GetFolder"
     }
 
-    test("renameFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = RenameFolderResponse(entries = entries)
-            val client = CapturingClient(RenameFolderResponse.ADAPTER.encode(response))
+    // -- ListFolders --
+
+    test("listFolders calls correct RPC path") {
+        val response = ListFoldersResponse(folders = emptyList())
+        val client = CapturingClient(ListFoldersResponse.ADAPTER.encode(response))
+        val dataSource = FolderRemoteDataSourceImpl(client)
+
+        dataSource.listFolders(ListFoldersRequest(parent_path = "/"))
+
+        client.capturedPath shouldBe "/folder.v1.FolderService/ListFolders"
+    }
+
+    test("listFolders deserializes response").config(invocations = 20) {
+        checkAll(Arb.list(arbProtoFolder, 0..5)) { folders ->
+            val response = ListFoldersResponse(folders = folders)
+            val client = CapturingClient(ListFoldersResponse.ADAPTER.encode(response))
             val dataSource = FolderRemoteDataSourceImpl(client)
 
-            val result = dataSource.renameFolder(
-                RenameFolderRequest(domain = "notes", folder_path = "old/", new_name = "new")
-            )
+            val result = dataSource.listFolders(ListFoldersRequest(parent_path = "/"))
 
-            result.entries.size shouldBe entries.size
-            result.entries.zip(entries).forEach { (actual, expected) ->
+            result.folders.size shouldBe folders.size
+            result.folders.zip(folders).forEach { (actual, expected) ->
                 actual.path shouldBe expected.path
+                actual.name shouldBe expected.name
             }
         }
     }
 
-    test("renameFolder propagates network errors") {
+    // -- UpdateFolder --
+
+    test("updateFolder calls correct RPC path") {
+        val response = UpdateFolderResponse(folder = folder.v1.Folder(path = "/new/", name = "new"))
+        val client = CapturingClient(UpdateFolderResponse.ADAPTER.encode(response))
+        val dataSource = FolderRemoteDataSourceImpl(client)
+
+        dataSource.updateFolder(UpdateFolderRequest(folder_path = "/old/", new_name = "new"))
+
+        client.capturedPath shouldBe "/folder.v1.FolderService/UpdateFolder"
+    }
+
+    test("updateFolder propagates network errors") {
         val error = NetworkException.ClientError(404, "not found")
         val client = FailingClient(error)
         val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
-            dataSource.renameFolder(
-                RenameFolderRequest(domain = "d", folder_path = "p/", new_name = "n")
-            )
+            dataSource.updateFolder(UpdateFolderRequest(folder_path = "p/", new_name = "n"))
         }
 
         result.isFailure shouldBe true
@@ -154,33 +165,14 @@ class FolderNetworkDataSourceImplTest : FunSpec({
 
     // -- DeleteFolder --
 
-    test("deleteFolder calls correct RPC path").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = DeleteFolderResponse(entries = entries)
-            val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderRemoteDataSourceImpl(client)
+    test("deleteFolder calls correct RPC path") {
+        val response = DeleteFolderResponse()
+        val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
+        val dataSource = FolderRemoteDataSourceImpl(client)
 
-            dataSource.deleteFolder(DeleteFolderRequest(domain = "notes", folder_path = "old/"))
+        dataSource.deleteFolder(DeleteFolderRequest(folder_path = "old/"))
 
-            client.capturedPath shouldBe "/folder.v1.FolderService/DeleteFolder"
-        }
-    }
-
-    test("deleteFolder deserializes response entries").config(invocations = 20) {
-        checkAll(Arb.list(arbFolderEntry, 0..5)) { entries ->
-            val response = DeleteFolderResponse(entries = entries)
-            val client = CapturingClient(DeleteFolderResponse.ADAPTER.encode(response))
-            val dataSource = FolderRemoteDataSourceImpl(client)
-
-            val result = dataSource.deleteFolder(
-                DeleteFolderRequest(domain = "notes", folder_path = "old/")
-            )
-
-            result.entries.size shouldBe entries.size
-            result.entries.zip(entries).forEach { (actual, expected) ->
-                actual.path shouldBe expected.path
-            }
-        }
+        client.capturedPath shouldBe "/folder.v1.FolderService/DeleteFolder"
     }
 
     test("deleteFolder propagates network errors") {
@@ -189,7 +181,7 @@ class FolderNetworkDataSourceImplTest : FunSpec({
         val dataSource = FolderRemoteDataSourceImpl(client)
 
         val result = runCatching {
-            dataSource.deleteFolder(DeleteFolderRequest(domain = "d", folder_path = "p/"))
+            dataSource.deleteFolder(DeleteFolderRequest(folder_path = "p/"))
         }
 
         result.isFailure shouldBe true

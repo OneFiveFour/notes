@@ -87,20 +87,29 @@ class NotesRepositoryPropertyTest : FunSpec({
     class MockNoteRemoteDataSource : NoteRemoteDataSource {
         var createNoteHandler: suspend (CreateNoteRequest) -> CreateNoteResponse = { req ->
             CreateNoteResponse(
-                file_path = "${req.path}/${req.title}.md",
-                title = req.title,
-                content = req.content,
-                updated_at = System.currentTimeMillis()
+                note = notes.v1.Note(
+                    file_path = "${req.path}/${req.title}.md",
+                    title = req.title,
+                    content = req.content,
+                    updated_at = System.currentTimeMillis()
+                )
             )
         }
         var listNotesHandler: suspend (ListNotesRequest) -> ListNotesResponse = {
-            ListNotesResponse(notes = emptyList())
+            ListNotesResponse(notes = emptyList(), entries = emptyList())
         }
         var getNoteHandler: suspend (GetNoteRequest) -> GetNoteResponse = { req ->
             throw NetworkException.ClientError(404, "not found")
         }
         var updateNoteHandler: suspend (UpdateNoteRequest) -> UpdateNoteResponse = { req ->
-            UpdateNoteResponse(updated_at = System.currentTimeMillis())
+            UpdateNoteResponse(
+                note = notes.v1.Note(
+                    file_path = req.file_path,
+                    title = "",
+                    content = req.content,
+                    updated_at = System.currentTimeMillis()
+                )
+            )
         }
         var deleteNoteHandler: suspend (DeleteNoteRequest) -> DeleteNoteResponse = {
             DeleteNoteResponse()
@@ -144,18 +153,22 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             mockNetwork.createNoteHandler = { req ->
                 CreateNoteResponse(
-                    file_path = createdFilePath,
-                    title = req.title,
-                    content = req.content,
-                    updated_at = createdTimestamp
+                    note = notes.v1.Note(
+                        file_path = createdFilePath,
+                        title = req.title,
+                        content = req.content,
+                        updated_at = createdTimestamp
+                    )
                 )
             }
             mockNetwork.getNoteHandler = { req ->
                 GetNoteResponse(
-                    file_path = req.file_path,
-                    title = params.title,
-                    content = params.content,
-                    updated_at = createdTimestamp
+                    note = notes.v1.Note(
+                        file_path = req.file_path,
+                        title = params.title,
+                        content = params.content,
+                        updated_at = createdTimestamp
+                    )
                 )
             }
 
@@ -188,15 +201,24 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             val updatedTimestamp = originalNote.updatedAt + 1000
 
-            mockNetwork.updateNoteHandler = { _ ->
-                UpdateNoteResponse(updated_at = updatedTimestamp)
+            mockNetwork.updateNoteHandler = { req ->
+                UpdateNoteResponse(
+                    note = notes.v1.Note(
+                        file_path = req.file_path,
+                        title = originalNote.title,
+                        content = req.content,
+                        updated_at = updatedTimestamp
+                    )
+                )
             }
             mockNetwork.getNoteHandler = { req ->
                 GetNoteResponse(
-                    file_path = req.file_path,
-                    title = originalNote.title,
-                    content = newContent,
-                    updated_at = updatedTimestamp
+                    note = notes.v1.Note(
+                        file_path = req.file_path,
+                        title = originalNote.title,
+                        content = newContent,
+                        updated_at = updatedTimestamp
+                    )
                 )
             }
 
@@ -345,10 +367,12 @@ class NotesRepositoryPropertyTest : FunSpec({
             mockNetwork.createNoteHandler = { req ->
                 syncedOrder.add(req.title)
                 CreateNoteResponse(
-                    file_path = "${req.path}/${req.title}.md",
-                    title = req.title,
-                    content = req.content,
-                    updated_at = System.currentTimeMillis()
+                    note = notes.v1.Note(
+                        file_path = "${req.path}/${req.title}.md",
+                        title = req.title,
+                        content = req.content,
+                        updated_at = System.currentTimeMillis()
+                    )
                 )
             }
 

@@ -116,7 +116,7 @@ class HomeViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 // Use a folder repo that suspends indefinitely so we can observe Saving state
                 val folderRepo = object : FakeFolderRepository() {
-                    override suspend fun createFolder(params: net.onefivefour.echolist.data.models.CreateFolderParams): Result<List<Folder>> {
+                    override suspend fun createFolder(params: net.onefivefour.echolist.data.models.CreateFolderParams): Result<Folder> {
                         super.createFolder(params)
                         kotlinx.coroutines.awaitCancellation()
                     }
@@ -155,7 +155,6 @@ class HomeViewModelPropertyTest : FunSpec({
 
                 val params = folderRepo.lastCreateParams
                 params shouldBe net.onefivefour.echolist.data.models.CreateFolderParams(
-                    domain = "notes",
                     parentPath = path,
                     name = name.trim()
                 )
@@ -171,7 +170,7 @@ class HomeViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 val notesRepo = FakeNotesRepository()
                 val folderRepo = FakeFolderRepository()
-                folderRepo.createFolderResult = Result.success(listOf(Folder("/${name.trim()}/")))
+                folderRepo.createFolderResult = Result.success(Folder(path = "/${name.trim()}/", name = name.trim()))
 
                 val vm = HomeViewModel("/", notesRepo, folderRepo)
                 advanceUntilIdle()

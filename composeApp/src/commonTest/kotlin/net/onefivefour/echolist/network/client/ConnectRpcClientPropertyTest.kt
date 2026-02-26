@@ -91,10 +91,12 @@ class ConnectRpcClientPropertyTest : FunSpec({
             Arb.long(0L..Long.MAX_VALUE)
         ) { filePath, title, content, updatedAt ->
             val original = notes.v1.CreateNoteResponse(
-                file_path = filePath,
-                title = title,
-                content = content,
-                updated_at = updatedAt
+                note = notes.v1.Note(
+                    file_path = filePath,
+                    title = title,
+                    content = content,
+                    updated_at = updatedAt
+                )
             )
             val bytes = original.encode()
             val decoded = notes.v1.CreateNoteResponse.ADAPTER.decode(bytes)

@@ -1,33 +1,25 @@
 package net.onefivefour.echolist.data.mapper
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
+import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.arbitrary
+import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
 
 /**
- * Property-based tests for NoteMapper round-trip conversions.
+ * Feature: proto-api-update
+ * Property 3: Note mapper response-to-domain field preservation
  *
- * **Validates: Requirements 3.3, 3.4, 3.5**
+ * Validates: Requirements 6.1, 6.2, 6.3, 6.4
  */
 class NoteMapperPropertyTest : FunSpec({
 
     // -- Generators --
-
-    val arbNote = arbitrary {
-        Note(
-            filePath = Arb.string(1..100).bind(),
-            title = Arb.string(0..200).bind(),
-            content = Arb.string(0..500).bind(),
-            updatedAt = Arb.long(0L..Long.MAX_VALUE).bind()
-        )
-    }
 
     val arbProtoNote = arbitrary {
         notes.v1.Note(
@@ -38,61 +30,11 @@ class NoteMapperPropertyTest : FunSpec({
         )
     }
 
-    val arbCreateNoteParams = arbitrary {
-        CreateNoteParams(
-            title = Arb.string(0..200).bind(),
-            content = Arb.string(0..500).bind(),
-            path = Arb.string(1..100).bind()
-        )
-    }
+    // -- Property 3: Response -> Domain field preservation --
 
-    val arbUpdateNoteParams = arbitrary {
-        UpdateNoteParams(
-            filePath = Arb.string(1..100).bind(),
-            content = Arb.string(0..500).bind()
-        )
-    }
-
-    val arbTimestamp = Arb.long(0L..Long.MAX_VALUE)
-
-
-    // -- Property 4: Domain-Proto Mapping Round-Trip --
-
-    test("Property 4: Proto Note -> Domain Note preserves all fields").config(invocations = 20) {
-        checkAll(arbProtoNote) { protoNote ->
-            val domain = NoteMapper.toDomain(protoNote)
-            domain.filePath shouldBe protoNote.file_path
-            domain.title shouldBe protoNote.title
-            domain.content shouldBe protoNote.content
-            domain.updatedAt shouldBe protoNote.updated_at
-        }
-    }
-
-    test("Property 4: CreateNoteParams -> CreateNoteRequest preserves all fields").config(invocations = 20) {
-        checkAll(arbCreateNoteParams) { params ->
-            val proto = NoteMapper.toProto(params)
-            proto.title shouldBe params.title
-            proto.content shouldBe params.content
-            proto.path shouldBe params.path
-        }
-    }
-
-    test("Property 4: UpdateNoteParams -> UpdateNoteRequest preserves all fields").config(invocations = 20) {
-        checkAll(arbUpdateNoteParams) { params ->
-            val proto = NoteMapper.toProto(params)
-            proto.file_path shouldBe params.filePath
-            proto.content shouldBe params.content
-        }
-    }
-
-    test("Property 4: CreateNoteResponse -> Domain Note preserves all fields").config(invocations = 20) {
-        checkAll(arbProtoNote) { protoNote ->
-            val response = notes.v1.CreateNoteResponse(
-                file_path = protoNote.file_path,
-                title = protoNote.title,
-                content = protoNote.content,
-                updated_at = protoNote.updated_at
-            )
+    test("Feature: proto-api-update, Property 3: CreateNoteResponse -> domain Note preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoNote) { protoNote ->
+            val response = notes.v1.CreateNoteResponse(note = protoNote)
             val domain = NoteMapper.toDomain(response)
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
@@ -101,14 +43,9 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: GetNoteResponse -> Domain Note preserves all fields").config(invocations = 20) {
-        checkAll(arbProtoNote) { protoNote ->
-            val response = notes.v1.GetNoteResponse(
-                file_path = protoNote.file_path,
-                title = protoNote.title,
-                content = protoNote.content,
-                updated_at = protoNote.updated_at
-            )
+    test("Feature: proto-api-update, Property 3: GetNoteResponse -> domain Note preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoNote) { protoNote ->
+            val response = notes.v1.GetNoteResponse(note = protoNote)
             val domain = NoteMapper.toDomain(response)
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
@@ -117,44 +54,34 @@ class NoteMapperPropertyTest : FunSpec({
         }
     }
 
-    // -- Property 5: Timestamp Mapping Preservation --
-
-    test("Property 5: Timestamp round-trip through Proto Note -> Domain preserves exact value").config(invocations = 20) {
-        checkAll(arbTimestamp) { timestamp ->
-            val protoNote = notes.v1.Note(
-                file_path = "test.md",
-                title = "test",
-                content = "content",
-                updated_at = timestamp
-            )
-            val domain = NoteMapper.toDomain(protoNote)
-            domain.updatedAt shouldBe timestamp
+    test("Feature: proto-api-update, Property 3: UpdateNoteResponse -> domain Note preserves all fields") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoNote) { protoNote ->
+            val response = notes.v1.UpdateNoteResponse(note = protoNote)
+            val domain = NoteMapper.toDomain(response)
+            domain.filePath shouldBe protoNote.file_path
+            domain.title shouldBe protoNote.title
+            domain.content shouldBe protoNote.content
+            domain.updatedAt shouldBe protoNote.updated_at
         }
     }
 
-    test("Property 5: Timestamp through CreateNoteResponse -> Domain preserves exact value").config(invocations = 20) {
-        checkAll(arbTimestamp) { timestamp ->
-            val response = notes.v1.CreateNoteResponse(
-                file_path = "test.md",
-                title = "test",
-                content = "content",
-                updated_at = timestamp
-            )
-            val domain = NoteMapper.toDomain(response)
-            domain.updatedAt shouldBe timestamp
-        }
-    }
-
-    test("Property 5: Timestamp through GetNoteResponse -> Domain preserves exact value").config(invocations = 20) {
-        checkAll(arbTimestamp) { timestamp ->
-            val response = notes.v1.GetNoteResponse(
-                file_path = "test.md",
-                title = "test",
-                content = "content",
-                updated_at = timestamp
-            )
-            val domain = NoteMapper.toDomain(response)
-            domain.updatedAt shouldBe timestamp
+    test("Feature: proto-api-update, Property 3: ListNotesResponse -> ListNotesResult preserves notes count, entries count, and all field values") {
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.list(arbProtoNote, 0..10),
+            Arb.list(Arb.string(1..100), 0..10)
+        ) { protoNotes, entries ->
+            val response = notes.v1.ListNotesResponse(notes = protoNotes, entries = entries)
+            val result = NoteMapper.toDomain(response)
+            result.notes shouldHaveSize protoNotes.size
+            result.entries shouldHaveSize entries.size
+            result.entries shouldBe entries
+            result.notes.zip(protoNotes).forEach { (domain, proto) ->
+                domain.filePath shouldBe proto.file_path
+                domain.title shouldBe proto.title
+                domain.content shouldBe proto.content
+                domain.updatedAt shouldBe proto.updated_at
+            }
         }
     }
 })
