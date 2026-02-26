@@ -48,8 +48,8 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Reference existing `TasklistDetailScreen.kt` for layout structure
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
 
-- [ ] 4. Update navigation wiring in `App.kt`
-  - [ ] 4.1 Replace old entry providers with new unified route entries
+- [x] 4. Update navigation wiring in `App.kt`
+  - [x] 4.1 Replace old entry providers with new unified route entries
     - Remove `entry<NoteDetailRoute>`, `entry<NoteCreateRoute>`, `entry<TasklistDetailRoute>` from `NavDisplay`
     - Add `entry<EditNoteRoute>` that renders `EditNoteScreen` with `route.noteId`
     - Add `entry<EditTaskListRoute>` that renders `EditTaskListScreen` with `route.taskListId`
@@ -57,24 +57,24 @@ Refactor the EchoList navigation and screen layer to consolidate separate create
     - Wire `onSaveClick` as no-op
     - _Requirements: 5.1, 5.2, 5.3_
 
-  - [ ] 4.2 Update HomeScreen callback wiring in `App.kt`
+  - [x] 4.2 Update HomeScreen callback wiring in `App.kt`
     - Change `onAddNoteClick` to push `EditNoteRoute()` (noteId defaults to null)
     - Change `onAddTasklistClick` to push `EditTaskListRoute()` (taskListId defaults to null)
     - Change `onFileClick` to push `EditNoteRoute(noteId = fileId)`
     - _Requirements: 5.4, 5.5, 5.6, 5.7_
 
-  - [ ] 4.3 Write property tests for create actions pushing null-ID routes
+  - [x] 4.3 Write property tests for create actions pushing null-ID routes
     - **Property 3: Create actions push null-ID routes**
     - Update `NavigationPropertyTest.kt`: replace `NoteCreateRoute` with `EditNoteRoute(noteId = null)`, `TasklistDetailRoute` with `EditTaskListRoute(taskListId = null)`
     - Update `Arb.navKey()` and `Arb.detailRoute()` generators to use new routes
     - **Validates: Requirements 5.4, 5.5, 7.4, 7.5, 7.6**
 
-  - [ ] 4.4 Write property test for file click pushing `EditNoteRoute` with file ID
+  - [x] 4.4 Write property test for file click pushing `EditNoteRoute` with file ID
     - **Property 4: File click pushes EditNoteRoute with file ID**
     - Add test in `NavigationPropertyTest.kt`: generate random back stacks and non-empty file ID strings, invoke file-click action, assert `EditNoteRoute(noteId = fileId)` on top
     - **Validates: Requirements 5.6**
 
-  - [ ] 4.5 Write property test for back navigation popping top entry
+  - [x] 4.5 Write property test for back navigation popping top entry
     - **Property 5: Back navigation pops top entry**
     - Update existing back-navigation test in `NavigationPropertyTest.kt` to use `EditNoteRoute`/`EditTaskListRoute` as detail routes
     - **Validates: Requirements 5.7**

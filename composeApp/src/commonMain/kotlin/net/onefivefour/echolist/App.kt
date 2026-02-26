@@ -27,10 +27,8 @@ import net.onefivefour.echolist.ui.navigation.HomeRoute
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
-import net.onefivefour.echolist.ui.notecreate.NoteCreateScreen
-import net.onefivefour.echolist.ui.notedetail.NoteDetailScreen
-import net.onefivefour.echolist.ui.notedetail.NoteDetailViewModel
-import net.onefivefour.echolist.ui.tasklistdetail.TasklistDetailScreen
+import net.onefivefour.echolist.ui.editnote.EditNoteScreen
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -108,27 +106,20 @@ fun App() {
                         }
 
                         entry<EditNoteRoute> { route ->
-                            if (route.noteId != null) {
-                                val noteDetailViewModel = koinViewModel<NoteDetailViewModel> { parametersOf(route.noteId) }
-                                val noteDetailUiState by noteDetailViewModel.uiState.collectAsStateWithLifecycle()
-                                NoteDetailScreen(
-                                    uiState = noteDetailUiState,
-                                    onBackClick = { backStack.removeLastOrNull() }
-                                )
-                            } else {
-                                var text by remember { mutableStateOf("") }
-                                NoteCreateScreen(
-                                    text = text,
-                                    onTextChanged = { text = it },
-                                    onSaveClick = { /* no-op */ },
-                                    onBackClick = { backStack.removeLastOrNull() }
-                                )
-                            }
+                            var text by remember { mutableStateOf("") }
+                            EditNoteScreen(
+                                noteId = route.noteId,
+                                text = text,
+                                onTextChanged = { text = it },
+                                onSaveClick = { /* no-op */ },
+                                onBackClick = { backStack.removeLastOrNull() }
+                            )
                         }
 
-                        entry<EditTaskListRoute> {
+                        entry<EditTaskListRoute> { route ->
                             var text by remember { mutableStateOf("") }
-                            TasklistDetailScreen(
+                            EditTaskListScreen(
+                                taskListId = route.taskListId,
                                 text = text,
                                 onTextChanged = { text = it },
                                 onSaveClick = { /* no-op */ },
