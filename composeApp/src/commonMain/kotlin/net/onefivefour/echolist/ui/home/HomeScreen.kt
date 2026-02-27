@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -132,7 +131,7 @@ fun HomeScreen(
         // FOLDERS section
         Text(
             text = "FOLDERS",
-            style = MaterialTheme.typography.labelSmall,
+            style = EchoListTheme.typography.labelSmall,
             color = EchoListTheme.materialColors.primary
         )
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
@@ -196,7 +195,7 @@ fun HomeScreen(
         // FILES section
         Text(
             text = "FILES",
-            style = MaterialTheme.typography.labelSmall,
+            style = EchoListTheme.typography.labelSmall,
             color = EchoListTheme.materialColors.primary
         )
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))

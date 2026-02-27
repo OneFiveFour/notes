@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +22,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.theme.EchoListTheme
-import net.onefivefour.echolist.ui.theme.LocalDimensions
 
 @Composable
 fun FolderCard(
@@ -31,16 +29,16 @@ fun FolderCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalDimensions.current
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-    val mediumShape = MaterialTheme.shapes.medium
-    val smallShape = MaterialTheme.shapes.small
+    val dimensions = EchoListTheme.dimensions
+    val primaryColor = EchoListTheme.materialColors.primary
+    val onPrimaryColor = EchoListTheme.materialColors.onPrimary
+    val mediumShape = EchoListTheme.shapes.medium
+    val smallShape = EchoListTheme.shapes.small
 
     Row(
         modifier = modifier
             .clip(mediumShape)
-            .background(MaterialTheme.colorScheme.surface, mediumShape)
+            .background(EchoListTheme.materialColors.surface, mediumShape)
             .border(dimensions.borderWidth, primaryColor, mediumShape)
             .clickable(onClick = onClick)
             .padding(dimensions.m)
@@ -66,15 +64,15 @@ fun FolderCard(
         ) {
             Text(
                 text = folder.name,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = EchoListTheme.typography.titleSmall,
+                color = EchoListTheme.materialColors.onSurface,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
             Text(
                 text = "${folder.itemCount} items",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.onSurface,
                 maxLines = 1
             )
         }

@@ -1,0 +1,49 @@
+# Tasks — Quality Review Cleanup
+
+- [x] 1. Standardize theme accessor pattern to `EchoListTheme.*` across all composables
+  - [x] 1.1 Update `LoginScreen` to use `EchoListTheme.materialColors`, `EchoListTheme.typography`, `EchoListTheme.dimensions`, and `EchoListTheme.shapes` consistently
+  - [x] 1.2 Update `EditNoteScreen` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.3 Update `EditTaskListScreen` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.4 Update `HomeScreen` to use `EchoListTheme.*` accessors consistently (replace any direct `MaterialTheme.*` or `LocalDimensions.current` usage)
+  - [x] 1.5 Update `BreadcrumbNav` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.6 Update `FolderCard` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.7 Update `FileItem` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.8 Update `AddItemButton` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.9 Update `AddFileButton` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.10 Update `InlineItemEditor` to use `EchoListTheme.*` accessors consistently
+  - [x] 1.11 Update the `.kiro/steering/design-system.md` steering file to document that `EchoListTheme.*` is the canonical accessor pattern (not raw `MaterialTheme.*` or `LocalDimensions.current`)
+- [x] 2. Fix error color semantics
+  - [x] 2.1 In `LoginScreen`, change all error text colors from `EchoListTheme.materialColors.secondary` to `EchoListTheme.materialColors.error`
+  - [x] 2.2 Verify `InlineItemEditor` already uses `MaterialTheme.colorScheme.error` for its error message (no change expected, just confirm)
+- [ ] 3. Fix `LoginViewModel.loginSuccess` encapsulation
+  - [ ] 3.1 Change the public type of `loginSuccess` from `MutableSharedFlow<Unit>` to `SharedFlow<Unit>` using `asSharedFlow()`
+  - [ ] 3.2 Update `App.kt` if needed to work with the read-only `SharedFlow` type (it should already, since it only calls `collect`)
+- [ ] 4. Add JVM database comment about `Schema.create()` issue
+  - [ ] 4.1 Add a code comment in `DatabaseModule.jvm.kt` explaining that `Schema.create()` is called unconditionally and needs migration handling once the JVM target is used in production
+- [ ] 5. Fix resource leaks in `AuthRepositoryImpl` and `NotesRepositoryImpl`
+  - [ ] 5.1 Refactor `AuthRepositoryImpl` to receive the shared `ConnectRpcClient` and `NetworkConfigProvider` via constructor injection instead of creating throwaway `HttpClient` instances per call. Use `NetworkConfigProvider.updateBaseUrl()` for dynamic base URL after login. Remove the `clientFactory` parameter.
+  - [ ] 5.2 Update `authModule` in `AppModules.kt` to inject `ConnectRpcClient` and `NetworkConfigProvider` into `AuthRepositoryImpl`
+  - [ ] 5.3 Make `NotesRepositoryImpl` implement `Closeable`, cancel `backgroundScope` in `close()`, and register an `onClose` callback in the Koin `dataModule`
+- [ ] 6. Add domain-specific exceptions for force-unwrapped proto fields
+  - [ ] 6.1 Create a domain exception class (e.g., `MappingException`) for mapper errors
+  - [ ] 6.2 Replace `!!` with a meaningful domain exception in `FileMapper.toDomain(CreateFolderResponse)` and `FileMapper.toDomain(UpdateFolderResponse)`
+  - [ ] 6.3 Replace `!!` with a meaningful domain exception in `NoteMapper.toDomain(CreateNoteResponse)`, `NoteMapper.toDomain(GetNoteResponse)`, and `NoteMapper.toDomain(UpdateNoteResponse)`
+- [ ] 7. Delete `SaveButtonNoOpPropertyTest`
+  - [ ] 7.1 Delete `composeApp/src/commonTest/kotlin/net/onefivefour/echolist/ui/SaveButtonNoOpPropertyTest.kt`
+- [ ] 8. Make all Compose preview functions private
+  - [ ] 8.1 Make `FolderCardPreview` in `FolderCard.kt` private
+  - [ ] 8.2 Make `AddItemButtonPreview` in `AddItemButton.kt` private
+  - [ ] 8.3 Make `HomeScreenPreview` in `HomeScreen.kt` private
+  - [ ] 8.4 Make `AppAndroidPreview` in `MainActivity.kt` private
+  - [ ] 8.5 Verify all other preview functions (`AddFileButtonPreview`, `InlineItemEditorPreview`, etc.) are already private
+- [ ] 9. Implement Koin constructor DSL migration and create steering file
+  - [ ] 9.1 Remove `internal` visibility from `ConnectRpcClientImpl`, `FileRemoteDataSourceImpl`, `NoteRemoteDataSourceImpl`, `TaskListRemoteDataSourceImpl`, `CacheDataSourceImpl`, `NotesRepositoryImpl`, `FileRepositoryImpl`, `TaskListRepositoryImpl`, and `AuthRepositoryImpl`
+  - [ ] 9.2 Migrate applicable Koin definitions in `networkModule` from lambda DSL to `singleOf(::Impl) { bind<Interface>() }` constructor DSL
+  - [ ] 9.3 Migrate applicable Koin definitions in `dataModule` from lambda DSL to `singleOf(::Impl) { bind<Interface>() }` constructor DSL
+  - [ ] 9.4 Migrate applicable Koin definitions in `authModule` from lambda DSL to `singleOf(::Impl) { bind<Interface>() }` constructor DSL
+  - [ ] 9.5 Update `KoinModuleVerificationTest` to reflect the new constructor DSL definitions and add verification for `authModule`
+  - [ ] 9.6 Create a `.kiro/steering/koin-conventions.md` steering file documenting the constructor DSL approach, when to use lambda vs constructor DSL, and the `verify()` testing pattern
+  - [ ] 9.7 Delete the now-outdated `docs/koin-constructor-dsl-migration.md`
+- [ ] 10. Standardize repository error handling to catch `NetworkException`
+  - [ ] 10.1 In `FileRepositoryImpl`, change all `catch (e: Exception)` blocks to `catch (e: NetworkException)` to match `NotesRepositoryImpl`'s pattern
+  - [ ] 10.2 In `TaskListRepositoryImpl`, change all `catch (e: Exception)` blocks to `catch (e: NetworkException)` to match `NotesRepositoryImpl`'s pattern

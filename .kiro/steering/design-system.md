@@ -96,10 +96,10 @@ Accessed via `LocalEchoListDimensions.current` inside composables.
 ## Component Patterns
 
 - All composables are stateless — they receive UI state and emit callbacks
-- Use `MaterialTheme.colorScheme` for all color references
-- Use `MaterialTheme.typography` for all text styles
-- Use `LocalEchoListDimensions.current` for spacing and sizing
-- Use `MaterialTheme.shapes` for corner rounding
+- Use `EchoListTheme.materialColors` for all color references (not raw `MaterialTheme.colorScheme`)
+- Use `EchoListTheme.typography` for all text styles (not raw `MaterialTheme.typography`)
+- Use `EchoListTheme.dimensions` for spacing and sizing (not raw `LocalDimensions.current` or `LocalEchoListDimensions.current`)
+- Use `EchoListTheme.shapes` for corner rounding (not raw `MaterialTheme.shapes`)
 - Folder cards use primary-colored borders; file items use secondary-colored borders
 - Icon containers in folder cards: primary background, small shape
 - Icon containers in file items: 5% opacity primary background, small shape

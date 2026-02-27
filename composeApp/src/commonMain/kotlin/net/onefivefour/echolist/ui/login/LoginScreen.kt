@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -55,14 +54,14 @@ fun LoginScreen(
             label = { Text("Backend URL") },
             isError = uiState.backendUrlError != null,
             singleLine = true,
-            shape = MaterialTheme.shapes.small,
+            shape = EchoListTheme.shapes.small,
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.backendUrlError != null) {
             Text(
                 text = uiState.backendUrlError,
-                style = MaterialTheme.typography.bodySmall,
-                color = EchoListTheme.materialColors.secondary,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = dimensions.xs, top = dimensions.xxs)
@@ -78,14 +77,14 @@ fun LoginScreen(
             label = { Text("Username") },
             isError = uiState.usernameError != null,
             singleLine = true,
-            shape = MaterialTheme.shapes.small,
+            shape = EchoListTheme.shapes.small,
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.usernameError != null) {
             Text(
                 text = uiState.usernameError,
-                style = MaterialTheme.typography.bodySmall,
-                color = EchoListTheme.materialColors.secondary,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = dimensions.xs, top = dimensions.xxs)
@@ -102,14 +101,14 @@ fun LoginScreen(
             isError = uiState.passwordError != null,
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
-            shape = MaterialTheme.shapes.small,
+            shape = EchoListTheme.shapes.small,
             modifier = Modifier.fillMaxWidth()
         )
         if (uiState.passwordError != null) {
             Text(
                 text = uiState.passwordError,
-                style = MaterialTheme.typography.bodySmall,
-                color = EchoListTheme.materialColors.secondary,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(start = dimensions.xs, top = dimensions.xxs)
@@ -122,7 +121,7 @@ fun LoginScreen(
         Button(
             onClick = onLoginClick,
             enabled = !uiState.isLoading,
-            shape = MaterialTheme.shapes.small,
+            shape = EchoListTheme.shapes.small,
             colors = ButtonDefaults.buttonColors(
                 containerColor = EchoListTheme.materialColors.primary,
                 contentColor = EchoListTheme.materialColors.onPrimary
@@ -137,7 +136,7 @@ fun LoginScreen(
             } else {
                 Text(
                     text = "Log in",
-                    style = MaterialTheme.typography.labelMedium
+                    style = EchoListTheme.typography.labelMedium
                 )
             }
         }
@@ -147,8 +146,8 @@ fun LoginScreen(
             Spacer(modifier = Modifier.height(dimensions.m))
             Text(
                 text = uiState.error,
-                style = MaterialTheme.typography.bodySmall,
-                color = EchoListTheme.materialColors.secondary,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
                 modifier = Modifier.fillMaxWidth()
             )
         }

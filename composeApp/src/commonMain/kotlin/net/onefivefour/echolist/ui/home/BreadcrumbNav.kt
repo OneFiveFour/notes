@@ -5,13 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import net.onefivefour.echolist.ui.theme.LocalDimensions
+import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
 fun BreadcrumbNav(
@@ -19,9 +18,9 @@ fun BreadcrumbNav(
     onBreadcrumbClick: (path: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalDimensions.current
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
+    val dimensions = EchoListTheme.dimensions
+    val primaryColor = EchoListTheme.materialColors.primary
+    val onPrimaryColor = EchoListTheme.materialColors.onPrimary
 
     Row(
         modifier = modifier,
@@ -35,7 +34,7 @@ fun BreadcrumbNav(
                 val pillShape = RoundedCornerShape(50)
                 Text(
                     text = item.label,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = EchoListTheme.typography.labelMedium,
                     color = onPrimaryColor,
                     modifier = Modifier
                         .clip(pillShape)
@@ -49,13 +48,13 @@ fun BreadcrumbNav(
                 // Non-current segment: clickable plain text
                 Text(
                     text = item.label,
-                    style = MaterialTheme.typography.labelMedium,
+                    style = EchoListTheme.typography.labelMedium,
                     color = primaryColor,
                     modifier = Modifier.clickable { onBreadcrumbClick(item.path) }
                 )
                 Text(
                     text = " / ",
-                    style = MaterialTheme.typography.labelMedium,
+                    style = EchoListTheme.typography.labelMedium,
                     color = primaryColor
                 )
             }

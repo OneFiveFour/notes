@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Checklist
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
@@ -26,7 +25,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.theme.EchoListTheme
-import net.onefivefour.echolist.ui.theme.LocalDimensions
 
 @Composable
 fun AddFileButton(
@@ -34,15 +32,15 @@ fun AddFileButton(
     onAddTasklistClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalDimensions.current
-    val secondaryColor = MaterialTheme.colorScheme.secondary
-    val mediumShape = MaterialTheme.shapes.medium
+    val dimensions = EchoListTheme.dimensions
+    val secondaryColor = EchoListTheme.materialColors.secondary
+    val mediumShape = EchoListTheme.shapes.medium
 
     Row(
         modifier = modifier
             .height(IntrinsicSize.Min)
             .clip(mediumShape)
-            .background(MaterialTheme.colorScheme.surface, mediumShape)
+            .background(EchoListTheme.materialColors.surface, mediumShape)
             .border(dimensions.borderWidth, secondaryColor, mediumShape),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -75,7 +73,7 @@ private fun SubButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalDimensions.current
+    val dimensions = EchoListTheme.dimensions
 
     Column(
         modifier = modifier
@@ -87,12 +85,12 @@ private fun SubButton(
         Icon(
             imageVector = icon,
             contentDescription = label,
-            tint = MaterialTheme.colorScheme.secondary
+            tint = EchoListTheme.materialColors.secondary
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelMedium,
-            color = MaterialTheme.colorScheme.onSurface
+            style = EchoListTheme.typography.labelMedium,
+            color = EchoListTheme.materialColors.onSurface
         )
     }
 }

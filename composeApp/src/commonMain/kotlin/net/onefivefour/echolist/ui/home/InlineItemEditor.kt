@@ -20,7 +20,6 @@ import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,7 +34,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.onefivefour.echolist.ui.theme.EchoListTheme
-import net.onefivefour.echolist.ui.theme.LocalDimensions
 
 @OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
@@ -50,11 +48,11 @@ fun InlineItemEditor(
     placeholder: String,
     modifier: Modifier = Modifier
 ) {
-    val dimensions = LocalDimensions.current
-    val primaryColor = MaterialTheme.colorScheme.primary
-    val onPrimaryColor = MaterialTheme.colorScheme.onPrimary
-    val mediumShape = MaterialTheme.shapes.medium
-    val smallShape = MaterialTheme.shapes.small
+    val dimensions = EchoListTheme.dimensions
+    val primaryColor = EchoListTheme.materialColors.primary
+    val onPrimaryColor = EchoListTheme.materialColors.onPrimary
+    val mediumShape = EchoListTheme.shapes.medium
+    val smallShape = EchoListTheme.shapes.small
 
     val focusRequester = remember { FocusRequester() }
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -67,7 +65,7 @@ fun InlineItemEditor(
     Column(modifier = modifier.bringIntoViewRequester(bringIntoViewRequester)) {
         Row(
             modifier = Modifier
-                .background(MaterialTheme.colorScheme.surface, mediumShape)
+                .background(EchoListTheme.materialColors.surface, mediumShape)
                 .border(dimensions.borderWidth, primaryColor, mediumShape)
                 .padding(dimensions.m),
             verticalAlignment = Alignment.CenterVertically
@@ -93,8 +91,8 @@ fun InlineItemEditor(
                 modifier = Modifier
                     .weight(1f)
                     .focusRequester(focusRequester),
-                textStyle = MaterialTheme.typography.titleSmall.merge(
-                    TextStyle(color = MaterialTheme.colorScheme.onSurface)
+                textStyle = EchoListTheme.typography.titleSmall.merge(
+                    TextStyle(color = EchoListTheme.materialColors.onSurface)
                 ),
                 singleLine = true,
                 cursorBrush = SolidColor(primaryColor),
@@ -103,8 +101,8 @@ fun InlineItemEditor(
                         if (value.isEmpty()) {
                             Text(
                                 text = placeholder,
-                                style = MaterialTheme.typography.titleSmall,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+                                style = EchoListTheme.typography.titleSmall,
+                                color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.5f)
                             )
                         }
                         innerTextField()
@@ -142,8 +140,8 @@ fun InlineItemEditor(
         if (errorMessage != null) {
             Text(
                 text = errorMessage,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
                 modifier = Modifier.padding(
                     start = dimensions.m,
                     top = dimensions.xs
