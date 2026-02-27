@@ -182,7 +182,7 @@ wire {
     // Exclude gRPC service generation — we use ConnectRPC instead
     prune("notes.v1.NoteService")
     prune("auth.v1.AuthService")
-    prune("folder.v1.FolderService")
+    prune("file.v1.FileService")
     prune("tasks.v1.TaskListService")
 }
 

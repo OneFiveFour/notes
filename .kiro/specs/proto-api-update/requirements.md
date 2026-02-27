@@ -2,220 +2,173 @@
 
 ## Introduction
 
-The EchoList backend has undergone a proto API revision that introduces four major changes:
+The EchoList backend introduces breaking changes to its proto API. The primary changes are:
 
-1. The "domain" concept (separate `/data/notes` and `/data/tasks` roots) is removed. All content lives under a single data root folder.
-2. API request/response names are unified across FolderService, NoteService, and TaskListService (e.g. `RenameFolder` → `UpdateFolder`).
-3. Deletion RPCs now return empty responses instead of a full folder list.
-4. The existing TaskService is renamed to TaskListService, with updated CRUD operations and message shapes.
+1. FolderService is renamed to FileService (proto package `folder.v1` → `file.v1`).
+2. The `GetFolder` RPC is removed (redundant).
+3. `ListFolders` is replaced by `ListFiles`, which returns `repeated string entries` instead of `repeated Folder folders`. Folder entries are suffixed with `/`.
+4. NoteService and TaskListService proto definitions are updated but their client-side logic is preserved for future editing use.
+5. The HomeScreen switches from using NotesRepository.listNotes to FileRepository.listFiles as its sole data source for directory listing.
 
-This feature updates the Kotlin data layer (proto files, domain models, mappers, remote data sources, repositories, DI wiring, and tests) to align with the new proto definitions. Since the client does not yet have a task implementation, the TaskListService client code is created fresh to match the renamed backend service. No migration code is needed — this is a pre-release breaking change.
+This is a pre-release change — no migration or backwards compatibility is needed. Existing NoteService and TaskListService logic must not be deleted, as it will be needed for editing notes and tasks later.
 
 ## Glossary
 
-- **FolderService**: The ConnectRPC service handling folder CRUD operations (create, get, list, update, delete).
-- **NoteService**: The ConnectRPC service handling note CRUD operations (create, get, list, update, delete).
-- **TaskListService**: The ConnectRPC service handling task list CRUD operations (create, get, list, update, delete). Renamed from the former TaskService on the backend.
-- **TaskService** (deprecated): The former name of the backend service for task operations, now renamed to TaskListService.
-- **Folder**: A domain model representing a folder with a path and name.
-- **Note**: A domain model representing a note with file_path, title, content, and updated_at.
-- **TaskList**: A domain model representing a task list with file_path, name, tasks, and updated_at.
-- **MainTask**: A domain model representing a task with description, done status, due_date, recurrence, and SubTasks.
-- **SubTask**: A domain model representing a SubTask with description and done status.
-- **Mapper**: An object that converts between Wire-generated proto types and Kotlin domain models.
-- **RemoteDataSource**: An interface that wraps ConnectRPC calls for a specific service.
-- **Repository**: An interface that orchestrates data access across network and cache sources.
+- **FileService**: The ConnectRPC service (renamed from FolderService) handling folder CRUD and file listing operations. Proto package: `file.v1`.
+- **FolderService** (deprecated): The former name of the file/folder backend service, now renamed to FileService.
+- **NoteService**: The ConnectRPC service handling note CRUD operations. Proto package: `notes.v1`.
+- **TaskListService**: The ConnectRPC service handling task list CRUD operations. Proto package: `tasks.v1`.
+- **Folder**: A domain model representing a folder with path and name fields.
+- **Note**: A domain model representing a note with filePath, title, content, and updatedAt fields.
+- **Entry**: A string path returned by ListFiles. Folder entries end with `/`, file entries do not.
+- **FileRepository**: The repository interface (renamed from FolderRepository) that wraps FileService operations.
+- **FileRemoteDataSource**: The remote data source interface (renamed from FolderRemoteDataSource) that wraps FileService RPC calls.
 - **ConnectRpcClient**: The shared HTTP client that serializes/deserializes protobuf messages over ConnectRPC.
-- **Entry**: An immediate child path returned by list operations; folder paths end with "/", file paths do not.
-- **ListResult**: A domain model combining full objects with immediate-child entry paths from a list response.
+- **HomeViewModel**: The ViewModel powering the HomeScreen, responsible for loading directory content.
 
 ## Requirements
 
-### Requirement 1: Remove Domain Parameter from Folder Operations
+### Requirement 1: Rename FolderService Proto to FileService
 
-**User Story:** As a developer, I want the domain parameter removed from all folder-related models and API calls, so that the data layer matches the new single-root backend architecture.
-
-#### Acceptance Criteria
-
-1. THE CreateFolderParams model SHALL contain only parentPath and name fields.
-2. THE DeleteFolderParams model SHALL contain only folderPath field.
-3. THE RenameFolderParams model SHALL be replaced by an UpdateFolderParams model containing folderPath and newName fields.
-4. THE FolderMapper SHALL map CreateFolderParams to CreateFolderRequest without a domain field.
-5. THE FolderMapper SHALL map UpdateFolderParams to UpdateFolderRequest with folder_path and new_name fields.
-6. THE FolderMapper SHALL map DeleteFolderParams to DeleteFolderRequest with only folder_path field.
-7. WHEN the HomeViewModel creates a folder, THE HomeViewModel SHALL construct CreateFolderParams without a domain field.
-
-### Requirement 2: Update Folder Proto and Service Definitions
-
-**User Story:** As a developer, I want the folder.proto file and FolderService RPCs updated, so that the generated code matches the new backend contract.
+**User Story:** As a developer, I want the folder.proto file replaced with a file.proto using the `file.v1` package and FileService name, so that the generated code matches the renamed backend service.
 
 #### Acceptance Criteria
 
-1. THE folder.proto file SHALL define five RPCs: CreateFolder, GetFolder, ListFolders, UpdateFolder, DeleteFolder.
-2. THE Folder message SHALL contain path and name fields.
-3. THE CreateFolderRequest message SHALL contain parent_path and name fields without a domain field.
-4. THE CreateFolderResponse message SHALL contain a single folder field of type Folder.
-5. THE GetFolderRequest message SHALL contain a folder_path field.
-6. THE GetFolderResponse message SHALL contain a single folder field of type Folder.
-7. THE ListFoldersRequest message SHALL contain a parent_path field.
-8. THE ListFoldersResponse message SHALL contain a repeated folders field of type Folder.
+1. THE file.proto file SHALL define the proto package as `file.v1`.
+2. THE file.proto file SHALL define FileService with four RPCs: CreateFolder, ListFiles, UpdateFolder, DeleteFolder.
+3. THE FileService SHALL not include a GetFolder RPC.
+4. THE Folder message SHALL contain path and name fields.
+5. THE CreateFolderRequest message SHALL contain parent_path and name fields.
+6. THE CreateFolderResponse message SHALL contain a single folder field of type Folder.
+7. THE ListFilesRequest message SHALL contain a parent_path field.
+8. THE ListFilesResponse message SHALL contain a repeated string entries field.
 9. THE UpdateFolderRequest message SHALL contain folder_path and new_name fields.
 10. THE UpdateFolderResponse message SHALL contain a single folder field of type Folder.
 11. THE DeleteFolderRequest message SHALL contain a folder_path field.
 12. THE DeleteFolderResponse message SHALL be an empty message.
 
-### Requirement 3: Update Folder Domain Model and Mapper
+### Requirement 2: Rename and Update File Remote Data Source
 
-**User Story:** As a developer, I want the Folder domain model to include a name field and the mapper to handle the new response shapes, so that the app can display folder names from the API.
-
-#### Acceptance Criteria
-
-1. THE Folder domain model SHALL contain path and name fields.
-2. THE FolderMapper SHALL map a proto Folder message to a domain Folder preserving path and name.
-3. THE FolderMapper SHALL map CreateFolderResponse to a single domain Folder.
-4. THE FolderMapper SHALL map GetFolderResponse to a single domain Folder.
-5. THE FolderMapper SHALL map ListFoldersResponse to a list of domain Folder objects.
-6. THE FolderMapper SHALL map UpdateFolderResponse to a single domain Folder.
-7. THE FolderMapper SHALL not map DeleteFolderResponse to any Folder (empty response).
-
-### Requirement 4: Update Folder Remote Data Source and Repository
-
-**User Story:** As a developer, I want the FolderRemoteDataSource and FolderRepository updated with the new RPC set, so that the app can perform all folder CRUD operations against the new API.
+**User Story:** As a developer, I want the FolderRemoteDataSource renamed to FileRemoteDataSource with updated RPC paths using `file.v1.FileService`, so that network calls reach the renamed backend service.
 
 #### Acceptance Criteria
 
-1. THE FolderRemoteDataSource interface SHALL expose createFolder, getFolder, listFolders, updateFolder, and deleteFolder methods.
-2. THE FolderRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/folder.v1.FolderService/CreateFolder" for createFolder.
-3. THE FolderRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/folder.v1.FolderService/GetFolder" for getFolder.
-4. THE FolderRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/folder.v1.FolderService/ListFolders" for listFolders.
-5. THE FolderRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/folder.v1.FolderService/UpdateFolder" for updateFolder.
-6. THE FolderRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/folder.v1.FolderService/DeleteFolder" for deleteFolder.
-7. THE FolderRepository interface SHALL expose createFolder, getFolder, listFolders, updateFolder, and deleteFolder methods.
-8. THE FolderRepository.deleteFolder method SHALL return Result<Unit> instead of Result<List<Folder>>.
-9. THE FolderRepository.createFolder method SHALL return Result<Folder> instead of Result<List<Folder>>.
-10. THE FolderRepository.updateFolder method SHALL return Result<Folder>.
+1. THE FileRemoteDataSource interface SHALL expose createFolder, listFiles, updateFolder, and deleteFolder methods.
+2. THE FileRemoteDataSource interface SHALL not expose a getFolder method.
+3. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/CreateFolder" for createFolder.
+4. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/ListFiles" for listFiles.
+5. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/UpdateFolder" for updateFolder.
+6. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/DeleteFolder" for deleteFolder.
+7. THE FileRemoteDataSourceImpl SHALL use proto types from the `file.v1` package for request serialization and response deserialization.
 
-### Requirement 5: Update Note Proto and Service Definitions
+### Requirement 3: Update File Mapper for New Response Shapes
 
-**User Story:** As a developer, I want the notes.proto file updated, so that the generated code matches the new backend contract.
+**User Story:** As a developer, I want the FolderMapper updated to handle the new FileService response types including ListFilesResponse returning string entries, so that domain model mapping remains correct.
 
 #### Acceptance Criteria
 
-1. THE notes.proto file SHALL define the service as NoteService with RPCs: CreateNote, ListNotes, GetNote, UpdateNote, DeleteNote.
+1. THE FileMapper SHALL map a proto Folder message (from `file.v1` package) to a domain Folder preserving path and name.
+2. THE FileMapper SHALL map CreateFolderResponse to a single domain Folder.
+3. THE FileMapper SHALL map ListFilesResponse to a List of String entries.
+4. THE FileMapper SHALL map UpdateFolderResponse to a single domain Folder.
+5. THE FileMapper SHALL map CreateFolderParams to a proto CreateFolderRequest using `file.v1` types.
+6. THE FileMapper SHALL map UpdateFolderParams to a proto UpdateFolderRequest using `file.v1` types.
+7. THE FileMapper SHALL map DeleteFolderParams to a proto DeleteFolderRequest using `file.v1` types.
+
+### Requirement 4: Rename and Update File Repository
+
+**User Story:** As a developer, I want the FolderRepository renamed to FileRepository with the listFolders method replaced by listFiles returning string entries, so that the repository API matches the new FileService contract.
+
+#### Acceptance Criteria
+
+1. THE FileRepository interface SHALL expose createFolder, listFiles, updateFolder, and deleteFolder methods.
+2. THE FileRepository interface SHALL not expose a getFolder method.
+3. THE FileRepository.listFiles method SHALL accept a parentPath String and return Result<List<String>>.
+4. THE FileRepository.createFolder method SHALL accept CreateFolderParams and return Result<Folder>.
+5. THE FileRepository.updateFolder method SHALL accept UpdateFolderParams and return Result<Folder>.
+6. THE FileRepository.deleteFolder method SHALL accept DeleteFolderParams and return Result<Unit>.
+7. IF a network call fails, THEN THE FileRepositoryImpl SHALL return Result.failure with the caught exception.
+
+### Requirement 5: Update HomeViewModel to Use FileRepository for Directory Listing
+
+**User Story:** As a developer, I want the HomeViewModel to fetch directory content from FileRepository.listFiles instead of NotesRepository.listNotes, so that the HomeScreen gets all its listing data from the FileService alone.
+
+#### Acceptance Criteria
+
+1. THE HomeViewModel SHALL depend on FileRepository for loading directory listings.
+2. THE HomeViewModel SHALL not depend on NotesRepository for loading directory listings.
+3. WHEN the HomeViewModel loads data, THE HomeViewModel SHALL call FileRepository.listFiles to obtain the list of entries.
+4. THE HomeViewModel SHALL extract folder entries (paths ending with `/`) from the string entries list to build FolderUiModel items.
+5. THE HomeViewModel SHALL extract file entries (paths not ending with `/`) from the string entries list to build FileUiModel items.
+6. WHEN building a FileUiModel from a file entry path, THE HomeViewModel SHALL strip the `note_` prefix from note file names and the `tasks_` prefix from task list file names to derive a clean display title.
+7. THE FileUiModel SHALL indicate the file type (note or task list) based on whether the original file name starts with `note_` or `tasks_`.
+8. WHEN a folder is created successfully, THE HomeViewModel SHALL reload the directory listing via FileRepository.listFiles.
+9. THE HomeViewModel SHALL still depend on FolderRepository for createFolder operations through the renamed FileRepository.
+
+### Requirement 6: Update Koin Dependency Injection Modules
+
+**User Story:** As a developer, I want the Koin DI modules updated to wire the renamed FileRemoteDataSource and FileRepository, so that all dependencies resolve correctly at runtime.
+
+#### Acceptance Criteria
+
+1. THE networkModule SHALL provide a FileRemoteDataSource binding to FileRemoteDataSourceImpl.
+2. THE dataModule SHALL provide a FileRepository binding to FileRepositoryImpl.
+3. THE navigationModule SHALL inject FileRepository (instead of FolderRepository) into HomeViewModel.
+4. THE navigationModule SHALL not inject NotesRepository into HomeViewModel for directory listing.
+5. THE networkModule SHALL continue to provide NoteRemoteDataSource and TaskListRemoteDataSource bindings unchanged.
+6. THE dataModule SHALL continue to provide NotesRepository and TaskListRepository bindings unchanged.
+
+### Requirement 7: Update Note Proto Definitions
+
+**User Story:** As a developer, I want the notes.proto file updated to match the new backend contract, so that the generated code stays in sync.
+
+#### Acceptance Criteria
+
+1. THE notes.proto file SHALL define NoteService with RPCs: CreateNote, ListNotes, GetNote, UpdateNote, DeleteNote.
 2. THE Note message SHALL contain file_path, title, content, and updated_at fields.
 3. THE CreateNoteRequest message SHALL contain title, content, and path fields.
 4. THE CreateNoteResponse message SHALL contain a single note field of type Note.
-5. THE ListNotesResponse message SHALL contain repeated notes and repeated entries fields.
-6. THE GetNoteResponse message SHALL contain a single note field of type Note.
-7. THE UpdateNoteRequest message SHALL contain file_path and content fields.
-8. THE UpdateNoteResponse message SHALL contain a single note field of type Note.
+5. THE GetNoteResponse message SHALL contain a single note field of type Note.
+6. THE UpdateNoteRequest message SHALL contain file_path and content fields.
+7. THE UpdateNoteResponse message SHALL contain a single note field of type Note.
+8. THE ListNotesResponse message SHALL contain repeated notes of type Note and repeated string entries fields.
 9. THE DeleteNoteResponse message SHALL be an empty message.
 
-### Requirement 6: Update Note Mapper for New Response Shapes
+### Requirement 8: Update Task Proto Definitions
 
-**User Story:** As a developer, I want the NoteMapper updated to handle the new response message shapes, so that domain model mapping remains correct.
-
-#### Acceptance Criteria
-
-1. THE NoteMapper SHALL map CreateNoteResponse (containing a note field) to a domain Note.
-2. THE NoteMapper SHALL map GetNoteResponse (containing a note field) to a domain Note.
-3. THE NoteMapper SHALL map UpdateNoteResponse (containing a note field) to a domain Note.
-4. THE NoteMapper SHALL map ListNotesResponse to a ListNotesResult containing notes and entries.
-5. WHEN the UpdateNoteResponse contains a full Note, THE NotesRepositoryImpl SHALL use the mapped Note directly without a separate GetNote call.
-
-### Requirement 7: Update Note Remote Data Source Service Path
-
-**User Story:** As a developer, I want the NoteRemoteDataSourceImpl to use the renamed service path, so that RPC calls reach the correct backend endpoint.
+**User Story:** As a developer, I want the tasks.proto file updated to match the new backend contract with the TaskListService name, so that the generated code stays in sync.
 
 #### Acceptance Criteria
 
-1. THE NoteRemoteDataSourceImpl SHALL call ConnectRpcClient with paths using "/notes.v1.NoteService/" instead of "/notes.v1.NotesService/".
-
-### Requirement 8: Update TaskList Proto and Service Definitions
-
-**User Story:** As a developer, I want the tasks.proto file updated to reflect the renamed TaskListService and its revised message shapes, so that the generated code matches the new backend contract.
-
-#### Acceptance Criteria
-
-1. THE tasks.proto file SHALL define TaskListService (renamed from TaskService) with RPCs: CreateTaskList, GetTaskList, ListTaskLists, UpdateTaskList, DeleteTaskList.
+1. THE tasks.proto file SHALL define TaskListService with RPCs: CreateTaskList, GetTaskList, ListTaskLists, UpdateTaskList, DeleteTaskList.
 2. THE SubTask message SHALL contain description and done fields.
-3. THE MainTask message SHALL contain description, done, due_date, recurrence, and repeated SubTasks fields.
+3. THE MainTask message SHALL contain description, done, due_date, recurrence, and repeated sub_tasks fields.
 4. THE CreateTaskListRequest message SHALL contain name, path, and repeated tasks fields.
-5. THE CreateTaskListResponse message SHALL contain file_path, name, repeated tasks, and updated_at fields.
-6. THE GetTaskListRequest message SHALL contain a file_path field.
-7. THE GetTaskListResponse message SHALL contain file_path, name, repeated tasks, and updated_at fields.
-8. THE ListTaskListsRequest message SHALL contain a path field.
-9. THE TaskListEntry message SHALL contain file_path, name, and updated_at fields.
-10. THE ListTaskListsResponse message SHALL contain repeated task_lists and repeated entries fields.
-11. THE UpdateTaskListRequest message SHALL contain file_path and repeated tasks fields.
-12. THE UpdateTaskListResponse message SHALL contain file_path, name, repeated tasks, and updated_at fields.
-13. THE DeleteTaskListRequest message SHALL contain a file_path field.
-14. THE DeleteTaskListResponse message SHALL be an empty message.
+5. THE GetTaskListResponse message SHALL contain file_path, name, repeated tasks, and updated_at fields.
+6. THE TaskListEntry message SHALL contain file_path, name, and updated_at fields.
+7. THE ListTaskListsResponse message SHALL contain repeated task_lists and repeated string entries fields.
+8. THE DeleteTaskListResponse message SHALL be an empty message.
 
-### Requirement 9: Update TaskList Domain Models
+### Requirement 9: Preserve Existing Note and Task Service Client Logic
 
-**User Story:** As a developer, I want Kotlin domain models for task lists, MainTasks, and SubTasks updated to match the renamed TaskListService, so that the app has typed representations of the revised task data.
+**User Story:** As a developer, I want the existing NoteService and TaskListService client-side logic (remote data sources, repositories, mappers) preserved, so that editing notes and tasks remains possible in the future.
 
 #### Acceptance Criteria
 
-1. THE SubTask domain model SHALL contain description (String) and done (Boolean) fields.
-2. THE MainTask domain model SHALL contain description (String), done (Boolean), dueDate (String), recurrence (String), and subTasks (List of SubTask) fields.
-3. THE TaskList domain model SHALL contain filePath (String), name (String), tasks (List of MainTask), and updatedAt (Long) fields.
-4. THE TaskListEntry domain model SHALL contain filePath (String), name (String), and updatedAt (Long) fields.
-5. THE ListTaskListsResult domain model SHALL contain taskLists (List of TaskListEntry) and entries (List of String) fields.
-6. THE CreateTaskListParams domain model SHALL contain name (String), path (String), and tasks (List of MainTask) fields.
-7. THE UpdateTaskListParams domain model SHALL contain filePath (String) and tasks (List of MainTask) fields.
+1. THE NoteRemoteDataSource, NoteRemoteDataSourceImpl, NotesRepository, and NotesRepositoryImpl SHALL remain in the codebase.
+2. THE TaskListRemoteDataSource, TaskListRemoteDataSourceImpl, TaskListRepository, and TaskListRepositoryImpl SHALL remain in the codebase.
+3. THE NoteMapper and TaskListMapper SHALL remain in the codebase.
+4. THE Koin bindings for NoteRemoteDataSource, NotesRepository, TaskListRemoteDataSource, and TaskListRepository SHALL remain active.
 
-### Requirement 10: Update TaskList Mapper
+### Requirement 10: Adapt HomeScreen UI for Entry-Only Data
 
-**User Story:** As a developer, I want the TaskListMapper updated to convert between the renamed proto messages and domain models, so that the data layer can translate task list API responses.
+**User Story:** As a developer, I want the HomeScreen UI adapted to work with string entries from FileService instead of full Note objects, so that the directory listing displays correctly with the new data source.
 
 #### Acceptance Criteria
 
-1. THE TaskListMapper SHALL map a proto SubTask to a domain SubTask preserving description and done.
-2. THE TaskListMapper SHALL map a proto MainTask to a domain MainTask preserving all fields including nested SubTasks.
-3. THE TaskListMapper SHALL map CreateTaskListResponse to a domain TaskList.
-4. THE TaskListMapper SHALL map GetTaskListResponse to a domain TaskList.
-5. THE TaskListMapper SHALL map ListTaskListsResponse to a domain ListTaskListsResult.
-6. THE TaskListMapper SHALL map UpdateTaskListResponse to a domain TaskList.
-7. THE TaskListMapper SHALL map CreateTaskListParams to a proto CreateTaskListRequest including nested MainTask and SubTask conversion.
-8. THE TaskListMapper SHALL map UpdateTaskListParams to a proto UpdateTaskListRequest including nested MainTask and SubTask conversion.
-9. FOR ALL valid TaskList domain objects, mapping to proto and back to domain SHALL produce an equivalent object (round-trip property).
-
-### Requirement 11: Update TaskList Remote Data Source
-
-**User Story:** As a developer, I want the TaskListRemoteDataSource updated to wrap ConnectRPC calls for the renamed TaskListService, so that the repository can access the task list API.
-
-#### Acceptance Criteria
-
-1. THE TaskListRemoteDataSource interface SHALL expose createTaskList, getTaskList, listTaskLists, updateTaskList, and deleteTaskList methods.
-2. THE TaskListRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/tasks.v1.TaskListService/CreateTaskList" for createTaskList.
-3. THE TaskListRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/tasks.v1.TaskListService/GetTaskList" for getTaskList.
-4. THE TaskListRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/tasks.v1.TaskListService/ListTaskLists" for listTaskLists.
-5. THE TaskListRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/tasks.v1.TaskListService/UpdateTaskList" for updateTaskList.
-6. THE TaskListRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/tasks.v1.TaskListService/DeleteTaskList" for deleteTaskList.
-
-### Requirement 12: Update TaskList Repository
-
-**User Story:** As a developer, I want the TaskListRepository updated to orchestrate task list data access for the renamed TaskListService, so that the UI layer has a clean API for task list operations.
-
-#### Acceptance Criteria
-
-1. THE TaskListRepository interface SHALL expose createTaskList, getTaskList, listTaskLists, updateTaskList, and deleteTaskList methods.
-2. THE TaskListRepository.createTaskList method SHALL accept CreateTaskListParams and return Result<TaskList>.
-3. THE TaskListRepository.getTaskList method SHALL accept a filePath String and return Result<TaskList>.
-4. THE TaskListRepository.listTaskLists method SHALL accept a path String and return Result<ListTaskListsResult>.
-5. THE TaskListRepository.updateTaskList method SHALL accept UpdateTaskListParams and return Result<TaskList>.
-6. THE TaskListRepository.deleteTaskList method SHALL accept a filePath String and return Result<Unit>.
-7. IF a network call fails, THEN THE TaskListRepositoryImpl SHALL return Result.failure with the caught exception.
-
-### Requirement 13: Update Koin Dependency Injection Modules
-
-**User Story:** As a developer, I want the Koin DI modules updated to wire the new and changed data sources and repositories, so that all dependencies resolve correctly at runtime.
-
-#### Acceptance Criteria
-
-1. THE networkModule SHALL provide a TaskListRemoteDataSource binding to TaskListRemoteDataSourceImpl (updated from former TaskService wiring).
-2. THE dataModule SHALL provide a TaskListRepository binding to TaskListRepositoryImpl (updated from former TaskService wiring).
-3. THE dataModule SHALL provide FolderRepository bound to the updated FolderRepositoryImpl.
-4. THE networkModule SHALL provide FolderRemoteDataSource bound to the updated FolderRemoteDataSourceImpl.
+1. THE HomeScreen SHALL display folder entries as FolderCard composables using the folder name extracted from the entry path.
+2. THE HomeScreen SHALL display file entries as FileItem composables using the file name extracted from the entry path.
+3. WHEN only string entries are available (no full Note objects), THE FileUiModel SHALL derive its title from the file name in the entry path.
+4. THE FolderUiModel SHALL derive its name from the folder path by extracting the last path segment before the trailing `/`.
+5. WHEN a folder entry is tapped, THE HomeScreen SHALL navigate to the folder path.
+6. WHEN a file entry is tapped, THE HomeScreen SHALL navigate to the file editing screen using the file path.
