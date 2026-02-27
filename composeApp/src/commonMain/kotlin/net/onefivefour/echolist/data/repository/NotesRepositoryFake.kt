@@ -9,7 +9,7 @@ import net.onefivefour.echolist.data.models.UpdateNoteParams
  * Fake [NotesRepository] for testing. Stores notes in memory,
  * supports pre-configured error simulation, and tracks all method calls.
  */
-class FakeNotesRepository : NotesRepository {
+class NotesRepositoryFake : NotesRepository {
 
     private val notes = mutableMapOf<String, Note>()
     private var shouldFail: Exception? = null

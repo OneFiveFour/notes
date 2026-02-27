@@ -8,13 +8,13 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-class FakeNotesRepositoryTest {
+class NotesRepositoryFakeTest {
 
     private val sampleNote = Note("docs/hello.md", "hello", "world", 100L)
 
     @Test
     fun preConfiguredNoteIsReturnedByGetNote() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.addNotes(sampleNote)
 
         val result = repo.getNote(sampleNote.filePath)
@@ -25,7 +25,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun preConfiguredNotesAreReturnedByListNotes() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         val note2 = Note("docs/second.md", "second", "content", 200L)
         repo.addNotes(sampleNote, note2)
 
@@ -37,7 +37,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun createNoteReturnsCreatedNote() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         val params = CreateNoteParams("title", "body", "/docs")
 
         val result = repo.createNote(params)
@@ -49,7 +49,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun setShouldFailCausesAllOperationsToFail() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         val error = RuntimeException("simulated")
         repo.setShouldFail(error)
 
@@ -62,7 +62,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun clearingShouldFailRestoresNormalBehavior() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.addNotes(sampleNote)
         repo.setShouldFail(RuntimeException("fail"))
 
@@ -75,7 +75,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun callLogTracksAllInvocations() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.addNotes(sampleNote)
 
         repo.createNote(CreateNoteParams("t", "c", "/p"))
@@ -94,7 +94,7 @@ class FakeNotesRepositoryTest {
 
     @Test
     fun callLogRecordsEvenWhenFailing() = runTest {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.setShouldFail(RuntimeException("err"))
 
         repo.getNote("x")

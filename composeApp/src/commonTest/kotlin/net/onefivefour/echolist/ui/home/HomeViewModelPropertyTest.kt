@@ -19,7 +19,7 @@ import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.FakeFolderRepository
-import net.onefivefour.echolist.data.repository.FakeNotesRepository
+import net.onefivefour.echolist.data.repository.NotesRepositoryFake
 
 /**
  * Property-based tests for HomeViewModel inline folder creation logic.
@@ -43,7 +43,7 @@ class HomeViewModelPropertyTest : FunSpec({
     test("Property 3: Tapping add transitions state from Hidden to Editing") {
         checkAll(PropTestConfig(iterations = 20), Arb.string(0..50)) { path ->
             runTest(testDispatcher) {
-                val vm = HomeViewModel(path, FakeNotesRepository(), FakeFolderRepository())
+                val vm = HomeViewModel(path, NotesRepositoryFake(), FakeFolderRepository())
                 advanceUntilIdle()
 
                 vm.uiState.value.inlineCreationState.shouldBeInstanceOf<InlineCreationState.Hidden>()
@@ -63,7 +63,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
-                val notesRepo = FakeNotesRepository()
+                val notesRepo = NotesRepositoryFake()
                 notesRepo.addNotes(Note("/work/", "Work", "", 0L))
                 notesRepo.addEntries("work/")
 
@@ -92,7 +92,7 @@ class HomeViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), whitespaceArb) { blankName ->
             runTest(testDispatcher) {
                 val folderRepo = FakeFolderRepository()
-                val vm = HomeViewModel("/", FakeNotesRepository(), folderRepo)
+                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -122,7 +122,7 @@ class HomeViewModelPropertyTest : FunSpec({
                     }
                 }
 
-                val vm = HomeViewModel("/", FakeNotesRepository(), folderRepo)
+                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -145,7 +145,7 @@ class HomeViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), pathArb, nonBlankArb) { path, name ->
             runTest(testDispatcher) {
                 val folderRepo = FakeFolderRepository()
-                val vm = HomeViewModel(path, FakeNotesRepository(), folderRepo)
+                val vm = HomeViewModel(path, NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -168,7 +168,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
-                val notesRepo = FakeNotesRepository()
+                val notesRepo = NotesRepositoryFake()
                 val folderRepo = FakeFolderRepository()
                 folderRepo.createFolderResult = Result.success(Folder(path = "/${name.trim()}/", name = name.trim()))
 
@@ -195,7 +195,7 @@ class HomeViewModelPropertyTest : FunSpec({
                 val folderRepo = FakeFolderRepository()
                 folderRepo.createFolderResult = Result.failure(RuntimeException(errorMsg))
 
-                val vm = HomeViewModel("/", FakeNotesRepository(), folderRepo)
+                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()

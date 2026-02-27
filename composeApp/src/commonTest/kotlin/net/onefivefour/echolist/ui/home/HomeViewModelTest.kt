@@ -8,7 +8,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.repository.FakeNotesRepository
+import net.onefivefour.echolist.data.repository.NotesRepositoryFake
 import net.onefivefour.echolist.data.repository.FakeFolderRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
@@ -32,7 +32,7 @@ class HomeViewModelTest {
 
     @Test
     fun emitsCorrectStateForRootPath() = runTest(testDispatcher) {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.addNotes(
             Note("/notes/hello.md", "Hello", "Hello content", 60_000L),
             Note("/readme.md", "Readme", "Readme content", 120_000L)
@@ -56,7 +56,7 @@ class HomeViewModelTest {
 
     @Test
     fun emitsEmptyListsOnRepositoryFailure() = runTest(testDispatcher) {
-        val repo = FakeNotesRepository()
+        val repo = NotesRepositoryFake()
         repo.setShouldFail(RuntimeException("network error"))
 
         val viewModel = HomeViewModel("/docs", repo, FakeFolderRepository())
