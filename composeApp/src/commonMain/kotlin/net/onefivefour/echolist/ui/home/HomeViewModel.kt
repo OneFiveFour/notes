@@ -8,14 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.FileRepository
-import net.onefivefour.echolist.data.repository.NotesRepository
 
 class HomeViewModel(
     private val path: String,
-    private val notesRepository: NotesRepository,
-    private val folderRepository: FileRepository
+    private val fileRepository: FileRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -59,7 +56,7 @@ class HomeViewModel(
                 parentPath = path,
                 name = trimmedName
             )
-            folderRepository.createFolder(params).fold(
+            fileRepository.createFolder(params).fold(
                 onSuccess = {
                     loadData()
                     _uiState.update { it.copy(inlineCreationState = InlineCreationState.Hidden) }
@@ -83,15 +80,15 @@ class HomeViewModel(
     }
 
     private suspend fun loadData() {
-        val result = notesRepository.listNotes(path)
+        val result = fileRepository.listFiles(path)
         result.fold(
-            onSuccess = { listResult ->
+            onSuccess = { entries ->
                 _uiState.update { current ->
                     current.copy(
                         title = titleFromPath(path),
                         breadcrumbs = buildBreadcrumbs(path),
-                        folders = extractFolders(listResult.entries, listResult.notes),
-                        files = extractFiles(listResult.entries, listResult.notes)
+                        folders = extractFolders(entries),
+                        files = extractFiles(entries)
                     )
                 }
             },
@@ -109,13 +106,12 @@ class HomeViewModel(
     }
 }
 
-
-private fun titleFromPath(path: String): String {
+internal fun titleFromPath(path: String): String {
     if (path == "/" || path.isEmpty()) return "Home"
     return path.trimEnd('/').substringAfterLast('/')
 }
 
-private fun buildBreadcrumbs(path: String): List<BreadcrumbItem> {
+internal fun buildBreadcrumbs(path: String): List<BreadcrumbItem> {
     val breadcrumbs = mutableListOf(BreadcrumbItem(label = "Home", path = "/"))
     if (path == "/" || path.isEmpty()) return breadcrumbs
 
@@ -129,54 +125,43 @@ private fun buildBreadcrumbs(path: String): List<BreadcrumbItem> {
 }
 
 /**
- * Extracts folders from the entries list.
- * Folder entries end with "/". For each folder entry, count how many notes
- * have file paths starting with that folder path.
+ * Extracts folder entries (paths ending with "/") and builds FolderUiModels.
+ * itemCount is 0 since string entries don't carry sub-item counts.
  */
-private fun extractFolders(entries: List<String>, notes: List<Note>): List<FolderUiModel> {
+internal fun extractFolders(entries: List<String>): List<FolderUiModel> {
     return entries
         .filter { it.endsWith("/") }
         .map { folderPath ->
             val name = folderPath.trimEnd('/').substringAfterLast('/')
-            val itemCount = notes.count { it.filePath.startsWith(folderPath) }
             FolderUiModel(
                 id = folderPath,
                 name = name,
-                itemCount = itemCount
+                itemCount = 0
             )
         }
 }
 
 /**
- * Extracts files from the entries list.
- * File entries don't end with "/". Matches each entry to its Note for title/content.
+ * Extracts file entries (paths not ending with "/") and builds FileUiModels.
+ * Detects file type from prefix: "note_" → NOTE, "tasks_" → TASK_LIST.
+ * Derives display title by stripping the prefix.
  */
-private fun extractFiles(entries: List<String>, notes: List<Note>): List<FileUiModel> {
-    val notesByPath = notes.associateBy { it.filePath }
+internal fun extractFiles(entries: List<String>): List<FileUiModel> {
     return entries
         .filter { !it.endsWith("/") }
-        .mapNotNull { filePath ->
-            val note = notesByPath[filePath] ?: return@mapNotNull null
+        .map { filePath ->
+            val fileName = filePath.substringAfterLast('/')
+            val (fileType, title) = when {
+                fileName.startsWith("note_") -> FileType.NOTE to fileName.removePrefix("note_")
+                fileName.startsWith("tasks_") -> FileType.TASK_LIST to fileName.removePrefix("tasks_")
+                else -> FileType.NOTE to fileName
+            }
             FileUiModel(
-                id = note.filePath,
-                title = note.title,
-                preview = note.content.take(100),
-                timestamp = formatTimestamp(note.updatedAt)
+                id = filePath,
+                title = title,
+                fileType = fileType,
+                preview = "",
+                timestamp = ""
             )
         }
-}
-
-private fun formatTimestamp(epochMillis: Long): String {
-    if (epochMillis == 0L) return ""
-    // Simple relative formatting without kotlinx-datetime
-    val seconds = epochMillis / 1000
-    val minutes = seconds / 60
-    val hours = minutes / 60
-    val days = hours / 24
-    return when {
-        days > 0 -> "$days day${if (days > 1) "s" else ""} ago"
-        hours > 0 -> "$hours hour${if (hours > 1) "s" else ""} ago"
-        minutes > 0 -> "$minutes minute${if (minutes > 1) "s" else ""} ago"
-        else -> "Just now"
-    }
 }

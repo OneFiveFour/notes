@@ -255,12 +255,14 @@ fun HomeScreenPreview() {
             FileUiModel(
                 id = "1",
                 title = "Meeting Notes",
+                fileType = FileType.NOTE,
                 preview = "Discussed project timeline and deliverables...",
                 timestamp = "2 hours ago"
             ),
             FileUiModel(
                 id = "2",
                 title = "Shopping List",
+                fileType = FileType.TASK_LIST,
                 preview = "Milk, eggs, bread, butter...",
                 timestamp = "Yesterday"
             )

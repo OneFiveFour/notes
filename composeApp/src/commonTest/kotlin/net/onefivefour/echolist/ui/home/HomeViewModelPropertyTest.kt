@@ -17,9 +17,7 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.Folder
-import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.FakeFileRepository
-import net.onefivefour.echolist.data.repository.NotesRepositoryFake
 
 /**
  * Property-based tests for HomeViewModel inline folder creation logic.
@@ -43,7 +41,7 @@ class HomeViewModelPropertyTest : FunSpec({
     test("Property 3: Tapping add transitions state from Hidden to Editing") {
         checkAll(PropTestConfig(iterations = 20), Arb.string(0..50)) { path ->
             runTest(testDispatcher) {
-                val vm = HomeViewModel(path, NotesRepositoryFake(), FakeFileRepository())
+                val vm = HomeViewModel(path, FakeFileRepository())
                 advanceUntilIdle()
 
                 vm.uiState.value.inlineCreationState.shouldBeInstanceOf<InlineCreationState.Hidden>()
@@ -63,11 +61,10 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
-                val notesRepo = NotesRepositoryFake()
-                notesRepo.addNotes(Note("/work/", "Work", "", 0L))
-                notesRepo.addEntries("work/")
+                val fileRepo = FakeFileRepository()
+                fileRepo.listFilesResult = Result.success(listOf("work/"))
 
-                val vm = HomeViewModel("/", notesRepo, FakeFileRepository())
+                val vm = HomeViewModel("/", fileRepo)
                 advanceUntilIdle()
 
                 val foldersBefore = vm.uiState.value.folders
@@ -91,8 +88,8 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), whitespaceArb) { blankName ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFileRepository()
-                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
+                val fileRepo = FakeFileRepository()
+                val vm = HomeViewModel("/", fileRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -103,7 +100,7 @@ class HomeViewModelPropertyTest : FunSpec({
                 // State should remain Editing — no transition to Saving
                 vm.uiState.value.inlineCreationState.shouldBeInstanceOf<InlineCreationState.Editing>()
                 // No repository call should have been made
-                folderRepo.callLog.size shouldBe 0
+                fileRepo.callLog.size shouldBe 0
             }
         }
     }
@@ -114,15 +111,15 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
-                // Use a folder repo that suspends indefinitely so we can observe Saving state
-                val folderRepo = object : FakeFileRepository() {
+                // Use a file repo that suspends indefinitely so we can observe Saving state
+                val fileRepo = object : FakeFileRepository() {
                     override suspend fun createFolder(params: net.onefivefour.echolist.data.models.CreateFolderParams): Result<Folder> {
                         super.createFolder(params)
                         kotlinx.coroutines.awaitCancellation()
                     }
                 }
 
-                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
+                val vm = HomeViewModel("/", fileRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -144,8 +141,8 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), pathArb, nonBlankArb) { path, name ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFileRepository()
-                val vm = HomeViewModel(path, NotesRepositoryFake(), folderRepo)
+                val fileRepo = FakeFileRepository()
+                val vm = HomeViewModel(path, fileRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -153,7 +150,7 @@ class HomeViewModelPropertyTest : FunSpec({
                 vm.onInlineConfirm()
                 advanceUntilIdle()
 
-                val params = folderRepo.lastCreateParams
+                val params = fileRepo.lastCreateParams
                 params shouldBe net.onefivefour.echolist.data.models.CreateFolderParams(
                     parentPath = path,
                     name = name.trim()
@@ -168,11 +165,10 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
-                val notesRepo = NotesRepositoryFake()
-                val folderRepo = FakeFileRepository()
-                folderRepo.createFolderResult = Result.success(Folder(path = "/${name.trim()}/", name = name.trim()))
+                val fileRepo = FakeFileRepository()
+                fileRepo.createFolderResult = Result.success(Folder(path = "/${name.trim()}/", name = name.trim()))
 
-                val vm = HomeViewModel("/", notesRepo, folderRepo)
+                val vm = HomeViewModel("/", fileRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()
@@ -192,10 +188,10 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, errorMsgArb) { name, errorMsg ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFileRepository()
-                folderRepo.createFolderResult = Result.failure(RuntimeException(errorMsg))
+                val fileRepo = FakeFileRepository()
+                fileRepo.createFolderResult = Result.failure(RuntimeException(errorMsg))
 
-                val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
+                val vm = HomeViewModel("/", fileRepo)
                 advanceUntilIdle()
 
                 vm.onAddFolderClicked()

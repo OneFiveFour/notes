@@ -26,9 +26,12 @@ data class FolderUiModel(
     val itemCount: Int
 )
 
+enum class FileType { NOTE, TASK_LIST }
+
 data class FileUiModel(
     val id: String,
     val title: String,
+    val fileType: FileType,
     val preview: String,
     val timestamp: String
 )

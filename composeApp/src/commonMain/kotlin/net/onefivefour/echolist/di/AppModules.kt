@@ -126,8 +126,7 @@ val navigationModule: Module = module {
     viewModel { params ->
         HomeViewModel(
             path = params.get(),
-            notesRepository = get(),
-            folderRepository = get<FileRepository>()
+            fileRepository = get()
         )
     }
 }

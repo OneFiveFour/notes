@@ -86,13 +86,13 @@ Rename FolderService to FileService across proto definitions, data sources, mapp
     - Use a fake data source; generate random inputs to verify success delegation and error propagation
     - **Validates: Requirements 4.3, 4.4, 4.5, 4.6, 4.7**
 
-- [ ] 6. Update UI models and HomeViewModel
-  - [ ] 6.1 Add `FileType` enum and update `FileUiModel` in `HomeScreenUiState.kt`
+- [x] 6. Update UI models and HomeViewModel
+  - [x] 6.1 Add `FileType` enum and update `FileUiModel` in `HomeScreenUiState.kt`
     - Add `enum class FileType { NOTE, TASK_LIST }`
     - Add `fileType: FileType` field to `FileUiModel`
     - _Requirements: 5.7, 10.3_
 
-  - [ ] 6.2 Update `HomeViewModel` to use `FileRepository.listFiles`
+  - [x] 6.2 Update `HomeViewModel` to use `FileRepository.listFiles`
     - Replace constructor dependency: `FileRepository` instead of `NotesRepository` + `FolderRepository`
     - Update `loadData()` to call `fileRepository.listFiles(path)`
     - Implement entry partitioning: folders (ending with `/`) vs files (not ending with `/`)
@@ -103,7 +103,7 @@ Rename FolderService to FileService across proto definitions, data sources, mapp
     - Update `onInlineConfirm` to use `fileRepository.createFolder` and reload via `fileRepository.listFiles`
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 10.1, 10.2, 10.3, 10.4_
 
-  - [ ] 6.3 Write property tests for entry parsing logic
+  - [x] 6.3 Write property tests for entry parsing logic
     - **Property 6: Entry partitioning into folders and files**
     - **Property 7: File entry type classification and title derivation**
     - **Property 8: Folder name extraction from path**
@@ -111,7 +111,7 @@ Rename FolderService to FileService across proto definitions, data sources, mapp
     - Generate random entry lists with mixed folder/file entries, verify partitioning, type classification, title derivation, and folder name extraction
     - **Validates: Requirements 5.4, 5.5, 5.6, 5.7, 10.3, 10.4**
 
-  - [ ] 6.4 Write unit tests for HomeViewModel
+  - [x] 6.4 Write unit tests for HomeViewModel
     - Create `HomeViewModelTest.kt` in `composeApp/src/commonTest/kotlin/net/onefivefour/echolist/ui/home/`
     - Verify `loadData()` calls `fileRepository.listFiles`
     - Verify folder creation triggers reload via `fileRepository.listFiles`

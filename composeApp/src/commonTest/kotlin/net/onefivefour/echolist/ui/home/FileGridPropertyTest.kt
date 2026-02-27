@@ -25,6 +25,7 @@ class FileGridPropertyTest : FunSpec({
         FileUiModel(
             id = value,
             title = value,
+            fileType = FileType.NOTE,
             preview = value,
             timestamp = value
         )
