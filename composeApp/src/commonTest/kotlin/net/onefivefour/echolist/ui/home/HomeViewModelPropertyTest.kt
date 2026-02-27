@@ -18,7 +18,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.repository.FakeFolderRepository
+import net.onefivefour.echolist.data.repository.FakeFileRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryFake
 
 /**
@@ -43,7 +43,7 @@ class HomeViewModelPropertyTest : FunSpec({
     test("Property 3: Tapping add transitions state from Hidden to Editing") {
         checkAll(PropTestConfig(iterations = 20), Arb.string(0..50)) { path ->
             runTest(testDispatcher) {
-                val vm = HomeViewModel(path, NotesRepositoryFake(), FakeFolderRepository())
+                val vm = HomeViewModel(path, NotesRepositoryFake(), FakeFileRepository())
                 advanceUntilIdle()
 
                 vm.uiState.value.inlineCreationState.shouldBeInstanceOf<InlineCreationState.Hidden>()
@@ -67,7 +67,7 @@ class HomeViewModelPropertyTest : FunSpec({
                 notesRepo.addNotes(Note("/work/", "Work", "", 0L))
                 notesRepo.addEntries("work/")
 
-                val vm = HomeViewModel("/", notesRepo, FakeFolderRepository())
+                val vm = HomeViewModel("/", notesRepo, FakeFileRepository())
                 advanceUntilIdle()
 
                 val foldersBefore = vm.uiState.value.folders
@@ -91,7 +91,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), whitespaceArb) { blankName ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFolderRepository()
+                val folderRepo = FakeFileRepository()
                 val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
@@ -115,7 +115,7 @@ class HomeViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
                 // Use a folder repo that suspends indefinitely so we can observe Saving state
-                val folderRepo = object : FakeFolderRepository() {
+                val folderRepo = object : FakeFileRepository() {
                     override suspend fun createFolder(params: net.onefivefour.echolist.data.models.CreateFolderParams): Result<Folder> {
                         super.createFolder(params)
                         kotlinx.coroutines.awaitCancellation()
@@ -144,7 +144,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), pathArb, nonBlankArb) { path, name ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFolderRepository()
+                val folderRepo = FakeFileRepository()
                 val vm = HomeViewModel(path, NotesRepositoryFake(), folderRepo)
                 advanceUntilIdle()
 
@@ -169,7 +169,7 @@ class HomeViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 20), nonBlankArb) { name ->
             runTest(testDispatcher) {
                 val notesRepo = NotesRepositoryFake()
-                val folderRepo = FakeFolderRepository()
+                val folderRepo = FakeFileRepository()
                 folderRepo.createFolderResult = Result.success(Folder(path = "/${name.trim()}/", name = name.trim()))
 
                 val vm = HomeViewModel("/", notesRepo, folderRepo)
@@ -192,7 +192,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, errorMsgArb) { name, errorMsg ->
             runTest(testDispatcher) {
-                val folderRepo = FakeFolderRepository()
+                val folderRepo = FakeFileRepository()
                 folderRepo.createFolderResult = Result.failure(RuntimeException(errorMsg))
 
                 val vm = HomeViewModel("/", NotesRepositoryFake(), folderRepo)

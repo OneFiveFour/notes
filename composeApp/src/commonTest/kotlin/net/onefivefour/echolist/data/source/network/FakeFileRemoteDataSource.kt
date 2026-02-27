@@ -1,27 +1,23 @@
 package net.onefivefour.echolist.data.source.network
 
-import folder.v1.CreateFolderRequest
-import folder.v1.CreateFolderResponse
-import folder.v1.DeleteFolderRequest
-import folder.v1.DeleteFolderResponse
-import folder.v1.GetFolderRequest
-import folder.v1.GetFolderResponse
-import folder.v1.ListFoldersRequest
-import folder.v1.ListFoldersResponse
-import folder.v1.UpdateFolderRequest
-import folder.v1.UpdateFolderResponse
+import `file`.v1.CreateFolderRequest
+import `file`.v1.CreateFolderResponse
+import `file`.v1.DeleteFolderRequest
+import `file`.v1.DeleteFolderResponse
+import `file`.v1.ListFilesRequest
+import `file`.v1.ListFilesResponse
+import `file`.v1.UpdateFolderRequest
+import `file`.v1.UpdateFolderResponse
 
-internal class FakeFolderRemoteDataSource : FolderRemoteDataSource {
+internal class FakeFileRemoteDataSource : FileRemoteDataSource {
 
     var createFolderResult: Result<CreateFolderResponse> = Result.success(CreateFolderResponse())
-    var getFolderResult: Result<GetFolderResponse> = Result.success(GetFolderResponse())
-    var listFoldersResult: Result<ListFoldersResponse> = Result.success(ListFoldersResponse())
+    var listFilesResult: Result<ListFilesResponse> = Result.success(ListFilesResponse())
     var updateFolderResult: Result<UpdateFolderResponse> = Result.success(UpdateFolderResponse())
     var deleteFolderResult: Result<DeleteFolderResponse> = Result.success(DeleteFolderResponse())
 
     var lastCreateRequest: CreateFolderRequest? = null
-    var lastGetRequest: GetFolderRequest? = null
-    var lastListRequest: ListFoldersRequest? = null
+    var lastListRequest: ListFilesRequest? = null
     var lastUpdateRequest: UpdateFolderRequest? = null
     var lastDeleteRequest: DeleteFolderRequest? = null
 
@@ -30,14 +26,9 @@ internal class FakeFolderRemoteDataSource : FolderRemoteDataSource {
         return createFolderResult.getOrThrow()
     }
 
-    override suspend fun getFolder(request: GetFolderRequest): GetFolderResponse {
-        lastGetRequest = request
-        return getFolderResult.getOrThrow()
-    }
-
-    override suspend fun listFolders(request: ListFoldersRequest): ListFoldersResponse {
+    override suspend fun listFiles(request: ListFilesRequest): ListFilesResponse {
         lastListRequest = request
-        return listFoldersResult.getOrThrow()
+        return listFilesResult.getOrThrow()
     }
 
     override suspend fun updateFolder(request: UpdateFolderRequest): UpdateFolderResponse {

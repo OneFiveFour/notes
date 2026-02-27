@@ -4,22 +4,21 @@ import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.UpdateFolderParams
-import folder.v1.CreateFolderRequest
-import folder.v1.CreateFolderResponse
-import folder.v1.DeleteFolderRequest
-import folder.v1.GetFolderResponse
-import folder.v1.ListFoldersResponse
-import folder.v1.UpdateFolderRequest
-import folder.v1.UpdateFolderResponse
+import `file`.v1.CreateFolderRequest
+import `file`.v1.CreateFolderResponse
+import `file`.v1.DeleteFolderRequest
+import `file`.v1.ListFilesResponse
+import `file`.v1.UpdateFolderRequest
+import `file`.v1.UpdateFolderResponse
 
 /**
- * Maps between Wire-generated folder proto models and domain models.
+ * Maps between Wire-generated file.v1 proto models and domain models.
  */
-internal object FolderMapper {
+internal object FileMapper {
 
     // Proto -> Domain
 
-    fun toDomain(proto: folder.v1.Folder): Folder = Folder(
+    fun toDomain(proto: `file`.v1.Folder): Folder = Folder(
         path = proto.path,
         name = proto.name
     )
@@ -27,11 +26,8 @@ internal object FolderMapper {
     fun toDomain(proto: CreateFolderResponse): Folder =
         toDomain(proto.folder!!)
 
-    fun toDomain(proto: GetFolderResponse): Folder =
-        toDomain(proto.folder!!)
-
-    fun toDomain(proto: ListFoldersResponse): List<Folder> =
-        proto.folders.map { toDomain(it) }
+    fun toDomain(proto: ListFilesResponse): List<String> =
+        proto.entries
 
     fun toDomain(proto: UpdateFolderResponse): Folder =
         toDomain(proto.folder!!)

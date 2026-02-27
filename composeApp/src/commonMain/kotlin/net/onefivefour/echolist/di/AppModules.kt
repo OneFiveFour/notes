@@ -10,14 +10,14 @@ import net.onefivefour.echolist.network.auth.AuthEvent
 import net.onefivefour.echolist.network.auth.AuthInterceptor
 import net.onefivefour.echolist.data.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
-import net.onefivefour.echolist.data.repository.FolderRepository
-import net.onefivefour.echolist.data.repository.FolderRepositoryImpl
+import net.onefivefour.echolist.data.repository.FileRepository
+import net.onefivefour.echolist.data.repository.FileRepositoryImpl
 import net.onefivefour.echolist.data.repository.TaskListRepository
 import net.onefivefour.echolist.data.repository.TaskListRepositoryImpl
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.data.source.network.FolderRemoteDataSource
-import net.onefivefour.echolist.data.source.network.FolderRemoteDataSourceImpl
+import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
+import net.onefivefour.echolist.data.source.network.FileRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
@@ -73,8 +73,8 @@ val networkModule: Module = module {
         NoteRemoteDataSourceImpl(client = get())
     }
 
-    single<FolderRemoteDataSource> {
-        FolderRemoteDataSourceImpl(client = get())
+    single<FileRemoteDataSource> {
+        FileRemoteDataSourceImpl(client = get())
     }
 
     single<TaskListRemoteDataSource> {
@@ -95,8 +95,8 @@ val dataModule: Module = module {
         )
     }
 
-    single<FolderRepository> {
-        FolderRepositoryImpl(
+    single<FileRepository> {
+        FileRepositoryImpl(
             networkDataSource = get(),
             dispatcher = Dispatchers.Default
         )
@@ -127,7 +127,7 @@ val navigationModule: Module = module {
         HomeViewModel(
             path = params.get(),
             notesRepository = get(),
-            folderRepository = get()
+            folderRepository = get<FileRepository>()
         )
     }
 }

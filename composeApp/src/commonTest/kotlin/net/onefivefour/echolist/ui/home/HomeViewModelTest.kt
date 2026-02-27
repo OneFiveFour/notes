@@ -9,7 +9,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.Note
 import net.onefivefour.echolist.data.repository.NotesRepositoryFake
-import net.onefivefour.echolist.data.repository.FakeFolderRepository
+import net.onefivefour.echolist.data.repository.FakeFileRepository
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
 import kotlin.test.Test
@@ -39,7 +39,7 @@ class HomeViewModelTest {
         )
         repo.addEntries("notes/", "/readme.md")
 
-        val viewModel = HomeViewModel("/", repo, FakeFolderRepository())
+        val viewModel = HomeViewModel("/", repo, FakeFileRepository())
         advanceUntilIdle()
 
         val state = viewModel.uiState.value
@@ -59,7 +59,7 @@ class HomeViewModelTest {
         val repo = NotesRepositoryFake()
         repo.setShouldFail(RuntimeException("network error"))
 
-        val viewModel = HomeViewModel("/docs", repo, FakeFolderRepository())
+        val viewModel = HomeViewModel("/docs", repo, FakeFileRepository())
         advanceUntilIdle()
 
         val state = viewModel.uiState.value

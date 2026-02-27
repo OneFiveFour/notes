@@ -9,13 +9,13 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.repository.FolderRepository
+import net.onefivefour.echolist.data.repository.FileRepository
 import net.onefivefour.echolist.data.repository.NotesRepository
 
 class HomeViewModel(
     private val path: String,
     private val notesRepository: NotesRepository,
-    private val folderRepository: FolderRepository
+    private val folderRepository: FileRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(

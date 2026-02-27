@@ -1,50 +1,38 @@
 package net.onefivefour.echolist.data.repository
 
-import folder.v1.GetFolderRequest
-import folder.v1.ListFoldersRequest
+import `file`.v1.ListFilesRequest
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.onefivefour.echolist.data.mapper.FolderMapper
+import net.onefivefour.echolist.data.mapper.FileMapper
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.UpdateFolderParams
-import net.onefivefour.echolist.data.source.network.FolderRemoteDataSource
+import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
 
-internal class FolderRepositoryImpl(
-    private val networkDataSource: FolderRemoteDataSource,
+internal class FileRepositoryImpl(
+    private val networkDataSource: FileRemoteDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default
-) : FolderRepository {
+) : FileRepository {
 
     override suspend fun createFolder(params: CreateFolderParams): Result<Folder> =
         withContext(dispatcher) {
             try {
-                val request = FolderMapper.toProto(params)
+                val request = FileMapper.toProto(params)
                 val response = networkDataSource.createFolder(request)
-                Result.success(FolderMapper.toDomain(response))
+                Result.success(FileMapper.toDomain(response))
             } catch (e: Exception) {
                 Result.failure(e)
             }
         }
 
-    override suspend fun getFolder(folderPath: String): Result<Folder> =
+    override suspend fun listFiles(parentPath: String): Result<List<String>> =
         withContext(dispatcher) {
             try {
-                val request = GetFolderRequest(folder_path = folderPath)
-                val response = networkDataSource.getFolder(request)
-                Result.success(FolderMapper.toDomain(response))
-            } catch (e: Exception) {
-                Result.failure(e)
-            }
-        }
-
-    override suspend fun listFolders(parentPath: String): Result<List<Folder>> =
-        withContext(dispatcher) {
-            try {
-                val request = ListFoldersRequest(parent_path = parentPath)
-                val response = networkDataSource.listFolders(request)
-                Result.success(FolderMapper.toDomain(response))
+                val request = ListFilesRequest(parent_path = parentPath)
+                val response = networkDataSource.listFiles(request)
+                Result.success(FileMapper.toDomain(response))
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -53,9 +41,9 @@ internal class FolderRepositoryImpl(
     override suspend fun updateFolder(params: UpdateFolderParams): Result<Folder> =
         withContext(dispatcher) {
             try {
-                val request = FolderMapper.toProto(params)
+                val request = FileMapper.toProto(params)
                 val response = networkDataSource.updateFolder(request)
-                Result.success(FolderMapper.toDomain(response))
+                Result.success(FileMapper.toDomain(response))
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -64,7 +52,7 @@ internal class FolderRepositoryImpl(
     override suspend fun deleteFolder(params: DeleteFolderParams): Result<Unit> =
         withContext(dispatcher) {
             try {
-                val request = FolderMapper.toProto(params)
+                val request = FileMapper.toProto(params)
                 networkDataSource.deleteFolder(request)
                 Result.success(Unit)
             } catch (e: Exception) {
