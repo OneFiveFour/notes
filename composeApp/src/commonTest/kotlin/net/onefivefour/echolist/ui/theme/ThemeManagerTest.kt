@@ -15,20 +15,20 @@ class ThemeManagerTest : FunSpec({
 
     val themeA = ColorTheme(
         name = "Theme A",
-        lightColorScheme = lightColorScheme(primary = Color.Red),
-        darkColorScheme = darkColorScheme(primary = Color.Blue)
+        materialColorSchemeLight = lightColorScheme(primary = Color.Red),
+        materialColorSchemeDark = darkColorScheme(primary = Color.Blue)
     )
 
     val themeB = ColorTheme(
         name = "Theme B",
-        lightColorScheme = lightColorScheme(primary = Color.Green),
-        darkColorScheme = darkColorScheme(primary = Color.Yellow)
+        materialColorSchemeLight = lightColorScheme(primary = Color.Green),
+        materialColorSchemeDark = darkColorScheme(primary = Color.Yellow)
     )
 
     val themeNotInList = ColorTheme(
         name = "Unknown",
-        lightColorScheme = lightColorScheme(primary = Color.Cyan),
-        darkColorScheme = darkColorScheme(primary = Color.Magenta)
+        materialColorSchemeLight = lightColorScheme(primary = Color.Cyan),
+        materialColorSchemeDark = darkColorScheme(primary = Color.Magenta)
     )
 
     test("initialization sets selectedTheme to initial theme") {

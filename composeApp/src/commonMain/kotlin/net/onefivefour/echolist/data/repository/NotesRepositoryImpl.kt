@@ -3,6 +3,7 @@ package net.onefivefour.echolist.data.repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.sync.Mutex
@@ -25,10 +26,14 @@ internal class NotesRepositoryImpl(
     private val cacheDataSource: CacheDataSource,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val backgroundScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
-) : NotesRepository {
+) : NotesRepository, AutoCloseable {
 
     private val mutex = Mutex()
     private val pendingOperations = mutableListOf<PendingOperation>()
+
+    override fun close() {
+        backgroundScope.coroutineContext[Job]?.cancel()
+    }
 
     override suspend fun createNote(params: CreateNoteParams): Result<Note> = withContext(dispatcher) {
         try {

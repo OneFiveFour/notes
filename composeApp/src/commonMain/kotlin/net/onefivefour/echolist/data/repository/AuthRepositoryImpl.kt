@@ -1,27 +1,14 @@
 package net.onefivefour.echolist.data.repository
 
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpTimeout
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.network.client.ConnectRpcClient
-import net.onefivefour.echolist.network.client.ConnectRpcClientImpl
-import net.onefivefour.echolist.network.config.NetworkConfig
+import net.onefivefour.echolist.network.config.NetworkConfigProvider
 
 internal class AuthRepositoryImpl(
     private val secureStorage: SecureStorage,
-    private val clientFactory: (baseUrl: String) -> ConnectRpcClient = { url ->
-        val config = NetworkConfig.default(baseUrl = url)
-        ConnectRpcClientImpl(
-            httpClient = HttpClient {
-                install(HttpTimeout) {
-                    requestTimeoutMillis = config.requestTimeoutMs
-                    connectTimeoutMillis = config.connectTimeoutMs
-                }
-            },
-            config = config
-        )
-    }
+    private val client: ConnectRpcClient,
+    private val networkConfigProvider: NetworkConfigProvider
 ) : AuthRepository {
 
     override suspend fun login(
@@ -29,7 +16,8 @@ internal class AuthRepositoryImpl(
         username: String,
         password: String
     ): Result<Unit> {
-        val client = clientFactory(baseUrl)
+        networkConfigProvider.updateBaseUrl(baseUrl)
+
         val request = auth.v1.LoginRequest(
             username = username,
             password = password
@@ -53,7 +41,8 @@ internal class AuthRepositoryImpl(
         val refreshToken = secureStorage.get(StorageKeys.REFRESH_TOKEN)
             ?: return Result.failure(IllegalStateException("No refresh token stored"))
 
-        val client = clientFactory(baseUrl)
+        networkConfigProvider.updateBaseUrl(baseUrl)
+
         val request = auth.v1.RefreshTokenRequest(refresh_token = refreshToken)
 
         return client.call(

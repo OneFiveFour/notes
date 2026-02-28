@@ -62,15 +62,15 @@ class DarkModeResolutionPropertyTest : FunSpec({
     val arbColorTheme: Arb<ColorTheme> = arbitrary {
         ColorTheme(
             name = Arb.stringPattern("[A-Za-z][A-Za-z0-9 ]{0,49}").bind(),
-            lightColorScheme = arbColorSchemeLight().bind(),
-            darkColorScheme = arbColorSchemeDark().bind()
+            materialColorSchemeLight = arbColorSchemeLight().bind(),
+            materialColorSchemeDark = arbColorSchemeDark().bind()
         )
     }
 
     // -- Resolution helper matching EchoListTheme logic --
 
     fun resolveColorScheme(theme: ColorTheme, isDarkMode: Boolean): ColorScheme {
-        return if (isDarkMode) theme.darkColorScheme else theme.lightColorScheme
+        return if (isDarkMode) theme.materialColorSchemeDark else theme.materialColorSchemeLight
     }
 
     // -- Property 3: Dark mode variant resolution --
@@ -79,9 +79,9 @@ class DarkModeResolutionPropertyTest : FunSpec({
         checkAll(arbColorTheme, Arb.boolean()) { theme, isDarkMode ->
             val resolved = resolveColorScheme(theme, isDarkMode)
             if (isDarkMode) {
-                resolved shouldBe theme.darkColorScheme
+                resolved shouldBe theme.materialColorSchemeDark
             } else {
-                resolved shouldBe theme.lightColorScheme
+                resolved shouldBe theme.materialColorSchemeLight
             }
         }
     }

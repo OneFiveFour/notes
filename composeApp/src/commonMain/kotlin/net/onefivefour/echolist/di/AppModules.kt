@@ -25,19 +25,21 @@ import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
 import net.onefivefour.echolist.network.client.ConnectRpcClient
 import net.onefivefour.echolist.network.client.ConnectRpcClientImpl
 import net.onefivefour.echolist.network.config.NetworkConfigProvider
-import net.onefivefour.echolist.ui.theme.EchoListClassicTheme
-import net.onefivefour.echolist.ui.theme.EchoListTheme2
+import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
+import net.onefivefour.echolist.ui.theme.colorscheme.EchoListTheme2
 import net.onefivefour.echolist.ui.theme.ThemeManager
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.viewModel
+import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 
 val authModule: Module = module {
     single { MutableSharedFlow<AuthEvent>() }
-    single<AuthRepository> { AuthRepositoryImpl(secureStorage = get()) }
+    single<AuthRepository> { AuthRepositoryImpl(secureStorage = get(), client = get(), networkConfigProvider = get()) }
     viewModel { AuthViewModel(secureStorage = get(), authEvents = get()) }
     viewModel { LoginViewModel(authRepository = get(), secureStorage = get(), networkConfigProvider = get()) }
 }
@@ -93,6 +95,8 @@ val dataModule: Module = module {
             cacheDataSource = get(),
             dispatcher = Dispatchers.Default
         )
+    } withOptions {
+        onClose { (it as? AutoCloseable)?.close() }
     }
 
     single<FileRepository> {

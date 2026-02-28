@@ -3,6 +3,7 @@ package net.onefivefour.echolist.ui.theme
 import androidx.compose.ui.graphics.Color
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
+import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 
 /**
  * Unit tests for EchoList Classic theme color values.
@@ -11,8 +12,8 @@ import io.kotest.matchers.shouldBe
  */
 class EchoListClassicThemeTest : FunSpec({
 
-    val light = EchoListClassicTheme.lightColorScheme
-    val dark = EchoListClassicTheme.darkColorScheme
+    val light = EchoListClassicTheme.materialColorSchemeLight
+    val dark = EchoListClassicTheme.materialColorSchemeDark
 
     // -- Light variant exact hex values (Requirement 1.2) --
 

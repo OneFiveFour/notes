@@ -62,8 +62,8 @@ class ThemeManagerPropertyTest : FunSpec({
     val arbColorTheme: Arb<ColorTheme> = arbitrary {
         ColorTheme(
             name = Arb.stringPattern("[A-Za-z][A-Za-z0-9 ]{0,49}").bind(),
-            lightColorScheme = arbColorSchemeLight().bind(),
-            darkColorScheme = arbColorSchemeDark().bind()
+            materialColorSchemeLight = arbColorSchemeLight().bind(),
+            materialColorSchemeDark = arbColorSchemeDark().bind()
         )
     }
 

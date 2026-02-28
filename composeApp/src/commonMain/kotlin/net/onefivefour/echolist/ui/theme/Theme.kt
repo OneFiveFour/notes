@@ -10,10 +10,15 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
 
 object EchoListTheme {
+    val echoListColorScheme: EchoListColorScheme
+        @Composable
+        @ReadOnlyComposable
+        get() = LocalEchoListColors.current
     val materialColors: ColorScheme
         @Composable
         @ReadOnlyComposable
@@ -49,16 +54,24 @@ fun EchoListTheme(
         )
     }
     val colorTheme by resolvedThemeManager.selectedTheme.collectAsState()
-    val colorScheme = if (darkTheme) colorTheme.darkColorScheme else colorTheme.lightColorScheme
+    val materialColorScheme = when {
+        darkTheme -> colorTheme.materialColorSchemeDark
+        else -> colorTheme.materialColorSchemeLight
+    }
+    val echoListColorScheme = when {
+        darkTheme -> colorTheme.echoListColorSchemeDark
+        else -> colorTheme.echoListColorSchemeLight
+    }
 
     val typography = material3Typography()
 
     CompositionLocalProvider(
         LocalTypography provides typography,
-        LocalMaterialColors provides colorScheme,
+        LocalMaterialColors provides materialColorScheme,
+        LocalEchoListColors provides echoListColorScheme
     ) {
         MaterialTheme(
-            colorScheme = colorScheme,
+            colorScheme = materialColorScheme,
             typography = typography,
             shapes = EchoListTheme.shapes,
             content = content

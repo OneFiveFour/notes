@@ -5,7 +5,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.matchers.string.shouldNotBeBlank
 import io.kotest.property.Arb
 import io.kotest.property.arbitrary.arbitrary
@@ -62,8 +61,8 @@ class ColorThemePropertyTest : FunSpec({
     val arbColorTheme = arbitrary {
         ColorTheme(
             name = Arb.stringPattern("[A-Za-z][A-Za-z0-9 ]{0,49}").bind(),
-            lightColorScheme = arbColorSchemeLight().bind(),
-            darkColorScheme = arbColorSchemeDark().bind()
+            materialColorSchemeLight = arbColorSchemeLight().bind(),
+            materialColorSchemeDark = arbColorSchemeDark().bind()
         )
     }
 
@@ -77,7 +76,7 @@ class ColorThemePropertyTest : FunSpec({
 
     test("Property 1: ColorTheme light and dark schemes must be distinct instances").config(invocations = 20) {
         checkAll(arbColorTheme) { theme ->
-            (theme.lightColorScheme !== theme.darkColorScheme) shouldBe true
+            (theme.materialColorSchemeLight !== theme.materialColorSchemeDark) shouldBe true
         }
     }
 })

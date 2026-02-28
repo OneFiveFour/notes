@@ -15,15 +15,15 @@
 - [x] 2. Fix error color semantics
   - [x] 2.1 In `LoginScreen`, change all error text colors from `EchoListTheme.materialColors.secondary` to `EchoListTheme.materialColors.error`
   - [x] 2.2 Verify `InlineItemEditor` already uses `MaterialTheme.colorScheme.error` for its error message (no change expected, just confirm)
-- [ ] 3. Fix `LoginViewModel.loginSuccess` encapsulation
-  - [ ] 3.1 Change the public type of `loginSuccess` from `MutableSharedFlow<Unit>` to `SharedFlow<Unit>` using `asSharedFlow()`
-  - [ ] 3.2 Update `App.kt` if needed to work with the read-only `SharedFlow` type (it should already, since it only calls `collect`)
-- [ ] 4. Add JVM database comment about `Schema.create()` issue
-  - [ ] 4.1 Add a code comment in `DatabaseModule.jvm.kt` explaining that `Schema.create()` is called unconditionally and needs migration handling once the JVM target is used in production
-- [ ] 5. Fix resource leaks in `AuthRepositoryImpl` and `NotesRepositoryImpl`
-  - [ ] 5.1 Refactor `AuthRepositoryImpl` to receive the shared `ConnectRpcClient` and `NetworkConfigProvider` via constructor injection instead of creating throwaway `HttpClient` instances per call. Use `NetworkConfigProvider.updateBaseUrl()` for dynamic base URL after login. Remove the `clientFactory` parameter.
-  - [ ] 5.2 Update `authModule` in `AppModules.kt` to inject `ConnectRpcClient` and `NetworkConfigProvider` into `AuthRepositoryImpl`
-  - [ ] 5.3 Make `NotesRepositoryImpl` implement `Closeable`, cancel `backgroundScope` in `close()`, and register an `onClose` callback in the Koin `dataModule`
+- [x] 3. Fix `LoginViewModel.loginSuccess` encapsulation
+  - [x] 3.1 Change the public type of `loginSuccess` from `MutableSharedFlow<Unit>` to `SharedFlow<Unit>` using `asSharedFlow()`
+  - [x] 3.2 Update `App.kt` if needed to work with the read-only `SharedFlow` type (it should already, since it only calls `collect`)
+- [x] 4. Add JVM database comment about `Schema.create()` issue
+  - [x] 4.1 Add a code comment in `DatabaseModule.jvm.kt` explaining that `Schema.create()` is called unconditionally and needs migration handling once the JVM target is used in production
+- [x] 5. Fix resource leaks in `AuthRepositoryImpl` and `NotesRepositoryImpl`
+  - [x] 5.1 Refactor `AuthRepositoryImpl` to receive the shared `ConnectRpcClient` and `NetworkConfigProvider` via constructor injection instead of creating throwaway `HttpClient` instances per call. Use `NetworkConfigProvider.updateBaseUrl()` for dynamic base URL after login. Remove the `clientFactory` parameter.
+  - [x] 5.2 Update `authModule` in `AppModules.kt` to inject `ConnectRpcClient` and `NetworkConfigProvider` into `AuthRepositoryImpl`
+  - [x] 5.3 Make `NotesRepositoryImpl` implement `Closeable`, cancel `backgroundScope` in `close()`, and register an `onClose` callback in the Koin `dataModule`
 - [ ] 6. Add domain-specific exceptions for force-unwrapped proto fields
   - [ ] 6.1 Create a domain exception class (e.g., `MappingException`) for mapper errors
   - [ ] 6.2 Replace `!!` with a meaningful domain exception in `FileMapper.toDomain(CreateFolderResponse)` and `FileMapper.toDomain(UpdateFolderResponse)`

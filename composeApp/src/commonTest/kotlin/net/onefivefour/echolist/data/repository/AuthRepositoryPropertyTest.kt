@@ -9,6 +9,7 @@ import io.kotest.property.checkAll
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.network.client.ConnectRpcClient
+import net.onefivefour.echolist.network.config.NetworkConfigProvider
 
 /**
  * Property-based tests for AuthRepository login behavior.
@@ -54,7 +55,8 @@ class AuthRepositoryPropertyTest : FunSpec({
 
             val repo = AuthRepositoryImpl(
                 secureStorage = storage,
-                clientFactory = { _ -> mockClient }
+                client = mockClient,
+                networkConfigProvider = NetworkConfigProvider(storage)
             )
 
             val result = repo.login(baseUrl, username, password)
@@ -111,7 +113,8 @@ class AuthRepositoryPropertyTest : FunSpec({
 
             val repo = AuthRepositoryImpl(
                 secureStorage = storage,
-                clientFactory = { _ -> mockClient }
+                client = mockClient,
+                networkConfigProvider = NetworkConfigProvider(storage)
             )
 
             repo.login(baseUrl, username, password)
