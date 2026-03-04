@@ -249,8 +249,8 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Verify equivalence (round-trip property)
     - Run with minimum 100 iterations
 
-- [ ] 8. Update TaskListRepository and integration
-  - [ ] 8.1 Update TaskListRepository to use new network source methods
+- [x] 8. Update TaskListRepository and integration
+  - [x] 8.1 Update TaskListRepository to use new network source methods
     - Update createTaskList to call network source with name, path, tasks parameters
     - Update getTaskList to call network source with file_path parameter
     - Update listTaskLists to call network source with path parameter
@@ -259,41 +259,41 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Use updated TaskListMapper for all transformations
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5, 10.6_
   
-  - [ ] 8.2 Write unit tests for TaskListRepository
+  - [x] 8.2 Write unit tests for TaskListRepository
     - Test successful operations with mock network source
     - Test network failures and error handling
     - Test Result wrapping (success and failure cases)
     - _Requirements: 10.1, 10.2, 10.3, 10.4, 10.5_
   
-  - [ ] 8.3 Write property test for TaskListRepository createTaskList
+  - [x] 8.3 Write property test for TaskListRepository createTaskList
     - **Property 21: TaskListRepository creates task lists correctly**
     - **Validates: Requirements 10.1**
     - Create Arb.createTaskListParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 8.4 Write property test for TaskListRepository getTaskList
+  - [x] 8.4 Write property test for TaskListRepository getTaskList
     - **Property 22: TaskListRepository gets task lists correctly**
     - **Validates: Requirements 10.2**
     - Generate random file paths
     - Verify correct request and successful Result with mapped TaskList
     - Run with minimum 100 iterations
   
-  - [ ] 8.5 Write property test for TaskListRepository listTaskLists
+  - [x] 8.5 Write property test for TaskListRepository listTaskLists
     - **Property 23: TaskListRepository lists task lists correctly**
     - **Validates: Requirements 10.3**
     - Generate random paths
     - Verify correct request and successful Result with mapped list
     - Run with minimum 100 iterations
   
-  - [ ] 8.6 Write property test for TaskListRepository updateTaskList
+  - [x] 8.6 Write property test for TaskListRepository updateTaskList
     - **Property 24: TaskListRepository updates task lists correctly**
     - **Validates: Requirements 10.4**
     - Create Arb.updateTaskListParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 8.7 Write property test for TaskListRepository deleteTaskList
+  - [x] 8.7 Write property test for TaskListRepository deleteTaskList
     - **Property 25: TaskListRepository deletes task lists correctly**
     - **Validates: Requirements 10.5**
     - Generate random file paths
