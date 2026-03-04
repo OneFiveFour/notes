@@ -19,8 +19,7 @@ class HomeViewModel(
     private val _uiState = MutableStateFlow(
         HomeScreenUiState(
             title = "",
-            breadcrumbs = emptyList(),
-            files = emptyList()
+            breadcrumbs = emptyList()
         )
     )
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
@@ -38,8 +37,7 @@ class HomeViewModel(
                 _uiState.update { current ->
                     current.copy(
                         title = titleFromPath(path),
-                        breadcrumbs = buildBreadcrumbs(path),
-                        files = extractFiles(entries)
+                        breadcrumbs = buildBreadcrumbs(path)
                     )
                 }
             },
@@ -47,8 +45,7 @@ class HomeViewModel(
                 _uiState.update { current ->
                     current.copy(
                         title = titleFromPath(path),
-                        breadcrumbs = buildBreadcrumbs(path),
-                        files = emptyList()
+                        breadcrumbs = buildBreadcrumbs(path)
                     )
                 }
             }
@@ -72,12 +69,4 @@ internal fun buildBreadcrumbs(path: String): List<BreadcrumbItem> {
         breadcrumbs.add(BreadcrumbItem(label = segment, path = accumulated))
     }
     return breadcrumbs
-}
-
-/**
- * Extracts folder entries (paths ending with "/") and files (paths not ending with "/").
- * Calculates itemCount by files with the same path.
- */
-internal fun extractFolders(entries: List<String>): List<FileUiModel> {
-
 }
