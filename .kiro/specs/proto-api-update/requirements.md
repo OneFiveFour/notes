@@ -2,173 +2,157 @@
 
 ## Introduction
 
-The EchoList backend introduces breaking changes to its proto API. The primary changes are:
-
-1. FolderService is renamed to FileService (proto package `folder.v1` → `file.v1`).
-2. The `GetFolder` RPC is removed (redundant).
-3. `ListFolders` is replaced by `ListFiles`, which returns `repeated string entries` instead of `repeated Folder folders`. Folder entries are suffixed with `/`.
-4. NoteService and TaskListService proto definitions are updated but their client-side logic is preserved for future editing use.
-5. The HomeScreen switches from using NotesRepository.listNotes to FileRepository.listFiles as its sole data source for directory listing.
-
-This is a pre-release change — no migration or backwards compatibility is needed. Existing NoteService and TaskListService logic must not be deleted, as it will be needed for editing notes and tasks later.
+The backend API has evolved with new proto definitions for all services. The EchoList client application needs to be updated to work with the new API contracts. This is a pre-release update, so no migration or backward compatibility is required. The update will proceed bottom-to-top: file service first, then notes and tasks services.
 
 ## Glossary
 
-- **FileService**: The ConnectRPC service (renamed from FolderService) handling folder CRUD and file listing operations. Proto package: `file.v1`.
-- **FolderService** (deprecated): The former name of the file/folder backend service, now renamed to FileService.
-- **NoteService**: The ConnectRPC service handling note CRUD operations. Proto package: `notes.v1`.
-- **TaskListService**: The ConnectRPC service handling task list CRUD operations. Proto package: `tasks.v1`.
-- **Folder**: A domain model representing a folder with path and name fields.
-- **Note**: A domain model representing a note with filePath, title, content, and updatedAt fields.
-- **Entry**: A string path returned by ListFiles. Folder entries end with `/`, file entries do not.
-- **FileRepository**: The repository interface (renamed from FolderRepository) that wraps FileService operations.
-- **FileRemoteDataSource**: The remote data source interface (renamed from FolderRemoteDataSource) that wraps FileService RPC calls.
-- **ConnectRpcClient**: The shared HTTP client that serializes/deserializes protobuf messages over ConnectRPC.
-- **HomeViewModel**: The ViewModel powering the HomeScreen, responsible for loading directory content.
+- **Proto_File**: Protocol Buffer definition file (.proto) that defines service contracts and message types
+- **FileService**: Backend service for folder operations (previously named "folder service")
+- **NoteService**: Backend service for note CRUD operations
+- **TaskListService**: Backend service for task list CRUD operations
+- **AuthService**: Backend service for authentication operations
+- **Network_Source**: Kotlin client implementation that calls the backend service via ConnectRPC
+- **Repository**: Data layer component that coordinates between network sources and UI layer
+- **Mapper**: Component that transforms proto messages to domain models
+- **go_package**: Proto option that specifies the Go package path for generated code
+- **ConnectRPC**: RPC framework used for client-server communication
 
 ## Requirements
 
-### Requirement 1: Rename FolderService Proto to FileService
+### Requirement 1: Update FileService Network Source
 
-**User Story:** As a developer, I want the folder.proto file replaced with a file.proto using the `file.v1` package and FileService name, so that the generated code matches the renamed backend service.
-
-#### Acceptance Criteria
-
-1. THE file.proto file SHALL define the proto package as `file.v1`.
-2. THE file.proto file SHALL define FileService with four RPCs: CreateFolder, ListFiles, UpdateFolder, DeleteFolder.
-3. THE FileService SHALL not include a GetFolder RPC.
-4. THE Folder message SHALL contain path and name fields.
-5. THE CreateFolderRequest message SHALL contain parent_path and name fields.
-6. THE CreateFolderResponse message SHALL contain a single folder field of type Folder.
-7. THE ListFilesRequest message SHALL contain a parent_path field.
-8. THE ListFilesResponse message SHALL contain a repeated string entries field.
-9. THE UpdateFolderRequest message SHALL contain folder_path and new_name fields.
-10. THE UpdateFolderResponse message SHALL contain a single folder field of type Folder.
-11. THE DeleteFolderRequest message SHALL contain a folder_path field.
-12. THE DeleteFolderResponse message SHALL be an empty message.
-
-### Requirement 2: Rename and Update File Remote Data Source
-
-**User Story:** As a developer, I want the FolderRemoteDataSource renamed to FileRemoteDataSource with updated RPC paths using `file.v1.FileService`, so that network calls reach the renamed backend service.
+**User Story:** As a developer, I want the FileService network source updated to match the new proto definition, so that folder operations work with the backend API.
 
 #### Acceptance Criteria
 
-1. THE FileRemoteDataSource interface SHALL expose createFolder, listFiles, updateFolder, and deleteFolder methods.
-2. THE FileRemoteDataSource interface SHALL not expose a getFolder method.
-3. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/CreateFolder" for createFolder.
-4. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/ListFiles" for listFiles.
-5. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/UpdateFolder" for updateFolder.
-6. THE FileRemoteDataSourceImpl SHALL call ConnectRpcClient with path "/file.v1.FileService/DeleteFolder" for deleteFolder.
-7. THE FileRemoteDataSourceImpl SHALL use proto types from the `file.v1` package for request serialization and response deserialization.
+1. THE FileService_Network_Source SHALL implement CreateFolder RPC with CreateFolderRequest and CreateFolderResponse
+2. THE FileService_Network_Source SHALL implement ListFiles RPC with ListFilesRequest and ListFilesResponse
+3. THE FileService_Network_Source SHALL implement UpdateFolder RPC with UpdateFolderRequest and UpdateFolderResponse
+4. THE FileService_Network_Source SHALL implement DeleteFolder RPC with DeleteFolderRequest and DeleteFolderResponse
+5. THE FileService_Network_Source SHALL use the package name "file.v1"
 
-### Requirement 3: Update File Mapper for New Response Shapes
+### Requirement 2: Update FileService Mapper
 
-**User Story:** As a developer, I want the FolderMapper updated to handle the new FileService response types including ListFilesResponse returning string entries, so that domain model mapping remains correct.
+**User Story:** As a developer, I want the FileMapper updated to transform new proto messages, so that the data layer can work with domain models.
 
 #### Acceptance Criteria
 
-1. THE FileMapper SHALL map a proto Folder message (from `file.v1` package) to a domain Folder preserving path and name.
-2. THE FileMapper SHALL map CreateFolderResponse to a single domain Folder.
-3. THE FileMapper SHALL map ListFilesResponse to a List of String entries.
-4. THE FileMapper SHALL map UpdateFolderResponse to a single domain Folder.
-5. THE FileMapper SHALL map CreateFolderParams to a proto CreateFolderRequest using `file.v1` types.
-6. THE FileMapper SHALL map UpdateFolderParams to a proto UpdateFolderRequest using `file.v1` types.
-7. THE FileMapper SHALL map DeleteFolderParams to a proto DeleteFolderRequest using `file.v1` types.
+1. WHEN a CreateFolderResponse is received, THE FileMapper SHALL transform it to a Folder domain model
+2. WHEN a ListFilesResponse is received, THE FileMapper SHALL transform the entries list to domain models
+3. WHEN an UpdateFolderResponse is received, THE FileMapper SHALL transform it to a Folder domain model
+4. THE FileMapper SHALL handle the new Folder message structure with path and name fields
 
-### Requirement 4: Rename and Update File Repository
+### Requirement 3: Update FileRepository
 
-**User Story:** As a developer, I want the FolderRepository renamed to FileRepository with the listFolders method replaced by listFiles returning string entries, so that the repository API matches the new FileService contract.
+**User Story:** As a developer, I want the FileRepository updated to use the new network source methods, so that the UI layer can perform folder operations.
 
 #### Acceptance Criteria
 
-1. THE FileRepository interface SHALL expose createFolder, listFiles, updateFolder, and deleteFolder methods.
-2. THE FileRepository interface SHALL not expose a getFolder method.
-3. THE FileRepository.listFiles method SHALL accept a parentPath String and return Result<List<String>>.
-4. THE FileRepository.createFolder method SHALL accept CreateFolderParams and return Result<Folder>.
-5. THE FileRepository.updateFolder method SHALL accept UpdateFolderParams and return Result<Folder>.
-6. THE FileRepository.deleteFolder method SHALL accept DeleteFolderParams and return Result<Unit>.
-7. IF a network call fails, THEN THE FileRepositoryImpl SHALL return Result.failure with the caught exception.
+1. THE FileRepository SHALL call the updated CreateFolder method with correct parameters
+2. THE FileRepository SHALL call the updated ListFiles method with correct parameters
+3. THE FileRepository SHALL call the updated UpdateFolder method with correct parameters
+4. THE FileRepository SHALL call the updated DeleteFolder method with correct parameters
+5. THE FileRepository SHALL use the updated mapper to transform responses
 
-### Requirement 5: Update HomeViewModel to Use FileRepository for Directory Listing
+### Requirement 4: Update NoteService Network Source
 
-**User Story:** As a developer, I want the HomeViewModel to fetch directory content from FileRepository.listFiles instead of NotesRepository.listNotes, so that the HomeScreen gets all its listing data from the FileService alone.
+**User Story:** As a developer, I want the NoteService network source updated to match the new proto definition, so that note operations work with the backend API.
 
 #### Acceptance Criteria
 
-1. THE HomeViewModel SHALL depend on FileRepository for loading directory listings.
-2. THE HomeViewModel SHALL not depend on NotesRepository for loading directory listings.
-3. WHEN the HomeViewModel loads data, THE HomeViewModel SHALL call FileRepository.listFiles to obtain the list of entries.
-4. THE HomeViewModel SHALL extract folder entries (paths ending with `/`) from the string entries list to build FolderUiModel items.
-5. THE HomeViewModel SHALL extract file entries (paths not ending with `/`) from the string entries list to build FileUiModel items.
-6. WHEN building a FileUiModel from a file entry path, THE HomeViewModel SHALL strip the `note_` prefix from note file names and the `tasks_` prefix from task list file names to derive a clean display title.
-7. THE FileUiModel SHALL indicate the file type (note or task list) based on whether the original file name starts with `note_` or `tasks_`.
-8. WHEN a folder is created successfully, THE HomeViewModel SHALL reload the directory listing via FileRepository.listFiles.
-9. THE HomeViewModel SHALL still depend on FolderRepository for createFolder operations through the renamed FileRepository.
+1. THE NoteService_Network_Source SHALL implement CreateNote RPC with CreateNoteRequest and CreateNoteResponse
+2. THE NoteService_Network_Source SHALL implement ListNotes RPC with ListNotesRequest and ListNotesResponse
+3. THE NoteService_Network_Source SHALL implement GetNote RPC with GetNoteRequest and GetNoteResponse
+4. THE NoteService_Network_Source SHALL implement UpdateNote RPC with UpdateNoteRequest and UpdateNoteResponse
+5. THE NoteService_Network_Source SHALL implement DeleteNote RPC with DeleteNoteRequest and DeleteNoteResponse
+6. THE NoteService_Network_Source SHALL use the package name "notes.v1"
 
-### Requirement 6: Update Koin Dependency Injection Modules
+### Requirement 5: Update NoteService Mapper
 
-**User Story:** As a developer, I want the Koin DI modules updated to wire the renamed FileRemoteDataSource and FileRepository, so that all dependencies resolve correctly at runtime.
+**User Story:** As a developer, I want the NoteMapper updated to transform new proto messages, so that the data layer can work with domain models.
 
 #### Acceptance Criteria
 
-1. THE networkModule SHALL provide a FileRemoteDataSource binding to FileRemoteDataSourceImpl.
-2. THE dataModule SHALL provide a FileRepository binding to FileRepositoryImpl.
-3. THE navigationModule SHALL inject FileRepository (instead of FolderRepository) into HomeViewModel.
-4. THE navigationModule SHALL not inject NotesRepository into HomeViewModel for directory listing.
-5. THE networkModule SHALL continue to provide NoteRemoteDataSource and TaskListRemoteDataSource bindings unchanged.
-6. THE dataModule SHALL continue to provide NotesRepository and TaskListRepository bindings unchanged.
+1. WHEN a Note proto message is received, THE NoteMapper SHALL transform it to a Note domain model with file_path, title, content, and updated_at fields
+2. WHEN a CreateNoteResponse is received, THE NoteMapper SHALL extract and transform the Note message
+3. WHEN a ListNotesResponse is received, THE NoteMapper SHALL transform the repeated notes field
+4. WHEN a GetNoteResponse is received, THE NoteMapper SHALL extract and transform the Note message
+5. WHEN a UpdateNoteResponse is received, THE NoteMapper SHALL extract and transform the Note message
 
-### Requirement 7: Update Note Proto Definitions
+### Requirement 6: Update NotesRepository
 
-**User Story:** As a developer, I want the notes.proto file updated to match the new backend contract, so that the generated code stays in sync.
-
-#### Acceptance Criteria
-
-1. THE notes.proto file SHALL define NoteService with RPCs: CreateNote, ListNotes, GetNote, UpdateNote, DeleteNote.
-2. THE Note message SHALL contain file_path, title, content, and updated_at fields.
-3. THE CreateNoteRequest message SHALL contain title, content, and path fields.
-4. THE CreateNoteResponse message SHALL contain a single note field of type Note.
-5. THE GetNoteResponse message SHALL contain a single note field of type Note.
-6. THE UpdateNoteRequest message SHALL contain file_path and content fields.
-7. THE UpdateNoteResponse message SHALL contain a single note field of type Note.
-8. THE ListNotesResponse message SHALL contain repeated notes of type Note and repeated string entries fields.
-9. THE DeleteNoteResponse message SHALL be an empty message.
-
-### Requirement 8: Update Task Proto Definitions
-
-**User Story:** As a developer, I want the tasks.proto file updated to match the new backend contract with the TaskListService name, so that the generated code stays in sync.
+**User Story:** As a developer, I want the NotesRepository updated to use the new network source methods, so that the UI layer can perform note operations.
 
 #### Acceptance Criteria
 
-1. THE tasks.proto file SHALL define TaskListService with RPCs: CreateTaskList, GetTaskList, ListTaskLists, UpdateTaskList, DeleteTaskList.
-2. THE SubTask message SHALL contain description and done fields.
-3. THE MainTask message SHALL contain description, done, due_date, recurrence, and repeated sub_tasks fields.
-4. THE CreateTaskListRequest message SHALL contain name, path, and repeated tasks fields.
-5. THE GetTaskListResponse message SHALL contain file_path, name, repeated tasks, and updated_at fields.
-6. THE TaskListEntry message SHALL contain file_path, name, and updated_at fields.
-7. THE ListTaskListsResponse message SHALL contain repeated task_lists and repeated string entries fields.
-8. THE DeleteTaskListResponse message SHALL be an empty message.
+1. THE NotesRepository SHALL call the updated CreateNote method with title, content, and parent_dir parameters
+2. THE NotesRepository SHALL call the updated ListNotes method with parent_dir parameter
+3. THE NotesRepository SHALL call the updated GetNote method with file_path parameter
+4. THE NotesRepository SHALL call the updated UpdateNote method with file_path and content parameters
+5. THE NotesRepository SHALL call the updated DeleteNote method with file_path parameter
+6. THE NotesRepository SHALL use the updated mapper to transform responses
 
-### Requirement 9: Preserve Existing Note and Task Service Client Logic
+### Requirement 7: Update TaskListService Network Source
 
-**User Story:** As a developer, I want the existing NoteService and TaskListService client-side logic (remote data sources, repositories, mappers) preserved, so that editing notes and tasks remains possible in the future.
+**User Story:** As a developer, I want the TaskListService network source updated to match the new proto definition, so that task list operations work with the backend API.
 
 #### Acceptance Criteria
 
-1. THE NoteRemoteDataSource, NoteRemoteDataSourceImpl, NotesRepository, and NotesRepositoryImpl SHALL remain in the codebase.
-2. THE TaskListRemoteDataSource, TaskListRemoteDataSourceImpl, TaskListRepository, and TaskListRepositoryImpl SHALL remain in the codebase.
-3. THE NoteMapper and TaskListMapper SHALL remain in the codebase.
-4. THE Koin bindings for NoteRemoteDataSource, NotesRepository, TaskListRemoteDataSource, and TaskListRepository SHALL remain active.
+1. THE TaskListService_Network_Source SHALL implement CreateTaskList RPC with CreateTaskListRequest and CreateTaskListResponse
+2. THE TaskListService_Network_Source SHALL implement GetTaskList RPC with GetTaskListRequest and GetTaskListResponse
+3. THE TaskListService_Network_Source SHALL implement ListTaskLists RPC with ListTaskListsRequest and ListTaskListsResponse
+4. THE TaskListService_Network_Source SHALL implement UpdateTaskList RPC with UpdateTaskListRequest and UpdateTaskListResponse
+5. THE TaskListService_Network_Source SHALL implement DeleteTaskList RPC with DeleteTaskListRequest and DeleteTaskListResponse
+6. THE TaskListService_Network_Source SHALL use the package name "tasks.v1"
 
-### Requirement 10: Adapt HomeScreen UI for Entry-Only Data
+### Requirement 9: Update TaskListService Mapper
 
-**User Story:** As a developer, I want the HomeScreen UI adapted to work with string entries from FileService instead of full Note objects, so that the directory listing displays correctly with the new data source.
+**User Story:** As a developer, I want the TaskListMapper updated to transform new proto messages, so that the data layer can work with domain models.
 
 #### Acceptance Criteria
 
-1. THE HomeScreen SHALL display folder entries as FolderCard composables using the folder name extracted from the entry path.
-2. THE HomeScreen SHALL display file entries as FileItem composables using the file name extracted from the entry path.
-3. WHEN only string entries are available (no full Note objects), THE FileUiModel SHALL derive its title from the file name in the entry path.
-4. THE FolderUiModel SHALL derive its name from the folder path by extracting the last path segment before the trailing `/`.
-5. WHEN a folder entry is tapped, THE HomeScreen SHALL navigate to the folder path.
-6. WHEN a file entry is tapped, THE HomeScreen SHALL navigate to the file editing screen using the file path.
+1. WHEN a MainTask proto message is received, THE TaskListMapper SHALL transform it to a MainTask domain model with description, done, due_date, recurrence, and sub_tasks fields
+2. WHEN a SubTask proto message is received, THE TaskListMapper SHALL transform it to a SubTask domain model with description and done fields
+3. WHEN a CreateTaskListResponse is received, THE TaskListMapper SHALL transform it to a TaskList domain model
+4. WHEN a GetTaskListResponse is received, THE TaskListMapper SHALL transform it to a TaskList domain model
+5. WHEN a ListTaskListsResponse is received, THE TaskListMapper SHALL transform task_lists and entries fields
+6. WHEN a UpdateTaskListResponse is received, THE TaskListMapper SHALL transform it to a TaskList domain model
+7. WHEN creating proto messages from domain models, THE TaskListMapper SHALL transform MainTask and SubTask domain models to proto messages
+
+### Requirement 10: Update TaskListRepository
+
+**User Story:** As a developer, I want the TaskListRepository updated to use the new network source methods, so that the UI layer can perform task list operations.
+
+#### Acceptance Criteria
+
+1. THE TaskListRepository SHALL call the updated CreateTaskList method with name, path, and tasks parameters
+2. THE TaskListRepository SHALL call the updated GetTaskList method with file_path parameter
+3. THE TaskListRepository SHALL call the updated ListTaskLists method with path parameter
+4. THE TaskListRepository SHALL call the updated UpdateTaskList method with file_path and tasks parameters
+5. THE TaskListRepository SHALL call the updated DeleteTaskList method with file_path parameter
+6. THE TaskListRepository SHALL use the updated mapper to transform responses
+
+### Requirement 11: Update Domain Models
+
+**User Story:** As a developer, I want domain models updated to match the new proto message structures, so that the application can represent all data correctly.
+
+#### Acceptance Criteria
+
+1. WHERE the proto message structure differs from the current domain model, THE domain model SHALL be updated to match
+2. THE Note domain model SHALL include file_path, title, content, and updated_at fields
+3. THE TaskList domain model SHALL include file_path, name, tasks, and updated_at fields
+4. THE MainTask domain model SHALL include description, done, due_date, recurrence, and sub_tasks fields
+5. THE SubTask domain model SHALL include description and done fields
+6. THE Folder domain model SHALL include path and name fields
+
+### Requirement 12: Verify ConnectRPC Client Configuration
+
+**User Story:** As a developer, I want to verify the ConnectRPC client is configured correctly for all services, so that RPC calls can be made successfully.
+
+#### Acceptance Criteria
+
+1. THE ConnectRPC_Client SHALL be configured to call FileService at the correct endpoint
+2. THE ConnectRPC_Client SHALL be configured to call NoteService at the correct endpoint
+3. THE ConnectRPC_Client SHALL be configured to call TaskListService at the correct endpoint
+4. THE ConnectRPC_Client SHALL be configured to call AuthService at the correct endpoint
+5. THE ConnectRPC_Client SHALL use the correct package names for all service calls

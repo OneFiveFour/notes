@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notes.v1;
 
-option go_package = "gen/notes;notes";
+option go_package = "gen/notes/v1;notesv1";
 
 service NoteService {
   rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
@@ -15,7 +15,7 @@ service NoteService {
 message CreateNoteRequest {
   string title = 1;
   string content = 2;
-  string path = 3;
+  string parent_dir = 3;
 }
 
 message CreateNoteResponse {
@@ -23,7 +23,7 @@ message CreateNoteResponse {
 }
 
 message ListNotesRequest {
-  string path = 1;
+  string parent_dir = 1; // optional filter on subfolder, empty = root
 }
 
 message Note {
@@ -35,7 +35,6 @@ message Note {
 
 message ListNotesResponse {
   repeated Note notes = 1;
-  repeated string entries = 2;
 }
 
 message GetNoteRequest {

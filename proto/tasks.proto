@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package tasks.v1;
 
-option go_package = "gen/tasks;tasks";
+option go_package = "tasks/v1;tasksv1";
 
 service TaskListService {
   rpc CreateTaskList (CreateTaskListRequest) returns (CreateTaskListResponse);
@@ -25,17 +25,21 @@ message MainTask {
   repeated SubTask sub_tasks = 5;
 }
 
+message TaskList {
+  string file_path = 1;
+  string title = 2;
+  repeated MainTask tasks = 3;
+  int64 updated_at = 4;
+}
+
 message CreateTaskListRequest {
-  string name = 1;
-  string path = 2;
+  string title = 1;
+  string parent_dir = 2;
   repeated MainTask tasks = 3;
 }
 
 message CreateTaskListResponse {
-  string file_path = 1;
-  string name = 2;
-  repeated MainTask tasks = 3;
-  int64 updated_at = 4;
+  TaskList task_list = 1;
 }
 
 message GetTaskListRequest {
@@ -43,25 +47,15 @@ message GetTaskListRequest {
 }
 
 message GetTaskListResponse {
-  string file_path = 1;
-  string name = 2;
-  repeated MainTask tasks = 3;
-  int64 updated_at = 4;
+  TaskList task_list = 1;
 }
 
 message ListTaskListsRequest {
-  string path = 1;
-}
-
-message TaskListEntry {
-  string file_path = 1;
-  string name = 2;
-  int64 updated_at = 3;
+  string parent_dir = 1;
 }
 
 message ListTaskListsResponse {
-  repeated TaskListEntry task_lists = 1;
-  repeated string entries = 2;
+  repeated TaskList task_lists = 1;
 }
 
 message UpdateTaskListRequest {
@@ -70,10 +64,7 @@ message UpdateTaskListRequest {
 }
 
 message UpdateTaskListResponse {
-  string file_path = 1;
-  string name = 2;
-  repeated MainTask tasks = 3;
-  int64 updated_at = 4;
+  TaskList task_list = 1;
 }
 
 message DeleteTaskListRequest {

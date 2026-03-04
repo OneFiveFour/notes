@@ -2,266 +2,572 @@
 
 ## Overview
 
-The EchoList backend is introducing breaking changes to its protobuf API. This design covers the client-side adaptation required across the Kotlin Compose Multiplatform codebase. The changes are:
+This design covers the update of EchoList's data layer to work with the new backend proto definitions. The backend API has evolved with new proto contracts for FileService, NoteService, and TaskListService. Since this is a pre-release update, no migration or backward compatibility is required.
 
-1. **FolderService → FileService**: The proto package renames from `folder.v1` to `file.v1`, the service from `FolderService` to `FileService`, and `GetFolder`/`ListFolders` RPCs are replaced by `ListFiles` returning `repeated string entries`.
-2. **NoteService & TaskListService proto updates**: Field and message shape changes to match the new backend contract. Client-side logic (data sources, repositories, mappers) is preserved for future editing use.
-3. **HomeViewModel data source switch**: The HomeScreen stops using `NotesRepository.listNotes` for directory listing and instead uses `FileRepository.listFiles`. File entries use `note_` and `tasks_` prefixes to indicate type.
-4. **Koin DI rewiring**: All renamed interfaces and implementations are re-bound in the DI modules.
+The update follows a bottom-to-top approach:
+1. FileService (folder operations)
+2. NoteService (note CRUD operations)
+3. TaskListService (task list CRUD operations)
 
-This is a pre-release change — no migration or backwards compatibility is needed.
+Each service update involves three components:
+- **Network Source**: ConnectRPC client implementation that makes RPC calls
+- **Mapper**: Transforms proto messages to/from domain models
+- **Repository**: Coordinates between network sources and UI layer
+
+The domain models already match the new proto structure, so minimal changes are needed there. The primary work is updating the network layer to use the correct proto package names and ensuring all RPC methods are properly implemented.
 
 ## Architecture
 
-The existing layered architecture remains unchanged. The change flows top-down through these layers:
+### Layer Structure
 
-```mermaid
-graph TD
-    A[Proto Definitions] --> B[Wire Code Generation]
-    B --> C[FileRemoteDataSource]
-    C --> D[FileMapper]
-    D --> E[FileRepository]
-    E --> F[HomeViewModel]
-    F --> G[HomeScreen UI]
-
-    H[NoteRemoteDataSource] -.-> I[NotesRepository]
-    J[TaskListRemoteDataSource] -.-> K[TaskListRepository]
-
-    style H stroke-dasharray: 5 5
-    style I stroke-dasharray: 5 5
-    style J stroke-dasharray: 5 5
-    style K stroke-dasharray: 5 5
+```
+UI Layer (ViewModels)
+        ↓
+Repository Layer (FileRepository, NotesRepository, TaskListRepository)
+        ↓
+Mapper Layer (FileMapper, NoteMapper, TaskListMapper)
+        ↓
+Network Source Layer (FileRemoteDataSource, NoteRemoteDataSource, TaskListRemoteDataSource)
+        ↓
+ConnectRPC Client (ConnectRpcClientImpl)
+        ↓
+Backend API (file.v1, notes.v1, tasks.v1)
 ```
 
-Dashed lines indicate preserved-but-unused-for-listing services. The solid path is the new primary data flow for the HomeScreen.
+### Service Package Names
 
-### Key Architectural Decisions
+The proto definitions use the following package structure:
+- **FileService**: `file.v1` (handles folder operations)
+- **NoteService**: `notes.v1` (handles note CRUD)
+- **TaskListService**: `tasks.v1` (handles task list CRUD)
+- **AuthService**: `auth.v1` (handles authentication)
 
-1. **Rename, don't duplicate**: `FolderRemoteDataSource` → `FileRemoteDataSource`, `FolderRepository` → `FileRepository`, etc. The old names are removed since this is pre-release.
-2. **String entries as the listing primitive**: `ListFiles` returns `repeated string entries` instead of typed `Folder` messages. The ViewModel is responsible for parsing folder vs. file entries and deriving display names.
-3. **Preserve note/task client logic**: `NoteRemoteDataSource`, `NotesRepository`, `TaskListRemoteDataSource`, `TaskListRepository` and their mappers remain in the codebase and Koin graph for future editing screens.
-4. **FileUiModel gains a `fileType` field**: To distinguish notes from task lists based on the `note_` / `tasks_` prefix in entry paths.
+### ConnectRPC Communication Pattern
+
+All RPC calls follow this pattern:
+1. Repository receives domain parameters
+2. Mapper converts domain parameters to proto request messages
+3. Network source calls ConnectRPC client with:
+   - Service path (e.g., `/file.v1.FileService/CreateFolder`)
+   - Request message
+   - Request serializer (Wire ADAPTER.encode)
+   - Response deserializer (Wire ADAPTER.decode)
+4. Mapper converts proto response to domain model
+5. Repository returns Result<T> to caller
 
 ## Components and Interfaces
 
-### Proto Layer (changed files)
+### FileService Components
 
-| File | Change |
-|------|--------|
-| `proto/file.proto` (new, replaces `folder.proto`) | Package `file.v1`, service `FileService` with `CreateFolder`, `ListFiles`, `UpdateFolder`, `DeleteFolder`. `ListFilesResponse` has `repeated string entries`. |
-| `proto/notes.proto` | Updated message shapes per Requirement 7. `ListNotesResponse` gains `repeated string entries`. |
-| `proto/tasks.proto` | Updated message shapes per Requirement 8. `ListTaskListsResponse` gains `repeated string entries`. |
-| `build.gradle.kts` | Wire prune rule changes from `folder.v1.FolderService` to `file.v1.FileService`. |
+#### FileRemoteDataSource Interface
+```kotlin
+internal interface FileRemoteDataSource {
+    suspend fun createFolder(request: CreateFolderRequest): CreateFolderResponse
+    suspend fun listFiles(request: ListFilesRequest): ListFilesResponse
+    suspend fun updateFolder(request: UpdateFolderRequest): UpdateFolderResponse
+    suspend fun deleteFolder(request: DeleteFolderRequest): DeleteFolderResponse
+}
+```
 
-### Network Layer
+#### FileRemoteDataSourceImpl
+- Uses ConnectRPC client to make RPC calls
+- Service path format: `/file.v1.FileService/{MethodName}`
+- Methods: CreateFolder, ListFiles, UpdateFolder, DeleteFolder
+- Uses Wire ADAPTER for serialization/deserialization
 
-| Component | Interface | Change |
-|-----------|-----------|--------|
-| `FileRemoteDataSource` | `createFolder`, `listFiles`, `updateFolder`, `deleteFolder` | Renamed from `FolderRemoteDataSource`. `getFolder` removed. `listFolders` → `listFiles`. |
-| `FileRemoteDataSourceImpl` | — | RPC paths change to `/file.v1.FileService/*`. Uses `file.v1` proto types. |
+#### FileMapper
+Transformations:
+- `file.v1.Folder` ↔ `Folder` domain model
+- `CreateFolderParams` → `CreateFolderRequest`
+- `CreateFolderResponse` → `Folder`
+- `ListFilesResponse` → `List<String>`
+- `UpdateFolderParams` → `UpdateFolderRequest`
+- `UpdateFolderResponse` → `Folder`
+- `DeleteFolderParams` → `DeleteFolderRequest`
 
-### Data / Mapper Layer
+#### FileRepository
+- Orchestrates network calls through FileRemoteDataSource
+- Uses FileMapper for all transformations
+- Returns `Result<T>` for error handling
+- Methods: createFolder, listFiles, updateFolder, deleteFolder
 
-| Component | Change |
-|-----------|--------|
-| `FileMapper` (renamed from `FolderMapper`) | `toDomain(ListFoldersResponse)` removed. New `toDomain(ListFilesResponse): List<String>` extracts entries. All other mappings updated to use `file.v1` types. |
+### NoteService Components
 
-### Repository Layer
+#### NoteRemoteDataSource Interface
+```kotlin
+internal interface NoteRemoteDataSource {
+    suspend fun createNote(request: CreateNoteRequest): CreateNoteResponse
+    suspend fun listNotes(request: ListNotesRequest): ListNotesResponse
+    suspend fun getNote(request: GetNoteRequest): GetNoteResponse
+    suspend fun updateNote(request: UpdateNoteRequest): UpdateNoteResponse
+    suspend fun deleteNote(request: DeleteNoteRequest): DeleteNoteResponse
+}
+```
 
-| Component | Interface | Change |
-|-----------|-----------|--------|
-| `FileRepository` (renamed from `FolderRepository`) | `createFolder`, `listFiles`, `updateFolder`, `deleteFolder` | `getFolder` removed. `listFolders` → `listFiles` returning `Result<List<String>>`. |
-| `FileRepositoryImpl` (renamed from `FolderRepositoryImpl`) | — | Delegates to `FileRemoteDataSource` + `FileMapper`. |
+#### NoteRemoteDataSourceImpl
+- Uses ConnectRPC client to make RPC calls
+- Service path format: `/notes.v1.NoteService/{MethodName}`
+- Methods: CreateNote, ListNotes, GetNote, UpdateNote, DeleteNote
+- Uses Wire ADAPTER for serialization/deserialization
 
-### ViewModel Layer
+#### NoteMapper
+Transformations:
+- `notes.v1.Note` → `Note` domain model (with file_path, title, content, updated_at)
+- `CreateNoteParams` → `CreateNoteRequest`
+- `CreateNoteResponse` → `Note`
+- `ListNotesResponse` → `ListNotesResult` (contains list of notes and entries)
+- `GetNoteResponse` → `Note`
+- `UpdateNoteParams` → `UpdateNoteRequest`
+- `UpdateNoteResponse` → `Note`
 
-| Component | Change |
-|-----------|--------|
-| `HomeViewModel` | Constructor takes `FileRepository` instead of `NotesRepository` + `FolderRepository`. `loadData()` calls `fileRepository.listFiles(path)`. Entry parsing logic extracts folders (trailing `/`) and files (prefix-based type detection). |
+#### NotesRepository
+- Orchestrates network calls through NoteRemoteDataSource
+- Uses NoteMapper for all transformations
+- Returns `Result<T>` for error handling
+- Methods: createNote, listNotes, getNote, updateNote, deleteNote
 
-### UI Models
+### TaskListService Components
 
-| Model | Change |
-|-------|--------|
-| `FileUiModel` | Adds `fileType: FileType` enum field (`NOTE`, `TASK_LIST`). `preview` and `timestamp` become empty strings (no full Note objects available). |
-| `FolderUiModel` | `itemCount` becomes 0 (no sub-item count available from string entries). |
+#### TaskListRemoteDataSource Interface
+```kotlin
+internal interface TaskListRemoteDataSource {
+    suspend fun createTaskList(request: CreateTaskListRequest): CreateTaskListResponse
+    suspend fun getTaskList(request: GetTaskListRequest): GetTaskListResponse
+    suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse
+    suspend fun updateTaskList(request: UpdateTaskListRequest): UpdateTaskListResponse
+    suspend fun deleteTaskList(request: DeleteTaskListRequest): DeleteTaskListResponse
+}
+```
 
-### DI Layer
+#### TaskListRemoteDataSourceImpl
+- Uses ConnectRPC client to make RPC calls
+- Service path format: `/tasks.v1.TaskListService/{MethodName}`
+- Methods: CreateTaskList, GetTaskList, ListTaskLists, UpdateTaskList, DeleteTaskList
+- Uses Wire ADAPTER for serialization/deserialization
 
-| Module | Change |
-|--------|--------|
-| `networkModule` | `FolderRemoteDataSource` binding → `FileRemoteDataSource` / `FileRemoteDataSourceImpl` |
-| `dataModule` | `FolderRepository` binding → `FileRepository` / `FileRepositoryImpl` |
-| `navigationModule` | `HomeViewModel` constructor: `fileRepository = get()` replaces `notesRepository = get()` + `folderRepository = get()` |
+#### TaskListMapper
+Transformations:
+- `tasks.v1.MainTask` ↔ `MainTask` domain model (with description, done, due_date, recurrence, sub_tasks)
+- `tasks.v1.SubTask` ↔ `SubTask` domain model (with description, done)
+- `tasks.v1.TaskList` → `TaskList` domain model (with file_path, name, tasks, updated_at)
+- `CreateTaskListParams` → `CreateTaskListRequest`
+- `CreateTaskListResponse` → `TaskList`
+- `GetTaskListResponse` → `TaskList`
+- `ListTaskListsResponse` → `ListTaskListsResult`
+- `UpdateTaskListParams` → `UpdateTaskListRequest`
+- `UpdateTaskListResponse` → `TaskList`
 
+#### TaskListRepository
+- Orchestrates network calls through TaskListRemoteDataSource
+- Uses TaskListMapper for all transformations
+- Returns `Result<T>` for error handling
+- Methods: createTaskList, getTaskList, listTaskLists, updateTaskList, deleteTaskList
+
+### ConnectRPC Client Configuration
+
+The ConnectRpcClientImpl is already properly configured and requires no changes:
+- Uses Ktor HttpClient for HTTP communication
+- Accepts dynamic NetworkConfig via NetworkConfigProvider
+- Supports retry logic with configurable attempts and delays
+- Handles serialization/deserialization via Wire ADAPTER
+- Returns Result<T> for error handling
+- Service paths are specified per-call (e.g., `/file.v1.FileService/CreateFolder`)
 
 ## Data Models
 
-### Proto Messages (file.v1)
+### Domain Models
 
-```protobuf
-// file.proto — package file.v1
-service FileService {
-  rpc CreateFolder (CreateFolderRequest) returns (CreateFolderResponse);
-  rpc ListFiles (ListFilesRequest) returns (ListFilesResponse);
-  rpc UpdateFolder (UpdateFolderRequest) returns (UpdateFolderResponse);
-  rpc DeleteFolder (DeleteFolderRequest) returns (DeleteFolderResponse);
-}
+The existing domain models already match the new proto structure:
 
-message Folder { string path = 1; string name = 2; }
-message CreateFolderRequest { string parent_path = 1; string name = 2; }
-message CreateFolderResponse { Folder folder = 1; }
-message ListFilesRequest { string parent_path = 1; }
-message ListFilesResponse { repeated string entries = 1; }
-message UpdateFolderRequest { string folder_path = 1; string new_name = 2; }
-message UpdateFolderResponse { Folder folder = 1; }
-message DeleteFolderRequest { string folder_path = 1; }
-message DeleteFolderResponse {}
+**Folder**
+```kotlin
+data class Folder(
+    val path: String,
+    val name: String
+)
 ```
 
-### Domain Models (Kotlin)
-
-Existing domain models remain unchanged:
-
+**Note**
 ```kotlin
-data class Folder(val path: String, val name: String)
-data class CreateFolderParams(val parentPath: String, val name: String)
-data class UpdateFolderParams(val folderPath: String, val newName: String)
-data class DeleteFolderParams(val folderPath: String)
-```
-
-### UI Models (updated)
-
-```kotlin
-enum class FileType { NOTE, TASK_LIST }
-
-data class FileUiModel(
-    val id: String,
+data class Note(
+    val filePath: String,
     val title: String,
-    val fileType: FileType,
-    val preview: String,
-    val timestamp: String
-)
-
-// FolderUiModel unchanged structurally, but itemCount will be 0
-data class FolderUiModel(
-    val id: String,
-    val name: String,
-    val itemCount: Int
+    val content: String,
+    val updatedAt: Long // Unix timestamp in milliseconds
 )
 ```
 
-### Entry Parsing Rules
+**TaskList**
+```kotlin
+data class TaskList(
+    val filePath: String,
+    val name: String,
+    val tasks: List<MainTask>,
+    val updatedAt: Long
+)
+```
 
-The `ListFiles` response returns string entries. The ViewModel applies these rules:
+**MainTask**
+```kotlin
+data class MainTask(
+    val description: String,
+    val done: Boolean,
+    val dueDate: String,
+    val recurrence: String,
+    val subTasks: List<SubTask>
+)
+```
 
-| Entry Pattern | Classification | Display Title Derivation |
-|---------------|---------------|--------------------------|
-| Ends with `/` | Folder | Last path segment before trailing `/` |
-| Starts with `note_` (after last `/`) | Note file | Strip `note_` prefix |
-| Starts with `tasks_` (after last `/`) | Task list file | Strip `tasks_` prefix |
+**SubTask**
+```kotlin
+data class SubTask(
+    val description: String,
+    val done: Boolean
+)
+```
 
-Example entries and their parsed results:
+### Proto Message Mapping
 
-| Entry | Type | Display Title |
-|-------|------|---------------|
-| `/work/` | Folder | `work` |
-| `/note_meeting-notes` | Note | `meeting-notes` |
-| `/tasks_shopping` | Task list | `shopping` |
+The mapper layer handles field name conversions between proto snake_case and Kotlin camelCase:
+
+**Proto → Domain**
+- `file_path` → `filePath`
+- `updated_at` → `updatedAt`
+- `due_date` → `dueDate`
+- `sub_tasks` → `subTasks`
+- `parent_path` → `parentPath`
+- `folder_path` → `folderPath`
+- `new_name` → `newName`
+- `parent_dir` → `parentDir`
+
+**Domain → Proto**
+- `filePath` → `file_path`
+- `updatedAt` → `updated_at`
+- `dueDate` → `due_date`
+- `subTasks` → `sub_tasks`
+- `parentPath` → `parent_path`
+- `folderPath` → `folder_path`
+- `newName` → `new_name`
+- `parentDir` → `parent_dir`
+
+### Parameter Models
+
+The existing parameter models (CreateFolderParams, UpdateFolderParams, etc.) remain unchanged as they already match the required request structure.
 
 
 ## Correctness Properties
 
-*A property is a characteristic or behavior that should hold true across all valid executions of a system — essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
+*A property is a characteristic or behavior that should hold true across all valid executions of a system—essentially, a formal statement about what the system should do. Properties serve as the bridge between human-readable specifications and machine-verifiable correctness guarantees.*
 
-### Property 1: FileMapper domain-to-proto field preservation
+### Property 1: FileMapper transforms CreateFolderResponse correctly
 
-*For any* `CreateFolderParams`, `UpdateFolderParams`, or `DeleteFolderParams`, mapping to the corresponding `file.v1` proto request message and reading back the fields should yield the original values.
+*For any* valid CreateFolderResponse proto message, the FileMapper should transform it to a Folder domain model with matching path and name fields.
 
-**Validates: Requirements 1.5, 1.9, 1.11, 3.5, 3.6, 3.7**
+**Validates: Requirements 2.1**
 
-### Property 2: FileMapper proto-to-domain field preservation
+### Property 2: FileMapper transforms ListFilesResponse correctly
 
-*For any* `file.v1.Folder`, `CreateFolderResponse`, `ListFilesResponse`, or `UpdateFolderResponse`, mapping to the corresponding domain model should preserve all field values. In particular, `ListFilesResponse` entries should map to an identical `List<String>`.
+*For any* valid ListFilesResponse proto message, the FileMapper should transform the entries list to a List<String> with all entries preserved in order.
 
-**Validates: Requirements 1.4, 1.6, 1.8, 1.10, 3.1, 3.2, 3.3, 3.4**
+**Validates: Requirements 2.2**
 
-### Property 3: FileRemoteDataSource RPC path correctness
+### Property 3: FileMapper transforms UpdateFolderResponse correctly
 
-*For any* valid request, each `FileRemoteDataSourceImpl` method (`createFolder`, `listFiles`, `updateFolder`, `deleteFolder`) should invoke `ConnectRpcClient.call` with the path `/file.v1.FileService/{MethodName}`.
+*For any* valid UpdateFolderResponse proto message, the FileMapper should transform it to a Folder domain model with matching path and name fields.
 
-**Validates: Requirements 2.3, 2.4, 2.5, 2.6**
+**Validates: Requirements 2.3**
 
-### Property 4: FileRepositoryImpl success delegation
+### Property 4: FileRepository creates folders correctly
 
-*For any* valid input parameters, when the underlying `FileRemoteDataSource` succeeds, `FileRepositoryImpl` should return `Result.success` containing the correctly mapped domain object (or `List<String>` for `listFiles`).
+*For any* valid CreateFolderParams, the FileRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped Folder.
 
-**Validates: Requirements 4.3, 4.4, 4.5, 4.6**
+**Validates: Requirements 3.1**
 
-### Property 5: FileRepositoryImpl error propagation
+### Property 5: FileRepository lists files correctly
 
-*For any* exception thrown by `FileRemoteDataSource`, `FileRepositoryImpl` should return `Result.failure` wrapping that same exception.
+*For any* valid parent path string, the FileRepository should call the network source with the correct request and return a successful Result containing the mapped list of file entries.
 
-**Validates: Requirements 4.7**
+**Validates: Requirements 3.2**
 
-### Property 6: Entry partitioning into folders and files
+### Property 6: FileRepository updates folders correctly
 
-*For any* list of string entries, partitioning into folder entries (ending with `/`) and file entries (not ending with `/`) should be exhaustive and mutually exclusive — every entry appears in exactly one partition, and the combined count equals the original list size.
+*For any* valid UpdateFolderParams, the FileRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped Folder.
 
-**Validates: Requirements 5.4, 5.5**
+**Validates: Requirements 3.3**
 
-### Property 7: File entry type classification and title derivation
+### Property 7: FileRepository deletes folders correctly
 
-*For any* file entry path whose filename starts with `note_`, the derived `FileUiModel` should have `fileType = NOTE` and a title equal to the filename with the `note_` prefix removed. *For any* file entry path whose filename starts with `tasks_`, the derived `FileUiModel` should have `fileType = TASK_LIST` and a title equal to the filename with the `tasks_` prefix removed.
+*For any* valid DeleteFolderParams, the FileRepository should call the network source with the correctly mapped request and return a successful Result.
 
-**Validates: Requirements 5.6, 5.7, 10.3**
+**Validates: Requirements 3.4**
 
-### Property 8: Folder name extraction from path
+### Property 8: NoteMapper transforms Note proto messages correctly
 
-*For any* folder entry path ending with `/`, the derived `FolderUiModel` name should equal the last path segment before the trailing `/`.
+*For any* valid Note proto message, the NoteMapper should transform it to a Note domain model with file_path mapped to filePath, and all other fields (title, content, updated_at) correctly mapped.
+
+**Validates: Requirements 5.1**
+
+### Property 9: NoteMapper transforms Note response messages correctly
+
+*For any* valid response message containing a Note (CreateNoteResponse, GetNoteResponse, UpdateNoteResponse), the NoteMapper should extract and transform the Note to a domain model with all fields correctly mapped.
+
+**Validates: Requirements 5.2, 5.4, 5.5**
+
+### Property 10: NoteMapper transforms ListNotesResponse correctly
+
+*For any* valid ListNotesResponse proto message with a list of notes, the NoteMapper should transform all notes in the repeated notes field to domain models, preserving order and count.
+
+**Validates: Requirements 5.3**
+
+### Property 11: NotesRepository creates notes correctly
+
+*For any* valid CreateNoteParams with title, content, and parent_dir, the NotesRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped Note.
+
+**Validates: Requirements 6.1**
+
+### Property 12: NotesRepository lists notes correctly
+
+*For any* valid parent directory path, the NotesRepository should call the network source with the correct request and return a successful Result containing the mapped list of notes.
+
+**Validates: Requirements 6.2**
+
+### Property 13: NotesRepository gets notes correctly
+
+*For any* valid file path, the NotesRepository should call the network source with the correct request and return a successful Result containing the mapped Note.
+
+**Validates: Requirements 6.3**
+
+### Property 14: NotesRepository updates notes correctly
+
+*For any* valid UpdateNoteParams with file_path and content, the NotesRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped Note.
+
+**Validates: Requirements 6.4**
+
+### Property 15: NotesRepository deletes notes correctly
+
+*For any* valid file path, the NotesRepository should call the network source with the correct request and return a successful Result.
+
+**Validates: Requirements 6.5**
+
+### Property 16: TaskListMapper transforms MainTask proto messages correctly
+
+*For any* valid MainTask proto message, the TaskListMapper should transform it to a MainTask domain model with all fields (description, done, due_date, recurrence, sub_tasks) correctly mapped.
+
+**Validates: Requirements 9.1**
+
+### Property 17: TaskListMapper transforms SubTask proto messages correctly
+
+*For any* valid SubTask proto message, the TaskListMapper should transform it to a SubTask domain model with description and done fields correctly mapped.
+
+**Validates: Requirements 9.2**
+
+### Property 18: TaskListMapper transforms TaskList response messages correctly
+
+*For any* valid response message containing a TaskList (CreateTaskListResponse, GetTaskListResponse, UpdateTaskListResponse), the TaskListMapper should extract and transform the TaskList to a domain model with all fields correctly mapped.
+
+**Validates: Requirements 9.3, 9.4, 9.6**
+
+### Property 19: TaskListMapper transforms ListTaskListsResponse correctly
+
+*For any* valid ListTaskListsResponse proto message, the TaskListMapper should transform both task_lists and entries fields to domain models, preserving all data.
+
+**Validates: Requirements 9.5**
+
+### Property 20: TaskListMapper round-trip transformation preserves data
+
+*For any* valid MainTask or SubTask domain model, transforming it to proto and back to domain should produce an equivalent model (round-trip property).
+
+**Validates: Requirements 9.7**
+
+### Property 21: TaskListRepository creates task lists correctly
+
+*For any* valid CreateTaskListParams with name, path, and tasks, the TaskListRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped TaskList.
+
+**Validates: Requirements 10.1**
+
+### Property 22: TaskListRepository gets task lists correctly
+
+*For any* valid file path, the TaskListRepository should call the network source with the correct request and return a successful Result containing the mapped TaskList.
+
+**Validates: Requirements 10.2**
+
+### Property 23: TaskListRepository lists task lists correctly
+
+*For any* valid path, the TaskListRepository should call the network source with the correct request and return a successful Result containing the mapped list of task lists.
+
+**Validates: Requirements 10.3**
+
+### Property 24: TaskListRepository updates task lists correctly
+
+*For any* valid UpdateTaskListParams with file_path and tasks, the TaskListRepository should call the network source with the correctly mapped request and return a successful Result containing the mapped TaskList.
 
 **Validates: Requirements 10.4**
 
+### Property 25: TaskListRepository deletes task lists correctly
+
+*For any* valid file path, the TaskListRepository should call the network source with the correct request and return a successful Result.
+
+**Validates: Requirements 10.5**
+
 ## Error Handling
 
-| Layer | Error Source | Handling Strategy |
-|-------|-------------|-------------------|
-| `ConnectRpcClientImpl` | HTTP errors, timeouts, deserialization failures | Returns typed `Result.failure` with `NetworkException` subtypes. Retries on transient failures per `NetworkConfig.maxRetries`. |
-| `FileRemoteDataSourceImpl` | `ConnectRpcClient` returns `Result.failure` | Calls `.getOrThrow()` — propagates the exception upward. |
-| `FileRepositoryImpl` | Any exception from data source or mapper | Wraps in `try/catch`, returns `Result.failure(e)`. |
-| `HomeViewModel` | `Result.failure` from repository | `loadData()` handles failure by setting empty folders/files lists in UI state. No crash. |
-| Inline folder creation | `Result.failure` from `createFolder` | Sets `InlineCreationState.Error` with the error message. |
+### Network Layer Error Handling
 
-No new error types are introduced. The existing `NetworkException` hierarchy (`ClientError`, `ServerError`, `TimeoutError`, `SerializationError`, `NetworkError`) covers all cases.
+The ConnectRPC client already implements comprehensive error handling:
+- **Serialization errors**: Caught and wrapped in NetworkException.SerializationError
+- **Client errors (4xx)**: Wrapped in NetworkException.ClientError with status code and message
+- **Server errors (5xx)**: Wrapped in NetworkException.ServerError with status code and message
+- **Timeout errors**: Caught and wrapped in NetworkException.TimeoutError
+- **Network errors**: Caught and wrapped in NetworkException.NetworkError
+
+### Repository Layer Error Handling
+
+All repository methods follow the same error handling pattern:
+1. Wrap network calls in try-catch blocks
+2. Return `Result.success(T)` for successful operations
+3. Return `Result.failure(Exception)` for any errors
+4. Execute on a background dispatcher (Dispatchers.Default)
+
+This pattern ensures:
+- Exceptions never propagate to the UI layer uncaught
+- Callers can handle errors using Result's functional API
+- All operations are non-blocking
+
+### Mapper Layer Error Handling
+
+Mappers assume valid proto messages and will throw exceptions for:
+- Null required fields (e.g., `proto.folder!!` will throw if null)
+- Invalid data types
+
+These exceptions are caught by the repository layer and returned as Result.failure.
+
+### Error Recovery
+
+The ConnectRPC client supports automatic retry with configurable:
+- Maximum retry attempts (from NetworkConfig.maxRetries)
+- Retry delay in milliseconds (from NetworkConfig.retryDelayMs)
+
+Retries are attempted for transient failures but not for:
+- Client errors (4xx) - these indicate invalid requests
+- Serialization errors - these indicate code bugs
 
 ## Testing Strategy
 
-### Property-Based Tests (Kotest Property)
+### Dual Testing Approach
 
-Each correctness property maps to one or more Kotest property-based tests using `io.kotest.property`. All property tests run a minimum of 100 iterations.
+This feature requires both unit tests and property-based tests:
 
-| Test Class | Properties Covered | Description |
-|------------|-------------------|-------------|
-| `FileMapperPropertyTest` | Property 1, Property 2 | Generates random domain params and proto messages, verifies field preservation in both mapping directions. |
-| `FileRemoteDataSourcePropertyTest` | Property 3 | Uses a capturing fake `ConnectRpcClient` to verify RPC paths for all four methods. |
-| `FileRepositoryImplPropertyTest` | Property 4, Property 5 | Uses a fake data source; generates random inputs to verify success delegation and error propagation. |
-| `EntryParsingPropertyTest` | Property 6, Property 7, Property 8 | Generates random entry lists with mixed folder/file entries, verifies partitioning, type classification, title derivation, and folder name extraction. |
+**Unit Tests** focus on:
+- Specific examples of proto message transformations
+- Edge cases (empty lists, null optional fields)
+- Error conditions (network failures, invalid responses)
+- Integration points between components
 
-Each test is tagged with a comment: `Feature: proto-api-update, Property {N}: {title}`.
+**Property-Based Tests** focus on:
+- Universal properties that hold for all inputs
+- Comprehensive input coverage through randomization
+- Mapper transformations across all valid proto messages
+- Repository integration across all valid parameters
 
-### Unit Tests (Kotest FunSpec)
+### Property-Based Testing Configuration
 
-Unit tests cover specific examples, edge cases, and integration points:
+**Framework**: Kotest property-based testing (kotest-property)
 
-| Test Class | Coverage |
-|------------|----------|
-| `HomeViewModelTest` | Verifies `loadData()` calls `fileRepository.listFiles`, folder creation triggers reload (Requirements 5.3, 5.8). |
-| `KoinModuleTest` | Verifies DI resolution: `FileRemoteDataSource`, `FileRepository`, `HomeViewModel` injection, and preserved `NotesRepository`/`TaskListRepository` bindings (Requirements 6.1–6.6, 9.4). |
+**Configuration**:
+- Minimum 100 iterations per property test
+- Each test must reference its design document property
+- Tag format: `Feature: proto-api-update, Property {number}: {property_text}`
 
-### Testing Library
+**Test Organization**:
+```
+composeApp/src/commonTest/kotlin/net/onefivefour/echolist/
+├── data/
+│   ├── mapper/
+│   │   ├── FileMapperTest.kt (unit tests)
+│   │   ├── FileMapperPropertyTest.kt (properties 1-3)
+│   │   ├── NoteMapperTest.kt (unit tests)
+│   │   ├── NoteMapperPropertyTest.kt (properties 8-10)
+│   │   ├── TaskListMapperTest.kt (unit tests)
+│   │   └── TaskListMapperPropertyTest.kt (properties 16-20)
+│   └── repository/
+│       ├── FileRepositoryTest.kt (unit tests)
+│       ├── FileRepositoryPropertyTest.kt (properties 4-7)
+│       ├── NotesRepositoryTest.kt (unit tests)
+│       ├── NotesRepositoryPropertyTest.kt (properties 11-15)
+│       ├── TaskListRepositoryTest.kt (unit tests)
+│       └── TaskListRepositoryPropertyTest.kt (properties 21-25)
+```
 
-- **Framework**: Kotest (`io.kotest.core.spec.style.FunSpec`)
-- **Assertions**: Kotest assertions (`io.kotest.matchers`)
-- **Property testing**: Kotest property (`io.kotest.property`) with `Arb` generators and `checkAll`
-- **Mocking/Fakes**: Hand-written fakes (consistent with existing test patterns in the codebase)
-- **Configuration**: `PropTestConfig(iterations = 100)` for all property tests
+### Property Test Generators
+
+Property tests require custom generators for proto messages:
+
+**FileMapper Generators**:
+- `Arb.createFolderResponse()`: Generates random CreateFolderResponse with valid Folder
+- `Arb.listFilesResponse()`: Generates random ListFilesResponse with 0-100 entries
+- `Arb.updateFolderResponse()`: Generates random UpdateFolderResponse with valid Folder
+- `Arb.folder()`: Generates random Folder proto with valid path and name
+
+**NoteMapper Generators**:
+- `Arb.note()`: Generates random Note proto with all required fields
+- `Arb.createNoteResponse()`: Generates random CreateNoteResponse with valid Note
+- `Arb.getNoteResponse()`: Generates random GetNoteResponse with valid Note
+- `Arb.updateNoteResponse()`: Generates random UpdateNoteResponse with valid Note
+- `Arb.listNotesResponse()`: Generates random ListNotesResponse with 0-100 notes
+
+**TaskListMapper Generators**:
+- `Arb.mainTask()`: Generates random MainTask proto with 0-10 subtasks
+- `Arb.subTask()`: Generates random SubTask proto
+- `Arb.taskList()`: Generates random TaskList proto with 0-20 main tasks
+- `Arb.createTaskListResponse()`: Generates random CreateTaskListResponse
+- `Arb.getTaskListResponse()`: Generates random GetTaskListResponse
+- `Arb.updateTaskListResponse()`: Generates random UpdateTaskListResponse
+- `Arb.listTaskListsResponse()`: Generates random ListTaskListsResponse
+
+**Repository Generators**:
+- `Arb.createFolderParams()`: Generates random CreateFolderParams
+- `Arb.updateFolderParams()`: Generates random UpdateFolderParams
+- `Arb.deleteFolderParams()`: Generates random DeleteFolderParams
+- `Arb.createNoteParams()`: Generates random CreateNoteParams
+- `Arb.updateNoteParams()`: Generates random UpdateNoteParams
+- `Arb.createTaskListParams()`: Generates random CreateTaskListParams
+- `Arb.updateTaskListParams()`: Generates random UpdateTaskListParams
+
+### Unit Test Coverage
+
+Unit tests should cover:
+
+**Mapper Tests**:
+- Specific examples of each transformation
+- Empty lists and collections
+- Null optional fields (if any)
+- Field name conversions (snake_case ↔ camelCase)
+
+**Repository Tests**:
+- Successful operations with mock network sources
+- Network failures and error handling
+- Result wrapping (success and failure cases)
+- Dispatcher usage verification
+
+**Integration Tests**:
+- End-to-end flows with real ConnectRPC client (against test server)
+- Service path verification (correct package names)
+- Request/response serialization
+- Authentication header propagation
+
+### Test Doubles
+
+**Mock Network Sources**:
+- FileRemoteDataSourceFake: Returns predefined responses for testing
+- NoteRemoteDataSourceFake: Returns predefined responses for testing
+- TaskListRemoteDataSourceFake: Returns predefined responses for testing
+
+These fakes are used in repository tests to isolate the repository logic from network concerns.
+
+### Continuous Integration
+
+All tests (unit and property-based) must pass before merging:
+- Run on every commit
+- Run on all target platforms (Android, iOS, JVM, JS, WasmJS)
+- Property tests run with 100 iterations minimum
+- Code coverage target: 80% for mapper and repository layers
