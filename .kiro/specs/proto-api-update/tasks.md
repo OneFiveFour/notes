@@ -47,8 +47,8 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Verify path and name fields match after transformation
     - Run with minimum 100 iterations
 
-- [ ] 2. Update FileRepository and integration
-  - [ ] 2.1 Update FileRepository to use new network source methods
+- [x] 2. Update FileRepository and integration
+  - [x] 2.1 Update FileRepository to use new network source methods
     - Update createFolder to call updated network source with correct parameters
     - Update listFiles to call updated network source with correct parameters
     - Update updateFolder to call updated network source with correct parameters
@@ -56,34 +56,34 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Use updated FileMapper for all transformations
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
   
-  - [ ] 2.2 Write unit tests for FileRepository
+  - [x] 2.2 Write unit tests for FileRepository
     - Test successful operations with mock network source
     - Test network failures and error handling
     - Test Result wrapping (success and failure cases)
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
   
-  - [ ] 2.3 Write property test for FileRepository createFolder
+  - [x] 2.3 Write property test for FileRepository createFolder
     - **Property 4: FileRepository creates folders correctly**
     - **Validates: Requirements 3.1**
     - Create Arb.createFolderParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 2.4 Write property test for FileRepository listFiles
+  - [x] 2.4 Write property test for FileRepository listFiles
     - **Property 5: FileRepository lists files correctly**
     - **Validates: Requirements 3.2**
     - Generate random parent path strings
     - Verify correct request and successful Result with mapped entries
     - Run with minimum 100 iterations
   
-  - [ ] 2.5 Write property test for FileRepository updateFolder
+  - [x] 2.5 Write property test for FileRepository updateFolder
     - **Property 6: FileRepository updates folders correctly**
     - **Validates: Requirements 3.3**
     - Create Arb.updateFolderParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 2.6 Write property test for FileRepository deleteFolder
+  - [x] 2.6 Write property test for FileRepository deleteFolder
     - **Property 7: FileRepository deletes folders correctly**
     - **Validates: Requirements 3.4**
     - Create Arb.deleteFolderParams() generator

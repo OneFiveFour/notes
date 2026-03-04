@@ -2,6 +2,7 @@ package net.onefivefour.echolist.data.repository
 
 import `file`.v1.CreateFolderResponse
 import `file`.v1.DeleteFolderResponse
+import `file`.v1.ListFilesResponse
 import `file`.v1.UpdateFolderResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -88,6 +89,51 @@ class FileRepositoryImplTest : FunSpec({
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ServerError>()
+    }
+
+    // -- ListFiles --
+
+    test("listFiles returns mapped entries on success") {
+        val fake = FakeFileRemoteDataSource()
+        fake.listFilesResult = Result.success(ListFilesResponse(entries = listOf("file1.txt", "file2.md", "folder1")))
+        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+
+        val result = repo.listFiles("/home/user")
+
+        result.isSuccess shouldBe true
+        result.getOrThrow() shouldBe listOf("file1.txt", "file2.md", "folder1")
+    }
+
+    test("listFiles forwards correct parent_dir to data source") {
+        val fake = FakeFileRemoteDataSource()
+        fake.listFilesResult = Result.success(ListFilesResponse(entries = emptyList()))
+        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+
+        repo.listFiles("/some/path")
+
+        fake.lastListRequest?.parent_dir shouldBe "/some/path"
+    }
+
+    test("listFiles returns empty list when response has no entries") {
+        val fake = FakeFileRemoteDataSource()
+        fake.listFilesResult = Result.success(ListFilesResponse(entries = emptyList()))
+        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+
+        val result = repo.listFiles("")
+
+        result.isSuccess shouldBe true
+        result.getOrThrow() shouldBe emptyList()
+    }
+
+    test("listFiles returns failure when network throws") {
+        val fake = FakeFileRemoteDataSource()
+        fake.listFilesResult = Result.failure(NetworkException.TimeoutError("timed out"))
+        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+
+        val result = repo.listFiles("/any")
+
+        result.isFailure shouldBe true
+        result.exceptionOrNull().shouldBeInstanceOf<NetworkException.TimeoutError>()
     }
 
     // -- UpdateFolder --
