@@ -39,11 +39,11 @@ class NotesRepositoryFake : NotesRepository {
     }
 
     override suspend fun createNote(params: CreateNoteParams): Result<Note> {
-        callLog.add("createNote(${params.title}, ${params.content}, ${params.path})")
+        callLog.add("createNote(${params.title}, ${params.content}, ${params.parentDir})")
         shouldFail?.let { return Result.failure(it) }
 
         val note = Note(
-            filePath = "${params.path}/${params.title}",
+            filePath = "${params.parentDir}/${params.title}",
             title = params.title,
             content = params.content,
             updatedAt = 0L
@@ -52,14 +52,14 @@ class NotesRepositoryFake : NotesRepository {
         return Result.success(note)
     }
 
-    override suspend fun listNotes(path: String): Result<ListNotesResult> {
-        callLog.add("listNotes($path)")
+    override suspend fun listNotes(parentDir: String): Result<ListNotesResult> {
+        callLog.add("listNotes($parentDir)")
         shouldFail?.let { return Result.failure(it) }
 
-        val filteredNotes = if (path.isEmpty()) {
+        val filteredNotes = if (parentDir.isEmpty()) {
             notes.values.toList()
         } else {
-            notes.values.filter { it.filePath.startsWith(path) }
+            notes.values.filter { it.filePath.startsWith(parentDir) }
         }
         return Result.success(ListNotesResult(notes = filteredNotes, entries = entries.toList()))
     }

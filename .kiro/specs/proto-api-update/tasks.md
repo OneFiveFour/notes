@@ -90,17 +90,17 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Verify correct request and successful Result
     - Run with minimum 100 iterations
 
-- [ ] 3. Checkpoint - Verify FileService updates
+- [x] 3. Checkpoint - Verify FileService updates
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Update NoteService network source and mapper
-  - [ ] 4.1 Update NoteRemoteDataSourceImpl to use new proto package
+- [x] 4. Update NoteService network source and mapper
+  - [x] 4.1 Update NoteRemoteDataSourceImpl to use new proto package
     - Update service path to `/notes.v1.NoteService/{MethodName}` for all RPC calls
     - Implement CreateNote, ListNotes, GetNote, UpdateNote, DeleteNote methods
     - Use Wire ADAPTER for serialization/deserialization
     - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
   
-  - [ ] 4.2 Update NoteMapper for new proto messages
+  - [x] 4.2 Update NoteMapper for new proto messages
     - Implement transformation from Note proto to Note domain model (file_path, title, content, updated_at)
     - Implement transformation from CreateNoteResponse to Note domain model
     - Implement transformation from ListNotesResponse to list of Note domain models
@@ -108,27 +108,27 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Implement transformation from UpdateNoteResponse to Note domain model
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
   
-  - [ ] 4.3 Write unit tests for NoteMapper
+  - [x] 4.3 Write unit tests for NoteMapper
     - Test specific examples of each transformation
     - Test empty lists and edge cases
     - Test field name conversions (file_path → filePath, updated_at → updatedAt)
     - _Requirements: 5.1, 5.2, 5.3, 5.4, 5.5_
   
-  - [ ] 4.4 Write property test for NoteMapper Note proto transformation
+  - [x] 4.4 Write property test for NoteMapper Note proto transformation
     - **Property 8: NoteMapper transforms Note proto messages correctly**
     - **Validates: Requirements 5.1**
     - Create Arb.note() generator
     - Verify file_path → filePath and all other fields correctly mapped
     - Run with minimum 100 iterations
   
-  - [ ] 4.5 Write property test for NoteMapper response transformations
+  - [x] 4.5 Write property test for NoteMapper response transformations
     - **Property 9: NoteMapper transforms Note response messages correctly**
     - **Validates: Requirements 5.2, 5.4, 5.5**
     - Create Arb.createNoteResponse(), Arb.getNoteResponse(), Arb.updateNoteResponse() generators
     - Verify Note extraction and field mapping for all response types
     - Run with minimum 100 iterations
   
-  - [ ] 4.6 Write property test for NoteMapper ListNotesResponse transformation
+  - [x] 4.6 Write property test for NoteMapper ListNotesResponse transformation
     - **Property 10: NoteMapper transforms ListNotesResponse correctly**
     - **Validates: Requirements 5.3**
     - Create Arb.listNotesResponse() generator (0-100 notes)

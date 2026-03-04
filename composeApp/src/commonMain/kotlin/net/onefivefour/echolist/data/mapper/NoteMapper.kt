@@ -42,7 +42,7 @@ internal object NoteMapper {
     fun toProto(params: CreateNoteParams): CreateNoteRequest = CreateNoteRequest(
         title = params.title,
         content = params.content,
-        path = params.path
+        parent_dir = params.parentDir
     )
 
     fun toProto(params: UpdateNoteParams): UpdateNoteRequest = UpdateNoteRequest(

@@ -35,6 +35,7 @@ message Note {
 
 message ListNotesResponse {
   repeated Note notes = 1;
+  repeated string entries = 2;
 }
 
 message GetNoteRequest {

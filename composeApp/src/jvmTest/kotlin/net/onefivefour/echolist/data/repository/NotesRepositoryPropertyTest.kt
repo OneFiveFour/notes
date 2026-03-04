@@ -49,7 +49,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         CreateNoteParams(
             title = Arb.string(1..50).bind(),
             content = Arb.string(0..200).bind(),
-            path = Arb.string(1..50).bind()
+            parentDir = Arb.string(1..50).bind()
         )
     }
 
@@ -88,7 +88,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         var createNoteHandler: suspend (CreateNoteRequest) -> CreateNoteResponse = { req ->
             CreateNoteResponse(
                 note = notes.v1.Note(
-                    file_path = "${req.path}/${req.title}.md",
+                    file_path = "${req.parent_dir}/${req.title}.md",
                     title = req.title,
                     content = req.content,
                     updated_at = System.currentTimeMillis()
@@ -148,7 +148,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNoteRemoteDataSource()
 
-            val createdFilePath = "${params.path}/${params.title}.md"
+            val createdFilePath = "${params.parentDir}/${params.title}.md"
             val createdTimestamp = System.currentTimeMillis()
 
             mockNetwork.createNoteHandler = { req ->
@@ -352,7 +352,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             // Queue multiple create operations
             val paramsList = (1..opCount).map { i ->
-                CreateNoteParams(title = "note-$i", content = "content-$i", path = "/path")
+                CreateNoteParams(title = "note-$i", content = "content-$i", parentDir = "/path")
             }
             paramsList.forEach { params ->
                 repo.createNote(params) // will fail and queue
@@ -368,7 +368,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 syncedOrder.add(req.title)
                 CreateNoteResponse(
                     note = notes.v1.Note(
-                        file_path = "${req.path}/${req.title}.md",
+                        file_path = "${req.parent_dir}/${req.title}.md",
                         title = req.title,
                         content = req.content,
                         updated_at = System.currentTimeMillis()

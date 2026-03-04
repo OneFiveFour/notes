@@ -51,18 +51,18 @@ internal class NotesRepositoryImpl(
         }
     }
 
-    override suspend fun listNotes(path: String): Result<ListNotesResult> = withContext(dispatcher) {
-        val cachedNotes = cacheDataSource.listNotes(path)
-        val cachedEntries = cacheDataSource.listEntries(path)
+    override suspend fun listNotes(parentDir: String): Result<ListNotesResult> = withContext(dispatcher) {
+        val cachedNotes = cacheDataSource.listNotes(parentDir)
+        val cachedEntries = cacheDataSource.listEntries(parentDir)
         if (cachedNotes.isNotEmpty() || cachedEntries.isNotEmpty()) {
             // Return cached data immediately, refresh in background
             backgroundScope.launch {
                 try {
-                    val request = ListNotesRequest(path = path)
+                    val request = ListNotesRequest(parent_dir = parentDir)
                     val response = noteRemoteDataSource.listNotes(request)
                     val result = NoteMapper.toDomain(response)
                     cacheDataSource.saveNotes(result.notes)
-                    cacheDataSource.saveEntries(path, result.entries)
+                    cacheDataSource.saveEntries(parentDir, result.entries)
                 } catch (_: Exception) {
                     // Background refresh failure is non-fatal
                 }
@@ -71,11 +71,11 @@ internal class NotesRepositoryImpl(
         } else {
             // No cache — go to network directly
             try {
-                val request = ListNotesRequest(path = path)
+                val request = ListNotesRequest(parent_dir = parentDir)
                 val response = noteRemoteDataSource.listNotes(request)
                 val result = NoteMapper.toDomain(response)
                 cacheDataSource.saveNotes(result.notes)
-                cacheDataSource.saveEntries(path, result.entries)
+                cacheDataSource.saveEntries(parentDir, result.entries)
                 Result.success(result)
             } catch (e: NetworkException) {
                 Result.failure(e)
