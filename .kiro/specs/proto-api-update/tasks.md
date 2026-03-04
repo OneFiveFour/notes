@@ -135,8 +135,8 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Verify all notes transformed, preserving order and count
     - Run with minimum 100 iterations
 
-- [ ] 5. Update NotesRepository and integration
-  - [ ] 5.1 Update NotesRepository to use new network source methods
+- [x] 5. Update NotesRepository and integration
+  - [x] 5.1 Update NotesRepository to use new network source methods
     - Update createNote to call network source with title, content, parent_dir parameters
     - Update listNotes to call network source with parent_dir parameter
     - Update getNote to call network source with file_path parameter
@@ -145,41 +145,41 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Use updated NoteMapper for all transformations
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5, 6.6_
   
-  - [ ] 5.2 Write unit tests for NotesRepository
+  - [x] 5.2 Write unit tests for NotesRepository
     - Test successful operations with mock network source
     - Test network failures and error handling
     - Test Result wrapping (success and failure cases)
     - _Requirements: 6.1, 6.2, 6.3, 6.4, 6.5_
   
-  - [ ] 5.3 Write property test for NotesRepository createNote
+  - [x] 5.3 Write property test for NotesRepository createNote
     - **Property 11: NotesRepository creates notes correctly**
     - **Validates: Requirements 6.1**
     - Create Arb.createNoteParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 5.4 Write property test for NotesRepository listNotes
+  - [x] 5.4 Write property test for NotesRepository listNotes
     - **Property 12: NotesRepository lists notes correctly**
     - **Validates: Requirements 6.2**
     - Generate random parent directory paths
     - Verify correct request and successful Result with mapped notes
     - Run with minimum 100 iterations
   
-  - [ ] 5.5 Write property test for NotesRepository getNote
+  - [x] 5.5 Write property test for NotesRepository getNote
     - **Property 13: NotesRepository gets notes correctly**
     - **Validates: Requirements 6.3**
     - Generate random file paths
     - Verify correct request and successful Result with mapped Note
     - Run with minimum 100 iterations
   
-  - [ ] 5.6 Write property test for NotesRepository updateNote
+  - [x] 5.6 Write property test for NotesRepository updateNote
     - **Property 14: NotesRepository updates notes correctly**
     - **Validates: Requirements 6.4**
     - Create Arb.updateNoteParams() generator
     - Verify correct request mapping and successful Result
     - Run with minimum 100 iterations
   
-  - [ ] 5.7 Write property test for NotesRepository deleteNote
+  - [x] 5.7 Write property test for NotesRepository deleteNote
     - **Property 15: NotesRepository deletes notes correctly**
     - **Validates: Requirements 6.5**
     - Generate random file paths
