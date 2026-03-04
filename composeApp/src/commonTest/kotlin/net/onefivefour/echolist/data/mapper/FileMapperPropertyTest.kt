@@ -26,7 +26,7 @@ class FileMapperPropertyTest : FunSpec({
 
     val arbCreateFolderParams = arbitrary {
         CreateFolderParams(
-            parentPath = Arb.string(0..100).bind(),
+            parentDir = Arb.string(0..100).bind(),
             name = Arb.string(1..100).bind()
         )
     }
@@ -56,7 +56,7 @@ class FileMapperPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 1: CreateFolderParams -> CreateFolderRequest preserves all fields") {
         checkAll(PropTestConfig(iterations = 100), arbCreateFolderParams) { params ->
             val proto = FileMapper.toProto(params)
-            proto.parent_path shouldBe params.parentPath
+            proto.parent_dir shouldBe params.parentDir
             proto.name shouldBe params.name
         }
     }

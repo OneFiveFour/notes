@@ -57,7 +57,7 @@ class FileRemoteDataSourcePropertyTest : FunSpec({
             val dataSource = FileRemoteDataSourceImpl(client)
 
             runCatching {
-                dataSource.createFolder(CreateFolderRequest(parent_path = parentPath, name = name))
+                dataSource.createFolder(CreateFolderRequest(parent_dir = parentPath, name = name))
             }
 
             client.capturedPath shouldBe "/file.v1.FileService/CreateFolder"
@@ -73,7 +73,7 @@ class FileRemoteDataSourcePropertyTest : FunSpec({
             val dataSource = FileRemoteDataSourceImpl(client)
 
             runCatching {
-                dataSource.listFiles(ListFilesRequest(parent_path = parentPath))
+                dataSource.listFiles(ListFilesRequest(parent_dir = parentPath))
             }
 
             client.capturedPath shouldBe "/file.v1.FileService/ListFiles"

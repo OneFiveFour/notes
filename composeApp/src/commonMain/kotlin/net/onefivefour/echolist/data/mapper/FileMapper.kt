@@ -35,7 +35,7 @@ internal object FileMapper {
     // Domain -> Proto
 
     fun toProto(params: CreateFolderParams): CreateFolderRequest = CreateFolderRequest(
-        parent_path = params.parentPath,
+        parent_dir = params.parentDir,
         name = params.name
     )
 

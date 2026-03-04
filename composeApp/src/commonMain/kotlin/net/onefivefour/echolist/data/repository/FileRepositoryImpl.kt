@@ -30,7 +30,7 @@ internal class FileRepositoryImpl(
     override suspend fun listFiles(parentPath: String): Result<List<String>> =
         withContext(dispatcher) {
             try {
-                val request = ListFilesRequest(parent_path = parentPath)
+                val request = ListFilesRequest(parent_dir = parentPath)
                 val response = networkDataSource.listFiles(request)
                 Result.success(FileMapper.toDomain(response))
             } catch (e: Exception) {

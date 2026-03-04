@@ -152,7 +152,7 @@ class HomeViewModelPropertyTest : FunSpec({
 
                 val params = fileRepo.lastCreateParams
                 params shouldBe net.onefivefour.echolist.data.models.CreateFolderParams(
-                    parentPath = path,
+                    parentDir = path,
                     name = name.trim()
                 )
             }

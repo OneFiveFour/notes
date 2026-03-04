@@ -40,7 +40,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
 
     val arbCreateFolderParams = arbitrary {
         CreateFolderParams(
-            parentPath = Arb.string(0..100).bind(),
+            parentDir = Arb.string(0..100).bind(),
             name = Arb.string(1..100).bind()
         )
     }

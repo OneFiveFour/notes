@@ -30,7 +30,7 @@ class FileRepositoryImplTest : FunSpec({
 
     val arbCreateFolderParams = arbitrary {
         CreateFolderParams(
-            parentPath = Arb.string(0..100).bind(),
+            parentDir = Arb.string(0..100).bind(),
             name = Arb.string(1..100).bind()
         )
     }
@@ -74,7 +74,7 @@ class FileRepositoryImplTest : FunSpec({
 
             repo.createFolder(params)
 
-            fake.lastCreateRequest?.parent_path shouldBe params.parentPath
+            fake.lastCreateRequest?.parent_dir shouldBe params.parentDir
             fake.lastCreateRequest?.name shouldBe params.name
         }
     }

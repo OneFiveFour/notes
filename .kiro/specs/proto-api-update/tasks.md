@@ -6,41 +6,41 @@ This plan implements updates to EchoList's data layer to work with the new backe
 
 ## Tasks
 
-- [ ] 1. Update FileService network source and mapper
-  - [ ] 1.1 Update FileRemoteDataSourceImpl to use new proto package
+- [x] 1. Update FileService network source and mapper
+  - [x] 1.1 Update FileRemoteDataSourceImpl to use new proto package
     - Update service path to `/file.v1.FileService/{MethodName}` for all RPC calls
     - Implement CreateFolder, ListFiles, UpdateFolder, DeleteFolder methods
     - Use Wire ADAPTER for serialization/deserialization
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5_
   
-  - [ ] 1.2 Update FileMapper for new proto messages
+  - [x] 1.2 Update FileMapper for new proto messages
     - Implement transformation from CreateFolderResponse to Folder domain model
     - Implement transformation from ListFilesResponse to List<String>
     - Implement transformation from UpdateFolderResponse to Folder domain model
     - Handle Folder message structure with path and name fields
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
   
-  - [ ] 1.3 Write unit tests for FileMapper
+  - [x] 1.3 Write unit tests for FileMapper
     - Test specific examples of each transformation
     - Test empty lists and edge cases
     - Test field name conversions (snake_case ↔ camelCase)
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
   
-  - [ ] 1.4 Write property test for FileMapper CreateFolderResponse transformation
+  - [x] 1.4 Write property test for FileMapper CreateFolderResponse transformation
     - **Property 1: FileMapper transforms CreateFolderResponse correctly**
     - **Validates: Requirements 2.1**
     - Create Arb.createFolderResponse() and Arb.folder() generators
     - Verify path and name fields match after transformation
     - Run with minimum 100 iterations
   
-  - [ ] 1.5 Write property test for FileMapper ListFilesResponse transformation
+  - [x] 1.5 Write property test for FileMapper ListFilesResponse transformation
     - **Property 2: FileMapper transforms ListFilesResponse correctly**
     - **Validates: Requirements 2.2**
     - Create Arb.listFilesResponse() generator (0-100 entries)
     - Verify all entries preserved in order
     - Run with minimum 100 iterations
   
-  - [ ] 1.6 Write property test for FileMapper UpdateFolderResponse transformation
+  - [x] 1.6 Write property test for FileMapper UpdateFolderResponse transformation
     - **Property 3: FileMapper transforms UpdateFolderResponse correctly**
     - **Validates: Requirements 2.3**
     - Create Arb.updateFolderResponse() generator

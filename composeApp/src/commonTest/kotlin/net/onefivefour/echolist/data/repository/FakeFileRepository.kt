@@ -24,7 +24,7 @@ open class FakeFileRepository : FileRepository {
         private set
 
     override suspend fun createFolder(params: CreateFolderParams): Result<Folder> {
-        callLog.add("createFolder(${params.parentPath}, ${params.name})")
+        callLog.add("createFolder(${params.parentDir}, ${params.name})")
         lastCreateParams = params
         return createFolderResult
     }
