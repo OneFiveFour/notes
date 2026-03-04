@@ -40,10 +40,10 @@ internal class TaskListRepositoryImpl(
             }
         }
 
-    override suspend fun listTaskLists(path: String): Result<ListTaskListsResult> =
+    override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
         withContext(dispatcher) {
             try {
-                val request = ListTaskListsRequest(path = path)
+                val request = ListTaskListsRequest(parent_dir = parentDir)
                 val response = networkDataSource.listTaskLists(request)
                 Result.success(TaskListMapper.toDomain(response))
             } catch (e: Exception) {

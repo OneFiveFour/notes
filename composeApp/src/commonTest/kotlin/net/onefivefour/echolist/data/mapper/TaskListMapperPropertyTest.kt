@@ -45,10 +45,11 @@ class TaskListMapperPropertyTest : FunSpec({
         )
     }
 
-    val arbProtoTaskListEntry = arbitrary {
-        tasks.v1.TaskListEntry(
+    val arbProtoTaskList = arbitrary {
+        tasks.v1.TaskList(
             file_path = Arb.string(1..100).bind(),
-            name = Arb.string(1..100).bind(),
+            title = Arb.string(1..100).bind(),
+            tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
             updated_at = Arb.long(0L..Long.MAX_VALUE).bind()
         )
     }
@@ -120,75 +121,49 @@ class TaskListMapperPropertyTest : FunSpec({
     }
 
     test("Feature: proto-api-update, Property 4: CreateTaskListResponse -> domain TaskList preserves all fields") {
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.string(1..100),
-            Arb.string(1..100),
-            Arb.list(arbProtoMainTask, 0..5),
-            Arb.long(0L..Long.MAX_VALUE)
-        ) { filePath, name, protoTasks, updatedAt ->
-            val response = tasks.v1.CreateTaskListResponse(
-                file_path = filePath, name = name, tasks = protoTasks, updated_at = updatedAt
-            )
+        checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
+            val response = tasks.v1.CreateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
-            domain.filePath shouldBe filePath
-            domain.name shouldBe name
-            domain.updatedAt shouldBe updatedAt
-            assertMainTasksMatch(domain.tasks, protoTasks)
+            domain.filePath shouldBe protoTaskList.file_path
+            domain.name shouldBe protoTaskList.title
+            domain.updatedAt shouldBe protoTaskList.updated_at
+            assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
         }
     }
 
     test("Feature: proto-api-update, Property 4: GetTaskListResponse -> domain TaskList preserves all fields") {
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.string(1..100),
-            Arb.string(1..100),
-            Arb.list(arbProtoMainTask, 0..5),
-            Arb.long(0L..Long.MAX_VALUE)
-        ) { filePath, name, protoTasks, updatedAt ->
-            val response = tasks.v1.GetTaskListResponse(
-                file_path = filePath, name = name, tasks = protoTasks, updated_at = updatedAt
-            )
+        checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
+            val response = tasks.v1.GetTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
-            domain.filePath shouldBe filePath
-            domain.name shouldBe name
-            domain.updatedAt shouldBe updatedAt
-            assertMainTasksMatch(domain.tasks, protoTasks)
+            domain.filePath shouldBe protoTaskList.file_path
+            domain.name shouldBe protoTaskList.title
+            domain.updatedAt shouldBe protoTaskList.updated_at
+            assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
         }
     }
 
     test("Feature: proto-api-update, Property 4: UpdateTaskListResponse -> domain TaskList preserves all fields") {
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.string(1..100),
-            Arb.string(1..100),
-            Arb.list(arbProtoMainTask, 0..5),
-            Arb.long(0L..Long.MAX_VALUE)
-        ) { filePath, name, protoTasks, updatedAt ->
-            val response = tasks.v1.UpdateTaskListResponse(
-                file_path = filePath, name = name, tasks = protoTasks, updated_at = updatedAt
-            )
+        checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
+            val response = tasks.v1.UpdateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
-            domain.filePath shouldBe filePath
-            domain.name shouldBe name
-            domain.updatedAt shouldBe updatedAt
-            assertMainTasksMatch(domain.tasks, protoTasks)
+            domain.filePath shouldBe protoTaskList.file_path
+            domain.name shouldBe protoTaskList.title
+            domain.updatedAt shouldBe protoTaskList.updated_at
+            assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
         }
     }
 
     test("Feature: proto-api-update, Property 4: ListTaskListsResponse -> domain ListTaskListsResult preserves all fields") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(arbProtoTaskListEntry, 0..10),
-            Arb.list(Arb.string(1..100), 0..10)
-        ) { taskLists, entries ->
-            val response = tasks.v1.ListTaskListsResponse(task_lists = taskLists, entries = entries)
+            Arb.list(arbProtoTaskList, 0..10)
+        ) { protoTaskLists ->
+            val response = tasks.v1.ListTaskListsResponse(task_lists = protoTaskLists)
             val result = TaskListMapper.toDomain(response)
-            result.entries shouldBe entries
-            result.taskLists shouldHaveSize taskLists.size
-            result.taskLists.zip(taskLists).forEach { (d, p) ->
+            result.taskLists shouldHaveSize protoTaskLists.size
+            result.taskLists.zip(protoTaskLists).forEach { (d, p) ->
                 d.filePath shouldBe p.file_path
-                d.name shouldBe p.name
+                d.name shouldBe p.title
                 d.updatedAt shouldBe p.updated_at
             }
         }
@@ -199,8 +174,8 @@ class TaskListMapperPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 5: CreateTaskListParams -> CreateTaskListRequest preserves all fields") {
         checkAll(PropTestConfig(iterations = 100), arbCreateTaskListParams) { params ->
             val proto = TaskListMapper.toProto(params)
-            proto.name shouldBe params.name
-            proto.path shouldBe params.path
+            proto.title shouldBe params.name
+            proto.parent_dir shouldBe params.path
             proto.tasks shouldHaveSize params.tasks.size
             proto.tasks.zip(params.tasks).forEach { (p, d) ->
                 p.description shouldBe d.description

@@ -96,10 +96,7 @@ fun App() {
                                 },
                                 onFolderClick = { folderId -> backStack.add(HomeRoute(folderId)) },
                                 onFileClick = { fileId -> backStack.add(EditNoteRoute(noteId = fileId)) },
-                                onAddFolderClick = homeViewModel::onAddFolderClicked,
-                                onInlineNameChanged = homeViewModel::onInlineNameChanged,
-                                onInlineConfirm = homeViewModel::onInlineConfirm,
-                                onInlineCancel = homeViewModel::onInlineCancel,
+                                onAddFolderClick = { /* TODO: implement add folder */ },
                                 onAddNoteClick = { backStack.add(EditNoteRoute()) },
                                 onAddTasklistClick = { backStack.add(EditTaskListRoute()) }
                             )

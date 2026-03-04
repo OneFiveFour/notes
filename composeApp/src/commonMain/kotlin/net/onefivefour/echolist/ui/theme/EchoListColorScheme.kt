@@ -11,5 +11,10 @@ data class EchoListColorScheme(
 )
 
 val LocalEchoListColors = staticCompositionLocalOf {
-    echoListColorsLight
+    EchoListColorScheme(
+        background = Color.Unspecified,
+        backgroundGradient1 = Color.Unspecified,
+        backgroundGradient2 = Color.Unspecified,
+        backgroundGradient3 = Color.Unspecified
+    )
 }

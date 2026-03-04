@@ -62,7 +62,19 @@ class ColorThemePropertyTest : FunSpec({
         ColorTheme(
             name = Arb.stringPattern("[A-Za-z][A-Za-z0-9 ]{0,49}").bind(),
             materialColorSchemeLight = arbColorSchemeLight().bind(),
-            materialColorSchemeDark = arbColorSchemeDark().bind()
+            materialColorSchemeDark = arbColorSchemeDark().bind(),
+            echoListColorSchemeLight = EchoListColorScheme(
+                background = arbColor().bind(),
+                backgroundGradient1 = arbColor().bind(),
+                backgroundGradient2 = arbColor().bind(),
+                backgroundGradient3 = arbColor().bind()
+            ),
+            echoListColorSchemeDark = EchoListColorScheme(
+                background = arbColor().bind(),
+                backgroundGradient1 = arbColor().bind(),
+                backgroundGradient2 = arbColor().bind(),
+                backgroundGradient3 = arbColor().bind()
+            )
         )
     }
 

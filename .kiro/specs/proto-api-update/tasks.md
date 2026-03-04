@@ -186,7 +186,7 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Verify correct request and successful Result
     - Run with minimum 100 iterations
 
-- [ ] 6. Checkpoint - Verify NoteService updates
+- [x] 6. Checkpoint - Verify NoteService updates
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 7. Update TaskListService network source and mapper

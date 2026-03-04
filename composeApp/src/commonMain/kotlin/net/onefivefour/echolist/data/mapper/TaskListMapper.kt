@@ -34,43 +34,44 @@ internal object TaskListMapper {
         subTasks = proto.sub_tasks.map { toDomain(it) }
     )
 
-    fun toDomain(proto: CreateTaskListResponse): TaskList = TaskList(
+    fun toDomain(proto: tasks.v1.TaskList): TaskList = TaskList(
         filePath = proto.file_path,
-        name = proto.name,
+        name = proto.title,
         tasks = proto.tasks.map { toDomain(it) },
         updatedAt = proto.updated_at
     )
 
-    fun toDomain(proto: GetTaskListResponse): TaskList = TaskList(
-        filePath = proto.file_path,
-        name = proto.name,
-        tasks = proto.tasks.map { toDomain(it) },
-        updatedAt = proto.updated_at
-    )
+    fun toDomain(proto: CreateTaskListResponse): TaskList {
+        val taskList = proto.task_list!!
+        return toDomain(taskList)
+    }
+
+    fun toDomain(proto: GetTaskListResponse): TaskList {
+        val taskList = proto.task_list!!
+        return toDomain(taskList)
+    }
 
     fun toDomain(proto: ListTaskListsResponse): ListTaskListsResult = ListTaskListsResult(
-        taskLists = proto.task_lists.map { toDomain(it) },
-        entries = proto.entries
+        taskLists = proto.task_lists.map { toEntry(it) },
+        entries = emptyList()
     )
 
-    fun toDomain(proto: tasks.v1.TaskListEntry): TaskListEntry = TaskListEntry(
+    fun toEntry(proto: tasks.v1.TaskList): TaskListEntry = TaskListEntry(
         filePath = proto.file_path,
-        name = proto.name,
+        name = proto.title,
         updatedAt = proto.updated_at
     )
 
-    fun toDomain(proto: UpdateTaskListResponse): TaskList = TaskList(
-        filePath = proto.file_path,
-        name = proto.name,
-        tasks = proto.tasks.map { toDomain(it) },
-        updatedAt = proto.updated_at
-    )
+    fun toDomain(proto: UpdateTaskListResponse): TaskList {
+        val taskList = proto.task_list!!
+        return toDomain(taskList)
+    }
 
     // Domain -> Proto
 
     fun toProto(params: CreateTaskListParams): CreateTaskListRequest = CreateTaskListRequest(
-        name = params.name,
-        path = params.path,
+        title = params.name,
+        parent_dir = params.path,
         tasks = params.tasks.map { toProto(it) }
     )
 

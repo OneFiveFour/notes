@@ -67,7 +67,7 @@ class FileNetworkDataSourceImplTest : FunSpec({
         val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
         val dataSource = FileRemoteDataSourceImpl(client)
 
-        dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "test"))
+        dataSource.createFolder(CreateFolderRequest(parent_dir = "", name = "test"))
 
         client.capturedPath shouldBe "/file.v1.FileService/CreateFolder"
     }
@@ -78,7 +78,7 @@ class FileNetworkDataSourceImplTest : FunSpec({
             val client = CapturingClient(CreateFolderResponse.ADAPTER.encode(response))
             val dataSource = FileRemoteDataSourceImpl(client)
 
-            val result = dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "test"))
+            val result = dataSource.createFolder(CreateFolderRequest(parent_dir = "", name = "test"))
 
             result.folder shouldBe protoFolder
         }
@@ -90,7 +90,7 @@ class FileNetworkDataSourceImplTest : FunSpec({
         val dataSource = FileRemoteDataSourceImpl(client)
 
         val result = runCatching {
-            dataSource.createFolder(CreateFolderRequest(parent_path = "", name = "n"))
+            dataSource.createFolder(CreateFolderRequest(parent_dir = "", name = "n"))
         }
 
         result.isFailure shouldBe true
@@ -104,7 +104,7 @@ class FileNetworkDataSourceImplTest : FunSpec({
         val client = CapturingClient(ListFilesResponse.ADAPTER.encode(response))
         val dataSource = FileRemoteDataSourceImpl(client)
 
-        dataSource.listFiles(ListFilesRequest(parent_path = "/"))
+        dataSource.listFiles(ListFilesRequest(parent_dir = "/"))
 
         client.capturedPath shouldBe "/file.v1.FileService/ListFiles"
     }
@@ -115,7 +115,7 @@ class FileNetworkDataSourceImplTest : FunSpec({
             val client = CapturingClient(ListFilesResponse.ADAPTER.encode(response))
             val dataSource = FileRemoteDataSourceImpl(client)
 
-            val result = dataSource.listFiles(ListFilesRequest(parent_path = "/"))
+            val result = dataSource.listFiles(ListFilesRequest(parent_dir = "/"))
 
             result.entries.size shouldBe entries.size
             result.entries shouldBe entries

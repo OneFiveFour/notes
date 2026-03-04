@@ -13,22 +13,35 @@ import io.kotest.matchers.shouldBe
  */
 class ThemeManagerTest : FunSpec({
 
+    val defaultEchoListColors = EchoListColorScheme(
+        background = Color.White,
+        backgroundGradient1 = Color.White,
+        backgroundGradient2 = Color.White,
+        backgroundGradient3 = Color.White
+    )
+
     val themeA = ColorTheme(
         name = "Theme A",
         materialColorSchemeLight = lightColorScheme(primary = Color.Red),
-        materialColorSchemeDark = darkColorScheme(primary = Color.Blue)
+        materialColorSchemeDark = darkColorScheme(primary = Color.Blue),
+        echoListColorSchemeLight = defaultEchoListColors,
+        echoListColorSchemeDark = defaultEchoListColors
     )
 
     val themeB = ColorTheme(
         name = "Theme B",
         materialColorSchemeLight = lightColorScheme(primary = Color.Green),
-        materialColorSchemeDark = darkColorScheme(primary = Color.Yellow)
+        materialColorSchemeDark = darkColorScheme(primary = Color.Yellow),
+        echoListColorSchemeLight = defaultEchoListColors,
+        echoListColorSchemeDark = defaultEchoListColors
     )
 
     val themeNotInList = ColorTheme(
         name = "Unknown",
         materialColorSchemeLight = lightColorScheme(primary = Color.Cyan),
-        materialColorSchemeDark = darkColorScheme(primary = Color.Magenta)
+        materialColorSchemeDark = darkColorScheme(primary = Color.Magenta),
+        echoListColorSchemeLight = defaultEchoListColors,
+        echoListColorSchemeDark = defaultEchoListColors
     )
 
     test("initialization sets selectedTheme to initial theme") {
