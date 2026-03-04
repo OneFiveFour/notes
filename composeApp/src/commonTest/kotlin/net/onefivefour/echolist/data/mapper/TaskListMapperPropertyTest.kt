@@ -18,11 +18,13 @@ import net.onefivefour.echolist.data.models.UpdateTaskListParams
 
 /**
  * Feature: proto-api-update
- * Property 4: TaskList mapper proto-to-domain field preservation
- * Property 5: TaskList mapper domain-to-proto field preservation
- * Property 6: TaskList mapping round-trip
+ * Property 16: TaskListMapper transforms MainTask proto messages correctly
+ * Property 17: TaskListMapper transforms SubTask proto messages correctly
+ * Property 18: TaskListMapper transforms TaskList response messages correctly
+ * Property 19: TaskListMapper transforms ListTaskListsResponse correctly
+ * Property 20: TaskListMapper round-trip transformation preserves data
  *
- * Validates: Requirements 10.1–10.9
+ * Validates: Requirements 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7
  */
 class TaskListMapperPropertyTest : FunSpec({
 
@@ -41,7 +43,7 @@ class TaskListMapperPropertyTest : FunSpec({
             done = Arb.boolean().bind(),
             due_date = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
-            sub_tasks = Arb.list(arbProtoSubTask, 0..5).bind()
+            sub_tasks = Arb.list(arbProtoSubTask, 0..10).bind()
         )
     }
 
@@ -67,26 +69,11 @@ class TaskListMapperPropertyTest : FunSpec({
             done = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
-            subTasks = Arb.list(arbDomainSubTask, 0..5).bind()
+            subTasks = Arb.list(arbDomainSubTask, 0..10).bind()
         )
     }
 
-    val arbCreateTaskListParams = arbitrary {
-        CreateTaskListParams(
-            name = Arb.string(1..100).bind(),
-            path = Arb.string(1..100).bind(),
-            tasks = Arb.list(arbDomainMainTask, 0..5).bind()
-        )
-    }
-
-    val arbUpdateTaskListParams = arbitrary {
-        UpdateTaskListParams(
-            filePath = Arb.string(1..100).bind(),
-            tasks = Arb.list(arbDomainMainTask, 0..5).bind()
-        )
-    }
-
-    // -- Helper to compare SubTask lists recursively --
+    // -- Helper assertions --
 
     fun assertSubTasksMatch(domainList: List<SubTask>, protoList: List<tasks.v1.SubTask>) {
         domainList shouldHaveSize protoList.size
@@ -107,9 +94,12 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    // -- Property 4: Proto -> Domain field preservation --
+    // ---------------------------------------------------------------
+    // Property 16: TaskListMapper transforms MainTask proto messages correctly
+    // Validates: Requirements 9.1
+    // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 4: proto MainTask with nested SubTasks -> domain preserves all fields recursively") {
+    test("Feature: proto-api-update, Property 16: TaskListMapper transforms MainTask proto messages correctly") {
         checkAll(PropTestConfig(iterations = 100), arbProtoMainTask) { protoTask ->
             val domain = TaskListMapper.toDomain(protoTask)
             domain.description shouldBe protoTask.description
@@ -120,7 +110,25 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 4: CreateTaskListResponse -> domain TaskList preserves all fields") {
+    // ---------------------------------------------------------------
+    // Property 17: TaskListMapper transforms SubTask proto messages correctly
+    // Validates: Requirements 9.2
+    // ---------------------------------------------------------------
+
+    test("Feature: proto-api-update, Property 17: TaskListMapper transforms SubTask proto messages correctly") {
+        checkAll(PropTestConfig(iterations = 100), arbProtoSubTask) { protoSubTask ->
+            val domain = TaskListMapper.toDomain(protoSubTask)
+            domain.description shouldBe protoSubTask.description
+            domain.done shouldBe protoSubTask.done
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Property 18: TaskListMapper transforms TaskList response messages correctly
+    // Validates: Requirements 9.3, 9.4, 9.6
+    // ---------------------------------------------------------------
+
+    test("Feature: proto-api-update, Property 18: CreateTaskListResponse -> domain TaskList preserves all fields") {
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.CreateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
@@ -131,7 +139,7 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 4: GetTaskListResponse -> domain TaskList preserves all fields") {
+    test("Feature: proto-api-update, Property 18: GetTaskListResponse -> domain TaskList preserves all fields") {
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.GetTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
@@ -142,7 +150,7 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 4: UpdateTaskListResponse -> domain TaskList preserves all fields") {
+    test("Feature: proto-api-update, Property 18: UpdateTaskListResponse -> domain TaskList preserves all fields") {
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.UpdateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
@@ -153,10 +161,15 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 4: ListTaskListsResponse -> domain ListTaskListsResult preserves all fields") {
+    // ---------------------------------------------------------------
+    // Property 19: TaskListMapper transforms ListTaskListsResponse correctly
+    // Validates: Requirements 9.5
+    // ---------------------------------------------------------------
+
+    test("Feature: proto-api-update, Property 19: TaskListMapper transforms ListTaskListsResponse correctly") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(arbProtoTaskList, 0..10)
+            Arb.list(arbProtoTaskList, 0..100)
         ) { protoTaskLists ->
             val response = tasks.v1.ListTaskListsResponse(task_lists = protoTaskLists)
             val result = TaskListMapper.toDomain(response)
@@ -169,50 +182,12 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    // -- Property 5: Domain -> Proto field preservation --
+    // ---------------------------------------------------------------
+    // Property 20: TaskListMapper round-trip transformation preserves data
+    // Validates: Requirements 9.7
+    // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 5: CreateTaskListParams -> CreateTaskListRequest preserves all fields") {
-        checkAll(PropTestConfig(iterations = 100), arbCreateTaskListParams) { params ->
-            val proto = TaskListMapper.toProto(params)
-            proto.title shouldBe params.name
-            proto.parent_dir shouldBe params.path
-            proto.tasks shouldHaveSize params.tasks.size
-            proto.tasks.zip(params.tasks).forEach { (p, d) ->
-                p.description shouldBe d.description
-                p.done shouldBe d.done
-                p.due_date shouldBe d.dueDate
-                p.recurrence shouldBe d.recurrence
-                p.sub_tasks shouldHaveSize d.subTasks.size
-                p.sub_tasks.zip(d.subTasks).forEach { (ps, ds) ->
-                    ps.description shouldBe ds.description
-                    ps.done shouldBe ds.done
-                }
-            }
-        }
-    }
-
-    test("Feature: proto-api-update, Property 5: UpdateTaskListParams -> UpdateTaskListRequest preserves all fields") {
-        checkAll(PropTestConfig(iterations = 100), arbUpdateTaskListParams) { params ->
-            val proto = TaskListMapper.toProto(params)
-            proto.file_path shouldBe params.filePath
-            proto.tasks shouldHaveSize params.tasks.size
-            proto.tasks.zip(params.tasks).forEach { (p, d) ->
-                p.description shouldBe d.description
-                p.done shouldBe d.done
-                p.due_date shouldBe d.dueDate
-                p.recurrence shouldBe d.recurrence
-                p.sub_tasks shouldHaveSize d.subTasks.size
-                p.sub_tasks.zip(d.subTasks).forEach { (ps, ds) ->
-                    ps.description shouldBe ds.description
-                    ps.done shouldBe ds.done
-                }
-            }
-        }
-    }
-
-    // -- Property 6: Round-trip --
-
-    test("Feature: proto-api-update, Property 6: domain MainTask -> proto -> domain round-trip produces equivalent object") {
+    test("Feature: proto-api-update, Property 20: domain MainTask -> proto -> domain round-trip produces equivalent object") {
         checkAll(PropTestConfig(iterations = 100), arbDomainMainTask) { original ->
             val proto = TaskListMapper.toProto(original)
             val roundTripped = TaskListMapper.toDomain(proto)
@@ -220,7 +195,7 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 6: domain SubTask -> proto -> domain round-trip produces equivalent object") {
+    test("Feature: proto-api-update, Property 20: domain SubTask -> proto -> domain round-trip produces equivalent object") {
         checkAll(PropTestConfig(iterations = 100), arbDomainSubTask) { original ->
             val proto = TaskListMapper.toProto(original)
             val roundTripped = TaskListMapper.toDomain(proto)

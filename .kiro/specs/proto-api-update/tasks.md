@@ -189,14 +189,14 @@ This plan implements updates to EchoList's data layer to work with the new backe
 - [x] 6. Checkpoint - Verify NoteService updates
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Update TaskListService network source and mapper
-  - [ ] 7.1 Update TaskListRemoteDataSourceImpl to use new proto package
+- [x] 7. Update TaskListService network source and mapper
+  - [x] 7.1 Update TaskListRemoteDataSourceImpl to use new proto package
     - Update service path to `/tasks.v1.TaskListService/{MethodName}` for all RPC calls
     - Implement CreateTaskList, GetTaskList, ListTaskLists, UpdateTaskList, DeleteTaskList methods
     - Use Wire ADAPTER for serialization/deserialization
     - _Requirements: 7.1, 7.2, 7.3, 7.4, 7.5, 7.6_
   
-  - [ ] 7.2 Update TaskListMapper for new proto messages
+  - [x] 7.2 Update TaskListMapper for new proto messages
     - Implement transformation from MainTask proto to MainTask domain model (description, done, due_date, recurrence, sub_tasks)
     - Implement transformation from SubTask proto to SubTask domain model (description, done)
     - Implement transformation from CreateTaskListResponse to TaskList domain model
@@ -206,42 +206,42 @@ This plan implements updates to EchoList's data layer to work with the new backe
     - Implement transformation from MainTask/SubTask domain models to proto messages
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
   
-  - [ ] 7.3 Write unit tests for TaskListMapper
+  - [x] 7.3 Write unit tests for TaskListMapper
     - Test specific examples of each transformation
     - Test empty lists and edge cases
     - Test field name conversions (due_date → dueDate, sub_tasks → subTasks)
     - Test bidirectional transformations (domain → proto → domain)
     - _Requirements: 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7_
   
-  - [ ] 7.4 Write property test for TaskListMapper MainTask transformation
+  - [x] 7.4 Write property test for TaskListMapper MainTask transformation
     - **Property 16: TaskListMapper transforms MainTask proto messages correctly**
     - **Validates: Requirements 9.1**
     - Create Arb.mainTask() generator (0-10 subtasks)
     - Verify all fields correctly mapped (description, done, due_date, recurrence, sub_tasks)
     - Run with minimum 100 iterations
   
-  - [ ] 7.5 Write property test for TaskListMapper SubTask transformation
+  - [x] 7.5 Write property test for TaskListMapper SubTask transformation
     - **Property 17: TaskListMapper transforms SubTask proto messages correctly**
     - **Validates: Requirements 9.2**
     - Create Arb.subTask() generator
     - Verify description and done fields correctly mapped
     - Run with minimum 100 iterations
   
-  - [ ] 7.6 Write property test for TaskListMapper response transformations
+  - [x] 7.6 Write property test for TaskListMapper response transformations
     - **Property 18: TaskListMapper transforms TaskList response messages correctly**
     - **Validates: Requirements 9.3, 9.4, 9.6**
     - Create Arb.createTaskListResponse(), Arb.getTaskListResponse(), Arb.updateTaskListResponse() generators
     - Verify TaskList extraction and field mapping for all response types
     - Run with minimum 100 iterations
   
-  - [ ] 7.7 Write property test for TaskListMapper ListTaskListsResponse transformation
+  - [x] 7.7 Write property test for TaskListMapper ListTaskListsResponse transformation
     - **Property 19: TaskListMapper transforms ListTaskListsResponse correctly**
     - **Validates: Requirements 9.5**
     - Create Arb.listTaskListsResponse() generator
     - Verify both task_lists and entries fields transformed correctly
     - Run with minimum 100 iterations
   
-  - [ ] 7.8 Write property test for TaskListMapper round-trip transformation
+  - [x] 7.8 Write property test for TaskListMapper round-trip transformation
     - **Property 20: TaskListMapper round-trip transformation preserves data**
     - **Validates: Requirements 9.7**
     - Generate random MainTask and SubTask domain models
