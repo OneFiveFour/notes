@@ -30,14 +30,26 @@ val EchoListClassicTheme = ColorTheme(
     ),
     echoListColorSchemeLight = EchoListColorScheme(
         background = Color(0xFF1A0B18),
-        backgroundGradient1 = Color(0x3325C0F4),
-        backgroundGradient2 = Color(0x33F425C0),
-        backgroundGradient3 = Color(0x33F48C25)
+        backgroundGradient1 = Color(0xF3D21385),
+        backgroundGradient2 = Color(0xE125F4DC),
+        backgroundGradient3 = Color(0xEEB1702F)
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),
-        backgroundGradient1 = Color(0x3325C0F4),
-        backgroundGradient2 = Color(0x33F425C0),
-        backgroundGradient3 = Color(0x33F48C25)
+        backgroundGradient1 = Color(0xE908A9DE),
+        backgroundGradient2 = Color(0xE1F425C0),
+        backgroundGradient3 = Color(0xF80D94EF)
     )
+//    echoListColorSchemeLight = EchoListColorScheme(
+//        background = Color(0xFF1A0B18),
+//        backgroundGradient1 = Color(0x3325C0F4),
+//        backgroundGradient2 = Color(0x33F425C0),
+//        backgroundGradient3 = Color(0x33F48C25)
+//    ),
+//    echoListColorSchemeDark = EchoListColorScheme(
+//        background = Color(0xFF1A0B18),
+//        backgroundGradient1 = Color(0x3325C0F4),
+//        backgroundGradient2 = Color(0x33F425C0),
+//        backgroundGradient3 = Color(0x33F48C25)
+//    )
 )

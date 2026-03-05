@@ -10,6 +10,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform
@@ -70,11 +71,13 @@ fun EchoListTheme(
         LocalMaterialColors provides materialColorScheme,
         LocalEchoListColors provides echoListColorScheme
     ) {
-        MaterialTheme(
-            colorScheme = materialColorScheme,
-            typography = typography,
-            shapes = EchoListTheme.shapes,
-            content = content
-        )
+        GradientBackground {
+            MaterialTheme(
+                colorScheme = materialColorScheme,
+                typography = typography,
+                shapes = EchoListTheme.shapes,
+                content = content
+            )
+        }
     }
 }
