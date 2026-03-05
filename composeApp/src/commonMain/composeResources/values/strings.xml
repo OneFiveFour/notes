@@ -5,13 +5,15 @@
     <string name="login_backend_url_label">Backend URL</string>
     <string name="login_username_label">Username</string>
     <string name="login_password_label">Password</string>
-    <string name="login_button">Log in</string>
+    <string name="login_button">Connect</string>
 
     <!-- Login Validation Errors -->
     <string name="error_backend_url_required">Backend URL is required</string>
     <string name="error_username_required">Username is required</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_login_failed">Login failed</string>
+    <string name="show_password">Show password</string>
+    <string name="hide_password">Hide password</string>
 
     <!-- Edit Note Screen -->
     <string name="edit_note_title_new">New Note</string>

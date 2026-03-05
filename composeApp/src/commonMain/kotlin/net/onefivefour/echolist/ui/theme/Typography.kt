@@ -38,8 +38,8 @@ fun material3Typography(): Typography {
         ),
         labelMedium = TextStyle(
             fontFamily = WorkSansFontFamily,
-            fontWeight = FontWeight.Medium,
-            fontSize = 14.sp
+            fontWeight = FontWeight.SemiBold,
+            fontSize = 18.sp
         ),
         labelSmall = TextStyle(
             fontFamily = WorkSansFontFamily,
