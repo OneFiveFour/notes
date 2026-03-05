@@ -18,6 +18,7 @@ import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.repository.AuthRepository
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
+import net.onefivefour.echolist.domain.model.AuthError
 import net.onefivefour.echolist.network.config.NetworkConfigProvider
 import org.jetbrains.compose.resources.getString
 
@@ -41,22 +42,22 @@ class LoginViewModel(
     }
 
     fun onBackendUrlChanged(value: String) {
-        _uiState.update { it.copy(backendUrl = value, backendUrlError = null) }
+        _uiState.update { it.copy(backendUrl = value, backendUrlError = null, authError = null) }
     }
 
     fun onUsernameChanged(value: String) {
-        _uiState.update { it.copy(username = value, usernameError = null) }
+        _uiState.update { it.copy(username = value, usernameError = null, authError = null) }
     }
 
     fun onPasswordChanged(value: String) {
-        _uiState.update { it.copy(password = value, passwordError = null) }
+        _uiState.update { it.copy(password = value, passwordError = null, authError = null) }
     }
 
     fun onLoginClick() {
         val current = _uiState.value
         if (current.isLoading) return
 
-        _uiState.update { it.copy(isLoading = true, error = null) }
+        _uiState.update { it.copy(isLoading = true, authError = null) }
 
         viewModelScope.launch {
             // Perform validation with localized error strings
@@ -88,10 +89,11 @@ class LoginViewModel(
                     _loginSuccess.emit(Unit)
                 },
                 onFailure = { throwable ->
+                    val authError = AuthError.fromNetworkException(throwable)
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = throwable.message ?: getString(Res.string.error_login_failed)
+                            authError = authError
                         )
                     }
                 }

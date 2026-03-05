@@ -39,6 +39,7 @@ import echolist.composeapp.generated.resources.login_username_label
 import echolist.composeapp.generated.resources.show_password
 import echolist.composeapp.generated.resources.visibility_off
 import echolist.composeapp.generated.resources.visibility_on
+import net.onefivefour.echolist.domain.model.AuthError
 import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.common.ElOutlinedTextField
 import net.onefivefour.echolist.ui.theme.EchoListTheme
@@ -184,13 +185,11 @@ fun LoginScreen(
             }
         }
 
-        // General error message
-        uiState.error?.let { errorMessage ->
-            Spacer(modifier = Modifier.height(dimensions.m))
-            Text(
-                text = errorMessage,
-                style = EchoListTheme.typography.bodySmall,
-                color = EchoListTheme.materialColors.error,
+        // Authentication error card
+        uiState.authError?.let { error ->
+            Spacer(modifier = Modifier.height(dimensions.xl))
+            AuthErrorCard(
+                error = error,
                 modifier = Modifier.fillMaxWidth()
             )
         }
@@ -206,7 +205,8 @@ private fun LoginScreenPreview() {
                 backendUrl = "https://example.com",
                 username = "",
                 password = "asdf",
-                isLoading = false
+                isLoading = false,
+                authError = AuthError.Unknown("Unknown error")
             ),
             onBackendUrlChanged = { },
             onUsernameChanged = { },

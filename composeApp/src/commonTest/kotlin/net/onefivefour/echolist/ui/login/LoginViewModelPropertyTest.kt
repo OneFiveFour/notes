@@ -162,7 +162,7 @@ class LoginViewModelPropertyTest : FunSpec({
      * Property 6: Login errors surface to UI
      *
      * *For any* error result returned by AuthRepository.login, the LoginViewModel's
-     * UiState should have a non-null error message and isLoading set to false.
+     * UiState should have a non-null authError and isLoading set to false.
      *
      * **Validates: Requirements 2.4**
      */
@@ -181,7 +181,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 vm.onLoginClick()
                 advanceUntilIdle()
 
-                vm.uiState.value.error.shouldNotBeNull()
+                vm.uiState.value.authError.shouldNotBeNull()
                 vm.uiState.value.isLoading shouldBe false
             }
         }

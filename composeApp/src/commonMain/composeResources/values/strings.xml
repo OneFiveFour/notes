@@ -12,6 +12,17 @@
     <string name="error_username_required">Username is required</string>
     <string name="error_password_required">Password is required</string>
     <string name="error_login_failed">Login failed</string>
+    
+    <!-- Authentication Errors -->
+    <string name="error_auth_invalid_credentials">Invalid Credentials</string>
+    <string name="error_auth_invalid_credentials_description">Please check your username and password and try again.</string>
+    <string name="error_auth_server">Server Error</string>
+    <string name="error_auth_server_description">The server encountered an error. Please try again later.</string>
+    <string name="error_auth_network">Connection Failed</string>
+    <string name="error_auth_network_description">Unable to connect to the server. Please check your connection.</string>
+    <string name="error_auth_unknown">Authentication Failed</string>
+    <string name="error_auth_unknown_description">An unexpected error occurred. Please try again.</string>
+    
     <string name="show_password">Show password</string>
     <string name="hide_password">Hide password</string>
 
