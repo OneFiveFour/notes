@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Login Screen -->
+    <string name="app_name">EchoList</string>
+    <string name="login_backend_url_label">Backend URL</string>
+    <string name="login_username_label">Username</string>
+    <string name="login_password_label">Password</string>
+    <string name="login_button">Log in</string>
+
+    <!-- Login Validation Errors -->
+    <string name="error_backend_url_required">Backend URL is required</string>
+    <string name="error_username_required">Username is required</string>
+    <string name="error_password_required">Password is required</string>
+    <string name="error_login_failed">Login failed</string>
+
+    <!-- Edit Note Screen -->
+    <string name="edit_note_title_new">New Note</string>
+    <string name="edit_note_title_edit">Edit Note</string>
+    <string name="edit_note_placeholder">Enter note content</string>
+
+    <!-- Edit Tasklist Screen -->
+    <string name="edit_tasklist_title_new">New Tasklist</string>
+    <string name="edit_tasklist_title_edit">Edit Tasklist</string>
+    <string name="edit_tasklist_placeholder">Enter tasklist content</string>
+
+    <!-- Shared -->
+    <string name="navigate_back">Navigate back</string>
+    <string name="save_button">Save</string>
+
+    <!-- Home Screen -->
+    <string name="home_title">Home</string>
+</resources>

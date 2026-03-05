@@ -55,7 +55,7 @@ class AuthRepositoryPropertyTest : FunSpec({
 
             val repo = AuthRepositoryImpl(
                 secureStorage = storage,
-                client = mockClient,
+                lazyClient = lazy { mockClient },
                 networkConfigProvider = NetworkConfigProvider(storage)
             )
 
@@ -113,7 +113,7 @@ class AuthRepositoryPropertyTest : FunSpec({
 
             val repo = AuthRepositoryImpl(
                 secureStorage = storage,
-                client = mockClient,
+                lazyClient = lazy { mockClient },
                 networkConfigProvider = NetworkConfigProvider(storage)
             )
 

@@ -21,7 +21,14 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.edit_tasklist_placeholder
+import echolist.composeapp.generated.resources.edit_tasklist_title_edit
+import echolist.composeapp.generated.resources.edit_tasklist_title_new
+import echolist.composeapp.generated.resources.navigate_back
+import echolist.composeapp.generated.resources.save_button
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.jetbrains.compose.resources.stringResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -37,7 +44,11 @@ fun EditTaskListScreen(
     val typography = EchoListTheme.typography
     val dimensions = EchoListTheme.dimensions
 
-    val title = if (taskListId == null) "New Tasklist" else "Edit Tasklist"
+    val title = if (taskListId == null) {
+        stringResource(Res.string.edit_tasklist_title_new)
+    } else {
+        stringResource(Res.string.edit_tasklist_title_edit)
+    }
 
     Column(
         modifier = modifier
@@ -59,7 +70,7 @@ fun EditTaskListScreen(
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = "Navigate back",
+                        contentDescription = stringResource(Res.string.navigate_back),
                         tint = colors.primary
                     )
                 }
@@ -78,7 +89,7 @@ fun EditTaskListScreen(
                 textStyle = typography.bodyMedium.copy(color = colors.onBackground),
                 placeholder = {
                     Text(
-                        text = "Enter tasklist content",
+                        text = stringResource(Res.string.edit_tasklist_placeholder),
                         style = typography.bodyMedium,
                         color = colors.onBackground.copy(alpha = 0.6f)
                     )
@@ -100,7 +111,7 @@ fun EditTaskListScreen(
                 )
             ) {
                 Text(
-                    text = "Save",
+                    text = stringResource(Res.string.save_button),
                     style = typography.labelMedium
                 )
             }

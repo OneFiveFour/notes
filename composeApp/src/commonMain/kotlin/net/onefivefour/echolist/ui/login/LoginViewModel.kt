@@ -2,6 +2,11 @@ package net.onefivefour.echolist.ui.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.error_backend_url_required
+import echolist.composeapp.generated.resources.error_login_failed
+import echolist.composeapp.generated.resources.error_password_required
+import echolist.composeapp.generated.resources.error_username_required
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -14,6 +19,7 @@ import net.onefivefour.echolist.data.repository.AuthRepository
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.network.config.NetworkConfigProvider
+import org.jetbrains.compose.resources.getString
 
 class LoginViewModel(
     secureStorage: SecureStorage,
@@ -50,24 +56,26 @@ class LoginViewModel(
         val current = _uiState.value
         if (current.isLoading) return
 
-        val backendUrlError = if (current.backendUrl.isBlank()) "Backend URL is required" else null
-        val usernameError = if (current.username.isBlank()) "Username is required" else null
-        val passwordError = if (current.password.isBlank()) "Password is required" else null
-
-        if (backendUrlError != null || usernameError != null || passwordError != null) {
-            _uiState.update {
-                it.copy(
-                    backendUrlError = backendUrlError,
-                    usernameError = usernameError,
-                    passwordError = passwordError
-                )
-            }
-            return
-        }
-
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
+            // Perform validation with localized error strings
+            val backendUrlError = if (current.backendUrl.isBlank()) getString(Res.string.error_backend_url_required) else null
+            val usernameError = if (current.username.isBlank()) getString(Res.string.error_username_required) else null
+            val passwordError = if (current.password.isBlank()) getString(Res.string.error_password_required) else null
+
+            if (backendUrlError != null || usernameError != null || passwordError != null) {
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        backendUrlError = backendUrlError,
+                        usernameError = usernameError,
+                        passwordError = passwordError
+                    )
+                }
+                return@launch
+            }
+
             val result = authRepository.login(
                 baseUrl = current.backendUrl.trim(),
                 username = current.username.trim(),
@@ -83,7 +91,7 @@ class LoginViewModel(
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = throwable.message ?: "Login failed"
+                            error = throwable.message ?: getString(Res.string.error_login_failed)
                         )
                     }
                 }

@@ -18,7 +18,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.app_name
+import echolist.composeapp.generated.resources.login_backend_url_label
+import echolist.composeapp.generated.resources.login_button
+import echolist.composeapp.generated.resources.login_password_label
+import echolist.composeapp.generated.resources.login_username_label
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun LoginScreen(
@@ -39,7 +46,7 @@ fun LoginScreen(
         verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "EchoList",
+            text = stringResource(Res.string.app_name),
             style = EchoListTheme.typography.titleLarge,
             color = EchoListTheme.materialColors.primary
         )
@@ -50,7 +57,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = uiState.backendUrl,
             onValueChange = onBackendUrlChanged,
-            label = { Text("Backend URL") },
+            label = { Text(stringResource(Res.string.login_backend_url_label)) },
             isError = uiState.backendUrlError != null,
             singleLine = true,
             shape = EchoListTheme.shapes.small,
@@ -73,7 +80,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = uiState.username,
             onValueChange = onUsernameChanged,
-            label = { Text("Username") },
+            label = { Text(stringResource(Res.string.login_username_label)) },
             isError = uiState.usernameError != null,
             singleLine = true,
             shape = EchoListTheme.shapes.small,
@@ -96,7 +103,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = uiState.password,
             onValueChange = onPasswordChanged,
-            label = { Text("Password") },
+            label = { Text(stringResource(Res.string.login_password_label)) },
             isError = uiState.passwordError != null,
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -134,7 +141,7 @@ fun LoginScreen(
                 )
             } else {
                 Text(
-                    text = "Log in",
+                    text = stringResource(Res.string.login_button),
                     style = EchoListTheme.typography.labelMedium
                 )
             }
