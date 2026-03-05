@@ -34,7 +34,6 @@ fun LoginScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(EchoListTheme.materialColors.background)
             .padding(horizontal = dimensions.xl),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center

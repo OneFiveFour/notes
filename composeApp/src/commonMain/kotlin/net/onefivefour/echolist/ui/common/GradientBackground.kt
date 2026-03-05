@@ -1,18 +1,20 @@
 package net.onefivefour.echolist.ui.common
 
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TileMode
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.tooling.preview.AndroidUiModes
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewLightDark
 import androidx.compose.ui.unit.Dp
@@ -44,22 +46,19 @@ fun GradientBackground(
         GradientOrb(
             color = colors.backgroundGradient1,
             alignment = Alignment.TopStart,
-            diameter = 500.dp,
-            blurRadius = 200.dp
-        )
-
-        GradientOrb(
-            color = colors.backgroundGradient3,
-            alignment = Alignment.Center,
-            diameter = 750.dp,
-            blurRadius = 150.dp
+            diameter = 700.dp
         )
 
         GradientOrb(
             color = colors.backgroundGradient2,
+            alignment = Alignment.Center,
+            diameter = 750.dp
+        )
+
+        GradientOrb(
+            color = colors.backgroundGradient3,
             alignment = Alignment.BottomEnd,
-            diameter = 600.dp,
-            blurRadius = 150.dp
+            diameter = 600.dp
         )
 
         content()
@@ -70,40 +69,36 @@ fun GradientBackground(
 private fun BoxScope.GradientOrb(
     color: Color,
     alignment: Alignment,
-    diameter: Dp,
-    blurRadius: Dp
+    diameter: Dp
 ) {
-    val halfDiameter = diameter / 2
-    val offsetX = when (alignment) {
-        Alignment.TopStart -> -halfDiameter
-        Alignment.BottomEnd -> halfDiameter
-        else -> 0.dp
-    }
-    val offsetY = when (alignment) {
-        Alignment.TopStart -> -halfDiameter
-        Alignment.BottomEnd -> halfDiameter
-        else -> 0.dp
-    }
+    val radiusPx = with(LocalDensity.current) { (diameter / 2f).toPx() }
 
-    Box(
+    Canvas(
         modifier = Modifier
-            .size(diameter)
+            .size(1.dp)
             .align(alignment)
-            .offset(x = offsetX, y = offsetY)
-            .blur(blurRadius)
-            .background(
-                brush = Brush.radialGradient(
-                    colors = listOf(color, Color.Transparent)
-                ),
-                shape = CircleShape
-            )
-    )
+    ) {
+        drawCircle(
+            brush = Brush.radialGradient(
+                colors = listOf(color, Color.Transparent),
+                center = Offset.Zero,
+                radius = radiusPx,
+                tileMode = TileMode.Clamp
+            ),
+            radius = radiusPx,
+            center = Offset.Zero
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun GradientBackgroundPreview() {
-    EchoListTheme {
-        GradientBackground()
-    }
+    EchoListTheme { }
+}
+
+@Preview(uiMode = AndroidUiModes.UI_MODE_NIGHT_YES)
+@Composable
+private fun GradientBackgroundPreviewDark() {
+    EchoListTheme { }
 }

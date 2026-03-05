@@ -29,16 +29,16 @@ val EchoListClassicTheme = ColorTheme(
         onSurface = Color(0xFFE0E0E0)
     ),
     echoListColorSchemeLight = EchoListColorScheme(
-        background = Color(0xFF1A0B18),
-        backgroundGradient1 = Color(0xF3D21385),
-        backgroundGradient2 = Color(0xE125F4DC),
-        backgroundGradient3 = Color(0xEEB1702F)
+        background = Color(0xFFE1E0D5),
+        backgroundGradient1 = Color(0x22F425A8),
+        backgroundGradient2 = Color(0x12F48C25),
+        backgroundGradient3 = Color(0x2225C0F4),
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),
-        backgroundGradient1 = Color(0xE908A9DE),
-        backgroundGradient2 = Color(0xE1F425C0),
-        backgroundGradient3 = Color(0xF80D94EF)
+        backgroundGradient1 = Color(0x22F425A8),
+        backgroundGradient2 = Color(0x12F48C25),
+        backgroundGradient3 = Color(0x2225C0F4),
     )
 //    echoListColorSchemeLight = EchoListColorScheme(
 //        background = Color(0xFF1A0B18),
