@@ -4,6 +4,7 @@ import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import net.onefivefour.echolist.ui.theme.ColorTheme
+import net.onefivefour.echolist.ui.theme.EchoListColorScheme
 
 val EchoListTheme2 = ColorTheme(
     name = "EchoList 2",
@@ -27,6 +28,16 @@ val EchoListTheme2 = ColorTheme(
         onBackground = Color(0xFFFFFAF0),
         onSurface = Color(0xFFE0E0E0)
     ),
-    echoListColorSchemeLight = TODO(),
-    echoListColorSchemeDark = TODO()
+    echoListColorSchemeLight = EchoListColorScheme(
+        background = Color(0xFF1A0B18),
+        backgroundGradient1 = Color(0x3325C0F4),
+        backgroundGradient2 = Color(0x33F425C0),
+        backgroundGradient3 = Color(0x33F48C25)
+    ),
+    echoListColorSchemeDark = EchoListColorScheme(
+        background = Color(0xFF1A0B18),
+        backgroundGradient1 = Color(0x3325C0F4),
+        backgroundGradient2 = Color(0x33F425C0),
+        backgroundGradient3 = Color(0x33F48C25)
+    )
 )

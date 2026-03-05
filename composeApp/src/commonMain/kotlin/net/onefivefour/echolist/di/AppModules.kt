@@ -39,7 +39,7 @@ import org.koin.dsl.module
 
 val authModule: Module = module {
     single { MutableSharedFlow<AuthEvent>() }
-    single<AuthRepository> { AuthRepositoryImpl(secureStorage = get(), client = get(), networkConfigProvider = get()) }
+    single<AuthRepository> { AuthRepositoryImpl(secureStorage = get(), lazyClient = lazy { get<ConnectRpcClient>() }, networkConfigProvider = get()) }
     viewModel { AuthViewModel(secureStorage = get(), authEvents = get()) }
     viewModel { LoginViewModel(authRepository = get(), secureStorage = get(), networkConfigProvider = get()) }
 }

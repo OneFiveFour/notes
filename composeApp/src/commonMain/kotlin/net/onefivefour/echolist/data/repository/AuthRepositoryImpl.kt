@@ -7,9 +7,11 @@ import net.onefivefour.echolist.network.config.NetworkConfigProvider
 
 internal class AuthRepositoryImpl(
     private val secureStorage: SecureStorage,
-    private val client: ConnectRpcClient,
+    private val lazyClient: Lazy<ConnectRpcClient>,
     private val networkConfigProvider: NetworkConfigProvider
 ) : AuthRepository {
+
+    private val client: ConnectRpcClient get() = lazyClient.value
 
     override suspend fun login(
         baseUrl: String,
