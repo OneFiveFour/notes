@@ -81,13 +81,17 @@ fun App() {
                     predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
                     entryProvider = entryProvider {
                         entry<HomeRoute> { route ->
-                            val homeViewModel = koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
+                            val homeViewModel =
+                                koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
                             val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                             HomeScreen(
                                 uiState = homeUiState,
-                                onNavigationClick = if (backStack.size > 1) {{ backStack.removeLastOrNull() }} else null,
+                                onNavigationClick = if (backStack.size > 1) {
+                                    { backStack.removeLastOrNull() }
+                                } else null,
                                 onBreadcrumbClick = { path ->
-                                    val index = backStack.indexOfLast { it is HomeRoute && it.path == path }
+                                    val index =
+                                        backStack.indexOfLast { it is HomeRoute && it.path == path }
                                     if (index >= 0) {
                                         while (backStack.size > index + 1) backStack.removeLast()
                                     } else {
@@ -129,3 +133,4 @@ fun App() {
         }
     }
 }
+

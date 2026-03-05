@@ -1,7 +1,7 @@
 package net.onefivefour.echolist.ui.login
 
 data class LoginUiState(
-    val backendUrl: String = "",
+    val backendUrl: String = "https://",
     val username: String = "",
     val password: String = "",
     val isLoading: Boolean = false,
