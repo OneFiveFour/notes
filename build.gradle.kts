@@ -27,6 +27,10 @@ allprojects {
         ignoreFailures = false
         ignoredBuildTypes = listOf("staging", "release")
     }
+
+    dependencies {
+        detektPlugins("ru.kode:detekt-rules-compose:1.4.0")
+    }
 }
 
 private fun getDetektSourcePaths(): List<File> {
@@ -49,8 +53,4 @@ private fun getDetektSourcePaths(): List<File> {
     }
 
     return sourceDirs.filter { it.exists() }
-}
-
-dependencies {
-    detektPlugins("ru.kode:detekt-rules-compose:1.4.0")
 }
