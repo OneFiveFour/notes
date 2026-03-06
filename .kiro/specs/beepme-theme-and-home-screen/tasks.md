@@ -51,7 +51,7 @@ Implement the Material 3 theme system and home screen in incremental steps. Star
     - _Requirements: 2.1, 2.2_
 
   - [x] 4.2 Create `EchoListTheme` composable
-    - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/Theme.kt`
+    - Create file `composeApp/src/commonMain/kotlin/net/onefivefour/notes/ui/theme/EchoListTheme.kt`
     - Resolve light/dark variant based on system dark mode setting
     - Provide EchoListDimensions via CompositionLocalProvider
     - Apply colorScheme, EchoListTypography, and EchoListShapes through MaterialTheme

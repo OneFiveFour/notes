@@ -3,7 +3,7 @@ package net.onefivefour.echolist
 import androidx.compose.ui.window.ComposeUIViewController
 import net.onefivefour.echolist.di.initKoin
 
-fun MainViewController() = run {
+fun mainViewController() = run {
     initKoin()
     ComposeUIViewController { App() }
 }

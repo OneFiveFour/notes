@@ -1,0 +1,53 @@
+naming:
+  FunctionNaming:
+    ignoreAnnotated: [ 'Composable' ]
+
+style:
+  UnusedPrivateMember:
+    active: true
+    ignoreAnnotated: [ 'DevicePreviews', 'Preview' ]
+  MaxLineLength:
+    excludes: [ "**/test/**","**/androidTest/**" ]
+  MagicNumber:
+    ignoreNumbers: [ '-1', '0', '1', '2', '50' ]
+    excludes: [ "**/test/**","**/androidTest/**" ]
+    ignorePropertyDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+  ReturnCount:
+    active: false
+  ForbiddenComment:
+    active: false
+
+exceptions:
+  TooGenericExceptionCaught:
+    active: false
+
+complexity:
+  LongParameterList:
+    ignoreAnnotated: [ 'Composable' ]
+  LongMethod:
+    ignoreAnnotated: [ 'Composable' ]
+
+compose:
+  ReusedModifierInstance:
+    active: true
+  UnnecessaryEventHandlerParameter:
+    active: true
+  ComposableEventParameterNaming:
+    active: true
+  ComposableParametersOrdering:
+    active: true
+  ModifierHeightWithText:
+    active: true
+  MissingModifierDefaultValue:
+    active: true
+  PublicComposablePreview:
+    active: true
+  TopLevelComposableFunctions:
+    active: true
+    allowInObjects: false
+  ComposableFunctionName:
+    active: true
+  ConditionCouldBeLifted:
+    active: true
+    ignoreCallsWithArgumentNames: [ 'modifier', 'contentAlignment' ]

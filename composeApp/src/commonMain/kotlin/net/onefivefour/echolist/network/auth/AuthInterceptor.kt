@@ -12,23 +12,6 @@ import kotlinx.coroutines.sync.withLock
 import net.onefivefour.echolist.data.repository.AuthRepository
 
 /**
- * Configuration for the [AuthInterceptor] Ktor client plugin.
- */
-class AuthInterceptorConfig {
-    lateinit var authRepository: AuthRepository
-    lateinit var authEventFlow: MutableSharedFlow<AuthEvent>
-}
-
-private val PUBLIC_AUTH_ENDPOINTS = setOf(
-    "/auth.v1.AuthService/Login",
-    "/auth.v1.AuthService/RefreshToken"
-)
-
-private fun isAuthEndpoint(path: String): Boolean {
-    return PUBLIC_AUTH_ENDPOINTS.any { path.endsWith(it) }
-}
-
-/**
  * Ktor client plugin that:
  * 1. Attaches Bearer token on non-auth endpoints from SecureStorage
  * 2. Handles 401 responses: acquires mutex, refreshes token, retries original request
@@ -76,3 +59,21 @@ val AuthInterceptor = createClientPlugin("AuthInterceptor", ::AuthInterceptorCon
         }
     }
 }
+
+/**
+ * Configuration for the [AuthInterceptor] Ktor client plugin.
+ */
+class AuthInterceptorConfig {
+    lateinit var authRepository: AuthRepository
+    lateinit var authEventFlow: MutableSharedFlow<AuthEvent>
+}
+
+private val PUBLIC_AUTH_ENDPOINTS = setOf(
+    "/auth.v1.AuthService/Login",
+    "/auth.v1.AuthService/RefreshToken"
+)
+
+private fun isAuthEndpoint(path: String): Boolean {
+    return PUBLIC_AUTH_ENDPOINTS.any { path.endsWith(it) }
+}
+

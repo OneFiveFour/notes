@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 internal fun BreadcrumbBar(
     breadcrumbs: List<BreadcrumbItem>,
-    onBreadcrumbClicked: (String) -> Unit
+    onBreadcrumbClick: (String) -> Unit
 ) {
 
     Surface(
@@ -67,7 +67,7 @@ internal fun BreadcrumbBar(
 
             breadcrumbs.dropLast(1).forEach { bc ->
                 Text(
-                    modifier = Modifier.clickable { onBreadcrumbClicked(bc.path) },
+                    modifier = Modifier.clickable { onBreadcrumbClick(bc.path) },
                     text = bc.label,
                     style = EchoListTheme.typography.labelSmall
                 )
@@ -109,7 +109,7 @@ private fun BreadcrumbBarPreview() {
                     path = "/folder1/folder2"
                 )
             ),
-            onBreadcrumbClicked = { }
+            onBreadcrumbClick = { }
         )
     }
 }

@@ -23,6 +23,7 @@ sealed class AuthError {
          * Parse ConnectRPC error response and create appropriate AuthError.
          * Expected JSON format: {"code": "unauthenticated" | "internal", "message": "error description"}
          */
+        @Suppress("MagicNumber")
         fun fromNetworkException(exception: Throwable): AuthError {
             val message = exception.message ?: "Unknown error occurred"
             
@@ -55,7 +56,7 @@ sealed class AuthError {
         private fun parseErrorResponse(message: String): ErrorResponse? {
             return try {
                 json.decodeFromString<ErrorResponse>(message)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 null
             }
         }

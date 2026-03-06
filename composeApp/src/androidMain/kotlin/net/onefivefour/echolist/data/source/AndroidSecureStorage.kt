@@ -3,6 +3,7 @@ package net.onefivefour.echolist.data.source
 import android.content.Context
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKeys
+import androidx.core.content.edit
 
 class AndroidSecureStorage(context: Context) : SecureStorage {
 
@@ -17,10 +18,10 @@ class AndroidSecureStorage(context: Context) : SecureStorage {
     override fun get(key: String): String? = prefs.getString(key, null)
 
     override fun put(key: String, value: String) {
-        prefs.edit().putString(key, value).apply()
+        prefs.edit { putString(key, value) }
     }
 
     override fun delete(key: String) {
-        prefs.edit().remove(key).apply()
+        prefs.edit { remove(key) }
     }
 }

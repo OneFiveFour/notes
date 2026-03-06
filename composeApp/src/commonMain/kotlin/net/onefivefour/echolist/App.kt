@@ -57,9 +57,9 @@ fun App() {
 
                 LoginScreen(
                     uiState = loginState,
-                    onBackendUrlChanged = loginViewModel::onBackendUrlChanged,
-                    onUsernameChanged = loginViewModel::onUsernameChanged,
-                    onPasswordChanged = loginViewModel::onPasswordChanged,
+                    onBackendUrlChange = loginViewModel::onBackendUrlChanged,
+                    onUsernameChange = loginViewModel::onUsernameChanged,
+                    onPasswordChange = loginViewModel::onPasswordChanged,
                     onLoginClick = loginViewModel::onLoginClick
                 )
             }
@@ -86,9 +86,6 @@ fun App() {
                             val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
                             HomeScreen(
                                 uiState = homeUiState,
-                                onNavigationClick = if (backStack.size > 1) {
-                                    { backStack.removeLastOrNull() }
-                                } else null,
                                 onBreadcrumbClick = { path ->
                                     val index =
                                         backStack.indexOfLast { it is HomeRoute && it.path == path }
@@ -97,12 +94,7 @@ fun App() {
                                     } else {
                                         backStack.add(HomeRoute(path))
                                     }
-                                },
-                                onFolderClick = { folderId -> backStack.add(HomeRoute(folderId)) },
-                                onFileClick = { fileId -> backStack.add(EditNoteRoute(noteId = fileId)) },
-                                onAddFolderClick = { /* TODO: implement add folder */ },
-                                onAddNoteClick = { backStack.add(EditNoteRoute()) },
-                                onAddTasklistClick = { backStack.add(EditTaskListRoute()) }
+                                }
                             )
                         }
 
@@ -111,7 +103,7 @@ fun App() {
                             EditNoteScreen(
                                 noteId = route.noteId,
                                 text = text,
-                                onTextChanged = { text = it },
+                                onTextChange = { text = it },
                                 onSaveClick = { /* no-op */ },
                                 onBackClick = { backStack.removeLastOrNull() }
                             )
@@ -122,7 +114,7 @@ fun App() {
                             EditTaskListScreen(
                                 taskListId = route.taskListId,
                                 text = text,
-                                onTextChanged = { text = it },
+                                onTextChange = { text = it },
                                 onSaveClick = { /* no-op */ },
                                 onBackClick = { backStack.removeLastOrNull() }
                             )

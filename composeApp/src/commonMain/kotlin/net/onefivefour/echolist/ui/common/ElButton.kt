@@ -11,8 +11,8 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
 fun ElButton(
-    modifier: Modifier = Modifier,
     onClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isEnabled: Boolean = true,
     content: @Composable () -> Unit
 ) {

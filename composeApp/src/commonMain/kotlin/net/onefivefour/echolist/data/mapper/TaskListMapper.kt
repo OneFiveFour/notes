@@ -17,6 +17,7 @@ import tasks.v1.UpdateTaskListResponse
 /**
  * Maps between Wire-generated task list proto models and domain models.
  */
+@Suppress("TooManyFunctions")
 internal object TaskListMapper {
 
     // Proto -> Domain

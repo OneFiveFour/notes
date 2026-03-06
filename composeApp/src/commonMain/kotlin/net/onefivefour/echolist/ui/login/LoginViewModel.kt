@@ -61,9 +61,24 @@ class LoginViewModel(
 
         viewModelScope.launch {
             // Perform validation with localized error strings
-            val backendUrlError = if (current.backendUrl.isBlank()) getString(Res.string.error_backend_url_required) else null
-            val usernameError = if (current.username.isBlank()) getString(Res.string.error_username_required) else null
-            val passwordError = if (current.password.isBlank()) getString(Res.string.error_password_required) else null
+            val backendUrlError = when {
+                current.backendUrl.isBlank() -> getString(
+                    Res.string.error_backend_url_required
+                )
+                else -> null
+            }
+            val usernameError = when {
+                current.username.isBlank() -> getString(
+                    Res.string.error_username_required
+                )
+                else -> null
+            }
+            val passwordError = when {
+                current.password.isBlank() -> getString(
+                    Res.string.error_password_required
+                )
+                else -> null
+            }
 
             if (backendUrlError != null || usernameError != null || passwordError != null) {
                 _uiState.update {

@@ -34,6 +34,7 @@ internal class ConnectRpcClientImpl(
         configSupplier = { config }
     )
 
+    @Suppress("MagicNumber")
     override suspend fun <Req, Res> call(
         path: String,
         request: Req,

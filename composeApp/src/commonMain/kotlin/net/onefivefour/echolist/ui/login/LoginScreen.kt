@@ -2,8 +2,6 @@ package net.onefivefour.echolist.ui.login
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -59,9 +57,9 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun LoginScreen(
     uiState: LoginUiState,
-    onBackendUrlChanged: (String) -> Unit,
-    onUsernameChanged: (String) -> Unit,
-    onPasswordChanged: (String) -> Unit,
+    onBackendUrlChange: (String) -> Unit,
+    onUsernameChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
     onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -96,7 +94,7 @@ fun LoginScreen(
             keyboardType = KeyboardType.Uri,
             imeAction = ImeAction.Next,
             keyboardActions = KeyboardActions(onNext = { usernameFocusRequester.requestFocus() }),
-            onValueChange = onBackendUrlChanged
+            onValueChange = onBackendUrlChange
         )
         uiState.backendUrlError?.let { errorMessage ->
             Text(
@@ -122,7 +120,7 @@ fun LoginScreen(
             keyboardType = KeyboardType.Text,
             imeAction = ImeAction.Next,
             keyboardActions = KeyboardActions(onNext = { passwordFocusRequester.requestFocus() }),
-            onValueChange = onUsernameChanged
+            onValueChange = onUsernameChange
         )
         uiState.usernameError?.let { errorMessage ->
             Text(
@@ -153,7 +151,7 @@ fun LoginScreen(
                 keyboardController?.hide()
                 onLoginClick()
             }),
-            onValueChange = onPasswordChanged,
+            onValueChange = onPasswordChange,
             visualTransformation = when {
                 showPassword -> VisualTransformation.None
                 else -> PasswordVisualTransformation()
@@ -236,9 +234,9 @@ private fun LoginScreenPreview() {
                 isLoading = false,
                 authError = AuthError.Unknown("Unknown error")
             ),
-            onBackendUrlChanged = { },
-            onUsernameChanged = { },
-            onPasswordChanged = { },
+            onBackendUrlChange = { },
+            onUsernameChange = { },
+            onPasswordChange = { },
             onLoginClick = { }
         )
     }

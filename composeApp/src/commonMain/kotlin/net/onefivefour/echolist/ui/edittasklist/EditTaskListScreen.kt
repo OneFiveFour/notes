@@ -35,7 +35,7 @@ import org.jetbrains.compose.resources.stringResource
 fun EditTaskListScreen(
     taskListId: String?,
     text: String,
-    onTextChanged: (String) -> Unit,
+    onTextChange: (String) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -84,7 +84,7 @@ fun EditTaskListScreen(
         ) {
             OutlinedTextField(
                 value = text,
-                onValueChange = onTextChanged,
+                onValueChange = onTextChange,
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = typography.bodyMedium.copy(color = colors.onBackground),
                 placeholder = {
