@@ -29,7 +29,7 @@ fun material3Typography(): Typography {
         titleLarge = TextStyle(
             fontFamily = WorkSansFontFamily,
             fontWeight = FontWeight.Bold,
-            fontSize = 24.sp
+            fontSize = 32.sp
         ),
         titleSmall = TextStyle(
             fontFamily = WorkSansFontFamily,

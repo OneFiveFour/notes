@@ -39,7 +39,13 @@
     <!-- Shared -->
     <string name="navigate_back">Navigate back</string>
     <string name="save_button">Save</string>
+    <string name="note">Note</string>
+    <string name="task">Task</string>
+    <string name="folder">Folder</string>
 
     <!-- Home Screen -->
     <string name="home_title">Home</string>
+    <string name="recent">Recent</string>
+    <string name="create">+ %1$s</string>
+
 </resources>

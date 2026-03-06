@@ -71,13 +71,11 @@ fun EchoListTheme(
         LocalMaterialColors provides materialColorScheme,
         LocalEchoListColors provides echoListColorScheme
     ) {
-        GradientBackground {
-            MaterialTheme(
-                colorScheme = materialColorScheme,
-                typography = typography,
-                shapes = EchoListTheme.shapes,
-                content = content
-            )
-        }
+        MaterialTheme(
+            colorScheme = materialColorScheme,
+            typography = typography,
+            shapes = EchoListTheme.shapes,
+            content = content
+        )
     }
 }

@@ -20,7 +20,6 @@ class HomeViewModel(
 
     private val _uiState = MutableStateFlow(
         HomeScreenUiState(
-            title = "",
             breadcrumbs = emptyList()
         )
     )
@@ -39,7 +38,6 @@ class HomeViewModel(
             onSuccess = { entries ->
                 _uiState.update { current ->
                     current.copy(
-                        title = titleFromPath(path, homeTitle),
                         breadcrumbs = buildBreadcrumbs(path, homeTitle)
                     )
                 }
@@ -47,18 +45,12 @@ class HomeViewModel(
             onFailure = {
                 _uiState.update { current ->
                     current.copy(
-                        title = titleFromPath(path, homeTitle),
                         breadcrumbs = buildBreadcrumbs(path, homeTitle)
                     )
                 }
             }
         )
     }
-}
-
-internal fun titleFromPath(path: String, homeTitle: String): String {
-    if (path == "/" || path.isEmpty()) return homeTitle
-    return path.trimEnd('/').substringAfterLast('/')
 }
 
 internal fun buildBreadcrumbs(path: String, homeTitle: String): List<BreadcrumbItem> {
