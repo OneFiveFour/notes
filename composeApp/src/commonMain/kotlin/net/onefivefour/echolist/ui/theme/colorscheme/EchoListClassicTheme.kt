@@ -13,7 +13,7 @@ val EchoListClassicTheme = ColorTheme(
         surface = Color(0x1A000000),
         surfaceVariant = Color(0x1A000000),
         primary = Color(0xFFC24142),
-        onPrimary = Color(0xFF383838),
+        onPrimary = Color(0xFFE1E0D5),
         secondary = Color(0xFFFF8C00),
         onSecondary = Color(0xFFFF8C00),
         onBackground = Color(0xFFFF8C00),
@@ -34,15 +34,15 @@ val EchoListClassicTheme = ColorTheme(
     ),
     echoListColorSchemeLight = EchoListColorScheme(
         background = Color(0xFFE1E0D5),
-        backgroundGradient1 = Color(0x22F425A8),
-        backgroundGradient2 = Color(0x12F48C25),
-        backgroundGradient3 = Color(0x2225C0F4),
+        backgroundGradient1 = Color(0x27F425A8),
+        backgroundGradient2 = Color(0x17F48C25),
+        backgroundGradient3 = Color(0x2725C0F4),
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),
-        backgroundGradient1 = Color(0x22F425A8),
-        backgroundGradient2 = Color(0x12F48C25),
-        backgroundGradient3 = Color(0x2225C0F4),
+        backgroundGradient1 = Color(0x27F425A8),
+        backgroundGradient2 = Color(0x17F48C25),
+        backgroundGradient3 = Color(0x2725C0F4),
     )
 //    echoListColorSchemeLight = EchoListColorScheme(
 //        background = Color(0xFF1A0B18),
