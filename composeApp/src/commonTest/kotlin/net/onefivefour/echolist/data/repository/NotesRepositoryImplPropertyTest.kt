@@ -58,7 +58,6 @@ class NotesRepositoryImplPropertyTest : FunSpec({
         )
     }
 
-
     // ---------------------------------------------------------------
     // Property 11: NotesRepository creates notes correctly
     // Validates: Requirements 6.1
@@ -154,7 +153,6 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             fakeNetwork.lastListRequest?.parent_dir shouldBe parentDir
         }
     }
-
 
     // ---------------------------------------------------------------
     // Property 13: NotesRepository gets notes correctly

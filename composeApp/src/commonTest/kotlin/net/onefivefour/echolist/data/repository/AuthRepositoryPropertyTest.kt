@@ -28,11 +28,11 @@ class AuthRepositoryPropertyTest : FunSpec({
     test("Property 5: Successful login persists access_token, refresh_token, and backend URL") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.string(1..50),  // baseUrl
-            Arb.string(1..50),  // username
-            Arb.string(1..50),  // password
+            Arb.string(1..50), // baseUrl
+            Arb.string(1..50), // username
+            Arb.string(1..50), // password
             Arb.string(1..100), // accessToken
-            Arb.string(1..100)  // refreshToken
+            Arb.string(1..100) // refreshToken
         ) { baseUrl, username, password, accessToken, refreshToken ->
             val storage = FakeSecureStorage()
 
@@ -81,9 +81,9 @@ class AuthRepositoryPropertyTest : FunSpec({
     test("Property 4: Login request path and protobuf fields match provided credentials") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.string(1..50),  // baseUrl
-            Arb.string(1..50),  // username
-            Arb.string(1..50)   // password
+            Arb.string(1..50), // baseUrl
+            Arb.string(1..50), // username
+            Arb.string(1..50) // password
         ) { baseUrl, username, password ->
             val storage = FakeSecureStorage()
             var capturedPath: String? = null

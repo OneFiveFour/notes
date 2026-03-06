@@ -14,7 +14,6 @@ fun HomeScreen(
     uiState: HomeScreenUiState,
     onBreadcrumbClick: (path: String) -> Unit
 ) {
-
     Column(
         modifier = Modifier
             .systemBarsPadding()
@@ -23,14 +22,9 @@ fun HomeScreen(
                 vertical = EchoListTheme.dimensions.l
             )
     ) {
-
         BreadcrumbBar(
             breadcrumbs = uiState.breadcrumbs,
             onBreadcrumbClick = onBreadcrumbClick
         )
-
-
-
     }
-
 }

@@ -76,4 +76,3 @@ private val PUBLIC_AUTH_ENDPOINTS = setOf(
 private fun isAuthEndpoint(path: String): Boolean {
     return PUBLIC_AUTH_ENDPOINTS.any { path.endsWith(it) }
 }
-

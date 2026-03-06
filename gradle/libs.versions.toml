@@ -17,6 +17,7 @@ composeNavigationEvent = "1.0.1"
 detekt = "1.23.8"
 detektRulesCompose = "1.4.0"
 detektRulesComposeVersion = "1.4.0"
+ktlint = "12.1.2"
 junit = "4.13.2"
 kotlin = "2.3.10"
 kotlinx-coroutines = "1.10.2"
@@ -97,6 +98,7 @@ composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMul
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 detekt-rules-compose = { id = "ru.kode:detekt-rules-compose", version.ref = "detektRulesCompose" }
+ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlint" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 wire = { id = "com.squareup.wire", version.ref = "wire" }
 kotlinSerialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

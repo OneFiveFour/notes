@@ -196,7 +196,7 @@ fun LoginScreen(
         ElButton(
             modifier = Modifier.width(150.dp).height(60.dp),
             onClick = onLoginClick,
-            isEnabled = !uiState.isLoading,
+            isEnabled = !uiState.isLoading
         ) {
             if (uiState.isLoading) {
                 CircularProgressIndicator(
@@ -240,5 +240,4 @@ private fun LoginScreenPreview() {
             onLoginClick = { }
         )
     }
-
 }

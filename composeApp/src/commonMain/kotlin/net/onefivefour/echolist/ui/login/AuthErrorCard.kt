@@ -36,22 +36,22 @@ fun AuthErrorCard(
     modifier: Modifier = Modifier
 ) {
     val dimensions = EchoListTheme.dimensions
-    
+
     val (title, description) = when (error) {
         is AuthError.InvalidCredentials -> {
-            stringResource(Res.string.error_auth_invalid_credentials) to 
+            stringResource(Res.string.error_auth_invalid_credentials) to
                 stringResource(Res.string.error_auth_invalid_credentials_description)
         }
         is AuthError.ServerError -> {
-            stringResource(Res.string.error_auth_server) to 
+            stringResource(Res.string.error_auth_server) to
                 stringResource(Res.string.error_auth_server_description)
         }
         is AuthError.NetworkError -> {
-            stringResource(Res.string.error_auth_network) to 
+            stringResource(Res.string.error_auth_network) to
                 stringResource(Res.string.error_auth_network_description)
         }
         is AuthError.Unknown -> {
-            stringResource(Res.string.error_auth_unknown) to 
+            stringResource(Res.string.error_auth_unknown) to
                 stringResource(Res.string.error_auth_unknown_description)
         }
     }
@@ -88,7 +88,7 @@ fun AuthErrorCard(
                 color = EchoListTheme.materialColors.onErrorContainer
             )
         }
-        
+
         Text(
             text = description,
             style = EchoListTheme.typography.bodySmall,

@@ -11,10 +11,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.models.CreateTaskListParams
 import net.onefivefour.echolist.data.models.MainTask
 import net.onefivefour.echolist.data.models.SubTask
-import net.onefivefour.echolist.data.models.UpdateTaskListParams
 
 /**
  * Feature: proto-api-update
@@ -187,7 +185,10 @@ class TaskListMapperPropertyTest : FunSpec({
     // Validates: Requirements 9.7
     // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 20: domain MainTask -> proto -> domain round-trip produces equivalent object") {
+    test(
+        "Feature: proto-api-update, Property 20: domain MainTask -> proto -> " +
+            "domain round-trip produces equivalent object"
+    ) {
         checkAll(PropTestConfig(iterations = 100), arbDomainMainTask) { original ->
             val proto = TaskListMapper.toProto(original)
             val roundTripped = TaskListMapper.toDomain(proto)
@@ -195,7 +196,10 @@ class TaskListMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 20: domain SubTask -> proto -> domain round-trip produces equivalent object") {
+    test(
+        "Feature: proto-api-update, Property 20: domain SubTask -> proto -> " +
+            "domain round-trip produces equivalent object"
+    ) {
         checkAll(PropTestConfig(iterations = 100), arbDomainSubTask) { original ->
             val proto = TaskListMapper.toProto(original)
             val roundTripped = TaskListMapper.toDomain(proto)

@@ -1,0 +1,31 @@
+[*]
+# line endings, possible values cr, lf, crlf
+end_of_line = lf
+# file encodings, possible values latin1, utf-8, utf-16be, utf-16le, utf-8-bom
+charset = utf-8
+
+# Ignore generated and build files
+[{**/build/**,**/generated/**}]
+ktlint = disabled
+
+[*.{kt,kts}]
+ktlint_code_style = android_studio
+# disabled because it's still buggy in IJ (https://youtrack.jetbrains.com/issue/KTIJ-18646)
+ktlint_standard_import-ordering = disabled
+ktlint_experimental = disabled
+ktlint_standard_discouraged-comment-location = disabled
+# possible values: number (e.g. 2), "unset" (makes ktlint ignore indentation completely)
+indent_size = 4
+indent_style = space
+# true (recommended) / false
+insert_final_newline = false
+# possible values: number (e.g. 120) (package name, imports & comments are ignored), "off"
+# it's automatically set to 100 on `ktlint --android ...` (per Android Kotlin Style Guide)
+max_line_length = 120
+ktlint_function_naming_ignore_when_annotated_with=Composable
+# disable forcing parameters to fit on a single line.
+# As long as they do not exceed the max length line, its valid to fit parameters on a single line
+# or multiline
+ktlint_standard_class-signature = disabled
+ktlint_standard_function-signature = disabled
+

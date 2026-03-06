@@ -139,7 +139,6 @@ class NotesRepositoryPropertyTest : FunSpec({
         }
     }
 
-
     // -- Property 6: Create-Then-Get Consistency --
 
     test("Property 6: After creating a note, getNote returns matching title/content/path") {
@@ -264,7 +263,6 @@ class NotesRepositoryPropertyTest : FunSpec({
             getResult.isFailure shouldBe true
         }
     }
-
 
     // -- Property 11: Error Propagation Transparency --
 

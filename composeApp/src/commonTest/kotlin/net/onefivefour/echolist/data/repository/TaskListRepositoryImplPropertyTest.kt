@@ -99,7 +99,10 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     // Validates: Requirements 10.1
     // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 21: TaskListRepository creates task lists correctly - returns mapped TaskList") {
+    test(
+        "Feature: proto-api-update, Property 21: " +
+            "TaskListRepository creates task lists correctly - returns mapped TaskList"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbCreateTaskListParams,
@@ -120,7 +123,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 21: TaskListRepository creates task lists correctly - maps request fields") {
+    test(
+        "Feature: proto-api-update, Property 21: TaskListRepository creates task lists correctly - maps request fields"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbCreateTaskListParams,
@@ -143,7 +148,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     // Validates: Requirements 10.2
     // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 22: TaskListRepository gets task lists correctly - returns mapped TaskList") {
+    test(
+        "Feature: proto-api-update, Property 22: TaskListRepository gets task lists correctly - returns mapped TaskList"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100),
@@ -193,7 +200,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     // Validates: Requirements 10.3
     // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 23: TaskListRepository lists task lists correctly - returns mapped list") {
+    test(
+        "Feature: proto-api-update, Property 23: TaskListRepository lists task lists correctly - returns mapped list"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(0..100),
@@ -218,7 +227,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 23: TaskListRepository lists task lists correctly - maps request fields") {
+    test(
+        "Feature: proto-api-update, Property 23: TaskListRepository lists task lists correctly - maps request fields"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(0..100)
@@ -238,7 +249,10 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     // Validates: Requirements 10.4
     // ---------------------------------------------------------------
 
-    test("Feature: proto-api-update, Property 24: TaskListRepository updates task lists correctly - returns mapped TaskList") {
+    test(
+        "Feature: proto-api-update, Property 24: " +
+            "TaskListRepository updates task lists correctly - returns mapped TaskList"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbUpdateTaskListParams,
@@ -259,7 +273,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 24: TaskListRepository updates task lists correctly - maps request fields") {
+    test(
+        "Feature: proto-api-update, Property 24: TaskListRepository updates task lists correctly - maps request fields"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbUpdateTaskListParams,
@@ -297,7 +313,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 25: TaskListRepository deletes task lists correctly - maps request fields") {
+    test(
+        "Feature: proto-api-update, Property 25: TaskListRepository deletes task lists correctly - maps request fields"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)

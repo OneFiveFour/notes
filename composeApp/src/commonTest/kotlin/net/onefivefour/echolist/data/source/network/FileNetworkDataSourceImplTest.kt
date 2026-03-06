@@ -59,7 +59,6 @@ class FileNetworkDataSourceImplTest : FunSpec({
         ): Result<Res> = Result.failure(exception)
     }
 
-
     // -- CreateFolder --
 
     test("createFolder calls correct RPC path") {

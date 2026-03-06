@@ -26,10 +26,10 @@ sealed class AuthError {
         @Suppress("MagicNumber")
         fun fromNetworkException(exception: Throwable): AuthError {
             val message = exception.message ?: "Unknown error occurred"
-            
+
             // Try to parse JSON error response
             val errorResponse = parseErrorResponse(message)
-            
+
             return when (errorResponse?.code) {
                 "unauthenticated" -> InvalidCredentials(errorResponse.message)
                 "internal" -> ServerError(errorResponse.message)

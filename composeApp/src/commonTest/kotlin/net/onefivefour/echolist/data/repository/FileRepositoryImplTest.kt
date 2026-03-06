@@ -49,7 +49,6 @@ class FileRepositoryImplTest : FunSpec({
         )
     }
 
-
     // -- CreateFolder --
 
     test("createFolder returns mapped folder on success").config(invocations = 20) {
@@ -70,7 +69,9 @@ class FileRepositoryImplTest : FunSpec({
     test("createFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbCreateFolderParams) { params ->
             val fake = FakeFileRemoteDataSource()
-            fake.createFolderResult = Result.success(CreateFolderResponse(folder = `file`.v1.Folder(path = "/test/", name = "test")))
+            fake.createFolderResult = Result.success(
+                CreateFolderResponse(folder = `file`.v1.Folder(path = "/test/", name = "test"))
+            )
             val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
 
             repo.createFolder(params)
@@ -156,7 +157,9 @@ class FileRepositoryImplTest : FunSpec({
     test("updateFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbUpdateFolderParams) { params ->
             val fake = FakeFileRemoteDataSource()
-            fake.updateFolderResult = Result.success(UpdateFolderResponse(folder = `file`.v1.Folder(path = "/new/", name = "new")))
+            fake.updateFolderResult = Result.success(
+                UpdateFolderResponse(folder = `file`.v1.Folder(path = "/new/", name = "new"))
+            )
             val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
 
             repo.updateFolder(params)

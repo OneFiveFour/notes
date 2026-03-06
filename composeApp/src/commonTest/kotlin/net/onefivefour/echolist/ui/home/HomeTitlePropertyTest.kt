@@ -23,8 +23,8 @@ class HomeTitlePropertyTest : FunSpec({
     test("Property 1: Home title parameterization") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.string(0..100),  // Random path strings
-            Arb.string(1..50)    // Random non-empty home title strings
+            Arb.string(0..100), // Random path strings
+            Arb.string(1..50) // Random non-empty home title strings
         ) { path, homeTitle ->
             // Test titleFromPath behavior
             if (path == "/" || path.isEmpty()) {
@@ -33,7 +33,7 @@ class HomeTitlePropertyTest : FunSpec({
 
             // Test buildBreadcrumbs behavior
             val breadcrumbs = buildBreadcrumbs(path, homeTitle)
-            
+
             // The first breadcrumb should always have homeTitle as the label
             breadcrumbs.first().label shouldBe homeTitle
             breadcrumbs.first().path shouldBe "/"

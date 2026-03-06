@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.error_backend_url_required
-import echolist.composeapp.generated.resources.error_login_failed
 import echolist.composeapp.generated.resources.error_password_required
 import echolist.composeapp.generated.resources.error_username_required
 import kotlinx.coroutines.flow.MutableSharedFlow

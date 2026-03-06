@@ -9,7 +9,7 @@ fun main() {
     application {
         Window(
             onCloseRequest = ::exitApplication,
-            title = "EchoList",
+            title = "EchoList"
         ) {
             App()
         }

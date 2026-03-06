@@ -48,7 +48,6 @@ class NotesRepositoryImplTest : FunSpec({
         )
     }
 
-
     // -- CreateNote --
 
     test("createNote returns mapped note on success").config(invocations = 20) {
@@ -211,7 +210,6 @@ class NotesRepositoryImplTest : FunSpec({
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()
     }
-
 
     // -- UpdateNote --
 

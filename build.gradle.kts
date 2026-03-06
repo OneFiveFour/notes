@@ -13,10 +13,12 @@ plugins {
     alias(libs.plugins.sqldelight) apply false
     alias(libs.plugins.kotlinSerialization) apply false
     alias(libs.plugins.detekt)
+    alias(libs.plugins.ktlint) apply false
 }
 
 allprojects {
     apply(plugin = "io.gitlab.arturbosch.detekt")
+    apply(plugin = "org.jlleitschuh.gradle.ktlint")
 
     detekt {
         toolVersion = "1.23.8"
@@ -30,6 +32,20 @@ allprojects {
 
     dependencies {
         detektPlugins("ru.kode:detekt-rules-compose:1.4.0")
+    }
+
+    configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+        version.set("1.0.1")
+        android.set(true)
+        ignoreFailures.set(false)
+    }
+
+    // Exclude build directories from ktlint after evaluation
+    afterEvaluate {
+        tasks.withType<org.jlleitschuh.gradle.ktlint.tasks.BaseKtLintCheckTask>().configureEach {
+            exclude("**/build/**")
+            exclude("**/generated/**")
+        }
     }
 }
 

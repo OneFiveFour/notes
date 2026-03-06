@@ -30,7 +30,6 @@ internal fun BreadcrumbBar(
     breadcrumbs: List<BreadcrumbItem>,
     onBreadcrumbClick: (String) -> Unit
 ) {
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -41,7 +40,6 @@ internal fun BreadcrumbBar(
             ),
         shape = RoundedCornerShape(50)
     ) {
-
         if (breadcrumbs.isEmpty()) {
             return@Surface
         }
@@ -54,7 +52,6 @@ internal fun BreadcrumbBar(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
         ) {
-
             Icon(
                 modifier = Modifier.offset(x = EchoListTheme.dimensions.xs),
                 painter = painterResource(Res.drawable.ic_home),
@@ -86,9 +83,7 @@ internal fun BreadcrumbBar(
             )
         }
     }
-
 }
-
 
 @Composable
 @Preview

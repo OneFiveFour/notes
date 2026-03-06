@@ -108,7 +108,11 @@ class NoteMapperTest : FunSpec({
         result.notes[1].filePath shouldBe "/home/user/notes/note2.md"
         result.notes[1].title shouldBe "Note 2"
         result.entries shouldHaveSize 3
-        result.entries shouldBe listOf("/home/user/notes/note1.md", "/home/user/notes/note2.md", "/home/user/notes/subfolder/")
+        result.entries shouldBe listOf(
+            "/home/user/notes/note1.md",
+            "/home/user/notes/note2.md",
+            "/home/user/notes/subfolder/"
+        )
     }
 
     test("toDomain transforms ListNotesResponse with empty notes list") {

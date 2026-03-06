@@ -6,7 +6,6 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
@@ -31,7 +30,6 @@ private fun Arb.Companion.navKey(): Arb<NavKey> =
  * The tests operate on MutableList<NavKey> which mirrors SnapshotStateList behavior.
  */
 class BackStackPropertyTest : FunSpec({
-
 
     // -----------------------------------------------------------------------
     // Property 2: Push navigation grows the back stack

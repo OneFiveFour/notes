@@ -45,7 +45,6 @@ class ConnectRpcClientPropertyTest : FunSpec({
     val arbServerErrorCode = Arb.int(500..599)
     val arbClientErrorCode = Arb.int(400..499)
 
-
     // -- Property 1: ConnectRPC Protocol Compliance --
 
     test("Property 1: All RPC requests include Connect-Protocol-Version header and application/proto content type") {

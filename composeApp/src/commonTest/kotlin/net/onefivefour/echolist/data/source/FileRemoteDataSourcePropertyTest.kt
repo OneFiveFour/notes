@@ -1,13 +1,9 @@
 package net.onefivefour.echolist.data.source
 
 import `file`.v1.CreateFolderRequest
-import `file`.v1.CreateFolderResponse
 import `file`.v1.DeleteFolderRequest
-import `file`.v1.DeleteFolderResponse
 import `file`.v1.ListFilesRequest
-import `file`.v1.ListFilesResponse
 import `file`.v1.UpdateFolderRequest
-import `file`.v1.UpdateFolderResponse
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb

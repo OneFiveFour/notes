@@ -65,10 +65,10 @@ class NoteMapperPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 8: NoteMapper transforms Note proto messages correctly") {
         checkAll(PropTestConfig(iterations = 100), arbProtoNote) { proto ->
             val domain = NoteMapper.toDomain(proto)
-            
+
             // Verify file_path -> filePath mapping
             domain.filePath shouldBe proto.file_path
-            
+
             // Verify all other fields correctly mapped
             domain.title shouldBe proto.title
             domain.content shouldBe proto.content
@@ -82,7 +82,7 @@ class NoteMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbCreateNoteResponse) { response ->
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
-            
+
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -94,7 +94,7 @@ class NoteMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbGetNoteResponse) { response ->
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
-            
+
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -106,7 +106,7 @@ class NoteMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbUpdateNoteResponse) { response ->
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
-            
+
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -116,13 +116,15 @@ class NoteMapperPropertyTest : FunSpec({
 
     // -- Property 10: NoteMapper transforms ListNotesResponse correctly --
 
-    test("Feature: proto-api-update, Property 10: ListNotesResponse -> ListNotesResult preserves all notes and entries") {
+    test(
+        "Feature: proto-api-update, Property 10: ListNotesResponse -> ListNotesResult preserves all notes and entries"
+    ) {
         checkAll(PropTestConfig(iterations = 100), arbListNotesResponse) { response ->
             val result = NoteMapper.toDomain(response)
-            
+
             // Verify all notes transformed
             result.notes shouldHaveSize response.notes.size
-            
+
             // Verify order and count preserved
             result.notes.forEachIndexed { index, note ->
                 val protoNote = response.notes[index]
@@ -131,7 +133,7 @@ class NoteMapperPropertyTest : FunSpec({
                 note.content shouldBe protoNote.content
                 note.updatedAt shouldBe protoNote.updated_at
             }
-            
+
             // Verify entries field correctly mapped
             result.entries shouldHaveSize response.entries.size
             result.entries shouldBe response.entries

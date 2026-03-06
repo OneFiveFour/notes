@@ -169,7 +169,13 @@ class LoginViewModelPropertyTest : FunSpec({
     test("Property 6: Login errors surface to UI") {
         val nonBlankArb = Arb.string(1..50).filter { it.isNotBlank() }
 
-        checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, nonBlankArb, Arb.string(1..100)) { url, user, pass, errorMsg ->
+        checkAll(
+            PropTestConfig(iterations = 20),
+            nonBlankArb,
+            nonBlankArb,
+            nonBlankArb,
+            Arb.string(1..100)
+        ) { url, user, pass, errorMsg ->
             runTest(testDispatcher) {
                 val repo = FakeAuthRepository()
                 repo.loginResult = Result.failure(RuntimeException(errorMsg))
