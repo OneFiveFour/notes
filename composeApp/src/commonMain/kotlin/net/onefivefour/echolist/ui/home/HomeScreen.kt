@@ -1,5 +1,8 @@
 package net.onefivefour.echolist.ui.home
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -19,5 +22,23 @@ fun HomeScreen(
     onAddNoteClick: () -> Unit,
     onAddTasklistClick: () -> Unit
 ) {
+
+    Column(
+        modifier = Modifier
+            .systemBarsPadding()
+            .padding(
+                horizontal = EchoListTheme.dimensions.xl,
+                vertical = EchoListTheme.dimensions.l
+            )
+    ) {
+
+        BreadcrumbBar(
+            breadcrumbs = uiState.breadcrumbs,
+            onBreadcrumbClicked = onBreadcrumbClick
+        )
+
+
+
+    }
 
 }

@@ -36,15 +36,20 @@ fun material3Typography(): Typography {
             fontWeight = FontWeight.SemiBold,
             fontSize = 14.sp
         ),
-        labelMedium = TextStyle(
+        labelLarge = TextStyle(
             fontFamily = WorkSansFontFamily,
             fontWeight = FontWeight.Medium,
             fontSize = 18.sp
         ),
+        labelMedium = TextStyle(
+            fontFamily = WorkSansFontFamily,
+            fontWeight = FontWeight.Medium,
+            fontSize = 14.sp
+        ),
         labelSmall = TextStyle(
             fontFamily = WorkSansFontFamily,
             fontWeight = FontWeight.Medium,
-            fontSize = 10.sp
+            fontSize = 12.sp
         ),
         bodySmall = TextStyle(
             fontFamily = WorkSansFontFamily,

@@ -1,0 +1,115 @@
+package net.onefivefour.echolist.ui.home
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.home_title
+import echolist.composeapp.generated.resources.ic_arrow_right
+import echolist.composeapp.generated.resources.ic_home
+import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
+@Composable
+internal fun BreadcrumbBar(
+    breadcrumbs: List<BreadcrumbItem>,
+    onBreadcrumbClicked: (String) -> Unit
+) {
+
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = 1.dp,
+                color = EchoListTheme.materialColors.surfaceVariant,
+                shape = RoundedCornerShape(50)
+            ),
+        shape = RoundedCornerShape(50)
+    ) {
+
+        if (breadcrumbs.isEmpty()) {
+            return@Surface
+        }
+
+        Row(
+            modifier = Modifier.padding(
+                horizontal = EchoListTheme.dimensions.m,
+                vertical = EchoListTheme.dimensions.m
+            ),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
+        ) {
+
+            Icon(
+                modifier = Modifier.offset(x = EchoListTheme.dimensions.xs),
+                painter = painterResource(Res.drawable.ic_home),
+                contentDescription = stringResource(Res.string.home_title),
+                tint = when (breadcrumbs.size) {
+                    1 -> EchoListTheme.materialColors.primary
+                    else -> EchoListTheme.materialColors.onSurface
+                }
+            )
+
+            breadcrumbs.dropLast(1).forEach { bc ->
+                Text(
+                    modifier = Modifier.clickable { onBreadcrumbClicked(bc.path) },
+                    text = bc.label,
+                    style = EchoListTheme.typography.labelSmall
+                )
+                Icon(
+                    painter = painterResource(Res.drawable.ic_arrow_right),
+                    contentDescription = null
+                )
+            }
+
+            Text(
+                text = breadcrumbs.last().label,
+                style = EchoListTheme.typography.labelSmall.copy(
+                    color = EchoListTheme.materialColors.primary,
+                    fontWeight = FontWeight.SemiBold
+                )
+            )
+        }
+    }
+
+}
+
+
+@Composable
+@Preview
+private fun BreadcrumbBarPreview() {
+    EchoListTheme {
+        BreadcrumbBar(
+            breadcrumbs = listOf(
+                BreadcrumbItem(
+                    label = "Home",
+                    path = "/"
+                ),
+                BreadcrumbItem(
+                    label = "Folder 1",
+                    path = "/folder1"
+                ),
+                BreadcrumbItem(
+                    label = "Folder 2",
+                    path = "/folder1/folder2"
+                )
+            ),
+            onBreadcrumbClicked = { }
+        )
+    }
+}
