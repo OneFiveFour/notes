@@ -17,6 +17,8 @@ style:
     active: false
   ForbiddenComment:
     active: false
+  NewLineAtEndOfFile:
+    active: false
 
 exceptions:
   TooGenericExceptionCaught:
