@@ -30,8 +30,8 @@ internal fun RoundIconButton(
 
     Surface(
         modifier = modifier
-            .size(EchoListTheme.dimensions.xxxl)
-            .clickable(onClick = onClick),
+            .size(EchoListTheme.dimensions.xxxl),
+        onClick = onClick,
         shape = RoundedCornerShape(50),
         border = BorderStroke(
             width = 1.dp,
@@ -40,7 +40,7 @@ internal fun RoundIconButton(
         color = containerColor
     ) {
         Icon(
-            modifier = Modifier.padding(EchoListTheme.dimensions.m),
+            modifier = Modifier.padding(14.dp),
             painter = painterResource(iconRes),
             contentDescription = contentDescription,
             tint = contentColor

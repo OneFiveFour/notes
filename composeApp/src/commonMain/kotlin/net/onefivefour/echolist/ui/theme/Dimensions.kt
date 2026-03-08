@@ -12,7 +12,7 @@ data class Dimensions(
     val l: Dp = 16.dp,
     val xl: Dp = 24.dp,
     val xxl: Dp = 32.dp,
-    val xxxl: Dp = 42.dp,
+    val xxxl: Dp = 48.dp,
     val iconSmall: Dp = 36.dp,
     val iconMedium: Dp = 40.dp,
     val borderWidth: Dp = 1.dp

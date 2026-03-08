@@ -66,7 +66,7 @@ internal fun BreadcrumbBar(
                 Text(
                     modifier = Modifier.clickable { onBreadcrumbClick(bc.path) },
                     text = bc.label,
-                    style = EchoListTheme.typography.labelSmall
+                    style = EchoListTheme.typography.labelMedium
                 )
                 Icon(
                     painter = painterResource(Res.drawable.ic_arrow_right),
@@ -76,7 +76,7 @@ internal fun BreadcrumbBar(
 
             Text(
                 text = breadcrumbs.last().label,
-                style = EchoListTheme.typography.labelSmall.copy(
+                style = EchoListTheme.typography.labelMedium.copy(
                     color = EchoListTheme.materialColors.primary,
                     fontWeight = FontWeight.SemiBold
                 )

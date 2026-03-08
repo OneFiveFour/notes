@@ -1,5 +1,8 @@
 package net.onefivefour.echolist.ui.home
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,7 +19,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import echolist.composeapp.generated.resources.Res
@@ -33,8 +42,12 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
-    onBreadcrumbClick: (path: String) -> Unit
+    onBreadcrumbClick: (path: String) -> Unit,
+    onNoteCreate: () -> Unit = {},
+    onTaskCreate: () -> Unit = {},
+    onFolderCreate: () -> Unit = {}
 ) {
+
     Column(
         modifier = Modifier
             .systemBarsPadding()
@@ -51,7 +64,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
 
         Text(
-            text = uiState.breadcrumbs.last().label,
+            text = uiState.breadcrumbs.lastOrNull()?.label ?: "",
             color = EchoListTheme.materialColors.primary,
             style = EchoListTheme.typography.titleLarge
         )
@@ -76,26 +89,73 @@ fun HomeScreen(
             style = EchoListTheme.typography.titleLarge
         )
 
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            RoundIconButton(
-                iconRes = Res.drawable.ic_search,
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
-            RoundIconButton(
-                iconRes = Res.drawable.ic_settings,
-                onClick = {}
-            )
-            Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
-            RoundIconButton(
-                iconRes = Res.drawable.ic_plus,
-                onClick = {},
-                containerColor = EchoListTheme.materialColors.primary,
-                contentColor = EchoListTheme.materialColors.onPrimary
-            )
+        var isFabExpanded by remember { mutableStateOf(false) }
+
+        Crossfade(targetState = isFabExpanded) { showItemPills ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                when (showItemPills) {
+                    true -> {
+                        CreateItemPill(
+                            color = EchoListTheme.echoListColorScheme.noteColor,
+                            text = "Note",
+                            onClick = {
+                                onNoteCreate()
+                                isFabExpanded = false
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
+                        CreateItemPill(
+                            color = EchoListTheme.echoListColorScheme.taskColor,
+                            text = "Task",
+                            onClick = {
+                                onTaskCreate()
+                                isFabExpanded = false
+                            }
+                        )
+                        Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
+                        CreateItemPill(
+                            color = EchoListTheme.echoListColorScheme.folderColor,
+                            text = "Folder",
+                            onClick = {
+                                onFolderCreate()
+                                isFabExpanded = false
+                            }
+                        )
+                    }
+
+                    else -> {
+                        RoundIconButton(
+                            iconRes = Res.drawable.ic_search,
+                            onClick = {}
+                        )
+                        Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
+                        RoundIconButton(
+                            iconRes = Res.drawable.ic_settings,
+                            onClick = {}
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(EchoListTheme.dimensions.m))
+
+                RoundIconButton(
+                    modifier = Modifier.rotate(
+                        when {
+                            isFabExpanded -> 45f
+                            else -> 0f
+                        }
+                    ),
+                    iconRes = Res.drawable.ic_plus,
+                    onClick = { isFabExpanded = !isFabExpanded },
+                    containerColor = EchoListTheme.materialColors.primary,
+                    contentColor = EchoListTheme.materialColors.onPrimary
+                )
+            }
+
         }
     }
 }
