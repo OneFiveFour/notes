@@ -1,31 +1,27 @@
 package net.onefivefour.echolist.ui.home
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.recent
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.stringResource
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
     onBreadcrumbClick: (path: String) -> Unit,
+    onFolderClick: (path: String) -> Unit = {},
+    onNoteClick: (path: String) -> Unit = {},
+    onTaskClick: (path: String) -> Unit = {},
     onNoteCreate: () -> Unit = {},
     onTaskCreate: () -> Unit = {},
     onFolderCreate: () -> Unit = {}
@@ -48,6 +44,12 @@ fun HomeScreen(
 
         FileOverview(
             title = uiState.breadcrumbs.lastOrNull()?.label ?: "",
+            fileEntries = uiState.fileEntries,
+            isLoading = uiState.isLoading,
+            error = uiState.error,
+            onFolderClick = onFolderClick,
+            onNoteClick = onNoteClick,
+            onTaskClick = onTaskClick,
             modifier = Modifier.weight(1f)
         )
 

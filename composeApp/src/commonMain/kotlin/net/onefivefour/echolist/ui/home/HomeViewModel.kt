@@ -20,7 +20,8 @@ class HomeViewModel(
 
     private val _uiState = MutableStateFlow(
         HomeScreenUiState(
-            breadcrumbs = emptyList()
+            breadcrumbs = emptyList(),
+            isLoading = true
         )
     )
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
@@ -38,14 +39,20 @@ class HomeViewModel(
             onSuccess = { entries ->
                 _uiState.update { current ->
                     current.copy(
-                        breadcrumbs = buildBreadcrumbs(path, homeTitle)
+                        breadcrumbs = buildBreadcrumbs(path, homeTitle),
+                        fileEntries = entries,
+                        isLoading = false,
+                        error = null
                     )
                 }
             },
-            onFailure = {
+            onFailure = { exception ->
                 _uiState.update { current ->
                     current.copy(
-                        breadcrumbs = buildBreadcrumbs(path, homeTitle)
+                        breadcrumbs = buildBreadcrumbs(path, homeTitle),
+                        fileEntries = emptyList(),
+                        isLoading = false,
+                        error = exception.message
                     )
                 }
             }
