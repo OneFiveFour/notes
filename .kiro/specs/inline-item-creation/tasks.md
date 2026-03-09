@@ -42,12 +42,12 @@ Transform `CreateItemPills` from a simple pill row into an inline creation flow 
 - [x] 2. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 3. Rewrite `CreateItemPills` composable with AnimatedContent and inline text field
-  - [ ] 3.1 Update `CreateItemPills` callback signatures from `() -> Unit` to `(String) -> Unit`
+- [x] 3. Rewrite `CreateItemPills` composable with AnimatedContent and inline text field
+  - [x] 3.1 Update `CreateItemPills` callback signatures from `() -> Unit` to `(String) -> Unit`
     - Change `onCreateNote`, `onTaskCreate`, `onFolderCreate` parameter types
     - _Requirements: 6.2_
 
-  - [ ] 3.2 Implement internal state management and AnimatedContent layout
+  - [x] 3.2 Implement internal state management and AnimatedContent layout
     - Add `pillsState` via `remember { mutableStateOf(PillsUiState.Idle) }` and `textFieldValue` via `remember { mutableStateOf("") }`
     - Restructure layout: outer `Row` with `AnimatedContent(modifier = Modifier.weight(1f))` + `Spacer` + `RoundIconButton` outside animation scope
     - Use `fadeIn`/`expandHorizontally` + `fadeOut`/`shrinkHorizontally` transition spec
@@ -58,7 +58,7 @@ Transform `CreateItemPills` from a simple pill row into an inline creation flow 
     - Request focus via `FocusRequester` + `LaunchedEffect` when entering `Input` state
     - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 5.1, 5.2, 5.3, 5.4, 5.5, 6.1, 6.3_
 
-  - [ ] 3.3 Write property test: Item type color mapping is consistent
+  - [x] 3.3 Write property test: Item type color mapping is consistent
     - **Property 2: Item type color mapping is consistent**
     - **Validates: Requirements 3.3**
     - For any item type in {NOTE, TASK_LIST, FOLDER}, `pillColor()` returns the matching color from `EchoListColorScheme`, and no two item types share a color

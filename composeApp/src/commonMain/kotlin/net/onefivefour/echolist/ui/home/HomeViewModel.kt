@@ -9,9 +9,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.repository.FileRepository
+import net.onefivefour.echolist.domain.repository.FileRepository
 import org.jetbrains.compose.resources.getString
-import kotlin.collections.emptyList
 
 class HomeViewModel(
     private val path: String,

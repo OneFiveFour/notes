@@ -10,7 +10,6 @@ import net.onefivefour.echolist.network.auth.AuthEvent
 import net.onefivefour.echolist.network.auth.AuthInterceptor
 import net.onefivefour.echolist.data.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
-import net.onefivefour.echolist.data.repository.FileRepository
 import net.onefivefour.echolist.data.repository.FileRepositoryImpl
 import net.onefivefour.echolist.data.repository.TaskListRepository
 import net.onefivefour.echolist.data.repository.TaskListRepositoryImpl
@@ -22,6 +21,7 @@ import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
+import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.network.client.ConnectRpcClient
 import net.onefivefour.echolist.network.client.ConnectRpcClientImpl
 import net.onefivefour.echolist.network.config.NetworkConfigProvider

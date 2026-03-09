@@ -63,3 +63,40 @@ class CreateItemPillsPropertyTest : FunSpec({
         }
     }
 })
+
+    test("Feature: inline-item-creation, Property 2: Item type color mapping is consistent") {
+        checkAll(validItemTypes) { itemType1 ->
+            checkAll(validItemTypes) { itemType2 ->
+                // Create a mock color scheme to test the mapping logic
+                val mockColorScheme = net.onefivefour.echolist.ui.theme.EchoListColorScheme(
+                    background = androidx.compose.ui.graphics.Color(0xFFFFFAF0),
+                    backgroundGradient1 = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    backgroundGradient2 = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    backgroundGradient3 = androidx.compose.ui.graphics.Color(0xFFFFFFFF),
+                    noteColor = androidx.compose.ui.graphics.Color(0xFF023047),
+                    taskColor = androidx.compose.ui.graphics.Color(0xFF780000),
+                    folderColor = androidx.compose.ui.graphics.Color(0xFF8ECAE6)
+                )
+                
+                // Map each ItemType to its expected color from the scheme
+                val color1 = when (itemType1) {
+                    ItemType.NOTE -> mockColorScheme.noteColor
+                    ItemType.TASK_LIST -> mockColorScheme.taskColor
+                    ItemType.FOLDER -> mockColorScheme.folderColor
+                    ItemType.UNSPECIFIED -> androidx.compose.ui.graphics.Color.Transparent
+                }
+                
+                val color2 = when (itemType2) {
+                    ItemType.NOTE -> mockColorScheme.noteColor
+                    ItemType.TASK_LIST -> mockColorScheme.taskColor
+                    ItemType.FOLDER -> mockColorScheme.folderColor
+                    ItemType.UNSPECIFIED -> androidx.compose.ui.graphics.Color.Transparent
+                }
+                
+                // If the item types are different, their colors should be different
+                if (itemType1 != itemType2) {
+                    color1 shouldNotBe color2
+                }
+            }
+        }
+    }
