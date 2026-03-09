@@ -6,40 +6,40 @@ Transform `CreateItemPills` from a simple pill row into an inline creation flow 
 
 ## Tasks
 
-- [ ] 1. Define PillsUiState and pure state machine logic
-  - [ ] 1.1 Create `PillsUiState` sealed interface and `PillsAction` sealed interface in a new file `CreateItemPillsState.kt`
+- [x] 1. Define PillsUiState and pure state machine logic
+  - [x] 1.1 Create `PillsUiState` sealed interface and `PillsAction` sealed interface in a new file `CreateItemPillsState.kt`
     - Define `PillsUiState.Idle` and `PillsUiState.Input(itemType: ItemType)`
     - Define `PillsAction` variants: `PillClicked(itemType)`, `ImeConfirm(title: String)`, `CloseClicked`
     - Implement pure `nextState(current: PillsUiState, action: PillsAction): PillsUiState` function
     - Implement pure `resolveImeAction(itemType: ItemType, title: String): ItemType?` function (returns null for empty/blank titles)
     - _Requirements: 1.1, 1.2, 1.3, 4.1, 4.2, 4.3, 5.3_
 
-  - [ ] 1.2 Add `ItemType.pillColor()` and `ItemType.pillLabel()` extension functions in `CreateItemPillsState.kt`
+  - [x] 1.2 Add `ItemType.pillColor()` and `ItemType.pillLabel()` extension functions in `CreateItemPillsState.kt`
     - `pillColor()` returns the matching color from `EchoListTheme.echoListColorScheme`
     - `pillLabel()` returns "Note", "Task", or "Folder" (empty string for UNSPECIFIED)
     - _Requirements: 3.3_
 
-  - [ ] 1.3 Write property test: Pill selection transitions to correct Input state
+  - [x] 1.3 Write property test: Pill selection transitions to correct Input state
     - **Property 1: Pill selection transitions to correct Input state**
     - **Validates: Requirements 1.1, 1.2, 1.3**
     - For any item type in {NOTE, TASK_LIST, FOLDER}, `nextState(Idle, PillClicked(itemType))` should return `Input(itemType)`
 
-  - [ ] 1.4 Write property test: IME confirm with non-empty title invokes correct callback and resets
+  - [x] 1.4 Write property test: IME confirm with non-empty title invokes correct callback and resets
     - **Property 3: IME confirm with non-empty title invokes correct callback and resets**
     - **Validates: Requirements 4.1, 4.2**
     - For any item type and any non-empty string, `resolveImeAction(itemType, title)` returns that item type, and `nextState(Input(itemType), ImeConfirm(title))` returns `Idle`
 
-  - [ ] 1.5 Write property test: IME confirm with empty title resets without callback
+  - [x] 1.5 Write property test: IME confirm with empty title resets without callback
     - **Property 4: IME confirm with empty title resets without callback**
     - **Validates: Requirements 4.3**
     - For any item type, `resolveImeAction(itemType, "")` returns null, and `nextState(Input(itemType), ImeConfirm(""))` returns `Idle`
 
-  - [ ] 1.6 Write property test: Close button in Input state resets and invokes onClosePills
+  - [x] 1.6 Write property test: Close button in Input state resets and invokes onClosePills
     - **Property 5: Close button in Input state resets and invokes onClosePills**
     - **Validates: Requirements 5.3, 5.4**
     - For any item type, `nextState(Input(itemType), CloseClicked)` returns `Idle`
 
-- [ ] 2. Checkpoint - Ensure all tests pass
+- [x] 2. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 3. Rewrite `CreateItemPills` composable with AnimatedContent and inline text field
