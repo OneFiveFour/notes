@@ -7,9 +7,11 @@ import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.FileMapper
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
+import net.onefivefour.echolist.data.models.FileEntry
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.UpdateFolderParams
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
+import net.onefivefour.echolist.domain.repository.FileRepository
 
 internal class FileRepositoryImpl(
     private val networkDataSource: FileRemoteDataSource,
@@ -27,7 +29,7 @@ internal class FileRepositoryImpl(
             }
         }
 
-    override suspend fun listFiles(parentPath: String): Result<List<String>> =
+    override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> =
         withContext(dispatcher) {
             try {
                 val request = ListFilesRequest(parent_dir = parentPath)

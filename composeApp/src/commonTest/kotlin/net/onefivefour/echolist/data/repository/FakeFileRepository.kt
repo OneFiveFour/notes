@@ -2,8 +2,10 @@ package net.onefivefour.echolist.data.repository
 
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
+import net.onefivefour.echolist.data.models.FileEntry
 import net.onefivefour.echolist.data.models.Folder
 import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.domain.repository.FileRepository
 
 /**
  * Fake [FileRepository] for testing. Supports pre-configured results
@@ -12,7 +14,7 @@ import net.onefivefour.echolist.data.models.UpdateFolderParams
 open class FakeFileRepository : FileRepository {
 
     var createFolderResult: Result<Folder> = Result.success(Folder(path = "", name = ""))
-    var listFilesResult: Result<List<String>> = Result.success(emptyList())
+    var listFilesResult: Result<List<FileEntry>> = Result.success(emptyList())
     var updateFolderResult: Result<Folder> = Result.success(Folder(path = "", name = ""))
     var deleteFolderResult: Result<Unit> = Result.success(Unit)
 
@@ -29,7 +31,7 @@ open class FakeFileRepository : FileRepository {
         return createFolderResult
     }
 
-    override suspend fun listFiles(parentPath: String): Result<List<String>> {
+    override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
         callLog.add("listFiles($parentPath)")
         return listFilesResult
     }
