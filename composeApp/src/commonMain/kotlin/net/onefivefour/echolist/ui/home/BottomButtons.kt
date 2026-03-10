@@ -30,7 +30,6 @@ fun BottomButtons(
             onClick = {}
         )
         RoundIconButton(
-            modifier = Modifier.Companion.rotate(45f),
             iconRes = Res.drawable.ic_plus,
             onClick = onOpenPills,
             containerColor = EchoListTheme.materialColors.primary,

@@ -74,8 +74,8 @@ internal fun ItemType.pillColor(): Color = when (this) {
  * Extension function that maps ItemType to its display label.
  */
 internal fun ItemType.pillLabel(): String = when (this) {
-    ItemType.NOTE -> "Note"
-    ItemType.TASK_LIST -> "Task"
-    ItemType.FOLDER -> "Folder"
+    ItemType.NOTE -> "+ Note"
+    ItemType.TASK_LIST -> "+ Task"
+    ItemType.FOLDER -> "+ Folder"
     ItemType.UNSPECIFIED -> ""
 }
