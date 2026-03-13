@@ -1,58 +1,38 @@
 package net.onefivefour.echolist.ui.home
 
-import androidx.compose.animation.BoundsTransform
-import androidx.compose.animation.animateBounds
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.VisibilityThreshold
-import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.layout.LookaheadScope
+import androidx.compose.ui.text.style.TextAlign
+import net.onefivefour.echolist.data.models.ItemType
+import net.onefivefour.echolist.ui.theme.EchoListTheme
 
-enum class ExpandablePillState {
-    COLLAPSED,
-    EXPANDED
-}
-
-private val ExpandableBoxBoundsTransform = BoundsTransform { _, _ ->
-    spring(
-        dampingRatio = Spring.DampingRatioNoBouncy,
-        stiffness = Spring.StiffnessLow,
-        visibilityThreshold = Rect.VisibilityThreshold
-    )
-}
-
-/**
- * A composable that animates its bounds within a [LookaheadScope] when its size changes.
- * Sizing (e.g. weight, fillMaxWidth) should be controlled by the caller via [modifier].
- *
- * @param state Whether this box is currently [ExpandablePillState.EXPANDED] or [ExpandablePillState.COLLAPSED].
- * @param onClick Called when the box is clicked (typically to toggle state).
- * @param lookaheadScope The enclosing [LookaheadScope] used to drive bounds animations.
- * @param modifier Modifier applied to the outer Box — use this to control sizing (weight, fillMaxWidth, etc.).
- * @param content The content to display inside the box.
- */
 @Composable
 internal fun CreateItemPill(
-    state: ExpandablePillState,
-    onClick: () -> Unit,
-    lookaheadScope: LookaheadScope,
-    modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    itemType: ItemType,
+    onClick: (ItemType) -> Unit
 ) {
-    Box(
-        modifier = modifier
-            .animateBounds(
-                lookaheadScope = lookaheadScope,
-                boundsTransform = ExpandableBoxBoundsTransform
-            )
-            .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
-    ) {
-        content()
-    }
+        Text(
+            modifier = Modifier
+                .clickable { onClick(itemType) }
+                .background(
+                    color = itemType.pillColor(),
+                    shape = RoundedCornerShape(50)
+                )
+                .padding(
+                    horizontal = EchoListTheme.dimensions.m,
+                    vertical = EchoListTheme.dimensions.s
+                ),
+            text = itemType.pillLabel(),
+            style = EchoListTheme.typography.labelMedium,
+            textAlign = TextAlign.Center
+        )
 }

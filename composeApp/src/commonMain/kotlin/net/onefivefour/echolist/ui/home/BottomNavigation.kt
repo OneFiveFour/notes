@@ -34,11 +34,11 @@ internal fun BottomNavigation(
                             onNoteCreate()
                             isFabExpanded = false
                         },
-                        onTaskCreate = {
+                        onCreateTaskList = {
                             onTaskCreate()
                             isFabExpanded = false
                         },
-                        onFolderCreate = {
+                        onCreateFolder = {
                             onFolderCreate()
                             isFabExpanded = false
                         },

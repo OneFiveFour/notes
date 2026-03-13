@@ -61,6 +61,8 @@ fun HomeScreen(
             style = EchoListTheme.typography.titleLarge
         )
 
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
+
         BottomNavigation(
             onNoteCreate = onNoteCreate,
             onTaskCreate = onTaskCreate,
