@@ -68,13 +68,19 @@ class DarkModeResolutionPropertyTest : FunSpec({
                 background = arbColor().bind(),
                 backgroundGradient1 = arbColor().bind(),
                 backgroundGradient2 = arbColor().bind(),
-                backgroundGradient3 = arbColor().bind()
+                backgroundGradient3 = arbColor().bind(),
+                taskColor = arbColor().bind(),
+                noteColor = arbColor().bind(),
+                folderColor = arbColor().bind()
             ),
             echoListColorSchemeDark = EchoListColorScheme(
                 background = arbColor().bind(),
                 backgroundGradient1 = arbColor().bind(),
                 backgroundGradient2 = arbColor().bind(),
-                backgroundGradient3 = arbColor().bind()
+                backgroundGradient3 = arbColor().bind(),
+                taskColor = arbColor().bind(),
+                noteColor = arbColor().bind(),
+                folderColor = arbColor().bind()
             )
         )
     }

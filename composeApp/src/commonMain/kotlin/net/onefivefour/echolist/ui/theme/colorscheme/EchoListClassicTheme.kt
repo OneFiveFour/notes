@@ -37,9 +37,9 @@ val EchoListClassicTheme = ColorTheme(
         backgroundGradient1 = Color(0x27F425A8),
         backgroundGradient2 = Color(0x17F48C25),
         backgroundGradient3 = Color(0x2725C0F4),
-        taskColor = Color(0xFFDBEAFE),
-        noteColor = Color(0xFFFFEDD5),
-        folderColor = Color(0xFFD1FAE5)
+        taskColor = Color(0xFF88A7E5),
+        noteColor = Color(0xFFE8B767),
+        folderColor = Color(0xFF69D09B)
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),

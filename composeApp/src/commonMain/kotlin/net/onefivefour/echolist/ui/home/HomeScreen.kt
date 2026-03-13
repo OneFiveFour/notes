@@ -22,9 +22,9 @@ fun HomeScreen(
     onFolderClick: (path: String) -> Unit = {},
     onNoteClick: (path: String) -> Unit = {},
     onTaskClick: (path: String) -> Unit = {},
-    onNoteCreate: () -> Unit = {},
-    onTaskCreate: () -> Unit = {},
-    onFolderCreate: () -> Unit = {}
+    onCreateNote: () -> Unit = {},
+    onCreateTaskList: () -> Unit = {},
+    onCreateFolder: () -> Unit
 ) {
 
     Column(
@@ -64,9 +64,9 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
 
         BottomNavigation(
-            onNoteCreate = onNoteCreate,
-            onTaskCreate = onTaskCreate,
-            onFolderCreate = onFolderCreate
+            onCreateNote = onCreateNote,
+            onCreateTaskList = onCreateTaskList,
+            onCreateFolder = onCreateFolder
         )
     }
 }
@@ -89,7 +89,8 @@ private fun HomeScreenPreview() {
                         )
                     )
                 ),
-                onBreadcrumbClick = {}
+                onBreadcrumbClick = {},
+                onCreateFolder = {}
             )
         }
     }
