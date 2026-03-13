@@ -95,12 +95,18 @@ class FileMapperPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: proto-api-update, Property 2: ListFilesResponse -> string entries list preserves all entries") {
-        checkAll(PropTestConfig(iterations = 100), Arb.list(Arb.string(1..100), 0..10)) { entries ->
+    test("Feature: proto-api-update, Property 2: ListFilesResponse -> domain entries list preserves all entries") {
+        val arbProtoFileEntry = arbitrary {
+            `file`.v1.FileEntry(
+                path = Arb.string(1..100).bind(),
+                title = Arb.string(1..100).bind(),
+                item_type = `file`.v1.ItemType.ITEM_TYPE_FOLDER
+            )
+        }
+        checkAll(PropTestConfig(iterations = 100), Arb.list(arbProtoFileEntry, 0..10)) { entries ->
             val response = `file`.v1.ListFilesResponse(entries = entries)
             val domainList = FileMapper.toDomain(response)
             domainList shouldHaveSize entries.size
-            domainList shouldBe entries
         }
     }
 

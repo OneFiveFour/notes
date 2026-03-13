@@ -96,7 +96,8 @@ fun App() {
                                         } else {
                                             backStack.add(HomeRoute(path))
                                         }
-                                    }
+                                    },
+                                    onCreateFolder = {}
                                 )
                             }
 

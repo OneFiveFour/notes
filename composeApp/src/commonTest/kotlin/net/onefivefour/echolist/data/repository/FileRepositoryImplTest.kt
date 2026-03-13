@@ -95,14 +95,22 @@ class FileRepositoryImplTest : FunSpec({
     // -- ListFiles --
 
     test("listFiles returns mapped entries on success") {
+        val protoEntries = listOf(
+            `file`.v1.FileEntry(path = "/file1.txt", title = "file1.txt", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
+            `file`.v1.FileEntry(path = "/file2.md", title = "file2.md", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
+            `file`.v1.FileEntry(path = "/folder1", title = "folder1", item_type = `file`.v1.ItemType.ITEM_TYPE_FOLDER)
+        )
         val fake = FakeFileRemoteDataSource()
-        fake.listFilesResult = Result.success(ListFilesResponse(entries = listOf("file1.txt", "file2.md", "folder1")))
+        fake.listFilesResult = Result.success(ListFilesResponse(entries = protoEntries))
         val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
 
         val result = repo.listFiles("/home/user")
 
         result.isSuccess shouldBe true
-        result.getOrThrow() shouldBe listOf("file1.txt", "file2.md", "folder1")
+        result.getOrThrow().size shouldBe 3
+        result.getOrThrow()[0].path shouldBe "/file1.txt"
+        result.getOrThrow()[1].path shouldBe "/file2.md"
+        result.getOrThrow()[2].path shouldBe "/folder1"
     }
 
     test("listFiles forwards correct parent_dir to data source") {

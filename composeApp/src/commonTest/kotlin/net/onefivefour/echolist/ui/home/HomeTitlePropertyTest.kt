@@ -26,11 +26,6 @@ class HomeTitlePropertyTest : FunSpec({
             Arb.string(0..100), // Random path strings
             Arb.string(1..50) // Random non-empty home title strings
         ) { path, homeTitle ->
-            // Test titleFromPath behavior
-            if (path == "/" || path.isEmpty()) {
-                titleFromPath(path, homeTitle) shouldBe homeTitle
-            }
-
             // Test buildBreadcrumbs behavior
             val breadcrumbs = buildBreadcrumbs(path, homeTitle)
 

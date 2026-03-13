@@ -1,5 +1,8 @@
 package net.onefivefour.echolist.data.repository
 
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import net.onefivefour.echolist.data.models.CreateFolderParams
 import net.onefivefour.echolist.data.models.DeleteFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
@@ -12,6 +15,9 @@ import net.onefivefour.echolist.domain.repository.FileRepository
  * and tracks all method calls for verification.
  */
 open class FakeFileRepository : FileRepository {
+
+    private val _directoryChanged = MutableSharedFlow<String>()
+    override val directoryChanged: SharedFlow<String> = _directoryChanged.asSharedFlow()
 
     var createFolderResult: Result<Folder> = Result.success(Folder(path = "", name = ""))
     var listFilesResult: Result<List<FileEntry>> = Result.success(emptyList())

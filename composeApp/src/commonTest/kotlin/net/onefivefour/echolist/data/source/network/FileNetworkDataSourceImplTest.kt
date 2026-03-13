@@ -109,7 +109,14 @@ class FileNetworkDataSourceImplTest : FunSpec({
     }
 
     test("listFiles deserializes response").config(invocations = 20) {
-        checkAll(Arb.list(Arb.string(1..100), 0..5)) { entries ->
+        val arbProtoFileEntry = arbitrary {
+            `file`.v1.FileEntry(
+                path = Arb.string(1..100).bind(),
+                title = Arb.string(1..100).bind(),
+                item_type = `file`.v1.ItemType.ITEM_TYPE_FOLDER
+            )
+        }
+        checkAll(Arb.list(arbProtoFileEntry, 0..5)) { entries ->
             val response = ListFilesResponse(entries = entries)
             val client = CapturingClient(ListFilesResponse.ADAPTER.encode(response))
             val dataSource = FileRemoteDataSourceImpl(client)

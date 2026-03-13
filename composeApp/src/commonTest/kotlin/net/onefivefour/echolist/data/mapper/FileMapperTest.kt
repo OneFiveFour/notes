@@ -42,14 +42,19 @@ class FileMapperTest : FunSpec({
     }
 
     test("toDomain transforms ListFilesResponse with multiple entries") {
-        val response = `file`.v1.ListFilesResponse(
-            entries = listOf("file1.txt", "file2.md", "folder1")
+        val protoEntries = listOf(
+            `file`.v1.FileEntry(path = "/file1.txt", title = "file1.txt", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
+            `file`.v1.FileEntry(path = "/file2.md", title = "file2.md", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
+            `file`.v1.FileEntry(path = "/folder1", title = "folder1", item_type = `file`.v1.ItemType.ITEM_TYPE_FOLDER)
         )
+        val response = `file`.v1.ListFilesResponse(entries = protoEntries)
 
         val domainList = FileMapper.toDomain(response)
 
         domainList shouldHaveSize 3
-        domainList shouldBe listOf("file1.txt", "file2.md", "folder1")
+        domainList[0].path shouldBe "/file1.txt"
+        domainList[1].path shouldBe "/file2.md"
+        domainList[2].path shouldBe "/folder1"
     }
 
     test("toDomain transforms ListFilesResponse with empty entries") {
@@ -136,11 +141,15 @@ class FileMapperTest : FunSpec({
     }
 
     test("toDomain handles ListFilesResponse with single entry") {
-        val response = `file`.v1.ListFilesResponse(entries = listOf("single.txt"))
+        val response = `file`.v1.ListFilesResponse(
+            entries = listOf(
+                `file`.v1.FileEntry(path = "/single.txt", title = "single.txt", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE)
+            )
+        )
 
         val domainList = FileMapper.toDomain(response)
 
         domainList shouldHaveSize 1
-        domainList[0] shouldBe "single.txt"
+        domainList[0].path shouldBe "/single.txt"
     }
 })
