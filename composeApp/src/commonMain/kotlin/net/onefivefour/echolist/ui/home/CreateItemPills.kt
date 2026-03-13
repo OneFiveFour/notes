@@ -24,8 +24,6 @@ import androidx.compose.ui.layout.LookaheadScope
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_plus
 import net.onefivefour.echolist.data.models.ItemType
-import net.onefivefour.echolist.ui.common.ExpandableBox
-import net.onefivefour.echolist.ui.common.ExpandableBoxState
 import net.onefivefour.echolist.ui.common.RoundIconButton
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -59,8 +57,11 @@ fun CreateItemPills(
                         shrinkTowards = Alignment.Start
                     )
                 ) {
-                    ExpandableBox(
-                        state = if (isExpanded) ExpandableBoxState.EXPANDED else ExpandableBoxState.COLLAPSED,
+                    CreateItemPill(
+                        state = when {
+                            isExpanded -> ExpandablePillState.EXPANDED
+                            else -> ExpandablePillState.COLLAPSED
+                        },
                         onClick = {
                             expandedType = if (isExpanded) null else itemType
                         },
@@ -75,10 +76,17 @@ fun CreateItemPills(
                                 vertical = EchoListTheme.dimensions.s
                             )
                     ) {
-                        Text(
-                            text = itemType.pillLabel(),
-                            style = EchoListTheme.typography.labelMedium
-                        )
+                        when {
+                            isExpanded -> {
+                                
+                            }
+                            else -> {
+                                Text(
+                                    text = itemType.pillLabel(),
+                                    style = EchoListTheme.typography.labelMedium
+                                )
+                            }
+                        }
                     }
                 }
             }

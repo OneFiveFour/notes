@@ -20,8 +20,8 @@ class CreateItemPillsPropertyTest : FunSpec({
 
     test("Feature: inline-item-creation, Property 1: Pill selection transitions to correct Input state") {
         checkAll(validItemTypes) { itemType ->
-            val result = nextState(PillsUiState.Idle, PillsAction.PillClicked(itemType))
-            result shouldBe PillsUiState.Input(itemType)
+            val result = nextState(CreateItemPillAction.BeginCreateItem(itemType))
+            result shouldBe CreateItemPillUiState.CreateMode(itemType)
         }
     }
 
@@ -32,8 +32,8 @@ class CreateItemPillsPropertyTest : FunSpec({
             resolvedType shouldBe itemType
 
             // nextState should transition back to Idle
-            val result = nextState(PillsUiState.Input(itemType), PillsAction.ImeConfirm(title))
-            result shouldBe PillsUiState.Idle
+            val result = nextState(CreateItemPillAction.ConfirmCreateItem(title))
+            result shouldBe CreateItemPillUiState.Idle
         }
     }
 
@@ -48,18 +48,18 @@ class CreateItemPillsPropertyTest : FunSpec({
             resolvedWhitespace shouldBe null
 
             // nextState should still transition back to Idle
-            val resultEmpty = nextState(PillsUiState.Input(itemType), PillsAction.ImeConfirm(""))
-            resultEmpty shouldBe PillsUiState.Idle
+            val resultEmpty = nextState(CreateItemPillAction.ConfirmCreateItem(""))
+            resultEmpty shouldBe CreateItemPillUiState.Idle
 
-            val resultWhitespace = nextState(PillsUiState.Input(itemType), PillsAction.ImeConfirm("   "))
-            resultWhitespace shouldBe PillsUiState.Idle
+            val resultWhitespace = nextState(CreateItemPillAction.ConfirmCreateItem("   "))
+            resultWhitespace shouldBe CreateItemPillUiState.Idle
         }
     }
 
     test("Feature: inline-item-creation, Property 5: Close button in Input state resets and invokes onClosePills") {
         checkAll(validItemTypes) { itemType ->
-            val result = nextState(PillsUiState.Input(itemType), PillsAction.CloseClicked)
-            result shouldBe PillsUiState.Idle
+            val result = nextState(CreateItemPillAction.OnClose)
+            result shouldBe CreateItemPillUiState.Idle
         }
     }
 })
