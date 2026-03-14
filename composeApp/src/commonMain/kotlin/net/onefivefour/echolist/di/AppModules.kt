@@ -29,6 +29,7 @@ import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 import net.onefivefour.echolist.ui.theme.colorscheme.EchoListTheme2
 import net.onefivefour.echolist.ui.theme.ThemeManager
 import net.onefivefour.echolist.ui.AuthViewModel
+import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import org.koin.core.module.Module
@@ -142,6 +143,12 @@ val navigationModule: Module = module {
     viewModel { params ->
         HomeViewModel(
             path = params.get(),
+            fileRepository = get()
+        )
+    }
+    viewModel { params ->
+        CreateFolderViewModel(
+            currentPath = params.get(),
             fileRepository = get()
         )
     }

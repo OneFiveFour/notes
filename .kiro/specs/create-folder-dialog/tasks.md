@@ -106,17 +106,17 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Verify `listFiles` is called again only for matching paths
     - **Validates: Requirements 2.2, 4.5**
 
-- [ ] 7. Koin registration and App.kt wiring
-  - [ ] 7.1 Register `CreateFolderViewModel` in `navigationModule` in `AppModules.kt`
+- [x] 7. Koin registration and App.kt wiring
+  - [x] 7.1 Register `CreateFolderViewModel` in `navigationModule` in `AppModules.kt`
     - Add `viewModel { params -> CreateFolderViewModel(currentPath = params.get(), fileRepository = get()) }`
     - _Requirements: 4.3, 5.3_
-  - [ ] 7.2 Update `entry<HomeRoute>` in `App.kt`
+  - [x] 7.2 Update `entry<HomeRoute>` in `App.kt`
     - Create `CreateFolderViewModel` via `koinViewModel` with key `"createFolder-${route.path}"` and `parametersOf(route.path)`
     - Collect `createFolderViewModel.uiState` with `collectAsStateWithLifecycle`
     - Pass `createFolderUiState`, `CreateItemCallbacks(onCreateFolder = createFolderViewModel::showDialog)`, `onFolderNameChange = createFolderViewModel::onNameChange`, `onConfirmCreateFolder = createFolderViewModel::onConfirm`, `onDismissCreateFolder = createFolderViewModel::dismissDialog` to `HomeScreen`
     - _Requirements: 5.2, 5.3_
 
-- [ ] 8. Final checkpoint
+- [x] 8. Final checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
 ## Notes
