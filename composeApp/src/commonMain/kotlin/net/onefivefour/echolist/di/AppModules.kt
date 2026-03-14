@@ -4,6 +4,8 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import net.onefivefour.echolist.data.network.logging.LogLevel
+import net.onefivefour.echolist.data.network.logging.NetworkLoggingPlugin
 import net.onefivefour.echolist.data.repository.AuthRepository
 import net.onefivefour.echolist.data.repository.AuthRepositoryImpl
 import net.onefivefour.echolist.network.auth.AuthEvent
@@ -65,6 +67,9 @@ val networkModule: Module = module {
         val authRepository: AuthRepository = get()
         val authEventFlow: MutableSharedFlow<AuthEvent> = get()
         HttpClient {
+            install(NetworkLoggingPlugin) {
+                minLogLevel = LogLevel.DEBUG
+            }
             install(HttpTimeout) {
                 requestTimeoutMillis = configProvider.config.requestTimeoutMs
                 connectTimeoutMillis = configProvider.config.connectTimeoutMs
