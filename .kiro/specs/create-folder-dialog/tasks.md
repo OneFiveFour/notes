@@ -14,7 +14,7 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Emit `params.parentDir` after successful `createFolder`, `updateFolder`, and `deleteFolder` calls
     - Do NOT emit on failure
     - _Requirements: 4.5, 2.2_
-  - [x] 1.3 Write property test for Property 6: Repository emits directoryChanged on successful mutation
+  - [xds] 1.3 Write property test for Property 6: Repository emits directoryChanged on successful mutation
     - **Property 6: Repository emits directoryChanged on successful mutation**
     - Generate arbitrary `CreateFolderParams` (arbitrary parentDir and name strings)
     - Mock `FileRemoteDataSource` to return success
@@ -22,17 +22,17 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Verify no emission on failure
     - **Validates: Requirements 4.5**
 
-- [ ] 2. Create `CreateFolderUiState` and `CreateFolderViewModel`
-  - [ ] 2.1 Create `CreateFolderUiState` data class in `ui/home/CreateFolderUiState.kt`
+- [x] 2. Create `CreateFolderUiState` and `CreateFolderViewModel`
+  - [x] 2.1 Create `CreateFolderUiState` data class in `ui/home/CreateFolderUiState.kt`
     - Fields: `isVisible: Boolean = false`, `folderName: String = ""`, `isLoading: Boolean = false`, `error: String? = null`
     - Computed property: `val isConfirmEnabled: Boolean get() = folderName.trim().isNotBlank() && !isLoading`
     - _Requirements: 1.4, 2.4, 3.2, 4.1_
-  - [ ] 2.2 Write property test for Property 2: Confirm button enabled iff valid and not loading
+  - [x] 2.2 Write property test for Property 2: Confirm button enabled iff valid and not loading
     - **Property 2: Confirm button enabled if and only if input is valid and not loading**
     - Generate arbitrary strings (including empty, whitespace-only, unicode) × arbitrary booleans for `isLoading`
     - Assert `isConfirmEnabled == (folderName.trim().isNotBlank() && !isLoading)`
     - **Validates: Requirements 1.4, 2.4, 3.2**
-  - [ ] 2.3 Create `CreateFolderViewModel` in `ui/home/CreateFolderViewModel.kt`
+  - [x] 2.3 Create `CreateFolderViewModel` in `ui/home/CreateFolderViewModel.kt`
     - Constructor params: `currentPath: String`, `fileRepository: FileRepository` (injected via Koin)
     - Expose `uiState: StateFlow<CreateFolderUiState>`
     - Implement `showDialog()`: set `isVisible = true`, reset `folderName`, `error`, `isLoading`
@@ -40,22 +40,22 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Implement `onNameChange(value: String)`: update `folderName`, clear `error`
     - Implement `onConfirm()`: trim name, guard blank, set `isLoading = true`, call `fileRepository.createFolder(CreateFolderParams(currentPath, trimmedName))`, on success reset state, on failure set `error` to exception message and `isLoading = false`
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 4.1, 4.2, 4.3_
-  - [ ] 2.4 Write property test for Property 1: Show/dismiss dialog round trip
+  - [x] 2.4 Write property test for Property 1: Show/dismiss dialog round trip
     - **Property 1: Show/dismiss dialog round trip**
     - For any initial `CreateFolderUiState` where `isVisible = false`, calling `showDialog()` then `dismissDialog()` returns state to hidden with empty name, no error, no loading
     - **Validates: Requirements 1.1, 1.5**
-  - [ ] 2.5 Write property test for Property 3: Confirm sends trimmed name with correct path
+  - [x] 2.5 Write property test for Property 3: Confirm sends trimmed name with correct path
     - **Property 3: Confirm sends trimmed name with correct path**
     - Generate non-blank strings with leading/trailing whitespace × arbitrary path strings
     - Mock `FileRepository` to capture `CreateFolderParams` argument
     - Verify `params.parentDir == currentPath` and `params.name == folderName.trim()`
     - **Validates: Requirements 2.1, 3.1**
-  - [ ] 2.6 Write property test for Property 4: Successful creation closes dialog
+  - [x] 2.6 Write property test for Property 4: Successful creation closes dialog
     - **Property 4: Successful creation closes dialog**
     - Generate non-blank folder names, mock `FileRepository.createFolder` to return `Result.success`
     - Verify state becomes `isVisible = false`, `folderName = ""`, `isLoading = false`, `error = null`
     - **Validates: Requirements 2.2**
-  - [ ] 2.7 Write property test for Property 5: Failed creation keeps dialog open with error
+  - [x] 2.7 Write property test for Property 5: Failed creation keeps dialog open with error
     - **Property 5: Failed creation keeps dialog open with error**
     - Generate non-blank folder names × arbitrary error messages
     - Mock `FileRepository.createFolder` to return `Result.failure`
