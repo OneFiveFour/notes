@@ -62,11 +62,11 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Verify state has `isVisible = true`, `isLoading = false`, `error == exception.message`
     - **Validates: Requirements 2.3**
 
-- [ ] 3. Checkpoint
+- [x] 3. Checkpoint
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Create `CreateFolderDialog` composable
-  - [ ] 4.1 Create `CreateFolderDialog` composable in `ui/home/CreateFolderDialog.kt`
+- [x] 4. Create `CreateFolderDialog` composable
+  - [x] 4.1 Create `CreateFolderDialog` composable in `ui/home/CreateFolderDialog.kt`
     - Parameters: `uiState: CreateFolderUiState`, `onNameChange: (String) -> Unit`, `onConfirm: () -> Unit`, `onDismiss: () -> Unit`
     - Render only when `uiState.isVisible` is true
     - Use Material 3 `AlertDialog` with `EchoListTheme` tokens for all colors, typography, dimensions, and shapes
