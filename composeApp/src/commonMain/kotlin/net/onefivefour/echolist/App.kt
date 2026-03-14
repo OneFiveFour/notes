@@ -20,6 +20,8 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.common.GradientBackground
+import net.onefivefour.echolist.ui.home.CreateFolderViewModel
+import net.onefivefour.echolist.ui.home.CreateItemCallbacks
 import net.onefivefour.echolist.ui.home.HomeScreen
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginScreen
@@ -86,8 +88,16 @@ fun App() {
                                 val homeViewModel =
                                     koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
                                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+                                val createFolderViewModel =
+                                    koinViewModel<CreateFolderViewModel>(
+                                        key = "createFolder-${route.path}"
+                                    ) { parametersOf(route.path) }
+                                val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
+
                                 HomeScreen(
                                     uiState = homeUiState,
+                                    createFolderUiState = createFolderUiState,
                                     onBreadcrumbClick = { path ->
                                         val index =
                                             backStack.indexOfLast { it is HomeRoute && it.path == path }
@@ -97,7 +107,12 @@ fun App() {
                                             backStack.add(HomeRoute(path))
                                         }
                                     },
-                                    onCreateFolder = {}
+                                    createItemCallbacks = CreateItemCallbacks(
+                                        onCreateFolder = createFolderViewModel::showDialog
+                                    ),
+                                    onFolderNameChange = createFolderViewModel::onNameChange,
+                                    onConfirmCreateFolder = createFolderViewModel::onConfirm,
+                                    onDismissCreateFolder = createFolderViewModel::dismissDialog
                                 )
                             }
 

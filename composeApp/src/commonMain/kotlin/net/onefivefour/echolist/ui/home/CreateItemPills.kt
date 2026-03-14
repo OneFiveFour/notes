@@ -19,9 +19,7 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
 fun CreateItemPills(
-    onCreateNote: () -> Unit,
-    onCreateTaskList: () -> Unit,
-    onCreateFolder: () -> Unit,
+    createItemCallbacks: CreateItemCallbacks,
     onClosePills: () -> Unit
 ) {
     val pillTypes = remember {
@@ -42,9 +40,9 @@ fun CreateItemPills(
                 onClick = { itemType ->
                     when (itemType) {
                         ItemType.UNSPECIFIED -> {}
-                        ItemType.FOLDER -> onCreateFolder()
-                        ItemType.NOTE -> onCreateNote()
-                        ItemType.TASK_LIST -> onCreateTaskList()
+                        ItemType.FOLDER -> createItemCallbacks.onCreateFolder()
+                        ItemType.NOTE -> createItemCallbacks.onCreateNote()
+                        ItemType.TASK_LIST -> createItemCallbacks.onCreateTaskList()
                     }
                 }
             )
@@ -65,9 +63,7 @@ fun CreateItemPills(
 private fun CreateItemPillsPreview() {
     EchoListTheme {
         CreateItemPills(
-            onCreateNote = {},
-            onCreateTaskList = {},
-            onCreateFolder = {},
+            createItemCallbacks = CreateItemCallbacks(),
             onClosePills = {}
         )
     }

@@ -77,11 +77,11 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Dismiss on cancel button tap or outside tap via `onDismissRequest`
     - _Requirements: 1.1, 1.2, 1.3, 1.4, 1.5, 2.3, 2.4_
 
-- [ ] 5. Refactor HomeScreen parameters and wire dialog
-  - [ ] 5.1 Create `CreateItemCallbacks` data class in `ui/home/CreateItemCallbacks.kt`
+- [x] 5. Refactor HomeScreen parameters and wire dialog
+  - [x] 5.1 Create `CreateItemCallbacks` data class in `ui/home/CreateItemCallbacks.kt`
     - Fields: `onCreateFolder: () -> Unit = {}`, `onCreateNote: () -> Unit = {}`, `onCreateTaskList: () -> Unit = {}`
     - _Requirements: 5.1_
-  - [ ] 5.2 Update `HomeScreen` composable signature
+  - [x] 5.2 Update `HomeScreen` composable signature
     - Replace `onCreateNote`, `onCreateTaskList`, `onCreateFolder` parameters with `createItemCallbacks: CreateItemCallbacks = CreateItemCallbacks()`
     - Add `createFolderUiState: CreateFolderUiState` parameter
     - Add `onFolderNameChange: (String) -> Unit = {}`, `onConfirmCreateFolder: () -> Unit = {}`, `onDismissCreateFolder: () -> Unit = {}` parameters

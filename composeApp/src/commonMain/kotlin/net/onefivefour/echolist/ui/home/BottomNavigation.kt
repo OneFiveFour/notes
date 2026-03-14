@@ -14,9 +14,7 @@ import androidx.compose.ui.Modifier
 
 @Composable
 internal fun BottomNavigation(
-    onCreateNote: () -> Unit = {},
-    onCreateTaskList: () -> Unit = {},
-    onCreateFolder: () -> Unit = {}
+    createItemCallbacks: CreateItemCallbacks = CreateItemCallbacks()
 ) {
 
     var isFabExpanded by remember { mutableStateOf(false) }
@@ -30,18 +28,20 @@ internal fun BottomNavigation(
             when (showItemPills) {
                 true -> {
                     CreateItemPills(
-                        onCreateNote = {
-                            onCreateNote()
-                            isFabExpanded = false
-                        },
-                        onCreateTaskList = {
-                            onCreateTaskList()
-                            isFabExpanded = false
-                        },
-                        onCreateFolder = {
-                            onCreateFolder()
-                            isFabExpanded = false
-                        },
+                        createItemCallbacks = CreateItemCallbacks(
+                            onCreateNote = {
+                                createItemCallbacks.onCreateNote()
+                                isFabExpanded = false
+                            },
+                            onCreateTaskList = {
+                                createItemCallbacks.onCreateTaskList()
+                                isFabExpanded = false
+                            },
+                            onCreateFolder = {
+                                createItemCallbacks.onCreateFolder()
+                                isFabExpanded = false
+                            }
+                        ),
                         onClosePills = {
                             isFabExpanded = false
                         }
