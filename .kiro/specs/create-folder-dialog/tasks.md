@@ -92,13 +92,13 @@ Implement a modal folder-creation dialog on the home screen, backed by a dedicat
     - Update preview composables to use the new parameter surface
     - _Requirements: 5.1, 5.2_
 
-- [ ] 6. Update HomeViewModel to observe `directoryChanged`
-  - [ ] 6.1 Add `directoryChanged` collection to `HomeViewModel.init`
+- [x] 6. Update HomeViewModel to observe `directoryChanged`
+  - [x] 6.1 Add `directoryChanged` collection to `HomeViewModel.init`
     - Launch a coroutine in `viewModelScope` that collects `fileRepository.directoryChanged`
     - When emitted path matches `this.path`, call `loadData()` to refresh
     - When emitted path does not match, ignore
     - _Requirements: 2.2, 4.4, 4.5_
-  - [ ] 6.2 Write property test for Property 7: HomeViewModel refreshes on matching directoryChanged signal
+  - [x] 6.2 Write property test for Property 7: HomeViewModel refreshes on matching directoryChanged signal
     - **Property 7: HomeViewModel refreshes on matching directoryChanged signal**
     - Generate arbitrary path strings for the ViewModel and for the emitted signal
     - Create `HomeViewModel` with a mock `FileRepository` that has a controllable `directoryChanged` flow

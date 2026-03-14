@@ -29,6 +29,13 @@ class HomeViewModel(
         viewModelScope.launch {
             loadData()
         }
+        viewModelScope.launch {
+            fileRepository.directoryChanged.collect { changedPath ->
+                if (changedPath == path) {
+                    loadData()
+                }
+            }
+        }
     }
 
     private suspend fun loadData() {
