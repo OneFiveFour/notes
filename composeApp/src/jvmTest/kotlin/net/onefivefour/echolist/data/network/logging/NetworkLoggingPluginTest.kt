@@ -112,7 +112,8 @@ class NetworkLoggingPluginTest : FunSpec({
         client.close()
     }
 
-    test("POST request with body logs hex-formatted body") {
+    test("POST request with body logs string-formatted body") {
+        val bodyContent = "hello"
         val mockEngine = MockEngine {
             respond(content = "ok", status = HttpStatusCode.OK)
         }
@@ -127,7 +128,7 @@ class NetworkLoggingPluginTest : FunSpec({
         try {
             client.post("http://localhost/data") {
                 contentType(ContentType.Application.OctetStream)
-                setBody(byteArrayOf(0x0A, 0x1B))
+                setBody(bodyContent.encodeToByteArray())
             }
         } finally {
             System.setOut(originalOut)
@@ -136,7 +137,8 @@ class NetworkLoggingPluginTest : FunSpec({
         val output = outputStream.toString()
 
         output shouldContain "--> POST"
-        output shouldContain "0A 1B"
+        output shouldContain "hello"
+        output shouldContain "(5 bytes)"
 
         client.close()
     }

@@ -9,7 +9,7 @@ internal object LogEntryFormatter {
         body: ByteArray
     ): String {
         val redactedHeaders = HeaderRedactor.redact(headers)
-        val formattedBody = HexFormatter.format(body)
+        val formattedBody = BodyFormatter.format(body)
         return buildString {
             appendLine("--> $method $url")
             appendLine("Headers: $redactedHeaders")
@@ -24,7 +24,7 @@ internal object LogEntryFormatter {
         elapsedMs: Long
     ): String {
         val redactedHeaders = HeaderRedactor.redact(headers)
-        val formattedBody = HexFormatter.format(body)
+        val formattedBody = BodyFormatter.format(body)
         return buildString {
             appendLine("<-- $statusCode (${elapsedMs}ms)")
             appendLine("Headers: $redactedHeaders")

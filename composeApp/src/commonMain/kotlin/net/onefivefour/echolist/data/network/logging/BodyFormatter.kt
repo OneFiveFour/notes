@@ -1,13 +1,13 @@
 package net.onefivefour.echolist.data.network.logging
 
-object HexFormatter {
+object BodyFormatter {
     private const val MAX_BYTES = 1024
 
     /**
-     * Formats [bytes] as space-separated uppercase hex octets.
+     * Formats [bytes] as a UTF-8 string for logging.
      * - Empty array → "empty body"
-     * - ≤1024 bytes → "0A 1B 2C (3 bytes)"
-     * - >1024 bytes → first 1024 octets + "... (truncated, N bytes total)"
+     * - ≤1024 bytes → decoded string + "(N bytes)"
+     * - >1024 bytes → first 1024 bytes decoded + "... (truncated, N bytes total)"
      */
     fun format(bytes: ByteArray): String {
         if (bytes.isEmpty()) return "empty body"
@@ -16,14 +16,12 @@ object HexFormatter {
         val isTruncated = totalSize > MAX_BYTES
         val bytesToFormat = if (isTruncated) bytes.copyOf(MAX_BYTES) else bytes
 
-        val hex = bytesToFormat.joinToString(" ") { byte ->
-            byte.toInt().and(0xFF).toString(16).uppercase().padStart(2, '0')
-        }
+        val text = bytesToFormat.decodeToString()
 
         return if (isTruncated) {
-            "$hex ... (truncated, $totalSize bytes total)"
+            "$text ... (truncated, $totalSize bytes total)"
         } else {
-            "$hex ($totalSize bytes)"
+            "$text ($totalSize bytes)"
         }
     }
 }

@@ -7,7 +7,7 @@
 
 ## Task 2: Implement HexFormatter
 
-- [x] 2.1 Create `HexFormatter` object in `data/network/logging/HexFormatter.kt` with `format(bytes: ByteArray): String` function
+- [x] 2.1 Create `HexFormatter` object in `data/network/logging/BodyFormatter.kt` with `format(bytes: ByteArray): String` function
 - [x] 2.2 Implement empty body handling returning `"empty body"`
 - [x] 2.3 Implement space-separated uppercase hex octet formatting with total byte count suffix
 - [x] 2.4 Implement truncation at 1024 bytes with truncation suffix indicating total size
