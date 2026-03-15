@@ -117,25 +117,9 @@ fun App() {
                             }
 
                             entry<EditNoteRoute> { route ->
-                                var text by remember { mutableStateOf("") }
-                                EditNoteScreen(
-                                    noteId = route.noteId,
-                                    text = text,
-                                    onTextChange = { text = it },
-                                    onSaveClick = { /* no-op */ },
-                                    onBackClick = { backStack.removeLastOrNull() }
-                                )
                             }
 
                             entry<EditTaskListRoute> { route ->
-                                var text by remember { mutableStateOf("") }
-                                EditTaskListScreen(
-                                    taskListId = route.taskListId,
-                                    text = text,
-                                    onTextChange = { text = it },
-                                    onSaveClick = { /* no-op */ },
-                                    onBackClick = { backStack.removeLastOrNull() }
-                                )
                             }
                         }
                     )
