@@ -146,12 +146,12 @@ Stateless composable. Receives `EditNoteUiState` (which contains the `TextFieldS
 
 ```kotlin
 data class EditTaskListUiState(
-    val nameState: TextFieldState,
+    val titleState: TextFieldState,
     val isLoading: Boolean = false,
     val error: String? = null
 ) {
     val isSaveEnabled: Boolean
-        get() = nameState.text.isNotBlank() && !isLoading
+        get() = titleState.text.isNotBlank() && !isLoading
 }
 ```
 
@@ -163,24 +163,24 @@ class EditTaskListViewModel(
     private val taskListRepository: TaskListRepository
 ) : ViewModel() {
 
-    private val nameState = TextFieldState()
+    private val titleState = TextFieldState()
 
-    private val _uiState = MutableStateFlow(EditTaskListUiState(nameState = nameState))
+    private val _uiState = MutableStateFlow(EditTaskListUiState(titleState = titleState))
     val uiState: StateFlow<EditTaskListUiState> = _uiState.asStateFlow()
 
     private val _navigateBack = MutableSharedFlow<Unit>()
     val navigateBack: SharedFlow<Unit> = _navigateBack.asSharedFlow()
 
     fun onSaveClick() {
-        val trimmedName = nameState.text.toString().trim()
-        if (trimmedName.isBlank()) return
+        val trimmedTitle = titleState.text.toString().trim()
+        if (trimmedTitle.isBlank()) return
 
         _uiState.update { it.copy(isLoading = true, error = null) }
 
         viewModelScope.launch {
             val result = taskListRepository.createTaskList(
                 CreateTaskListParams(
-                    name = trimmedName,
+                    title = trimmedTitle,
                     path = parentPath,
                     tasks = emptyList()
                 )
@@ -293,7 +293,7 @@ createItemCallbacks = CreateItemCallbacks(
 | Model | Fields | Package |
 |-------|--------|---------|
 | `EditNoteUiState` | `titleState: TextFieldState`, `isLoading: Boolean`, `error: String?` | `ui.editnote` |
-| `EditTaskListUiState` | `nameState: TextFieldState`, `isLoading: Boolean`, `error: String?` | `ui.edittasklist` |
+| `EditTaskListUiState` | `titleState: TextFieldState`, `isLoading: Boolean`, `error: String?` | `ui.edittasklist` |
 
 Both UI state classes expose a computed `isSaveEnabled: Boolean` property that returns `true` only when the text field is not blank and loading is `false`. This drives the save button's enabled state.
 
@@ -321,13 +321,13 @@ The following properties were derived from the acceptance criteria prework analy
 
 ### Property 2: Successful save emits navigate-back event
 
-*For any* non-blank title/name string, when the repository returns a successful `Result`, the ViewModel should emit exactly one event on its `navigateBack` SharedFlow.
+*For any* non-blank title string, when the repository returns a successful `Result`, the ViewModel should emit exactly one event on its `navigateBack` SharedFlow.
 
 **Validates: Requirements 5.5, 6.5**
 
 ### Property 3: Failed save sets error and clears loading
 
-*For any* non-blank title/name string, when the repository returns a failure `Result` with an exception, the ViewModel's UI state should have `isLoading == false` and `error` set to the exception's message.
+*For any* non-blank title string, when the repository returns a failure `Result` with an exception, the ViewModel's UI state should have `isLoading == false` and `error` set to the exception's message.
 
 **Validates: Requirements 5.6, 6.6**
 
@@ -351,7 +351,7 @@ Both editor ViewModels follow the same error-handling pattern established by `Cr
 
 1. **Repository failure**: When `NotesRepository.createNote` or `TaskListRepository.createTaskList` returns `Result.failure(exception)`, the ViewModel sets `error = exception.message` and `isLoading = false` in the UI state. The screen composable displays the error message.
 
-2. **Blank input guard**: When the user taps save with a blank (empty or whitespace-only) title/name, `onSaveClick` returns immediately without calling the repository or changing state. The save button is already disabled via `isSaveEnabled`, so this is a defensive guard.
+2. **Blank input guard**: When the user taps save with a blank (empty or whitespace-only) title, `onSaveClick` returns immediately without calling the repository or changing state. The save button is already disabled via `isSaveEnabled`, so this is a defensive guard.
 
 3. **No thrown exceptions**: Following the project convention, all repository operations return `Result<T>`. ViewModels never throw exceptions across layer boundaries.
 
@@ -376,9 +376,9 @@ Each test is tagged with a comment referencing the design property:
 
 | Property | Generator Strategy | Assertion |
 |----------|-------------------|-----------|
-| 1: Save guard | `Arb.string()` for title/name text, covering empty, whitespace-only, and non-blank strings | Verify repository call count (0 for blank, 1 for non-blank) and that params use trimmed text |
-| 2: Successful save | `Arb.string().filter { it.isNotBlank() }` for title/name | Verify `navigateBack` emits after repository returns success |
-| 3: Failed save | `Arb.string().filter { it.isNotBlank() }` for title/name, `Arb.string()` for error message | Verify `isLoading == false` and `error == message` after repository returns failure |
+| 1: Save guard | `Arb.string()` for title text, covering empty, whitespace-only, and non-blank strings | Verify repository call count (0 for blank, 1 for non-blank) and that params use trimmed text |
+| 2: Successful save | `Arb.string().filter { it.isNotBlank() }` for title | Verify `navigateBack` emits after repository returns success |
+| 3: Failed save | `Arb.string().filter { it.isNotBlank() }` for title, `Arb.string()` for error message | Verify `isLoading == false` and `error == message` after repository returns failure |
 | 4: Save-enabled | `Arb.string()` for text content, `Arb.boolean()` for isLoading | Verify `isSaveEnabled == (text.isNotBlank() && !isLoading)` |
 | 5: Route round-trip | `Arb.string()` for parentPath, `Arb.string().orNull()` for noteId/taskListId | Verify `decode(encode(route)) == route` |
 

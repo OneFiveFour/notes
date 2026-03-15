@@ -13,10 +13,10 @@ data object LoginRoute : NavKey
 data class HomeRoute(val path: String = "/") : NavKey
 
 @Serializable
-data class EditNoteRoute(val noteId: String? = null) : NavKey
+data object EditNoteRoute : NavKey
 
 @Serializable
-data class EditTaskListRoute(val taskListId: String? = null) : NavKey
+data object EditTaskListRoute : NavKey
 
 val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {

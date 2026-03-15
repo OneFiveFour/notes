@@ -6,9 +6,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
@@ -26,12 +23,14 @@ import net.onefivefour.echolist.ui.home.HomeScreen
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginScreen
 import net.onefivefour.echolist.ui.login.LoginViewModel
-import net.onefivefour.echolist.ui.navigation.HomeRoute
+import net.onefivefour.echolist.ui.editnote.EditNoteScreen
+import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
+import net.onefivefour.echolist.ui.navigation.HomeRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
-import net.onefivefour.echolist.ui.editnote.EditNoteScreen
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -108,7 +107,9 @@ fun App() {
                                         }
                                     },
                                     createItemCallbacks = CreateItemCallbacks(
-                                        onCreateFolder = createFolderViewModel::showDialog
+                                        onCreateFolder = createFolderViewModel::showDialog,
+                                        onCreateNote = { backStack.add(EditNoteRoute) },
+                                        onCreateTaskList = { backStack.add(EditTaskListRoute) }
                                     ),
                                     onFolderNameChange = createFolderViewModel::onNameChange,
                                     onConfirmCreateFolder = createFolderViewModel::onConfirm,
@@ -116,10 +117,38 @@ fun App() {
                                 )
                             }
 
-                            entry<EditNoteRoute> { route ->
+                            entry<EditNoteRoute> {
+                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: "/"
+                                val viewModel = koinViewModel<EditNoteViewModel>(
+                                    key = "editNote-$currentPath"
+                                ) { parametersOf(currentPath) }
+                                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                                LaunchedEffect(Unit) {
+                                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
+                                }
+
+                                EditNoteScreen(
+                                    uiState = uiState,
+                                    onSaveClick = viewModel::onSaveClick
+                                )
                             }
 
-                            entry<EditTaskListRoute> { route ->
+                            entry<EditTaskListRoute> {
+                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: "/"
+                                val viewModel = koinViewModel<EditTaskListViewModel>(
+                                    key = "editTaskList-$currentPath"
+                                ) { parametersOf(currentPath) }
+                                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                                LaunchedEffect(Unit) {
+                                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
+                                }
+
+                                EditTaskListScreen(
+                                    uiState = uiState,
+                                    onSaveClick = viewModel::onSaveClick
+                                )
                             }
                         }
                     )

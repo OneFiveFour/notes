@@ -31,6 +31,8 @@ import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 import net.onefivefour.echolist.ui.theme.colorscheme.EchoListTheme2
 import net.onefivefour.echolist.ui.theme.ThemeManager
 import net.onefivefour.echolist.ui.AuthViewModel
+import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
@@ -155,6 +157,18 @@ val navigationModule: Module = module {
         CreateFolderViewModel(
             currentPath = params.get(),
             fileRepository = get()
+        )
+    }
+    viewModel { params ->
+        EditNoteViewModel(
+            parentPath = params.get(),
+            notesRepository = get()
+        )
+    }
+    viewModel { params ->
+        EditTaskListViewModel(
+            parentPath = params.get(),
+            taskListRepository = get()
         )
     }
 }

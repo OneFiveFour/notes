@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.string
@@ -18,7 +19,7 @@ private fun Arb.Companion.homeRoute(): Arb<HomeRoute> =
     Arb.string(0..50).map { HomeRoute(it) }
 
 private fun Arb.Companion.editNoteRoute(): Arb<EditNoteRoute> =
-    Arb.string(1..50).map { EditNoteRoute(it) }
+    Arb.constant(EditNoteRoute)
 
 private fun Arb.Companion.navKey(): Arb<NavKey> =
     Arb.choice(Arb.homeRoute(), Arb.editNoteRoute())
