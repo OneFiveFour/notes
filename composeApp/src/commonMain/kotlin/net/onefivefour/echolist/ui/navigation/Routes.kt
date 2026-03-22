@@ -13,7 +13,10 @@ data object LoginRoute : NavKey
 data class HomeRoute(val path: String = "/") : NavKey
 
 @Serializable
-data object EditNoteRoute : NavKey
+data class EditNoteRoute(
+    val parentPath: String,
+    val filePath: String? = null
+) : NavKey
 
 @Serializable
 data object EditTaskListRoute : NavKey

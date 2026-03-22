@@ -1,21 +1,16 @@
 package net.onefivefour.echolist.ui.navigation
 
+import androidx.navigation3.runtime.NavKey
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
+import io.kotest.property.arbitrary.boolean
+import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.serialization.json.Json
-import androidx.navigation3.runtime.NavKey
 
-/**
- * Feature: unified-edit-screens, Property 1: Route serialization round-trip
- *
- * Validates serialization round-trip for all route types.
- *
- * **Validates: Requirements 1.4, 2.4, 7.1, 7.2, 7.3**
- */
 class RouteSerializationPropertyTest : FunSpec({
 
     val json = Json {
@@ -40,20 +35,38 @@ class RouteSerializationPropertyTest : FunSpec({
         }
     }
 
-    // EditNoteRoute and EditTaskListRoute are now data objects (singletons).
-    // Round-trip tests for these are in jvmTest/RouteSerializationPropertyTest.kt (Property 5).
-
     test("Property 1: EditNoteRoute serialization round-trip") {
-        val encoded = json.encodeToString(kotlinx.serialization.serializer<EditNoteRoute>(), EditNoteRoute)
-        val decoded = json.decodeFromString(kotlinx.serialization.serializer<EditNoteRoute>(), encoded)
-        decoded shouldBe EditNoteRoute
+        checkAll(
+            PropTestConfig(iterations = 25),
+            Arb.int(0..50),
+            Arb.boolean()
+        ) { index, withFilePath ->
+            val parentPath = if (index == 0) "/" else "/folder-$index"
+            val route = EditNoteRoute(
+                parentPath = parentPath,
+                filePath = if (withFilePath) "$parentPath/note-$index.md" else null
+            )
+            val encoded = json.encodeToString(kotlinx.serialization.serializer<EditNoteRoute>(), route)
+            val decoded = json.decodeFromString(kotlinx.serialization.serializer<EditNoteRoute>(), encoded)
+            decoded shouldBe route
+        }
     }
 
     test("Property 1: Polymorphic NavKey serialization round-trip for EditNoteRoute") {
-        val route: NavKey = EditNoteRoute
-        val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
-        val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
-        decoded shouldBe route
+        checkAll(
+            PropTestConfig(iterations = 25),
+            Arb.int(0..50),
+            Arb.boolean()
+        ) { index, withFilePath ->
+            val parentPath = if (index == 0) "/" else "/folder-$index"
+            val route: NavKey = EditNoteRoute(
+                parentPath = parentPath,
+                filePath = if (withFilePath) "$parentPath/note-$index.md" else null
+            )
+            val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
+            val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
+            decoded shouldBe route
+        }
     }
 
     test("Property 1: EditTaskListRoute serialization round-trip") {

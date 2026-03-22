@@ -108,20 +108,27 @@ fun App() {
                                     },
                                     createItemCallbacks = CreateItemCallbacks(
                                         onCreateFolder = createFolderViewModel::showDialog,
-                                        onCreateNote = { backStack.add(EditNoteRoute) },
+                                        onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
                                         onCreateTaskList = { backStack.add(EditTaskListRoute) }
                                     ),
+                                    onNoteClick = { notePath ->
+                                        backStack.add(
+                                            EditNoteRoute(
+                                                parentPath = route.path,
+                                                filePath = notePath
+                                            )
+                                        )
+                                    },
                                     onFolderNameChange = createFolderViewModel::onNameChange,
                                     onConfirmCreateFolder = createFolderViewModel::onConfirm,
                                     onDismissCreateFolder = createFolderViewModel::dismissDialog
                                 )
                             }
 
-                            entry<EditNoteRoute> {
-                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: "/"
+                            entry<EditNoteRoute> { route ->
                                 val viewModel = koinViewModel<EditNoteViewModel>(
-                                    key = "editNote-$currentPath"
-                                ) { parametersOf(currentPath) }
+                                    key = "editNote-${route.parentPath}-${route.filePath.orEmpty()}"
+                                ) { parametersOf(route.parentPath, route.filePath) }
                                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                                 LaunchedEffect(Unit) {
@@ -130,6 +137,8 @@ fun App() {
 
                                 EditNoteScreen(
                                     uiState = uiState,
+                                    onPreviewToggle = viewModel::onPreviewToggle,
+                                    onToolbarAction = viewModel::onToolbarAction,
                                     onSaveClick = viewModel::onSaveClick
                                 )
                             }

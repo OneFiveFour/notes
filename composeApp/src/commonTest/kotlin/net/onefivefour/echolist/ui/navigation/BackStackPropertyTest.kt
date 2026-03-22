@@ -6,36 +6,32 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.choice
-import io.kotest.property.arbitrary.constant
+import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 
-/**
- * Arb generators for NavKey instances used across all back stack property tests.
- */
 private fun Arb.Companion.homeRoute(): Arb<HomeRoute> =
-    Arb.string(0..50).map { HomeRoute(it) }
+    Arb.int(0..50).map { index ->
+        if (index == 0) HomeRoute("/") else HomeRoute("/folder-$index")
+    }
 
 private fun Arb.Companion.editNoteRoute(): Arb<EditNoteRoute> =
-    Arb.constant(EditNoteRoute)
+    Arb.int(0..50).map { index ->
+        if (index % 2 == 0) {
+            EditNoteRoute(parentPath = "/folder-$index")
+        } else {
+            EditNoteRoute(
+                parentPath = "/folder-$index",
+                filePath = "/folder-$index/note-$index.md"
+            )
+        }
+    }
 
 private fun Arb.Companion.navKey(): Arb<NavKey> =
     Arb.choice(Arb.homeRoute(), Arb.editNoteRoute())
 
-/**
- * Feature: compose-navigation-3, Properties 2, 3, 4: Back stack navigation
- *
- * These property tests verify the back stack manipulation logic used in App.kt.
- * The tests operate on MutableList<NavKey> which mirrors SnapshotStateList behavior.
- */
 class BackStackPropertyTest : FunSpec({
-
-    // -----------------------------------------------------------------------
-    // Property 2: Push navigation grows the back stack
-    // Validates: Requirements 4.1, 4.2
-    // -----------------------------------------------------------------------
 
     test("Property 2: pushing a NavKey increases stack size by one") {
         checkAll(
@@ -55,24 +51,16 @@ class BackStackPropertyTest : FunSpec({
         }
     }
 
-    // -----------------------------------------------------------------------
-    // Property 3: Breadcrumb navigation truncates the back stack
-    // Validates: Requirements 4.3
-    // -----------------------------------------------------------------------
-
     test("Property 3: breadcrumb navigation truncates to matching HomeRoute") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.list(Arb.string(1..20), 2..10)
+            Arb.list(Arb.int(1..10).map { "/folder-$it" }, 2..10)
         ) { paths ->
-            // Build a back stack of HomeRoutes with distinct paths
             val stack = paths.map { HomeRoute(it) }.toMutableList()
-            // Pick a random target index to navigate to
             val targetIndex = (0 until stack.size).random()
             val targetPath = stack[targetIndex].path
             val entriesBefore = stack.toList()
 
-            // Replicate the breadcrumb logic from App.kt
             val index = stack.indexOfLast { it is HomeRoute && it.path == targetPath }
             if (index >= 0) {
                 while (stack.size > index + 1) stack.removeLast()
@@ -80,18 +68,11 @@ class BackStackPropertyTest : FunSpec({
                 stack.add(HomeRoute(targetPath))
             }
 
-            // The stack should be truncated so the target is the last entry
             stack.last() shouldBe HomeRoute(targetPath)
             stack.size shouldBe index + 1
-            // All entries at or before the target index are unchanged
             stack shouldBe entriesBefore.subList(0, index + 1)
         }
     }
-
-    // -----------------------------------------------------------------------
-    // Property 4: Back navigation removes the top entry
-    // Validates: Requirements 5.1, 5.2, 5.3
-    // -----------------------------------------------------------------------
 
     test("Property 4: back on multi-entry stack removes top entry") {
         checkAll(
@@ -116,7 +97,6 @@ class BackStackPropertyTest : FunSpec({
         ) { singleKey ->
             val stack = mutableListOf<NavKey>(singleKey)
 
-            // Replicate App.kt logic: only remove if more than one entry
             if (stack.size > 1) {
                 stack.removeLastOrNull()
             }

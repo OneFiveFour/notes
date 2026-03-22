@@ -8,6 +8,7 @@ import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.editnote.EditNoteUiState
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListUiState
 
@@ -16,22 +17,25 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListUiState
 @OptIn(io.kotest.common.ExperimentalKotest::class)
 class SaveEnabledPropertyTest : FunSpec({
 
-    test("Property 4: EditNoteUiState.isSaveEnabled iff text is non-blank and not loading") {
+    test("Property 4: EditNoteUiState.isSaveEnabled iff text is non-blank and not loading or saving") {
         // **Validates: Requirements 8.1, 8.2**
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(0..50),
+            Arb.boolean(),
             Arb.boolean()
-        ) { text, isLoading ->
+        ) { text, isLoading, isSaving ->
             val titleState = TextFieldState()
             titleState.edit { replace(0, length, text) }
 
             val uiState = EditNoteUiState(
                 titleState = titleState,
-                isLoading = isLoading
+                mode = EditNoteMode.Create("/"),
+                isLoading = isLoading,
+                isSaving = isSaving
             )
 
-            val expected = text.isNotBlank() && !isLoading
+            val expected = text.isNotBlank() && !isLoading && !isSaving
             uiState.isSaveEnabled shouldBe expected
         }
     }
