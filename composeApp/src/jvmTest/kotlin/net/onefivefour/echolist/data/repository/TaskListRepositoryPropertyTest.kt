@@ -12,8 +12,8 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.models.MainTask
-import net.onefivefour.echolist.data.models.SubTask
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import tasks.v1.CreateTaskListRequest

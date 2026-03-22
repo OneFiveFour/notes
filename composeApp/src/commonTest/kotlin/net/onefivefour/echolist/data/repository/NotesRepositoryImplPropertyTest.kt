@@ -10,8 +10,8 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.FakeCacheDataSource
 import net.onefivefour.echolist.data.source.network.FakeNoteRemoteDataSource
 import notes.v1.CreateNoteResponse

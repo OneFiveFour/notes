@@ -12,11 +12,11 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.models.MainTask
-import net.onefivefour.echolist.data.models.SubTask
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.FakeTaskListRemoteDataSource
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.error.NetworkException
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListResponse
 import tasks.v1.GetTaskListResponse

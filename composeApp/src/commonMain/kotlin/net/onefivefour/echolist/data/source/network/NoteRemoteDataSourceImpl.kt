@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.data.source.network
 
-import net.onefivefour.echolist.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 import notes.v1.CreateNoteRequest
 import notes.v1.CreateNoteResponse
 import notes.v1.DeleteNoteRequest

@@ -1,6 +1,7 @@
 package net.onefivefour.echolist.di
 
 import io.kotest.core.spec.style.FunSpec
+import net.onefivefour.echolist.domain.repository.AuthRepository
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
 
@@ -15,7 +16,7 @@ class KoinModuleVerificationTest : FunSpec({
                 io.ktor.client.engine.HttpClientEngine::class,
                 // These are provided by authModule at runtime
                 net.onefivefour.echolist.data.source.SecureStorage::class,
-                net.onefivefour.echolist.data.repository.AuthRepository::class,
+                AuthRepository::class,
                 kotlinx.coroutines.flow.MutableSharedFlow::class
             )
         )

@@ -12,7 +12,7 @@ import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.models.Note
+import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource

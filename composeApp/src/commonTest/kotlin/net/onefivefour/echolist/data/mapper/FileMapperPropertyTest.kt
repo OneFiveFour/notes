@@ -9,9 +9,9 @@ import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 
 /**
  * Feature: proto-api-update

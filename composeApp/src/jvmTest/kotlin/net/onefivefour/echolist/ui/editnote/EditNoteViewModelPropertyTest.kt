@@ -15,11 +15,11 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.ListNotesResult
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
-import net.onefivefour.echolist.data.repository.NotesRepository
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.ListNotesResult
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
+import net.onefivefour.echolist.domain.repository.NotesRepository
 
 // Feature: note-tasklist-editors, Property 1: Save guard — repository called if and only if trimmed text is non-blank
 

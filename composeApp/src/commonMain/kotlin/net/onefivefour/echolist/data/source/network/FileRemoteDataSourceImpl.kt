@@ -8,7 +8,7 @@ import `file`.v1.ListFilesRequest
 import `file`.v1.ListFilesResponse
 import `file`.v1.UpdateFolderRequest
 import `file`.v1.UpdateFolderResponse
-import net.onefivefour.echolist.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 
 internal class FileRemoteDataSourceImpl(
     private val client: ConnectRpcClient

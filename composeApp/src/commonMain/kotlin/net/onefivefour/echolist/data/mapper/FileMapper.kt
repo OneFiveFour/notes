@@ -1,12 +1,12 @@
 package net.onefivefour.echolist.data.mapper
 
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
 import net.onefivefour.echolist.data.models.FileMetadata
-import net.onefivefour.echolist.data.models.Folder
+import net.onefivefour.echolist.domain.model.Folder
 import net.onefivefour.echolist.data.models.ItemType
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import `file`.v1.CreateFolderRequest
 import `file`.v1.CreateFolderResponse
 import `file`.v1.DeleteFolderRequest

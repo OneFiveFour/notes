@@ -14,11 +14,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.repository.AuthRepository
+import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.domain.model.AuthError
-import net.onefivefour.echolist.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
 import org.jetbrains.compose.resources.getString
 
 class LoginViewModel(

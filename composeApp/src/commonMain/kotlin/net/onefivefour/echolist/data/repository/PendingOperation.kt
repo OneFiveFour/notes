@@ -1,7 +1,7 @@
 package net.onefivefour.echolist.data.repository
 
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 
 /**
  * Represents a write operation queued while offline.

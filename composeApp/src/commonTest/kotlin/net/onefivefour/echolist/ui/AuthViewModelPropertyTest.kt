@@ -16,7 +16,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthEvent
 
 /**
  * Property 11: AuthState reflects storage

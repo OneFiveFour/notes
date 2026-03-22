@@ -1,9 +1,9 @@
 package net.onefivefour.echolist.data.mapper
 
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.ListNotesResult
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.ListNotesResult
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import notes.v1.CreateNoteRequest
 import notes.v1.CreateNoteResponse
 import notes.v1.GetNoteResponse

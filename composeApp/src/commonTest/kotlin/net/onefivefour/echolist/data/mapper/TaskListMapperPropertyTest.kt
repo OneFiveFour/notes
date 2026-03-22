@@ -11,8 +11,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.models.MainTask
-import net.onefivefour.echolist.data.models.SubTask
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
 
 /**
  * Feature: proto-api-update

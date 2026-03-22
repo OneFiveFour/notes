@@ -2,8 +2,9 @@ package net.onefivefour.echolist.data.repository
 
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.network.client.ConnectRpcClient
-import net.onefivefour.echolist.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.domain.repository.AuthRepository
 
 internal class AuthRepositoryImpl(
     private val secureStorage: SecureStorage,

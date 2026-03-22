@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.client
+package net.onefivefour.echolist.data.network.client
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpRequestTimeoutException
@@ -9,9 +9,9 @@ import io.ktor.client.statement.bodyAsText
 import io.ktor.client.statement.readRawBytes
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import net.onefivefour.echolist.network.config.NetworkConfig
-import net.onefivefour.echolist.network.config.NetworkConfigProvider
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.config.NetworkConfig
+import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 internal class ConnectRpcClientImpl(
     private val httpClient: HttpClient,
@@ -69,14 +69,17 @@ internal class ConnectRpcClientImpl(
                             )
                         }
                     }
+
                     in 400..499 -> {
                         val errorMessage = response.bodyAsText()
                         Result.failure(NetworkException.ClientError(statusCode, errorMessage))
                     }
+
                     in 500..599 -> {
                         val errorMessage = response.bodyAsText()
                         Result.failure(NetworkException.ServerError(statusCode, errorMessage))
                     }
+
                     else -> Result.failure(
                         NetworkException.NetworkError("Unexpected status: $statusCode")
                     )

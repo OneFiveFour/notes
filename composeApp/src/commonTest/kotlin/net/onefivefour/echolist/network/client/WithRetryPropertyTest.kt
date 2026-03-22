@@ -12,7 +12,8 @@ import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.client.withRetry
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 /**
  * Property-based tests for withRetry utility function.

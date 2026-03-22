@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.data.models
+package net.onefivefour.echolist.data.dto
 
 data class CreateFolderParams(
     val parentDir: String,

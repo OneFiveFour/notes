@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.repository.TaskListRepository
+import net.onefivefour.echolist.domain.repository.TaskListRepository
 
 class EditTaskListViewModel(
     private val parentPath: String,

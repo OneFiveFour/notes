@@ -4,8 +4,8 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 
 /**
  * Unit tests for NoteMapper transformations.

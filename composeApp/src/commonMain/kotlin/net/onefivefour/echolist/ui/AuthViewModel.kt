@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthEvent
 
 class AuthViewModel(
     private val secureStorage: SecureStorage,

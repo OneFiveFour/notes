@@ -8,8 +8,8 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.network.client.ConnectRpcClient
-import net.onefivefour.echolist.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
 
 /**
  * Property-based tests for AuthRepository login behavior.

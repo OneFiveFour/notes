@@ -11,7 +11,7 @@ import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSourceImpl
-import net.onefivefour.echolist.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 
 /**
  * Feature: proto-api-update, Property 3: FileRemoteDataSource RPC path correctness

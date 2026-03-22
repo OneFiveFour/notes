@@ -1,7 +1,7 @@
-package net.onefivefour.echolist.network.client
+package net.onefivefour.echolist.data.network.client
 
 import kotlinx.coroutines.delay
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 /**
  * Executes [block] with retry logic using exponential backoff.

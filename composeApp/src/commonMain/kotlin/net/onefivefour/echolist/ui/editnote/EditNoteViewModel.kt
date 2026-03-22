@@ -11,8 +11,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.repository.NotesRepository
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.domain.repository.NotesRepository
 
 class EditNoteViewModel(
     private val parentPath: String,

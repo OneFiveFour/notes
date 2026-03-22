@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.config
+package net.onefivefour.echolist.data.network.config
 
 data class NetworkConfig(
     val baseUrl: String,

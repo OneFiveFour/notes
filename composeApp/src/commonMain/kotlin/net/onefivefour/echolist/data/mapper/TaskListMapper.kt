@@ -1,11 +1,11 @@
 package net.onefivefour.echolist.data.mapper
 
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.models.ListTaskListsResult
-import net.onefivefour.echolist.data.models.MainTask
-import net.onefivefour.echolist.data.models.SubTask
-import net.onefivefour.echolist.data.models.TaskList
-import net.onefivefour.echolist.data.models.TaskListEntry
+import net.onefivefour.echolist.data.dto.ListTaskListsResult
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
+import net.onefivefour.echolist.domain.model.TaskList
+import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse

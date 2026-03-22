@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.ui.login
 
-import net.onefivefour.echolist.data.repository.AuthRepository
+import net.onefivefour.echolist.domain.repository.AuthRepository
 
 /**
  * Fake [AuthRepository] for LoginViewModel tests.

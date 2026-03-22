@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.client
+package net.onefivefour.echolist.data.network.client
 
 interface ConnectRpcClient {
     suspend fun <Req, Res> call(

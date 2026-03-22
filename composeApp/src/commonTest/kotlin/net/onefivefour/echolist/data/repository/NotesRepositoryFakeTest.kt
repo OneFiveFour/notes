@@ -1,9 +1,9 @@
 package net.onefivefour.echolist.data.repository
 
 import kotlinx.coroutines.test.runTest
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue

@@ -11,7 +11,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.models.Note
+import net.onefivefour.echolist.domain.model.Note
 
 /**
  * Property-based tests for cache data source round-trip persistence.

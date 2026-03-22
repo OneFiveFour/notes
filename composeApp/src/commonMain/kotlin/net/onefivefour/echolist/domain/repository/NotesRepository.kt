@@ -1,9 +1,9 @@
-package net.onefivefour.echolist.data.repository
+package net.onefivefour.echolist.domain.repository
 
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.ListNotesResult
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.ListNotesResult
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 
 /**
  * Repository abstraction for notes CRUD operations.

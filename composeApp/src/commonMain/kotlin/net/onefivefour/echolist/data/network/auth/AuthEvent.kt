@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.auth
+package net.onefivefour.echolist.data.network.auth
 
 /**
  * Events emitted by the auth layer to signal authentication state changes.

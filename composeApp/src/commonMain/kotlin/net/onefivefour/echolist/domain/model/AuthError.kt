@@ -2,7 +2,7 @@ package net.onefivefour.echolist.domain.model
 
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 /**
  * Domain model representing authentication errors from the backend.

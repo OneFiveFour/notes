@@ -1,8 +1,8 @@
-package net.onefivefour.echolist.data.repository
+package net.onefivefour.echolist.domain.repository
 
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.models.ListTaskListsResult
-import net.onefivefour.echolist.data.models.TaskList
+import net.onefivefour.echolist.data.dto.ListTaskListsResult
+import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 
 interface TaskListRepository {

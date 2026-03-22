@@ -16,10 +16,10 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.models.ListTaskListsResult
-import net.onefivefour.echolist.data.models.TaskList
+import net.onefivefour.echolist.data.dto.ListTaskListsResult
+import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
-import net.onefivefour.echolist.data.repository.TaskListRepository
+import net.onefivefour.echolist.domain.repository.TaskListRepository
 
 // Feature: note-tasklist-editors, Property 1: Save guard — repository called if and only if trimmed text is non-blank
 

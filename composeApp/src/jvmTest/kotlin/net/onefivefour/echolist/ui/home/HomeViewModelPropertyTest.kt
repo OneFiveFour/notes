@@ -16,11 +16,11 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
-import net.onefivefour.echolist.data.models.Folder
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.domain.model.Folder
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.domain.repository.FileRepository
 import java.util.concurrent.atomic.AtomicInteger
 

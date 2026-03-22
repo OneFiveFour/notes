@@ -12,11 +12,11 @@ import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.data.source.network.FakeFileRemoteDataSource
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 class FileRepositoryImplTest : FunSpec({
 

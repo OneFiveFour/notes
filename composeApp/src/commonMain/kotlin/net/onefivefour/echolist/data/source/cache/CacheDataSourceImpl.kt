@@ -1,7 +1,7 @@
 package net.onefivefour.echolist.data.source.cache
 
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.models.Note
+import net.onefivefour.echolist.domain.model.Note
 
 internal class CacheDataSourceImpl(
     private val database: EchoListDatabase,

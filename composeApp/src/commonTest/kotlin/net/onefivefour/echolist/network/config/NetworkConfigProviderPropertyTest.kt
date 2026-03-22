@@ -6,6 +6,7 @@ import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 

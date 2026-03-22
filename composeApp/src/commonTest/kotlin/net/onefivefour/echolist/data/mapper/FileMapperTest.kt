@@ -4,9 +4,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 
 /**
  * Unit tests for FileMapper transformations.

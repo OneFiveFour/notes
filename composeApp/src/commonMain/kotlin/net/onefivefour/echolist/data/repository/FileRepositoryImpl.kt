@@ -8,11 +8,11 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.FileMapper
-import net.onefivefour.echolist.data.models.CreateFolderParams
-import net.onefivefour.echolist.data.models.DeleteFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
-import net.onefivefour.echolist.data.models.Folder
-import net.onefivefour.echolist.data.models.UpdateFolderParams
+import net.onefivefour.echolist.domain.model.Folder
+import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
 import net.onefivefour.echolist.domain.repository.FileRepository
 

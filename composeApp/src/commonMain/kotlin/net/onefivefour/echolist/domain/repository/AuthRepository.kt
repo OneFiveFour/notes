@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.data.repository
+package net.onefivefour.echolist.domain.repository
 
 /**
  * Repository abstraction for authentication operations.

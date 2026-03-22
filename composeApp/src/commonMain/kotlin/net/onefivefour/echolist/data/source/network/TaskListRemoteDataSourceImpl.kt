@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.data.source.network
 
-import net.onefivefour.echolist.network.client.ConnectRpcClient
+import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest

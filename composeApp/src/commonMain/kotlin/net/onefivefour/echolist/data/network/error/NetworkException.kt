@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.error
+package net.onefivefour.echolist.data.network.error
 
 sealed class NetworkException(message: String, cause: Throwable? = null) : Exception(message, cause) {
     class NetworkError(message: String, cause: Throwable? = null) : NetworkException(message, cause)

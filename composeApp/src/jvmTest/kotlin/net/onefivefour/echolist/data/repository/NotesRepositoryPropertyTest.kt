@@ -18,13 +18,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.supervisorScope
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.error.NetworkException
 import notes.v1.CreateNoteRequest
 import notes.v1.CreateNoteResponse
 import notes.v1.DeleteNoteRequest

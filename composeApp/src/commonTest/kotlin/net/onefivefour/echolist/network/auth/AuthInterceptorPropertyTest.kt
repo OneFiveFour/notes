@@ -19,7 +19,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import net.onefivefour.echolist.data.repository.AuthRepository
+import net.onefivefour.echolist.data.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthInterceptor
+import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 

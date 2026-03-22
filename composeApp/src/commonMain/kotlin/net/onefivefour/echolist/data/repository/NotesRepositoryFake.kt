@@ -1,12 +1,13 @@
 package net.onefivefour.echolist.data.repository
 
-import net.onefivefour.echolist.data.models.CreateNoteParams
-import net.onefivefour.echolist.data.models.ListNotesResult
-import net.onefivefour.echolist.data.models.Note
-import net.onefivefour.echolist.data.models.UpdateNoteParams
+import net.onefivefour.echolist.data.dto.CreateNoteParams
+import net.onefivefour.echolist.data.dto.ListNotesResult
+import net.onefivefour.echolist.domain.model.Note
+import net.onefivefour.echolist.data.dto.UpdateNoteParams
+import net.onefivefour.echolist.domain.repository.NotesRepository
 
 /**
- * Fake [NotesRepository] for testing. Stores notes in memory,
+ * Fake [net.onefivefour.echolist.domain.repository.NotesRepository] for testing. Stores notes in memory,
  * supports pre-configured error simulation, and tracks all method calls.
  */
 class NotesRepositoryFake : NotesRepository {

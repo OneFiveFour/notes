@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.config
+package net.onefivefour.echolist.data.network.config
 
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys

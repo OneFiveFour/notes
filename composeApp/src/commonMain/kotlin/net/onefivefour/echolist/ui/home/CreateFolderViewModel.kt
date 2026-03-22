@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.models.CreateFolderParams
+import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.domain.repository.FileRepository
 
 class CreateFolderViewModel(

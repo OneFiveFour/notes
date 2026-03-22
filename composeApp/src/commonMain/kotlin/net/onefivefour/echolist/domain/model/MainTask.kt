@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.data.models
+package net.onefivefour.echolist.domain.model
 
 data class MainTask(
     val description: String,

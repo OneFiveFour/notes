@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.network.auth
+package net.onefivefour.echolist.data.network.auth
 
 import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
@@ -9,7 +9,7 @@ import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import net.onefivefour.echolist.data.repository.AuthRepository
+import net.onefivefour.echolist.domain.repository.AuthRepository
 
 /**
  * Ktor client plugin that:

@@ -16,8 +16,9 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import net.onefivefour.echolist.network.config.NetworkConfig
-import net.onefivefour.echolist.network.error.NetworkException
+import net.onefivefour.echolist.data.network.client.ConnectRpcClientImpl
+import net.onefivefour.echolist.data.network.config.NetworkConfig
+import net.onefivefour.echolist.data.network.error.NetworkException
 
 /**
  * Property-based tests for ConnectRPC client.
