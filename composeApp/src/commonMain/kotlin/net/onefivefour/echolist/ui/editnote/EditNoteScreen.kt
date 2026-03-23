@@ -1,17 +1,21 @@
 package net.onefivefour.echolist.ui.editnote
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.common.ElButton
+import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
@@ -33,7 +37,10 @@ fun EditNoteScreen(
             )
     ) {
 
-        EditNoteTitle(uiState)
+        EditNoteTitle(
+            isCreateMode = uiState.isCreateMode,
+            textFieldState = uiState.titleState
+        )
 
         Spacer(modifier = Modifier.height(dimensions.m))
 
@@ -47,32 +54,28 @@ fun EditNoteScreen(
                     color = EchoListTheme.materialColors.surfaceVariant,
                     shape = EchoListTheme.shapes.medium
                 )
-                .padding(EchoListTheme.dimensions.m)
         ) {
-            when {
-                uiState.isLoading -> EditNoteLoading()
+            Box(modifier = Modifier.padding(dimensions.m)) {
+                when {
+                    uiState.isLoading -> EditNoteLoading()
 
-                uiState.isPreview -> EditNotePreview(uiState)
+                    uiState.isPreview -> EditNotePreview(uiState)
 
-                else -> EditNoteTextField(
-                    state = uiState.contentState,
-                    placeholder = "Write your note in markdown...",
-                    modifier = Modifier.fillMaxSize(),
-                    textStyle = EchoListTheme.typography.bodyMedium
-                )
+                    else -> EditNoteTextField(textFieldState = uiState.contentState)
+                }
             }
         }
 
         uiState.error?.let { errorMessage ->
-            EditNoteError(dimensions, errorMessage)
+            EditNoteError(errorMessage)
         }
 
         Spacer(modifier = Modifier.height(dimensions.m))
 
         EditNoteToolbar(
-            uiState,
-            onToolbarAction,
-            onPreviewToggle
+            uiState = uiState,
+            onToolbarAction = onToolbarAction,
+            onPreviewToggle = onPreviewToggle
         )
 
         Spacer(modifier = Modifier.height(dimensions.m))
@@ -90,3 +93,26 @@ fun EditNoteScreen(
     }
 }
 
+
+@Preview
+@Composable
+private fun EditNoteScreenPreview() {
+    EchoListTheme {
+        GradientBackground {
+            EditNoteScreen(
+                uiState = EditNoteUiState(
+                    titleState = TextFieldState(initialText = "Title"),
+                    contentState = TextFieldState(initialText = "Content"),
+                    mode = EditNoteMode.Edit(filePath = "/path/to/file"),
+                    isLoading = false,
+                    isSaving = false,
+                    isPreview = true
+                ),
+
+                onPreviewToggle = {},
+                onToolbarAction = {},
+                onSaveClick = {}
+            )
+        }
+    }
+}

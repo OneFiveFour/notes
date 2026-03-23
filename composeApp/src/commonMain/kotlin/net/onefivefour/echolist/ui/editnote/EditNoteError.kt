@@ -10,15 +10,12 @@ import net.onefivefour.echolist.ui.theme.Dimensions
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
-internal fun EditNoteError(
-    dimensions: Dimensions,
-    errorMessage: String
-) {
-    Spacer(modifier = Modifier.Companion.height(dimensions.s))
+internal fun EditNoteError(errorMessage: String) {
+    Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
     Text(
         text = errorMessage,
         style = EchoListTheme.typography.bodySmall,
         color = EchoListTheme.materialColors.error,
-        modifier = Modifier.Companion.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth()
     )
 }

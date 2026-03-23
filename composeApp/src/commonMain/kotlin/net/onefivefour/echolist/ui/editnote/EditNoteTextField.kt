@@ -11,25 +11,21 @@ import androidx.compose.ui.text.TextStyle
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
-internal fun EditNoteTextField(
-    state: TextFieldState,
-    placeholder: String,
-    textStyle: TextStyle,
-    modifier: Modifier = Modifier.Companion
-) {
-    Box(modifier = modifier) {
-        if (state.text.isEmpty()) {
+internal fun EditNoteTextField(textFieldState: TextFieldState) {
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        if (textFieldState.text.isEmpty()) {
             Text(
-                text = placeholder,
-                style = textStyle,
+                text = "Write your note in markdown...",
+                style = EchoListTheme.typography.bodyMedium,
                 color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.45f)
             )
         }
 
         BasicTextField(
-            modifier = Modifier.Companion.fillMaxSize(),
-            state = state,
-            textStyle = textStyle.copy(
+            modifier = Modifier.fillMaxSize(),
+            state = textFieldState,
+            textStyle = EchoListTheme.typography.bodyMedium.copy(
                 color = EchoListTheme.materialColors.onSurface
             )
         )
