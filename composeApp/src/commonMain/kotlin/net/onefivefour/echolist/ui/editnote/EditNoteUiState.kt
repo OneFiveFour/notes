@@ -8,7 +8,7 @@ data class EditNoteUiState(
     val mode: EditNoteMode = EditNoteMode.Create("/"),
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
-    val isPreview: Boolean = false,
+    val isPreview: Boolean = true,
     val error: String? = null
 ) {
     val isSaveEnabled: Boolean

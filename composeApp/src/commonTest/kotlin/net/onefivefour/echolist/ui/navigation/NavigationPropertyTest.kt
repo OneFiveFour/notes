@@ -11,12 +11,12 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 
-private fun Arb.Companion.homeRoute(): Arb<HomeRoute> =
+private fun Arb.homeRoute(): Arb<HomeRoute> =
     Arb.int(0..50).map { index ->
         if (index == 0) HomeRoute("/") else HomeRoute("/folder-$index")
     }
 
-private fun Arb.Companion.editNoteRoute(): Arb<EditNoteRoute> =
+private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         EditNoteRoute(
             parentPath = "/folder-$index",
@@ -24,17 +24,17 @@ private fun Arb.Companion.editNoteRoute(): Arb<EditNoteRoute> =
         )
     }
 
-private fun Arb.Companion.editTaskListRoute(): Arb<EditTaskListRoute> =
+private fun Arb.editTaskListRoute(): Arb<EditTaskListRoute> =
     Arb.choice(Arb.list(Arb.int(1..1), 1..1).map { EditTaskListRoute })
 
-private fun Arb.Companion.navKey(): Arb<NavKey> =
+private fun Arb.navKey(): Arb<NavKey> =
     Arb.choice(
         Arb.homeRoute(),
         Arb.editNoteRoute(),
         Arb.editTaskListRoute()
     )
 
-private fun Arb.Companion.detailRoute(): Arb<NavKey> =
+private fun Arb.detailRoute(): Arb<NavKey> =
     Arb.choice(
         Arb.editNoteRoute(),
         Arb.editTaskListRoute()

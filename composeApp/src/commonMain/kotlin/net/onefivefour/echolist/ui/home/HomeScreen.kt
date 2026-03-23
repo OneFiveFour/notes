@@ -31,7 +31,6 @@ fun HomeScreen(
 
     Column(
         modifier = Modifier
-            .systemBarsPadding()
             .padding(
                 horizontal = EchoListTheme.dimensions.xl,
                 vertical = EchoListTheme.dimensions.l

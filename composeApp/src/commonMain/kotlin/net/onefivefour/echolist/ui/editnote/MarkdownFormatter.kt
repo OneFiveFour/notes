@@ -4,17 +4,6 @@ import androidx.compose.ui.text.TextRange
 import kotlin.math.max
 import kotlin.math.min
 
-enum class MarkdownToolbarAction(val label: String) {
-    Bold("Bold"),
-    BulletList("Bullets"),
-    CheckboxUnchecked("Todo"),
-    CheckboxChecked("Done"),
-    Link("Link"),
-    Heading1("H1"),
-    Heading2("H2"),
-    Heading3("H3")
-}
-
 data class MarkdownTextEdit(
     val text: String,
     val selectionStart: Int,

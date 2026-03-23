@@ -2,7 +2,6 @@ package net.onefivefour.echolist.ui.editnote
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,19 +11,27 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.TextStyle
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.edit
+import echolist.composeapp.generated.resources.visibility
+import kotlinx.serialization.builtins.ArraySerializer
 import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun EditNoteScreen(
@@ -44,13 +51,6 @@ fun EditNoteScreen(
                 vertical = dimensions.l
             )
     ) {
-        Text(
-            text = if (uiState.isCreateMode) "New note" else "Edit note",
-            style = EchoListTheme.typography.titleLarge,
-            color = EchoListTheme.materialColors.primary
-        )
-
-        Spacer(modifier = Modifier.height(dimensions.l))
 
         if (uiState.isCreateMode) {
             EditorCard(
@@ -65,58 +65,9 @@ fun EditNoteScreen(
             }
         } else {
             Text(
-                text = "Title",
-                style = EchoListTheme.typography.labelMedium,
-                color = EchoListTheme.materialColors.onBackground.copy(alpha = 0.7f)
-            )
-
-            Spacer(modifier = Modifier.height(dimensions.xs))
-
-            EditorCard(
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    text = uiState.titleState.text.toString(),
-                    style = EchoListTheme.typography.titleMedium,
-                    color = EchoListTheme.materialColors.onSurface,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.height(dimensions.m))
-
-        Text(
-            text = "Supported markdown: bold, bullet points, checkboxes, hyperlinks, and headings. Everything else is saved unchanged and previewed as plain text.",
-            style = EchoListTheme.typography.bodySmall,
-            color = EchoListTheme.materialColors.onBackground.copy(alpha = 0.7f)
-        )
-
-        Spacer(modifier = Modifier.height(dimensions.m))
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(dimensions.s)
-        ) {
-            ToggleChip(
-                label = "Edit",
-                isSelected = !uiState.isPreview,
-                onClick = {
-                    if (uiState.isPreview) onPreviewToggle()
-                }
-            )
-            ToggleChip(
-                label = "Preview",
-                isSelected = uiState.isPreview,
-                onClick = {
-                    if (!uiState.isPreview) onPreviewToggle()
-                }
-            )
-        }
-
-        if (!uiState.isPreview) {
-            Spacer(modifier = Modifier.height(dimensions.m))
-            MarkdownToolbar(
-                onToolbarAction = onToolbarAction
+                text = uiState.titleState.text.toString(),
+                style = EchoListTheme.typography.titleLarge,
+                color = EchoListTheme.materialColors.primary
             )
         }
 
@@ -177,7 +128,41 @@ fun EditNoteScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(dimensions.l))
+        Spacer(modifier = Modifier.height(dimensions.m))
+
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.End
+        ) {
+            if (!uiState.isPreview) {
+                MarkdownToolbar(
+                    modifier = Modifier.weight(1f),
+                    onToolbarAction = onToolbarAction
+                )
+            }
+
+            Spacer(modifier = Modifier.width(dimensions.m))
+
+            Icon(
+                painter = painterResource(when (uiState.isPreview) {
+                    true -> Res.drawable.edit
+                    false -> Res.drawable.visibility
+                }),
+                contentDescription = when (uiState.isPreview) {
+                    true -> "Edit"
+                    false -> "Preview"
+                },
+                modifier = Modifier
+                    .clip(RoundedCornerShape(50))
+                    .clickable { onPreviewToggle() }
+                    .padding(
+                        horizontal = EchoListTheme.dimensions.m,
+                        vertical = EchoListTheme.dimensions.m
+                    )
+            )
+        }
+
+        Spacer(modifier = Modifier.height(dimensions.m))
 
         ElButton(
             onClick = onSaveClick,
@@ -193,69 +178,17 @@ fun EditNoteScreen(
 }
 
 @Composable
-private fun MarkdownToolbar(
-    onToolbarAction: (MarkdownToolbarAction) -> Unit
-) {
-    val dimensions = EchoListTheme.dimensions
-    val scrollState = rememberScrollState()
-
-    Row(
-        modifier = Modifier.horizontalScroll(scrollState),
-        horizontalArrangement = Arrangement.spacedBy(dimensions.s)
-    ) {
-        MarkdownToolbarAction.entries.forEach { action ->
-            ToggleChip(
-                label = action.label,
-                isSelected = false,
-                onClick = { onToolbarAction(action) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun ToggleChip(
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    val colors = EchoListTheme.materialColors
-
-    Surface(
-        shape = RoundedCornerShape(50),
-        color = if (isSelected) colors.primary else colors.surface,
-        modifier = Modifier
-            .border(
-                width = EchoListTheme.dimensions.borderWidth,
-                color = if (isSelected) colors.primary else colors.surfaceVariant,
-                shape = RoundedCornerShape(50)
-            )
-            .clickable(onClick = onClick)
-    ) {
-        Text(
-            text = label,
-            style = EchoListTheme.typography.labelMedium,
-            color = if (isSelected) colors.onPrimary else colors.onSurface,
-            modifier = Modifier.padding(
-                horizontal = EchoListTheme.dimensions.m,
-                vertical = EchoListTheme.dimensions.s
-            )
-        )
-    }
-}
-
-@Composable
 private fun EditorCard(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Surface(
-        shape = EchoListTheme.shapes.small,
+        shape = EchoListTheme.shapes.medium,
         color = EchoListTheme.materialColors.surface,
         modifier = modifier.border(
             width = EchoListTheme.dimensions.borderWidth,
             color = EchoListTheme.materialColors.surfaceVariant,
-            shape = EchoListTheme.shapes.small
+            shape = EchoListTheme.shapes.medium
         )
     ) {
         Box(
@@ -284,6 +217,7 @@ private fun NoteTextField(
         }
 
         BasicTextField(
+            modifier = Modifier.fillMaxSize(),
             state = state,
             textStyle = textStyle.copy(
                 color = EchoListTheme.materialColors.onSurface

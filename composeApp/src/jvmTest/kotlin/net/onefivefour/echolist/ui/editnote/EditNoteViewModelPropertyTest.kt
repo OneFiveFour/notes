@@ -65,7 +65,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
         override suspend fun getNote(filePath: String): Result<Note> {
             getNoteCalls.add(filePath)
-            return notes[filePath]?.let(Result.Companion::success)
+            return notes[filePath]?.let(Result::success)
                 ?: Result.failure(NoSuchElementException("Note not found: $filePath"))
         }
 
