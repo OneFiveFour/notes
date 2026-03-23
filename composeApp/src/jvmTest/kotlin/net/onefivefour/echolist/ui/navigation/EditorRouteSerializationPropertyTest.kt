@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
+import net.onefivefour.echolist.data.repository.joinPath
 
 /**
  * Feature: note-tasklist-editors, Property 5: Route serialization round-trip
@@ -26,7 +27,7 @@ class EditorRouteSerializationPropertyTest : FunSpec({
             val parentPath = if (index == 0) "/" else "/folder-$index"
             val route = EditNoteRoute(
                 parentPath = parentPath,
-                filePath = if (withFilePath) "$parentPath/note-$index.md" else null
+                filePath = if (withFilePath) joinPath(parentPath, "note-$index.md") else null
             )
             val json = Json.encodeToString(route)
             val decoded = Json.decodeFromString<EditNoteRoute>(json)

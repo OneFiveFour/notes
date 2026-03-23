@@ -48,6 +48,16 @@ class NotesRepositoryFakeTest {
     }
 
     @Test
+    fun createNoteAtRootUsesSingleLeadingSlash() = runTest {
+        val repo = NotesRepositoryFake()
+
+        val result = repo.createNote(CreateNoteParams("title", "body", "/"))
+
+        assertTrue(result.isSuccess)
+        assertEquals("/title", result.getOrNull()?.filePath)
+    }
+
+    @Test
     fun setShouldFailCausesAllOperationsToFail() = runTest {
         val repo = NotesRepositoryFake()
         val error = RuntimeException("simulated")

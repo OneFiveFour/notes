@@ -31,6 +31,7 @@ import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
 import net.onefivefour.echolist.ui.theme.colorscheme.EchoListTheme2
 import net.onefivefour.echolist.ui.theme.ThemeManager
 import net.onefivefour.echolist.ui.AuthViewModel
+import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
@@ -161,7 +162,7 @@ val navigationModule: Module = module {
     }
     viewModel { params ->
         EditNoteViewModel(
-            parentPath = params.get(),
+            mode = params.get<EditNoteMode>(),
             notesRepository = get()
         )
     }

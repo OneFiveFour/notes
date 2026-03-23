@@ -17,8 +17,8 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.dto.CreateNoteParams
 import net.onefivefour.echolist.data.dto.ListNotesResult
-import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
+import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.domain.repository.NotesRepository
 
 // Feature: note-tasklist-editors, Property 1: Save guard — repository called if and only if trimmed text is non-blank
@@ -40,27 +40,43 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
     class FakeNotesRepository : NotesRepository {
         val createNoteCalls = mutableListOf<CreateNoteParams>()
+        val getNoteCalls = mutableListOf<String>()
+        val updateNoteCalls = mutableListOf<UpdateNoteParams>()
+        private val notes = mutableMapOf<String, Note>()
+
+        fun addNote(note: Note) {
+            notes[note.filePath] = note
+        }
 
         override suspend fun createNote(params: CreateNoteParams): Result<Note> {
             createNoteCalls.add(params)
-            return Result.success(
-                Note(
-                    filePath = "${params.parentDir}/${params.title}",
-                    title = params.title,
-                    content = params.content,
-                    updatedAt = 0L
-                )
+            val note = Note(
+                filePath = "${params.parentDir}/${params.title}",
+                title = params.title,
+                content = params.content,
+                updatedAt = 0L
             )
+            notes[note.filePath] = note
+            return Result.success(note)
         }
 
         override suspend fun listNotes(parentDir: String): Result<ListNotesResult> =
             Result.success(ListNotesResult(notes = emptyList(), entries = emptyList()))
 
-        override suspend fun getNote(filePath: String): Result<Note> =
-            Result.failure(UnsupportedOperationException())
+        override suspend fun getNote(filePath: String): Result<Note> {
+            getNoteCalls.add(filePath)
+            return notes[filePath]?.let(Result.Companion::success)
+                ?: Result.failure(NoSuchElementException("Note not found: $filePath"))
+        }
 
-        override suspend fun updateNote(params: UpdateNoteParams): Result<Note> =
-            Result.failure(UnsupportedOperationException())
+        override suspend fun updateNote(params: UpdateNoteParams): Result<Note> {
+            updateNoteCalls.add(params)
+            val existing = notes[params.filePath]
+                ?: return Result.failure(NoSuchElementException("Note not found: ${params.filePath}"))
+            val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
+            notes[updated.filePath] = updated
+            return Result.success(updated)
+        }
 
         override suspend fun deleteNote(filePath: String): Result<Unit> =
             Result.failure(UnsupportedOperationException())
@@ -70,30 +86,39 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
     test("Property 1: Save guard — repository called if and only if trimmed text is non-blank") {
         // Validates: Requirements 5.3, 5.7
-        checkAll(PropTestConfig(iterations = 100), Arb.string(0..50)) { generatedString ->
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.string(0..50),
+            Arb.string(0..100)
+        ) { generatedTitle, generatedContent ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeNotesRepository()
                 val parentPath = "/test/path"
                 val vm = EditNoteViewModel(
-                    parentPath = parentPath,
+                    mode = EditNoteMode.Create(parentPath),
                     notesRepository = fakeRepo
                 )
 
                 // Set the title text
                 vm.uiState.value.titleState.edit {
-                    replace(0, length, generatedString)
+                    replace(0, length, generatedTitle)
+                }
+
+                // Set the note content
+                vm.uiState.value.contentState.edit {
+                    replace(0, length, generatedContent)
                 }
 
                 vm.onSaveClick()
                 testScheduler.advanceUntilIdle()
 
-                val trimmed = generatedString.trim()
+                val trimmed = generatedTitle.trim()
                 if (trimmed.isBlank()) {
                     fakeRepo.createNoteCalls.size shouldBe 0
                 } else {
                     fakeRepo.createNoteCalls.size shouldBe 1
                     fakeRepo.createNoteCalls[0].title shouldBe trimmed
-                    fakeRepo.createNoteCalls[0].content shouldBe ""
+                    fakeRepo.createNoteCalls[0].content shouldBe generatedContent
                     fakeRepo.createNoteCalls[0].parentDir shouldBe parentPath
                 }
             }
@@ -109,7 +134,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
                 val fakeRepo = FakeNotesRepository()
                 val parentPath = "/test/path"
                 val vm = EditNoteViewModel(
-                    parentPath = parentPath,
+                    mode = EditNoteMode.Create(parentPath),
                     notesRepository = fakeRepo
                 )
 
@@ -162,7 +187,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
                 val parentPath = "/test/path"
                 val vm = EditNoteViewModel(
-                    parentPath = parentPath,
+                    mode = EditNoteMode.Create(parentPath),
                     notesRepository = failingRepo
                 )
 
@@ -175,8 +200,70 @@ class EditNoteViewModelPropertyTest : FunSpec({
                 testScheduler.advanceUntilIdle()
 
                 vm.uiState.value.isLoading shouldBe false
+                vm.uiState.value.isSaving shouldBe false
                 vm.uiState.value.error shouldBe errorMessage
             }
+        }
+    }
+
+    test("Property 4: Edit mode loads note data and treats empty content as loaded") {
+        runTest(testDispatcher) {
+            val fakeRepo = FakeNotesRepository()
+            val note = Note(
+                filePath = "/note-empty.md",
+                title = "note-empty",
+                content = "",
+                updatedAt = 1L
+            )
+            fakeRepo.addNote(note)
+
+            val vm = EditNoteViewModel(
+                mode = EditNoteMode.Edit(note.filePath),
+                notesRepository = fakeRepo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.mode shouldBe EditNoteMode.Edit(note.filePath)
+            vm.uiState.value.isLoading shouldBe false
+            vm.uiState.value.titleState.text.toString() shouldBe note.title
+            vm.uiState.value.contentState.text.toString() shouldBe ""
+            fakeRepo.getNoteCalls shouldBe listOf(note.filePath)
+        }
+    }
+
+    test("Property 5: Edit mode save updates the existing note") {
+        runTest(testDispatcher) {
+            val fakeRepo = FakeNotesRepository()
+            val note = Note(
+                filePath = "/note.md",
+                title = "note",
+                content = "before",
+                updatedAt = 1L
+            )
+            fakeRepo.addNote(note)
+
+            val vm = EditNoteViewModel(
+                mode = EditNoteMode.Edit(note.filePath),
+                notesRepository = fakeRepo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.contentState.edit {
+                replace(0, length, "after")
+            }
+
+            vm.onSaveClick()
+            testScheduler.advanceUntilIdle()
+
+            fakeRepo.createNoteCalls shouldBe emptyList()
+            fakeRepo.updateNoteCalls shouldBe listOf(
+                UpdateNoteParams(
+                    filePath = note.filePath,
+                    content = "after"
+                )
+            )
         }
     }
 })

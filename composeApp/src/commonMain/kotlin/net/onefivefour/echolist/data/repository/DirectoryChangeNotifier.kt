@@ -15,9 +15,10 @@ internal class DirectoryChangeNotifier {
 }
 
 internal fun parentDirectoryOf(filePath: String): String {
-    val lastSlash = filePath.lastIndexOf('/')
+    val normalizedFilePath = normalizePath(filePath)
+    val lastSlash = normalizedFilePath.lastIndexOf('/')
     return when {
         lastSlash <= 0 -> "/"
-        else -> filePath.substring(0, lastSlash)
+        else -> normalizedFilePath.substring(0, lastSlash)
     }
 }

@@ -14,9 +14,11 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import net.onefivefour.echolist.data.repository.normalizePath
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.common.GradientBackground
+import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.CreateItemCallbacks
 import net.onefivefour.echolist.ui.home.HomeScreen
@@ -115,7 +117,7 @@ fun App() {
                                         backStack.add(
                                             EditNoteRoute(
                                                 parentPath = route.path,
-                                                filePath = notePath
+                                                filePath = normalizePath(notePath)
                                             )
                                         )
                                     },
@@ -126,9 +128,12 @@ fun App() {
                             }
 
                             entry<EditNoteRoute> { route ->
+                                val mode = route.filePath?.let { filePath ->
+                                    EditNoteMode.Edit(normalizePath(filePath))
+                                } ?: EditNoteMode.Create(normalizePath(route.parentPath))
                                 val viewModel = koinViewModel<EditNoteViewModel>(
                                     key = "editNote-${route.parentPath}-${route.filePath.orEmpty()}"
-                                ) { parametersOf(route.parentPath, route.filePath) }
+                                ) { parametersOf(mode) }
                                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                                 LaunchedEffect(Unit) {

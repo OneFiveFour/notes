@@ -44,7 +44,7 @@ class NotesRepositoryFake : NotesRepository {
         shouldFail?.let { return Result.failure(it) }
 
         val note = Note(
-            filePath = "${params.parentDir}/${params.title}",
+            filePath = joinPath(params.parentDir, params.title),
             title = params.title,
             content = params.content,
             updatedAt = 0L
@@ -69,8 +69,9 @@ class NotesRepositoryFake : NotesRepository {
         callLog.add("getNote($filePath)")
         shouldFail?.let { return Result.failure(it) }
 
-        val note = notes[filePath]
-            ?: return Result.failure(NoSuchElementException("Note not found: $filePath"))
+        val normalizedFilePath = normalizePath(filePath)
+        val note = notes[normalizedFilePath]
+            ?: return Result.failure(NoSuchElementException("Note not found: $normalizedFilePath"))
         return Result.success(note)
     }
 
@@ -78,8 +79,9 @@ class NotesRepositoryFake : NotesRepository {
         callLog.add("updateNote(${params.filePath}, ${params.content})")
         shouldFail?.let { return Result.failure(it) }
 
-        val existing = notes[params.filePath]
-            ?: return Result.failure(NoSuchElementException("Note not found: ${params.filePath}"))
+        val normalizedFilePath = normalizePath(params.filePath)
+        val existing = notes[normalizedFilePath]
+            ?: return Result.failure(NoSuchElementException("Note not found: $normalizedFilePath"))
 
         val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
         notes[updated.filePath] = updated
@@ -90,7 +92,7 @@ class NotesRepositoryFake : NotesRepository {
         callLog.add("deleteNote($filePath)")
         shouldFail?.let { return Result.failure(it) }
 
-        notes.remove(filePath)
+        notes.remove(normalizePath(filePath))
         return Result.success(Unit)
     }
 }
