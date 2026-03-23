@@ -12,6 +12,7 @@ import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
@@ -55,7 +56,7 @@ class FileRepositoryImplTest : FunSpec({
         checkAll(arbCreateFolderParams, arbProtoFolder) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.createFolder(params)
 
@@ -72,7 +73,7 @@ class FileRepositoryImplTest : FunSpec({
             fake.createFolderResult = Result.success(
                 CreateFolderResponse(folder = `file`.v1.Folder(path = "/test/", name = "test"))
             )
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.createFolder(params)
 
@@ -84,7 +85,7 @@ class FileRepositoryImplTest : FunSpec({
     test("createFolder returns failure when network throws") {
         val fake = FakeFileRemoteDataSource()
         fake.createFolderResult = Result.failure(NetworkException.ServerError(500, "boom"))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.createFolder(CreateFolderParams("", "n"))
 
@@ -102,7 +103,7 @@ class FileRepositoryImplTest : FunSpec({
         )
         val fake = FakeFileRemoteDataSource()
         fake.listFilesResult = Result.success(ListFilesResponse(entries = protoEntries))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listFiles("/home/user")
 
@@ -116,7 +117,7 @@ class FileRepositoryImplTest : FunSpec({
     test("listFiles forwards correct parent_dir to data source") {
         val fake = FakeFileRemoteDataSource()
         fake.listFilesResult = Result.success(ListFilesResponse(entries = emptyList()))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         repo.listFiles("/some/path")
 
@@ -126,7 +127,7 @@ class FileRepositoryImplTest : FunSpec({
     test("listFiles returns empty list when response has no entries") {
         val fake = FakeFileRemoteDataSource()
         fake.listFilesResult = Result.success(ListFilesResponse(entries = emptyList()))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listFiles("")
 
@@ -137,7 +138,7 @@ class FileRepositoryImplTest : FunSpec({
     test("listFiles returns failure when network throws") {
         val fake = FakeFileRemoteDataSource()
         fake.listFilesResult = Result.failure(NetworkException.TimeoutError("timed out"))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listFiles("/any")
 
@@ -151,7 +152,7 @@ class FileRepositoryImplTest : FunSpec({
         checkAll(arbUpdateFolderParams, arbProtoFolder) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.updateFolderResult = Result.success(UpdateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.updateFolder(params)
 
@@ -168,7 +169,7 @@ class FileRepositoryImplTest : FunSpec({
             fake.updateFolderResult = Result.success(
                 UpdateFolderResponse(folder = `file`.v1.Folder(path = "/new/", name = "new"))
             )
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.updateFolder(params)
 
@@ -180,7 +181,7 @@ class FileRepositoryImplTest : FunSpec({
     test("updateFolder returns failure when network throws") {
         val fake = FakeFileRemoteDataSource()
         fake.updateFolderResult = Result.failure(NetworkException.ClientError(404, "not found"))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.updateFolder(UpdateFolderParams("p/", "n"))
 
@@ -194,7 +195,7 @@ class FileRepositoryImplTest : FunSpec({
         checkAll(arbDeleteFolderParams) { params ->
             val fake = FakeFileRemoteDataSource()
             fake.deleteFolderResult = Result.success(DeleteFolderResponse())
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.deleteFolder(params)
 
@@ -206,7 +207,7 @@ class FileRepositoryImplTest : FunSpec({
     test("deleteFolder forwards correct proto fields to data source").config(invocations = 20) {
         checkAll(arbDeleteFolderParams) { params ->
             val fake = FakeFileRemoteDataSource()
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.deleteFolder(params)
 
@@ -217,7 +218,7 @@ class FileRepositoryImplTest : FunSpec({
     test("deleteFolder returns failure when network throws") {
         val fake = FakeFileRemoteDataSource()
         fake.deleteFolderResult = Result.failure(NetworkException.NetworkError("timeout"))
-        val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.deleteFolder(DeleteFolderParams("p/"))
 

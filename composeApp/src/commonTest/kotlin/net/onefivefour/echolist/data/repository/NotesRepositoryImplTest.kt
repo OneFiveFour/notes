@@ -9,6 +9,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.data.dto.CreateNoteParams
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.FakeCacheDataSource
@@ -55,7 +56,7 @@ class NotesRepositoryImplTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.createNoteResult = Result.success(CreateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.createNote(params)
 
@@ -82,7 +83,7 @@ class NotesRepositoryImplTest : FunSpec({
                 )
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.createNote(params)
 
@@ -96,7 +97,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.createNoteResult = Result.failure(NetworkException.ServerError(500, "boom"))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.createNote(CreateNoteParams("t", "c", "/dir"))
 
@@ -117,7 +118,7 @@ class NotesRepositoryImplTest : FunSpec({
             )
         )
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listNotes("/parent")
 
@@ -133,7 +134,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.success(ListNotesResponse())
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         repo.listNotes("/some/path")
 
@@ -144,7 +145,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.success(ListNotesResponse(notes = emptyList(), entries = emptyList()))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listNotes("")
 
@@ -157,7 +158,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.failure(NetworkException.TimeoutError("timed out"))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listNotes("/any")
 
@@ -172,7 +173,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.getNoteResult = Result.success(GetNoteResponse(note = protoNote))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.getNote("/note.md")
 
@@ -192,7 +193,7 @@ class NotesRepositoryImplTest : FunSpec({
             )
         )
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         repo.getNote("/x.md")
 
@@ -203,7 +204,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.getNoteResult = Result.failure(NetworkException.ClientError(404, "not found"))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.getNote("/missing.md")
 
@@ -218,7 +219,7 @@ class NotesRepositoryImplTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.updateNoteResult = Result.success(UpdateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.updateNote(params)
 
@@ -245,7 +246,7 @@ class NotesRepositoryImplTest : FunSpec({
                 )
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.updateNote(params)
 
@@ -258,7 +259,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.updateNoteResult = Result.failure(NetworkException.ClientError(400, "bad request"))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.updateNote(UpdateNoteParams("/p.md", "c"))
 
@@ -272,7 +273,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.deleteNote("/note.md")
 
@@ -284,7 +285,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         repo.deleteNote("/target.md")
 
@@ -295,7 +296,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.deleteNoteResult = Result.failure(NetworkException.NetworkError("timeout"))
         val fakeCache = FakeCacheDataSource()
-        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, Dispatchers.Unconfined)
+        val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.deleteNote("/p.md")
 

@@ -17,6 +17,7 @@ import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.network.error.NetworkException
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.NotesRepository
 import notes.v1.DeleteNoteRequest
 import notes.v1.GetNoteRequest
@@ -25,6 +26,7 @@ import notes.v1.ListNotesRequest
 internal class NotesRepositoryImpl(
     private val noteRemoteDataSource: NoteRemoteDataSource,
     private val cacheDataSource: CacheDataSource,
+    private val directoryChangeNotifier: DirectoryChangeNotifier,
     private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
     private val backgroundScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
 ) : NotesRepository, AutoCloseable {
@@ -42,6 +44,7 @@ internal class NotesRepositoryImpl(
             val response = noteRemoteDataSource.createNote(request)
             val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
+            directoryChangeNotifier.notifyChanged(params.parentDir)
             Result.success(note)
         } catch (e: NetworkException) {
             // Queue for offline sync
@@ -119,6 +122,8 @@ internal class NotesRepositoryImpl(
             val response = noteRemoteDataSource.updateNote(request)
             val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
+            val parentDir = params.filePath.substringBeforeLast('/', "")
+            directoryChangeNotifier.notifyChanged(parentDir)
             Result.success(note)
         } catch (e: NetworkException) {
             // Queue for offline sync
@@ -134,6 +139,8 @@ internal class NotesRepositoryImpl(
             val request = DeleteNoteRequest(file_path = filePath)
             noteRemoteDataSource.deleteNote(request)
             cacheDataSource.deleteNote(filePath)
+            val parentDir = filePath.substringBeforeLast('/', "")
+            directoryChangeNotifier.notifyChanged(parentDir)
             Result.success(Unit)
         } catch (e: NetworkException) {
             Result.failure(e)

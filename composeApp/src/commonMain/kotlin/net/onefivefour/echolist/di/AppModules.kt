@@ -4,6 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import net.onefivefour.echolist.data.DirectoryChangeNotifierImpl
 import net.onefivefour.echolist.data.network.logging.LogLevel
 import net.onefivefour.echolist.data.network.logging.NetworkLoggingPlugin
 import net.onefivefour.echolist.domain.repository.AuthRepository
@@ -23,6 +24,7 @@ import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 import net.onefivefour.echolist.data.network.client.ConnectRpcClientImpl
@@ -110,10 +112,15 @@ val dataModule: Module = module {
         CacheDataSourceImpl(database = get())
     }
 
+    single<DirectoryChangeNotifier> {
+        DirectoryChangeNotifierImpl()
+    }
+
     single<NotesRepository> {
         NotesRepositoryImpl(
             noteRemoteDataSource = get(),
             cacheDataSource = get(),
+            directoryChangeNotifier = get(),
             dispatcher = Dispatchers.Default
         )
     } withOptions {
@@ -123,6 +130,7 @@ val dataModule: Module = module {
     single<FileRepository> {
         FileRepositoryImpl(
             networkDataSource = get(),
+            directoryChangeNotifier = get(),
             dispatcher = Dispatchers.Default
         )
     }
@@ -151,7 +159,8 @@ val navigationModule: Module = module {
     viewModel { params ->
         HomeViewModel(
             path = params.get(),
-            fileRepository = get()
+            fileRepository = get(),
+            directoryChangeNotifier = get()
         )
     }
     viewModel { params ->

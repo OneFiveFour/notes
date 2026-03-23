@@ -9,12 +9,14 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import org.jetbrains.compose.resources.getString
 
 class HomeViewModel(
     private val path: String,
-    private val fileRepository: FileRepository
+    private val fileRepository: FileRepository,
+    private val directoryChangeNotifier: DirectoryChangeNotifier
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -30,7 +32,7 @@ class HomeViewModel(
             loadData()
         }
         viewModelScope.launch {
-            fileRepository.directoryChanged.collect { changedPath ->
+            directoryChangeNotifier.directoryChanged.collect { changedPath ->
                 if (changedPath == path) {
                     loadData()
                 }

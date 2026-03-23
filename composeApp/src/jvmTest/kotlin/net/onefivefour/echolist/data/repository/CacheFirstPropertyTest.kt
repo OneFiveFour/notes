@@ -11,6 +11,7 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
@@ -101,7 +102,7 @@ class CacheFirstPropertyTest : FunSpec({
             // Seed cache with the note
             cache.saveNote(note)
 
-            val repo = NotesRepositoryImpl(delayedNetwork, cache, Dispatchers.Default)
+            val repo = NotesRepositoryImpl(delayedNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Default)
 
             val result = repo.getNote(note.filePath)
 

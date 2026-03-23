@@ -16,6 +16,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import kotlinx.coroutines.supervisorScope
 import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.data.dto.CreateNoteParams
@@ -171,7 +172,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 )
             }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val createResult = repo.createNote(params)
             createResult.isSuccess shouldBe true
@@ -221,7 +222,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 )
             }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             // Seed the cache with the original note
             cache.saveNote(originalNote)
@@ -250,7 +251,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 throw NetworkException.ClientError(404, "not found: ${req.file_path}")
             }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             // Seed the cache with the note
             cache.saveNote(note)
@@ -275,7 +276,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Make getNote throw the exception and ensure no cache fallback
             mockNetwork.getNoteHandler = { throw exception }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.getNote("nonexistent/path.md")
             result.isFailure shouldBe true
@@ -300,7 +301,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Network always fails
             mockNetwork.getNoteHandler = { throw NetworkException.NetworkError("offline") }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.getNote(note.filePath)
             result.isSuccess shouldBe true
@@ -325,7 +326,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Network always fails
             mockNetwork.listNotesHandler = { throw NetworkException.NetworkError("offline") }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.listNotes("")
             result.isSuccess shouldBe true
@@ -346,7 +347,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // First: network fails so operations get queued
             mockNetwork.createNoteHandler = { throw NetworkException.NetworkError("offline") }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Unconfined)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             // Queue multiple create operations
             val paramsList = (1..opCount).map { i ->
@@ -410,7 +411,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 }
             }
 
-            val repo = NotesRepositoryImpl(mockNetwork, cache, Dispatchers.Default)
+            val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Default)
 
             try {
                 supervisorScope {

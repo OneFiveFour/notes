@@ -14,7 +14,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
@@ -83,7 +83,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.createFolder(params)
 
@@ -102,7 +102,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.createFolder(params)
 
@@ -124,7 +124,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { parentPath, entries ->
             val fake = FakeFileRemoteDataSource()
             fake.listFilesResult = Result.success(ListFilesResponse(entries = entries))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.listFiles(parentPath)
 
@@ -140,7 +140,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { parentPath ->
             val fake = FakeFileRemoteDataSource()
             fake.listFilesResult = Result.success(ListFilesResponse(entries = emptyList()))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.listFiles(parentPath)
 
@@ -161,7 +161,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.updateFolderResult = Result.success(UpdateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.updateFolder(params)
 
@@ -180,7 +180,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.updateFolderResult = Result.success(UpdateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.updateFolder(params)
 
@@ -201,7 +201,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params ->
             val fake = FakeFileRemoteDataSource()
             fake.deleteFolderResult = Result.success(DeleteFolderResponse())
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.deleteFolder(params)
 
@@ -217,7 +217,7 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params ->
             val fake = FakeFileRemoteDataSource()
             fake.deleteFolderResult = Result.success(DeleteFolderResponse())
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = FileRepositoryImpl(fake, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.deleteFolder(params)
 
@@ -239,17 +239,13 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params, protoFolder ->
             val fake = FakeFileRemoteDataSource()
             fake.createFolderResult = Result.success(CreateFolderResponse(folder = protoFolder))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val notifier = FakeDirectoryChangeNotifier()
+            val repo = FileRepositoryImpl(fake, notifier, Dispatchers.Unconfined)
 
-            val emissions = mutableListOf<String>()
-            val collector = async(Dispatchers.Unconfined) {
-                repo.directoryChanged.collect { emissions.add(it) }
-            }
             repo.createFolder(params)
-            collector.cancel()
 
-            emissions.size shouldBe 1
-            emissions.first() shouldBe params.parentDir
+            notifier.emissions.size shouldBe 1
+            notifier.emissions.first() shouldBe params.parentDir
         }
     }
 
@@ -260,16 +256,12 @@ class FileRepositoryImplPropertyTest : FunSpec({
         ) { params ->
             val fake = FakeFileRemoteDataSource()
             fake.createFolderResult = Result.failure(RuntimeException("network error"))
-            val repo = FileRepositoryImpl(fake, Dispatchers.Unconfined)
+            val notifier = FakeDirectoryChangeNotifier()
+            val repo = FileRepositoryImpl(fake, notifier, Dispatchers.Unconfined)
 
-            val emissions = mutableListOf<String>()
-            val collector = async(Dispatchers.Unconfined) {
-                repo.directoryChanged.collect { emissions.add(it) }
-            }
             repo.createFolder(params)
-            collector.cancel()
 
-            emissions.shouldBeEmpty()
+            notifier.emissions.shouldBeEmpty()
         }
     }
 })
