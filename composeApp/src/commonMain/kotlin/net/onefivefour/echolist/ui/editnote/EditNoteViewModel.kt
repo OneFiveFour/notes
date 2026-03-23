@@ -86,7 +86,10 @@ class EditNoteViewModel(
                 )
             }
             result.fold(
-                onSuccess = { _navigateBack.emit(Unit) },
+                onSuccess = {
+                    _uiState.update { it.copy(isSaving = false) }
+                    _navigateBack.emit(Unit)
+                },
                 onFailure = { e ->
                     _uiState.update { it.copy(isSaving = false, error = e.message) }
                 }

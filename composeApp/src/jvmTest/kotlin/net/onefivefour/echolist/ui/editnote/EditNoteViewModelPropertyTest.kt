@@ -65,7 +65,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
         override suspend fun getNote(filePath: String): Result<Note> {
             getNoteCalls.add(filePath)
-            return notes[filePath]?.let(Result::success)
+            return notes[filePath]?.let { Result.success(it) }
                 ?: Result.failure(NoSuchElementException("Note not found: $filePath"))
         }
 
@@ -153,6 +153,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
                 // The deferred should complete with Unit, proving exactly one event was emitted
                 navigateBackDeferred.await() shouldBe Unit
+                vm.uiState.value.isSaving shouldBe false
             }
         }
     }
@@ -264,6 +265,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
                     content = "after"
                 )
             )
+            vm.uiState.value.isSaving shouldBe false
         }
     }
 })
