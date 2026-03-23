@@ -10,7 +10,7 @@ import kotlinx.serialization.modules.polymorphic
 data object LoginRoute : NavKey
 
 @Serializable
-data class HomeRoute(val path: String = "/") : NavKey
+data class HomeRoute(val path: String = "") : NavKey
 
 @Serializable
 data class EditNoteRoute(

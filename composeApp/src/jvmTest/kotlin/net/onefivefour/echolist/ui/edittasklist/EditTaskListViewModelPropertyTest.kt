@@ -73,7 +73,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..50)) { generatedString ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeTaskListRepository()
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditTaskListViewModel(
                     parentPath = parentPath,
                     taskListRepository = fakeRepo
@@ -107,7 +107,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..50).filter { it.isNotBlank() }) { generatedTitle ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeTaskListRepository()
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditTaskListViewModel(
                     parentPath = parentPath,
                     taskListRepository = fakeRepo
@@ -160,7 +160,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                         Result.failure(UnsupportedOperationException())
                 }
 
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditTaskListViewModel(
                     parentPath = parentPath,
                     taskListRepository = failingRepo

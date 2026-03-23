@@ -30,7 +30,7 @@ class SaveEnabledPropertyTest : FunSpec({
 
             val uiState = EditNoteUiState(
                 titleState = titleState,
-                mode = EditNoteMode.Create("/"),
+                mode = EditNoteMode.Create(""),
                 isLoading = isLoading,
                 isSaving = isSaving
             )

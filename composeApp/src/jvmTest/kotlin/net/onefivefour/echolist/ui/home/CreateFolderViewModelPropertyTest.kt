@@ -160,7 +160,7 @@ class CreateFolderViewModelPropertyTest : FunSpec({
                 repo.createFolderHandler = {
                     Result.failure(RuntimeException(errorMsg))
                 }
-                val vm = CreateFolderViewModel(currentPath = "/test", fileRepository = repo)
+                val vm = CreateFolderViewModel(currentPath = "test", fileRepository = repo)
 
                 vm.showDialog()
                 vm.onNameChange(name)

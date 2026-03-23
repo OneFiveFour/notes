@@ -93,7 +93,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         ) { generatedTitle, generatedContent ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeNotesRepository()
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditNoteViewModel(
                     mode = EditNoteMode.Create(parentPath),
                     notesRepository = fakeRepo
@@ -132,7 +132,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..50).filter { it.isNotBlank() }) { generatedTitle ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeNotesRepository()
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditNoteViewModel(
                     mode = EditNoteMode.Create(parentPath),
                     notesRepository = fakeRepo
@@ -186,7 +186,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
                         Result.failure(UnsupportedOperationException())
                 }
 
-                val parentPath = "/test/path"
+                val parentPath = "test/path"
                 val vm = EditNoteViewModel(
                     mode = EditNoteMode.Create(parentPath),
                     notesRepository = failingRepo
@@ -211,7 +211,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         runTest(testDispatcher) {
             val fakeRepo = FakeNotesRepository()
             val note = Note(
-                filePath = "/note-empty.md",
+                filePath = "note-empty.md",
                 title = "note-empty",
                 content = "",
                 updatedAt = 1L
@@ -237,7 +237,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         runTest(testDispatcher) {
             val fakeRepo = FakeNotesRepository()
             val note = Note(
-                filePath = "/note.md",
+                filePath = "note.md",
                 title = "note",
                 content = "before",
                 updatedAt = 1L

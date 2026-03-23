@@ -351,7 +351,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             // Queue multiple create operations
             val paramsList = (1..opCount).map { i ->
-                CreateNoteParams(title = "note-$i", content = "content-$i", parentDir = "/path")
+                CreateNoteParams(title = "note-$i", content = "content-$i", parentDir = "path")
             }
             paramsList.forEach { params ->
                 repo.createNote(params) // will fail and queue

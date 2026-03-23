@@ -24,7 +24,7 @@ class EditorRouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withFilePath ->
-            val parentPath = if (index == 0) "/" else "/folder-$index"
+            val parentPath = if (index == 0) "" else "folder-$index"
             val route = EditNoteRoute(
                 parentPath = parentPath,
                 filePath = if (withFilePath) joinPath(parentPath, "note-$index.md") else null

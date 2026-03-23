@@ -13,14 +13,14 @@ import io.kotest.property.checkAll
 
 private fun Arb.homeRoute(): Arb<HomeRoute> =
     Arb.int(0..50).map { index ->
-        if (index == 0) HomeRoute("/") else HomeRoute("/folder-$index")
+        if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
     }
 
 private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         EditNoteRoute(
-            parentPath = "/folder-$index",
-            filePath = if (index % 2 == 0) null else "/folder-$index/note-$index.md"
+            parentPath = "folder-$index",
+            filePath = if (index % 2 == 0) null else "folder-$index/note-$index.md"
         )
     }
 
@@ -87,8 +87,8 @@ class NavigationPropertyTest : FunSpec({
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
-            val filePath = if (currentHome.path == "/") {
-                "/note-$fileIndex.md"
+            val filePath = if (currentHome.path.isEmpty()) {
+                "note-$fileIndex.md"
             } else {
                 "${currentHome.path}/note-$fileIndex.md"
             }

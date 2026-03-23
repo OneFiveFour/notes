@@ -69,13 +69,13 @@ class HomeViewModel(
 }
 
 internal fun buildBreadcrumbs(path: String, homeTitle: String): List<BreadcrumbItem> {
-    val breadcrumbs = mutableListOf(BreadcrumbItem(label = homeTitle, path = "/"))
-    if (path == "/" || path.isEmpty()) return breadcrumbs
+    val breadcrumbs = mutableListOf(BreadcrumbItem(label = homeTitle, path = ""))
+    if (path.isEmpty()) return breadcrumbs
 
     val segments = path.trimStart('/').trimEnd('/').split('/')
     var accumulated = ""
     for (segment in segments) {
-        accumulated = "$accumulated/$segment"
+        accumulated = if (accumulated.isEmpty()) segment else "$accumulated/$segment"
         breadcrumbs.add(BreadcrumbItem(label = segment, path = accumulated))
     }
     return breadcrumbs

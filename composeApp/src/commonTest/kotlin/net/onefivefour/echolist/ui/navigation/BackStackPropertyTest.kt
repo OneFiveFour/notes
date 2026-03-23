@@ -13,17 +13,17 @@ import io.kotest.property.checkAll
 
 private fun Arb.homeRoute(): Arb<HomeRoute> =
     Arb.int(0..50).map { index ->
-        if (index == 0) HomeRoute("/") else HomeRoute("/folder-$index")
+        if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
     }
 
 private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         if (index % 2 == 0) {
-            EditNoteRoute(parentPath = "/folder-$index")
+            EditNoteRoute(parentPath = "folder-$index")
         } else {
             EditNoteRoute(
-                parentPath = "/folder-$index",
-                filePath = "/folder-$index/note-$index.md"
+                parentPath = "folder-$index",
+                filePath = "folder-$index/note-$index.md"
             )
         }
     }
@@ -54,7 +54,7 @@ class BackStackPropertyTest : FunSpec({
     test("Property 3: breadcrumb navigation truncates to matching HomeRoute") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.list(Arb.int(1..10).map { "/folder-$it" }, 2..10)
+            Arb.list(Arb.int(1..10).map { "folder-$it" }, 2..10)
         ) { paths ->
             val stack = paths.map { HomeRoute(it) }.toMutableList()
             val targetIndex = (0 until stack.size).random()

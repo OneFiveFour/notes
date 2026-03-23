@@ -87,11 +87,11 @@ private fun HomeScreenPreview() {
                     breadcrumbs = listOf(
                         BreadcrumbItem(
                             label = "Home",
-                            path = "/"
+                            path = ""
                         ),
                         BreadcrumbItem(
                             label = "Folder 1",
-                            path = "/folder1"
+                            path = "folder1"
                         )
                     )
                 ),

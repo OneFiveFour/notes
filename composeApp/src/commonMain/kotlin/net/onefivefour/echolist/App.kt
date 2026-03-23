@@ -149,7 +149,7 @@ fun App() {
                             }
 
                             entry<EditTaskListRoute> {
-                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: "/"
+                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: ""
                                 val viewModel = koinViewModel<EditTaskListViewModel>(
                                     key = "editTaskList-$currentPath"
                                 ) { parametersOf(currentPath) }

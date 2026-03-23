@@ -93,15 +93,15 @@ private fun BreadcrumbBarPreview() {
             breadcrumbs = listOf(
                 BreadcrumbItem(
                     label = "Home",
-                    path = "/"
+                    path = ""
                 ),
                 BreadcrumbItem(
                     label = "Folder 1",
-                    path = "/folder1"
+                    path = "folder1"
                 ),
                 BreadcrumbItem(
                     label = "Folder 2",
-                    path = "/folder1/folder2"
+                    path = "folder1/folder2"
                 )
             ),
             onBreadcrumbClick = { }

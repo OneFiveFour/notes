@@ -41,10 +41,12 @@ class RouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withFilePath ->
-            val parentPath = if (index == 0) "/" else "/folder-$index"
+            val parentPath = if (index == 0) "" else "folder-$index"
             val route = EditNoteRoute(
                 parentPath = parentPath,
-                filePath = if (withFilePath) "$parentPath/note-$index.md" else null
+                filePath = if (withFilePath) {
+                    if (parentPath.isEmpty()) "note-$index.md" else "$parentPath/note-$index.md"
+                } else null
             )
             val encoded = json.encodeToString(kotlinx.serialization.serializer<EditNoteRoute>(), route)
             val decoded = json.decodeFromString(kotlinx.serialization.serializer<EditNoteRoute>(), encoded)
@@ -58,10 +60,12 @@ class RouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withFilePath ->
-            val parentPath = if (index == 0) "/" else "/folder-$index"
+            val parentPath = if (index == 0) "" else "folder-$index"
             val route: NavKey = EditNoteRoute(
                 parentPath = parentPath,
-                filePath = if (withFilePath) "$parentPath/note-$index.md" else null
+                filePath = if (withFilePath) {
+                    if (parentPath.isEmpty()) "note-$index.md" else "$parentPath/note-$index.md"
+                } else null
             )
             val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
             val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
