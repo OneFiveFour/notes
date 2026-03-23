@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package tasks.v1;
 
-option go_package = "tasks/v1;tasksv1";
+option go_package = "echolist-backend/proto/gen/tasks/v1;tasksv1";
 
 service TaskListService {
   rpc CreateTaskList (CreateTaskListRequest) returns (CreateTaskListResponse);
@@ -26,14 +26,17 @@ message MainTask {
 }
 
 message TaskList {
-  string file_path = 1;
-  string title = 2;
-  repeated MainTask tasks = 3;
-  int64 updated_at = 4;
+  string id = 1;
+  string file_path = 2;
+  string title = 3;
+  repeated MainTask tasks = 4;
+  int64 updated_at = 5;
 }
 
 message CreateTaskListRequest {
   string title = 1;
+  // Relative path to the parent directory. Empty string for root.
+  // Must not start with "/", must not contain ".." segments.
   string parent_dir = 2;
   repeated MainTask tasks = 3;
 }
@@ -43,7 +46,7 @@ message CreateTaskListResponse {
 }
 
 message GetTaskListRequest {
-  string file_path = 1;
+  string id = 1;
 }
 
 message GetTaskListResponse {
@@ -51,6 +54,8 @@ message GetTaskListResponse {
 }
 
 message ListTaskListsRequest {
+  // Relative path to the parent directory. Empty string for root.
+  // Must not start with "/", must not contain ".." segments.
   string parent_dir = 1;
 }
 
@@ -59,7 +64,7 @@ message ListTaskListsResponse {
 }
 
 message UpdateTaskListRequest {
-  string file_path = 1;
+  string id = 1;
   repeated MainTask tasks = 2;
 }
 
@@ -68,7 +73,7 @@ message UpdateTaskListResponse {
 }
 
 message DeleteTaskListRequest {
-  string file_path = 1;
+  string id = 1;
 }
 
 message DeleteTaskListResponse {}

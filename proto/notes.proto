@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package notes.v1;
 
-option go_package = "gen/notes/v1;notesv1";
+option go_package = "echolist-backend/proto/gen/notes/v1;notesv1";
 
 service NoteService {
   rpc CreateNote (CreateNoteRequest) returns (CreateNoteResponse);
@@ -15,6 +15,8 @@ service NoteService {
 message CreateNoteRequest {
   string title = 1;
   string content = 2;
+  // Relative path to the parent directory. Empty string for root.
+  // Must not start with "/", must not contain ".." segments.
   string parent_dir = 3;
 }
 
@@ -23,23 +25,25 @@ message CreateNoteResponse {
 }
 
 message ListNotesRequest {
-  string parent_dir = 1; // optional filter on subfolder, empty = root
+  // Relative path to the parent directory. Empty string for root.
+  // Must not start with "/", must not contain ".." segments.
+  string parent_dir = 1;
 }
 
 message Note {
-  string file_path = 1;
-  string title = 2;
-  string content = 3;
-  int64 updated_at = 4;
+  string id = 1;
+  string file_path = 2;
+  string title = 3;
+  string content = 4;
+  int64 updated_at = 5;
 }
 
 message ListNotesResponse {
   repeated Note notes = 1;
-  repeated string entries = 2;
 }
 
 message GetNoteRequest {
-  string file_path = 1;
+  string id = 1;
 }
 
 message GetNoteResponse {
@@ -47,7 +51,7 @@ message GetNoteResponse {
 }
 
 message UpdateNoteRequest {
-  string file_path = 1;
+  string id = 1;
   string content = 2;
 }
 
@@ -56,7 +60,7 @@ message UpdateNoteResponse {
 }
 
 message DeleteNoteRequest {
-  string file_path = 1;
+  string id = 1;
 }
 
 message DeleteNoteResponse {}
