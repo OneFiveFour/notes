@@ -107,6 +107,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms proto TaskList to domain TaskList with field name conversions") {
         val protoTaskList = tasks.v1.TaskList(
+            id = "tl-uuid-1",
             file_path = "/home/user/lists/shopping.json",
             title = "Shopping List",
             tasks = listOf(
@@ -123,6 +124,7 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(protoTaskList)
 
+        domain.id shouldBe "tl-uuid-1"
         domain.filePath shouldBe "/home/user/lists/shopping.json"
         domain.name shouldBe "Shopping List"
         domain.tasks shouldHaveSize 1
@@ -134,6 +136,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms CreateTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
+            id = "tl-uuid-2",
             file_path = "/lists/new.json",
             title = "New List",
             tasks = emptyList(),
@@ -143,6 +146,7 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(response)
 
+        domain.id shouldBe "tl-uuid-2"
         domain.filePath shouldBe "/lists/new.json"
         domain.name shouldBe "New List"
         domain.tasks.shouldBeEmpty()
@@ -151,6 +155,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms GetTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
+            id = "tl-uuid-3",
             file_path = "/lists/existing.json",
             title = "Existing List",
             tasks = listOf(
@@ -168,6 +173,7 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(response)
 
+        domain.id shouldBe "tl-uuid-3"
         domain.filePath shouldBe "/lists/existing.json"
         domain.name shouldBe "Existing List"
         domain.tasks shouldHaveSize 1
@@ -178,6 +184,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms UpdateTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
+            id = "tl-uuid-4",
             file_path = "/lists/updated.json",
             title = "Updated List",
             tasks = emptyList(),
@@ -187,6 +194,7 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(response)
 
+        domain.id shouldBe "tl-uuid-4"
         domain.filePath shouldBe "/lists/updated.json"
         domain.name shouldBe "Updated List"
         domain.updatedAt shouldBe 1704326400000L
@@ -194,12 +202,14 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms ListTaskListsResponse with multiple task lists") {
         val tl1 = tasks.v1.TaskList(
+            id = "tl-uuid-5",
             file_path = "/lists/list1.json",
             title = "List 1",
             tasks = emptyList(),
             updated_at = 1704067200000L
         )
         val tl2 = tasks.v1.TaskList(
+            id = "tl-uuid-6",
             file_path = "/lists/list2.json",
             title = "List 2",
             tasks = emptyList(),
@@ -210,8 +220,10 @@ class TaskListMapperTest : FunSpec({
         val result = TaskListMapper.toDomain(response)
 
         result.taskLists shouldHaveSize 2
+        result.taskLists[0].id shouldBe "tl-uuid-5"
         result.taskLists[0].filePath shouldBe "/lists/list1.json"
         result.taskLists[0].name shouldBe "List 1"
+        result.taskLists[1].id shouldBe "tl-uuid-6"
         result.taskLists[1].filePath shouldBe "/lists/list2.json"
         result.taskLists[1].name shouldBe "List 2"
     }
@@ -252,9 +264,9 @@ class TaskListMapperTest : FunSpec({
         proto.tasks[0].sub_tasks[0].description shouldBe "Sub 1"
     }
 
-    test("toProto transforms UpdateTaskListParams to UpdateTaskListRequest") {
+    test("toProto transforms UpdateTaskListParams to UpdateTaskListRequest with id field") {
         val params = UpdateTaskListParams(
-            filePath = "/lists/existing.json",
+            id = "tl-uuid-existing",
             tasks = listOf(
                 MainTask(
                     description = "Updated task",
@@ -268,7 +280,7 @@ class TaskListMapperTest : FunSpec({
 
         val proto = TaskListMapper.toProto(params)
 
-        proto.file_path shouldBe "/lists/existing.json"
+        proto.id shouldBe "tl-uuid-existing"
         proto.tasks shouldHaveSize 1
         proto.tasks[0].description shouldBe "Updated task"
         proto.tasks[0].done shouldBe true
@@ -379,6 +391,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain preserves timestamp precision") {
         val protoTaskList = tasks.v1.TaskList(
+            id = "tl-uuid-ts",
             file_path = "/lists/ts.json",
             title = "Timestamp Test",
             tasks = emptyList(),
@@ -392,6 +405,7 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms ListTaskListsResponse with single task list") {
         val tl = tasks.v1.TaskList(
+            id = "tl-uuid-single",
             file_path = "/lists/single.json",
             title = "Single",
             tasks = emptyList(),
@@ -402,6 +416,7 @@ class TaskListMapperTest : FunSpec({
         val result = TaskListMapper.toDomain(response)
 
         result.taskLists shouldHaveSize 1
+        result.taskLists[0].id shouldBe "tl-uuid-single"
         result.taskLists[0].filePath shouldBe "/lists/single.json"
     }
 })

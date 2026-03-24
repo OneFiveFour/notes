@@ -25,6 +25,7 @@ class NoteMapperPropertyTest : FunSpec({
 
     val arbProtoNote = arbitrary {
         notes.v1.Note(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
@@ -65,6 +66,9 @@ class NoteMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoNote) { proto ->
             val domain = NoteMapper.toDomain(proto)
 
+            // Verify id mapping
+            domain.id shouldBe proto.id
+
             // Verify file_path -> filePath mapping
             domain.filePath shouldBe proto.file_path
 
@@ -82,6 +86,7 @@ class NoteMapperPropertyTest : FunSpec({
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
 
+            domain.id shouldBe protoNote.id
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -94,6 +99,7 @@ class NoteMapperPropertyTest : FunSpec({
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
 
+            domain.id shouldBe protoNote.id
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -106,6 +112,7 @@ class NoteMapperPropertyTest : FunSpec({
             val domain = NoteMapper.toDomain(response)
             val protoNote = response.note!!
 
+            domain.id shouldBe protoNote.id
             domain.filePath shouldBe protoNote.file_path
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
@@ -127,6 +134,7 @@ class NoteMapperPropertyTest : FunSpec({
             // Verify order and count preserved
             result.notes.forEachIndexed { index, note ->
                 val protoNote = response.notes[index]
+                note.id shouldBe protoNote.id
                 note.filePath shouldBe protoNote.file_path
                 note.title shouldBe protoNote.title
                 note.content shouldBe protoNote.content

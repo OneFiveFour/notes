@@ -23,7 +23,7 @@ private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
         } else {
             EditNoteRoute(
                 parentPath = "folder-$index",
-                filePath = "folder-$index/note-$index.md"
+                noteId = "note-id-$index"
             )
         }
     }

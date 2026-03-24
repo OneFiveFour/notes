@@ -42,6 +42,7 @@ class CacheFirstPropertyTest : FunSpec({
 
     val arbNote = arbitrary {
         Note(
+            id = Arb.string(1..50).bind(),
             filePath = Arb.string(1..50).bind(),
             title = Arb.string(1..50).bind(),
             content = Arb.string(0..200).bind(),
@@ -76,7 +77,8 @@ class CacheFirstPropertyTest : FunSpec({
             networkCompleted.set(true)
             return GetNoteResponse(
                 note = notes.v1.Note(
-                    file_path = request.file_path,
+                    id = request.id,
+                    file_path = "network/path.md",
                     title = "network-title",
                     content = "network-content",
                     updated_at = System.currentTimeMillis()
@@ -104,7 +106,7 @@ class CacheFirstPropertyTest : FunSpec({
 
             val repo = NotesRepositoryImpl(delayedNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Default)
 
-            val result = repo.getNote(note.filePath)
+            val result = repo.getNote(note.id)
 
             // The result should be the cached note, returned before the network completes
             result.isSuccess shouldBe true

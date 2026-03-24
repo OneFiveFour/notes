@@ -23,11 +23,11 @@ class EditorRouteSerializationPropertyTest : FunSpec({
             PropTestConfig(iterations = 50),
             Arb.int(0..50),
             Arb.boolean()
-        ) { index, withFilePath ->
+        ) { index, withNoteId ->
             val parentPath = if (index == 0) "" else "folder-$index"
             val route = EditNoteRoute(
                 parentPath = parentPath,
-                filePath = if (withFilePath) joinPath(parentPath, "note-$index.md") else null
+                noteId = if (withNoteId) "note-id-$index" else null
             )
             val json = Json.encodeToString(route)
             val decoded = Json.decodeFromString<EditNoteRoute>(json)

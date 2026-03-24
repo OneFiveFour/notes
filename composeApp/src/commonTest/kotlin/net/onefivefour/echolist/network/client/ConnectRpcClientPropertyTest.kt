@@ -92,6 +92,7 @@ class ConnectRpcClientPropertyTest : FunSpec({
         ) { filePath, title, content, updatedAt ->
             val original = notes.v1.CreateNoteResponse(
                 note = notes.v1.Note(
+                    id = "test-id",
                     file_path = filePath,
                     title = title,
                     content = content,

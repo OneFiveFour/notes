@@ -113,11 +113,11 @@ fun App() {
                                         onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
                                         onCreateTaskList = { backStack.add(EditTaskListRoute) }
                                     ),
-                                    onNoteClick = { notePath ->
+                                    onNoteClick = { noteId ->
                                         backStack.add(
                                             EditNoteRoute(
                                                 parentPath = route.path,
-                                                filePath = normalizePath(notePath)
+                                                noteId = noteId
                                             )
                                         )
                                     },
@@ -128,11 +128,11 @@ fun App() {
                             }
 
                             entry<EditNoteRoute> { route ->
-                                val mode = route.filePath?.let { filePath ->
-                                    EditNoteMode.Edit(normalizePath(filePath))
+                                val mode = route.noteId?.let { noteId ->
+                                    EditNoteMode.Edit(noteId)
                                 } ?: EditNoteMode.Create(normalizePath(route.parentPath))
                                 val viewModel = koinViewModel<EditNoteViewModel>(
-                                    key = "editNote-${route.parentPath}-${route.filePath.orEmpty()}"
+                                    key = "editNote-${route.parentPath}-${route.noteId.orEmpty()}"
                                 ) { parametersOf(mode) }
                                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 

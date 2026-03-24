@@ -37,6 +37,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
 
     val arbProtoNote = arbitrary {
         notes.v1.Note(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
@@ -54,7 +55,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
 
     val arbUpdateNoteParams = arbitrary {
         UpdateNoteParams(
-            filePath = Arb.string(1..100).bind(),
+            id = Arb.string(1..50).bind(),
             content = Arb.string(0..500).bind()
         )
     }
@@ -79,6 +80,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
 
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
+            note.id shouldBe protoNote.id
             note.filePath shouldBe protoNote.file_path
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
@@ -130,6 +132,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             val listResult = result.getOrThrow()
             listResult.notes.size shouldBe protoNotes.size
             listResult.notes.forEachIndexed { i, note ->
+                note.id shouldBe protoNotes[i].id
                 note.filePath shouldBe protoNotes[i].file_path
                 note.title shouldBe protoNotes[i].title
                 note.content shouldBe protoNotes[i].content
@@ -163,18 +166,19 @@ class NotesRepositoryImplPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 13: NotesRepository gets notes correctly - returns mapped Note") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.string(1..100),
+            Arb.string(1..50),
             arbProtoNote
-        ) { filePath, protoNote ->
+        ) { noteId, protoNote ->
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.getNoteResult = Result.success(GetNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
             val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            val result = repo.getNote(filePath)
+            val result = repo.getNote(noteId)
 
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
+            note.id shouldBe protoNote.id
             note.filePath shouldBe protoNote.file_path
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
@@ -185,13 +189,14 @@ class NotesRepositoryImplPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 13: NotesRepository gets notes correctly - maps request fields") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.string(1..100)
-        ) { filePath ->
+            Arb.string(1..50)
+        ) { noteId ->
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.getNoteResult = Result.success(
                 GetNoteResponse(
                     note = notes.v1.Note(
-                        file_path = filePath,
+                        id = noteId,
+                        file_path = "/some/path.md",
                         title = "t",
                         content = "c",
                         updated_at = 0L
@@ -201,9 +206,9 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeCache = FakeCacheDataSource()
             val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            repo.getNote(filePath)
+            repo.getNote(noteId)
 
-            fakeNetwork.lastGetRequest?.file_path shouldBe filePath
+            fakeNetwork.lastGetRequest?.id shouldBe noteId
         }
     }
 
@@ -227,6 +232,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
 
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
+            note.id shouldBe protoNote.id
             note.filePath shouldBe protoNote.file_path
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
@@ -247,7 +253,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
 
             repo.updateNote(params)
 
-            fakeNetwork.lastUpdateRequest?.file_path shouldBe params.filePath
+            fakeNetwork.lastUpdateRequest?.id shouldBe params.id
             fakeNetwork.lastUpdateRequest?.content shouldBe params.content
         }
     }
@@ -261,13 +267,13 @@ class NotesRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)
-        ) { filePath ->
+        ) { noteId ->
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
             val fakeCache = FakeCacheDataSource()
             val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            val result = repo.deleteNote(filePath)
+            val result = repo.deleteNote(noteId)
 
             result.isSuccess shouldBe true
             result.getOrThrow() shouldBe Unit
@@ -278,15 +284,15 @@ class NotesRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)
-        ) { filePath ->
+        ) { noteId ->
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
             val fakeCache = FakeCacheDataSource()
             val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            repo.deleteNote(filePath)
+            repo.deleteNote(noteId)
 
-            fakeNetwork.lastDeleteRequest?.file_path shouldBe filePath
+            fakeNetwork.lastDeleteRequest?.id shouldBe noteId
         }
     }
 })

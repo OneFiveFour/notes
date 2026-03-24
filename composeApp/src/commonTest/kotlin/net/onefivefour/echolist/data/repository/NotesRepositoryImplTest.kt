@@ -27,6 +27,7 @@ class NotesRepositoryImplTest : FunSpec({
 
     val arbProtoNote = arbitrary {
         notes.v1.Note(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
@@ -44,7 +45,7 @@ class NotesRepositoryImplTest : FunSpec({
 
     val arbUpdateNoteParams = arbitrary {
         UpdateNoteParams(
-            filePath = Arb.string(1..100).bind(),
+            id = Arb.string(1..50).bind(),
             content = Arb.string(0..500).bind()
         )
     }
@@ -62,6 +63,7 @@ class NotesRepositoryImplTest : FunSpec({
 
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
+            note.id shouldBe protoNote.id
             note.filePath shouldBe protoNote.file_path
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
@@ -75,6 +77,7 @@ class NotesRepositoryImplTest : FunSpec({
             fakeNetwork.createNoteResult = Result.success(
                 CreateNoteResponse(
                     note = notes.v1.Note(
+                        id = "new-uuid",
                         file_path = "/test.md",
                         title = "t",
                         content = "c",
@@ -108,8 +111,8 @@ class NotesRepositoryImplTest : FunSpec({
     // -- ListNotes --
 
     test("listNotes returns mapped notes on success (no cache)") {
-        val note1 = notes.v1.Note(file_path = "/n1.md", title = "N1", content = "C1", updated_at = 100L)
-        val note2 = notes.v1.Note(file_path = "/n2.md", title = "N2", content = "C2", updated_at = 200L)
+        val note1 = notes.v1.Note(id = "id-1", file_path = "/n1.md", title = "N1", content = "C1", updated_at = 100L)
+        val note2 = notes.v1.Note(id = "id-2", file_path = "/n2.md", title = "N2", content = "C2", updated_at = 200L)
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.success(
             ListNotesResponse(
@@ -125,7 +128,9 @@ class NotesRepositoryImplTest : FunSpec({
         result.isSuccess shouldBe true
         val listResult = result.getOrThrow()
         listResult.notes.size shouldBe 2
+        listResult.notes[0].id shouldBe "id-1"
         listResult.notes[0].filePath shouldBe "/n1.md"
+        listResult.notes[1].id shouldBe "id-2"
         listResult.notes[1].filePath shouldBe "/n2.md"
         listResult.entries shouldBe listOf("/n1.md", "/n2.md", "/subfolder/")
     }
@@ -169,35 +174,42 @@ class NotesRepositoryImplTest : FunSpec({
     // -- GetNote --
 
     test("getNote returns mapped note on success (no cache)") {
-        val protoNote = notes.v1.Note(file_path = "/note.md", title = "Title", content = "Content", updated_at = 999L)
+        val protoNote = notes.v1.Note(
+            id = "note-uuid-1",
+            file_path = "/note.md",
+            title = "Title",
+            content = "Content",
+            updated_at = 999L
+        )
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.getNoteResult = Result.success(GetNoteResponse(note = protoNote))
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.getNote("/note.md")
+        val result = repo.getNote("note-uuid-1")
 
         result.isSuccess shouldBe true
         val note = result.getOrThrow()
+        note.id shouldBe "note-uuid-1"
         note.filePath shouldBe "/note.md"
         note.title shouldBe "Title"
         note.content shouldBe "Content"
         note.updatedAt shouldBe 999L
     }
 
-    test("getNote forwards correct file_path to data source") {
+    test("getNote forwards correct id to data source") {
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.getNoteResult = Result.success(
             GetNoteResponse(
-                note = notes.v1.Note(file_path = "/x.md", title = "t", content = "c", updated_at = 0L)
+                note = notes.v1.Note(id = "uuid-x", file_path = "/x.md", title = "t", content = "c", updated_at = 0L)
             )
         )
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        repo.getNote("/x.md")
+        repo.getNote("uuid-x")
 
-        fakeNetwork.lastGetRequest?.file_path shouldBe "/x.md"
+        fakeNetwork.lastGetRequest?.id shouldBe "uuid-x"
     }
 
     test("getNote returns failure when network throws and no cache") {
@@ -206,7 +218,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.getNote("/missing.md")
+        val result = repo.getNote("missing-uuid")
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()
@@ -225,6 +237,7 @@ class NotesRepositoryImplTest : FunSpec({
 
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
+            note.id shouldBe protoNote.id
             note.filePath shouldBe protoNote.file_path
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
@@ -238,6 +251,7 @@ class NotesRepositoryImplTest : FunSpec({
             fakeNetwork.updateNoteResult = Result.success(
                 UpdateNoteResponse(
                     note = notes.v1.Note(
+                        id = params.id,
                         file_path = "/test.md",
                         title = "t",
                         content = "c",
@@ -250,7 +264,7 @@ class NotesRepositoryImplTest : FunSpec({
 
             repo.updateNote(params)
 
-            fakeNetwork.lastUpdateRequest?.file_path shouldBe params.filePath
+            fakeNetwork.lastUpdateRequest?.id shouldBe params.id
             fakeNetwork.lastUpdateRequest?.content shouldBe params.content
         }
     }
@@ -261,7 +275,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.updateNote(UpdateNoteParams("/p.md", "c"))
+        val result = repo.updateNote(UpdateNoteParams("some-uuid", "c"))
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()
@@ -275,21 +289,21 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.deleteNote("/note.md")
+        val result = repo.deleteNote("note-uuid-del")
 
         result.isSuccess shouldBe true
         result.getOrThrow() shouldBe Unit
     }
 
-    test("deleteNote forwards correct file_path to data source") {
+    test("deleteNote forwards correct id to data source") {
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        repo.deleteNote("/target.md")
+        repo.deleteNote("target-uuid")
 
-        fakeNetwork.lastDeleteRequest?.file_path shouldBe "/target.md"
+        fakeNetwork.lastDeleteRequest?.id shouldBe "target-uuid"
     }
 
     test("deleteNote returns failure when network throws") {
@@ -298,7 +312,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.deleteNote("/p.md")
+        val result = repo.deleteNote("some-uuid")
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.NetworkError>()

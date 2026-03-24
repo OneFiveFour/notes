@@ -46,6 +46,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
@@ -80,7 +81,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
-            filePath = Arb.string(1..100).bind(),
+            id = Arb.string(1..50).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }
@@ -97,6 +98,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -110,6 +112,7 @@ class TaskListRepositoryImplTest : FunSpec({
             fake.createTaskListResult = Result.success(
                 CreateTaskListResponse(
                     task_list = tasks.v1.TaskList(
+                        id = "new-uuid",
                         file_path = "/test.json",
                         title = "t",
                         tasks = emptyList(),
@@ -141,15 +144,16 @@ class TaskListRepositoryImplTest : FunSpec({
     // -- GetTaskList --
 
     test("getTaskList returns mapped task list on success").config(invocations = 20) {
-        checkAll(Arb.string(1..100), arbProtoTaskList) { filePath, protoTaskList ->
+        checkAll(Arb.string(1..50), arbProtoTaskList) { taskListId, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.getTaskListResult = Result.success(GetTaskListResponse(task_list = protoTaskList))
             val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-            val result = repo.getTaskList(filePath)
+            val result = repo.getTaskList(taskListId)
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -157,11 +161,12 @@ class TaskListRepositoryImplTest : FunSpec({
         }
     }
 
-    test("getTaskList forwards correct file_path to data source") {
+    test("getTaskList forwards correct id to data source") {
         val fake = FakeTaskListRemoteDataSource()
         fake.getTaskListResult = Result.success(
             GetTaskListResponse(
                 task_list = tasks.v1.TaskList(
+                    id = "uuid-x",
                     file_path = "/x.json",
                     title = "t",
                     tasks = emptyList(),
@@ -171,9 +176,9 @@ class TaskListRepositoryImplTest : FunSpec({
         )
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        repo.getTaskList("/x.json")
+        repo.getTaskList("uuid-x")
 
-        fake.lastGetRequest?.file_path shouldBe "/x.json"
+        fake.lastGetRequest?.id shouldBe "uuid-x"
     }
 
     test("getTaskList returns failure when network throws") {
@@ -181,7 +186,7 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.getTaskListResult = Result.failure(NetworkException.ClientError(404, "not found"))
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.getTaskList("/missing.json")
+        val result = repo.getTaskList("missing-uuid")
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()
@@ -191,12 +196,14 @@ class TaskListRepositoryImplTest : FunSpec({
 
     test("listTaskLists returns mapped result on success") {
         val tl1 = tasks.v1.TaskList(
+            id = "tl-uuid-1",
             file_path = "/lists/list1.json",
             title = "List 1",
             tasks = emptyList(),
             updated_at = 100L
         )
         val tl2 = tasks.v1.TaskList(
+            id = "tl-uuid-2",
             file_path = "/lists/list2.json",
             title = "List 2",
             tasks = emptyList(),
@@ -211,8 +218,10 @@ class TaskListRepositoryImplTest : FunSpec({
         result.isSuccess shouldBe true
         val listResult = result.getOrThrow()
         listResult.taskLists.size shouldBe 2
+        listResult.taskLists[0].id shouldBe "tl-uuid-1"
         listResult.taskLists[0].filePath shouldBe "/lists/list1.json"
         listResult.taskLists[0].name shouldBe "List 1"
+        listResult.taskLists[1].id shouldBe "tl-uuid-2"
         listResult.taskLists[1].filePath shouldBe "/lists/list2.json"
         listResult.taskLists[1].name shouldBe "List 2"
     }
@@ -261,6 +270,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -274,6 +284,7 @@ class TaskListRepositoryImplTest : FunSpec({
             fake.updateTaskListResult = Result.success(
                 UpdateTaskListResponse(
                     task_list = tasks.v1.TaskList(
+                        id = params.id,
                         file_path = "/test.json",
                         title = "t",
                         tasks = emptyList(),
@@ -285,7 +296,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
             repo.updateTaskList(params)
 
-            fake.lastUpdateRequest?.file_path shouldBe params.filePath
+            fake.lastUpdateRequest?.id shouldBe params.id
             fake.lastUpdateRequest?.tasks?.size shouldBe params.tasks.size
         }
     }
@@ -295,7 +306,7 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.updateTaskListResult = Result.failure(NetworkException.ClientError(400, "bad request"))
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.updateTaskList(UpdateTaskListParams("/p.json", emptyList()))
+        val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", emptyList()))
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()
@@ -308,20 +319,20 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.deleteTaskList("/list.json")
+        val result = repo.deleteTaskList("tl-uuid-del")
 
         result.isSuccess shouldBe true
         result.getOrThrow() shouldBe Unit
     }
 
-    test("deleteTaskList forwards correct file_path to data source") {
+    test("deleteTaskList forwards correct id to data source") {
         val fake = FakeTaskListRemoteDataSource()
         fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        repo.deleteTaskList("/target.json")
+        repo.deleteTaskList("target-uuid")
 
-        fake.lastDeleteRequest?.file_path shouldBe "/target.json"
+        fake.lastDeleteRequest?.id shouldBe "target-uuid"
     }
 
     test("deleteTaskList returns failure when network throws") {
@@ -329,7 +340,7 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.deleteTaskListResult = Result.failure(NetworkException.NetworkError("timeout"))
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.deleteTaskList("/p.json")
+        val result = repo.deleteTaskList("some-uuid")
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.NetworkError>()

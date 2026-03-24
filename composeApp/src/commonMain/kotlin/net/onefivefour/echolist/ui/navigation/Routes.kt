@@ -15,7 +15,7 @@ data class HomeRoute(val path: String = "") : NavKey
 @Serializable
 data class EditNoteRoute(
     val parentPath: String,
-    val filePath: String? = null
+    val noteId: String? = null
 ) : NavKey
 
 @Serializable

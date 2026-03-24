@@ -21,8 +21,8 @@ internal fun FileOverview(
     isLoading: Boolean,
     error: String?,
     onFolderClick: (path: String) -> Unit,
-    onNoteClick: (path: String) -> Unit,
-    onTaskClick: (path: String) -> Unit,
+    onNoteClick: (noteId: String) -> Unit,
+    onTaskClick: (taskListId: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {

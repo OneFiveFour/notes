@@ -20,7 +20,7 @@ private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         EditNoteRoute(
             parentPath = "folder-$index",
-            filePath = if (index % 2 == 0) null else "folder-$index/note-$index.md"
+            noteId = if (index % 2 == 0) null else "note-id-$index"
         )
     }
 
@@ -87,16 +87,12 @@ class NavigationPropertyTest : FunSpec({
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
-            val filePath = if (currentHome.path.isEmpty()) {
-                "note-$fileIndex.md"
-            } else {
-                "${currentHome.path}/note-$fileIndex.md"
-            }
+            val noteId = "note-id-$fileIndex"
 
-            backStack.add(EditNoteRoute(parentPath = currentHome.path, filePath = filePath))
+            backStack.add(EditNoteRoute(parentPath = currentHome.path, noteId = noteId))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditNoteRoute(parentPath = currentHome.path, filePath = filePath)
+            backStack.last() shouldBe EditNoteRoute(parentPath = currentHome.path, noteId = noteId)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }

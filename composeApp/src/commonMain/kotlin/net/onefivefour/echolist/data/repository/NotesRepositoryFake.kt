@@ -31,7 +31,7 @@ class NotesRepositoryFake : NotesRepository {
 
     /** Pre-populate the in-memory store with notes. */
     fun addNotes(vararg notesToAdd: Note) {
-        notesToAdd.forEach { notes[it.filePath] = it }
+        notesToAdd.forEach { notes[it.id] = it }
     }
 
     /** Pre-populate the entries list. */
@@ -44,12 +44,13 @@ class NotesRepositoryFake : NotesRepository {
         shouldFail?.let { return Result.failure(it) }
 
         val note = Note(
+            id = "generated-${params.title}",
             filePath = joinPath(params.parentDir, params.title),
             title = params.title,
             content = params.content,
             updatedAt = 0L
         )
-        notes[note.filePath] = note
+        notes[note.id] = note
         return Result.success(note)
     }
 
@@ -65,34 +66,32 @@ class NotesRepositoryFake : NotesRepository {
         return Result.success(ListNotesResult(notes = filteredNotes, entries = entries.toList()))
     }
 
-    override suspend fun getNote(filePath: String): Result<Note> {
-        callLog.add("getNote($filePath)")
+    override suspend fun getNote(noteId: String): Result<Note> {
+        callLog.add("getNote($noteId)")
         shouldFail?.let { return Result.failure(it) }
 
-        val normalizedFilePath = normalizePath(filePath)
-        val note = notes[normalizedFilePath]
-            ?: return Result.failure(NoSuchElementException("Note not found: $normalizedFilePath"))
+        val note = notes[noteId]
+            ?: return Result.failure(NoSuchElementException("Note not found: $noteId"))
         return Result.success(note)
     }
 
     override suspend fun updateNote(params: UpdateNoteParams): Result<Note> {
-        callLog.add("updateNote(${params.filePath}, ${params.content})")
+        callLog.add("updateNote(${params.id}, ${params.content})")
         shouldFail?.let { return Result.failure(it) }
 
-        val normalizedFilePath = normalizePath(params.filePath)
-        val existing = notes[normalizedFilePath]
-            ?: return Result.failure(NoSuchElementException("Note not found: $normalizedFilePath"))
+        val existing = notes[params.id]
+            ?: return Result.failure(NoSuchElementException("Note not found: ${params.id}"))
 
         val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
-        notes[updated.filePath] = updated
+        notes[updated.id] = updated
         return Result.success(updated)
     }
 
-    override suspend fun deleteNote(filePath: String): Result<Unit> {
-        callLog.add("deleteNote($filePath)")
+    override suspend fun deleteNote(noteId: String): Result<Unit> {
+        callLog.add("deleteNote($noteId)")
         shouldFail?.let { return Result.failure(it) }
 
-        notes.remove(normalizePath(filePath))
+        notes.remove(noteId)
         return Result.success(Unit)
     }
 }

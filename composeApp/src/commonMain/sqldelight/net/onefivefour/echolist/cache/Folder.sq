@@ -5,8 +5,6 @@ CREATE TABLE Folder (
     PRIMARY KEY (parentPath, entryPath)
 );
 
-CREATE INDEX entry_parent_index ON Folder(parentPath);
-
 insertOrReplace:
 INSERT OR REPLACE INTO Folder(parentPath, entryPath, cachedAt)
 VALUES (?, ?, ?);

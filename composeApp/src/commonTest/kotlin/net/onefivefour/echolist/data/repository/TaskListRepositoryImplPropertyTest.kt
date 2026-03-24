@@ -55,6 +55,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
@@ -89,7 +90,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
-            filePath = Arb.string(1..100).bind(),
+            id = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }
@@ -116,6 +117,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -155,15 +157,16 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             PropTestConfig(iterations = 100),
             Arb.string(1..100),
             arbProtoTaskList
-        ) { filePath, protoTaskList ->
+        ) { taskListId, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.getTaskListResult = Result.success(GetTaskListResponse(task_list = protoTaskList))
             val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-            val result = repo.getTaskList(filePath)
+            val result = repo.getTaskList(taskListId)
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -175,12 +178,13 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)
-        ) { filePath ->
+        ) { taskListId ->
             val fake = FakeTaskListRemoteDataSource()
             fake.getTaskListResult = Result.success(
                 GetTaskListResponse(
                     task_list = tasks.v1.TaskList(
-                        file_path = filePath,
+                        id = taskListId,
+                        file_path = "/some/path.tl",
                         title = "t",
                         tasks = emptyList(),
                         updated_at = 0L
@@ -189,9 +193,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             )
             val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-            repo.getTaskList(filePath)
+            repo.getTaskList(taskListId)
 
-            fake.lastGetRequest?.file_path shouldBe filePath
+            fake.lastGetRequest?.id shouldBe taskListId
         }
     }
 
@@ -220,6 +224,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             val listResult = result.getOrThrow()
             listResult.taskLists.size shouldBe protoTaskLists.size
             listResult.taskLists.forEachIndexed { i, entry ->
+                entry.id shouldBe protoTaskLists[i].id
                 entry.filePath shouldBe protoTaskLists[i].file_path
                 entry.name shouldBe protoTaskLists[i].title
                 entry.updatedAt shouldBe protoTaskLists[i].updated_at
@@ -266,6 +271,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
+            taskList.id shouldBe protoTaskList.id
             taskList.filePath shouldBe protoTaskList.file_path
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
@@ -287,7 +293,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
             repo.updateTaskList(params)
 
-            fake.lastUpdateRequest?.file_path shouldBe params.filePath
+            fake.lastUpdateRequest?.id shouldBe params.id
             fake.lastUpdateRequest?.tasks?.size shouldBe params.tasks.size
         }
     }
@@ -301,12 +307,12 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)
-        ) { filePath ->
+        ) { taskListId ->
             val fake = FakeTaskListRemoteDataSource()
             fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
             val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-            val result = repo.deleteTaskList(filePath)
+            val result = repo.deleteTaskList(taskListId)
 
             result.isSuccess shouldBe true
             result.getOrThrow() shouldBe Unit
@@ -319,14 +325,14 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(1..100)
-        ) { filePath ->
+        ) { taskListId ->
             val fake = FakeTaskListRemoteDataSource()
             fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
             val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-            repo.deleteTaskList(filePath)
+            repo.deleteTaskList(taskListId)
 
-            fake.lastDeleteRequest?.file_path shouldBe filePath
+            fake.lastDeleteRequest?.id shouldBe taskListId
         }
     }
 })

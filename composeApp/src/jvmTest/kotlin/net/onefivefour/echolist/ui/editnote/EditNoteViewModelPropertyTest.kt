@@ -45,40 +45,41 @@ class EditNoteViewModelPropertyTest : FunSpec({
         private val notes = mutableMapOf<String, Note>()
 
         fun addNote(note: Note) {
-            notes[note.filePath] = note
+            notes[note.id] = note
         }
 
         override suspend fun createNote(params: CreateNoteParams): Result<Note> {
             createNoteCalls.add(params)
             val note = Note(
+                id = "generated-${params.title}",
                 filePath = "${params.parentDir}/${params.title}",
                 title = params.title,
                 content = params.content,
                 updatedAt = 0L
             )
-            notes[note.filePath] = note
+            notes[note.id] = note
             return Result.success(note)
         }
 
         override suspend fun listNotes(parentDir: String): Result<ListNotesResult> =
             Result.success(ListNotesResult(notes = emptyList(), entries = emptyList()))
 
-        override suspend fun getNote(filePath: String): Result<Note> {
-            getNoteCalls.add(filePath)
-            return notes[filePath]?.let { Result.success(it) }
-                ?: Result.failure(NoSuchElementException("Note not found: $filePath"))
+        override suspend fun getNote(noteId: String): Result<Note> {
+            getNoteCalls.add(noteId)
+            return notes[noteId]?.let { Result.success(it) }
+                ?: Result.failure(NoSuchElementException("Note not found: $noteId"))
         }
 
         override suspend fun updateNote(params: UpdateNoteParams): Result<Note> {
             updateNoteCalls.add(params)
-            val existing = notes[params.filePath]
-                ?: return Result.failure(NoSuchElementException("Note not found: ${params.filePath}"))
+            val existing = notes[params.id]
+                ?: return Result.failure(NoSuchElementException("Note not found: ${params.id}"))
             val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
-            notes[updated.filePath] = updated
+            notes[updated.id] = updated
             return Result.success(updated)
         }
 
-        override suspend fun deleteNote(filePath: String): Result<Unit> =
+        override suspend fun deleteNote(noteId: String): Result<Unit> =
             Result.failure(UnsupportedOperationException())
     }
 
@@ -176,13 +177,13 @@ class EditNoteViewModelPropertyTest : FunSpec({
                     override suspend fun listNotes(parentDir: String): Result<ListNotesResult> =
                         Result.success(ListNotesResult(notes = emptyList(), entries = emptyList()))
 
-                    override suspend fun getNote(filePath: String): Result<Note> =
+                    override suspend fun getNote(noteId: String): Result<Note> =
                         Result.failure(UnsupportedOperationException())
 
                     override suspend fun updateNote(params: UpdateNoteParams): Result<Note> =
                         Result.failure(UnsupportedOperationException())
 
-                    override suspend fun deleteNote(filePath: String): Result<Unit> =
+                    override suspend fun deleteNote(noteId: String): Result<Unit> =
                         Result.failure(UnsupportedOperationException())
                 }
 
@@ -211,6 +212,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         runTest(testDispatcher) {
             val fakeRepo = FakeNotesRepository()
             val note = Note(
+                id = "note-empty-id",
                 filePath = "note-empty.md",
                 title = "note-empty",
                 content = "",
@@ -219,17 +221,17 @@ class EditNoteViewModelPropertyTest : FunSpec({
             fakeRepo.addNote(note)
 
             val vm = EditNoteViewModel(
-                mode = EditNoteMode.Edit(note.filePath),
+                mode = EditNoteMode.Edit(note.id),
                 notesRepository = fakeRepo
             )
 
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mode shouldBe EditNoteMode.Edit(note.filePath)
+            vm.uiState.value.mode shouldBe EditNoteMode.Edit(note.id)
             vm.uiState.value.isLoading shouldBe false
             vm.uiState.value.titleState.text.toString() shouldBe note.title
             vm.uiState.value.contentState.text.toString() shouldBe ""
-            fakeRepo.getNoteCalls shouldBe listOf(note.filePath)
+            fakeRepo.getNoteCalls shouldBe listOf(note.id)
         }
     }
 
@@ -237,6 +239,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
         runTest(testDispatcher) {
             val fakeRepo = FakeNotesRepository()
             val note = Note(
+                id = "note-id",
                 filePath = "note.md",
                 title = "note",
                 content = "before",
@@ -245,7 +248,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             fakeRepo.addNote(note)
 
             val vm = EditNoteViewModel(
-                mode = EditNoteMode.Edit(note.filePath),
+                mode = EditNoteMode.Edit(note.id),
                 notesRepository = fakeRepo
             )
 
@@ -261,7 +264,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             fakeRepo.createNoteCalls shouldBe emptyList()
             fakeRepo.updateNoteCalls shouldBe listOf(
                 UpdateNoteParams(
-                    filePath = note.filePath,
+                    id = note.id,
                     content = "after"
                 )
             )

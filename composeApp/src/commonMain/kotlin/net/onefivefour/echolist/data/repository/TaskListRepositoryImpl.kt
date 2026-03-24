@@ -30,10 +30,10 @@ internal class TaskListRepositoryImpl(
             }
         }
 
-    override suspend fun getTaskList(filePath: String): Result<TaskList> =
+    override suspend fun getTaskList(taskListId: String): Result<TaskList> =
         withContext(dispatcher) {
             try {
-                val request = GetTaskListRequest(file_path = filePath)
+                val request = GetTaskListRequest(id = taskListId)
                 val response = networkDataSource.getTaskList(request)
                 Result.success(TaskListMapper.toDomain(response))
             } catch (e: Exception) {
@@ -63,10 +63,10 @@ internal class TaskListRepositoryImpl(
             }
         }
 
-    override suspend fun deleteTaskList(filePath: String): Result<Unit> =
+    override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
         withContext(dispatcher) {
             try {
-                val request = DeleteTaskListRequest(file_path = filePath)
+                val request = DeleteTaskListRequest(id = taskListId)
                 networkDataSource.deleteTaskList(request)
                 Result.success(Unit)
             } catch (e: Exception) {

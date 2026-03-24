@@ -87,13 +87,13 @@ internal class NotesRepositoryImpl(
         }
     }
 
-    override suspend fun getNote(filePath: String): Result<Note> = withContext(dispatcher) {
-        val cached = cacheDataSource.getNote(filePath)
+    override suspend fun getNote(noteId: String): Result<Note> = withContext(dispatcher) {
+        val cached = cacheDataSource.getNote(noteId)
         if (cached != null) {
             // Return cached data immediately, refresh in background
             backgroundScope.launch {
                 try {
-                    val request = GetNoteRequest(file_path = filePath)
+                    val request = GetNoteRequest(id = noteId)
                     val response = noteRemoteDataSource.getNote(request)
                     val note = NoteMapper.toDomain(response)
                     cacheDataSource.saveNote(note)
@@ -105,7 +105,7 @@ internal class NotesRepositoryImpl(
         } else {
             // No cache — go to network directly
             try {
-                val request = GetNoteRequest(file_path = filePath)
+                val request = GetNoteRequest(id = noteId)
                 val response = noteRemoteDataSource.getNote(request)
                 val note = NoteMapper.toDomain(response)
                 cacheDataSource.saveNote(note)
@@ -122,7 +122,7 @@ internal class NotesRepositoryImpl(
             val response = noteRemoteDataSource.updateNote(request)
             val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
-            val parentDir = params.filePath.substringBeforeLast('/', "")
+            val parentDir = note.filePath.substringBeforeLast('/', "")
             directoryChangeNotifier.notifyChanged(parentDir)
             Result.success(note)
         } catch (e: NetworkException) {
@@ -134,13 +134,16 @@ internal class NotesRepositoryImpl(
         }
     }
 
-    override suspend fun deleteNote(filePath: String): Result<Unit> = withContext(dispatcher) {
+    override suspend fun deleteNote(noteId: String): Result<Unit> = withContext(dispatcher) {
         try {
-            val request = DeleteNoteRequest(file_path = filePath)
+            val cached = cacheDataSource.getNote(noteId)
+            val request = DeleteNoteRequest(id = noteId)
             noteRemoteDataSource.deleteNote(request)
-            cacheDataSource.deleteNote(filePath)
-            val parentDir = filePath.substringBeforeLast('/', "")
-            directoryChangeNotifier.notifyChanged(parentDir)
+            cacheDataSource.deleteNote(noteId)
+            cached?.let {
+                val parentDir = it.filePath.substringBeforeLast('/', "")
+                directoryChangeNotifier.notifyChanged(parentDir)
+            }
             Result.success(Unit)
         } catch (e: NetworkException) {
             Result.failure(e)

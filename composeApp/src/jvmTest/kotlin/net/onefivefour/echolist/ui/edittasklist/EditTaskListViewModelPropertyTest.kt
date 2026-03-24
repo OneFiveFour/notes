@@ -45,6 +45,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             createTaskListCalls.add(params)
             return Result.success(
                 TaskList(
+                    id = "generated-id",
                     filePath = "${params.path}/${params.name}",
                     name = params.name,
                     tasks = params.tasks,
@@ -53,7 +54,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             )
         }
 
-        override suspend fun getTaskList(filePath: String): Result<TaskList> =
+        override suspend fun getTaskList(taskListId: String): Result<TaskList> =
             Result.failure(UnsupportedOperationException())
 
         override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
@@ -62,7 +63,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
             Result.failure(UnsupportedOperationException())
 
-        override suspend fun deleteTaskList(filePath: String): Result<Unit> =
+        override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
             Result.failure(UnsupportedOperationException())
     }
 
@@ -147,7 +148,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                         return Result.failure(RuntimeException(errorMessage))
                     }
 
-                    override suspend fun getTaskList(filePath: String): Result<TaskList> =
+                    override suspend fun getTaskList(taskListId: String): Result<TaskList> =
                         Result.failure(UnsupportedOperationException())
 
                     override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
@@ -156,7 +157,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                     override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
                         Result.failure(UnsupportedOperationException())
 
-                    override suspend fun deleteTaskList(filePath: String): Result<Unit> =
+                    override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
                         Result.failure(UnsupportedOperationException())
                 }
 

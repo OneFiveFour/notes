@@ -37,7 +37,7 @@ class EditNoteViewModel(
 
     init {
         if (mode is EditNoteMode.Edit) {
-            loadNote(mode.filePath)
+            loadNote(mode.noteId)
         }
     }
 
@@ -80,7 +80,7 @@ class EditNoteViewModel(
                 )
                 is EditNoteMode.Edit -> notesRepository.updateNote(
                     UpdateNoteParams(
-                        filePath = currentMode.filePath,
+                        id = currentMode.noteId,
                         content = content
                     )
                 )
@@ -97,9 +97,9 @@ class EditNoteViewModel(
         }
     }
 
-    private fun loadNote(filePath: String) {
+    private fun loadNote(noteId: String) {
         viewModelScope.launch {
-            val result = notesRepository.getNote(filePath)
+            val result = notesRepository.getNote(noteId)
             result.fold(
                 onSuccess = { note ->
                     titleState.edit {

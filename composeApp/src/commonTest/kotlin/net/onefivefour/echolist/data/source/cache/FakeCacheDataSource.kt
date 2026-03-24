@@ -8,20 +8,20 @@ internal class FakeCacheDataSource : CacheDataSource {
     private val entries = mutableMapOf<String, List<String>>()
 
     override suspend fun saveNote(note: Note) {
-        notes[note.filePath] = note
+        notes[note.id] = note
     }
 
     override suspend fun saveNotes(notes: List<Note>) {
-        notes.forEach { this.notes[it.filePath] = it }
+        notes.forEach { this.notes[it.id] = it }
     }
 
-    override suspend fun getNote(filePath: String): Note? = notes[filePath]
+    override suspend fun getNote(id: String): Note? = notes[id]
 
     override suspend fun listNotes(path: String): List<Note> =
         notes.values.filter { it.filePath.startsWith(path) }
 
-    override suspend fun deleteNote(filePath: String) {
-        notes.remove(filePath)
+    override suspend fun deleteNote(id: String) {
+        notes.remove(id)
     }
 
     override suspend fun saveEntries(parentPath: String, entries: List<String>) {

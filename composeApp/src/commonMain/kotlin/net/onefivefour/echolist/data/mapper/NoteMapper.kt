@@ -20,6 +20,7 @@ internal object NoteMapper {
     // Proto -> Domain
 
     fun toDomain(proto: notes.v1.Note): Note = Note(
+        id = proto.id,
         filePath = proto.file_path,
         title = proto.title,
         content = proto.content,
@@ -46,7 +47,7 @@ internal object NoteMapper {
     )
 
     fun toProto(params: UpdateNoteParams): UpdateNoteRequest = UpdateNoteRequest(
-        file_path = params.filePath,
+        id = params.id,
         content = params.content
     )
 }

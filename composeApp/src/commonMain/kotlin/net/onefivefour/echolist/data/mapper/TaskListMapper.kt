@@ -36,6 +36,7 @@ internal object TaskListMapper {
     )
 
     fun toDomain(proto: tasks.v1.TaskList): TaskList = TaskList(
+        id = proto.id,
         filePath = proto.file_path,
         name = proto.title,
         tasks = proto.tasks.map { toDomain(it) },
@@ -58,6 +59,7 @@ internal object TaskListMapper {
     )
 
     fun toEntry(proto: tasks.v1.TaskList): TaskListEntry = TaskListEntry(
+        id = proto.id,
         filePath = proto.file_path,
         name = proto.title,
         updatedAt = proto.updated_at
@@ -77,7 +79,7 @@ internal object TaskListMapper {
     )
 
     fun toProto(params: UpdateTaskListParams): UpdateTaskListRequest = UpdateTaskListRequest(
-        file_path = params.filePath,
+        id = params.id,
         tasks = params.tasks.map { toProto(it) }
     )
 

@@ -64,7 +64,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
-            filePath = Arb.string(1..100).bind(),
+            id = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }
@@ -102,12 +102,12 @@ class TaskListRepositoryPropertyTest : FunSpec({
     }
 
     test("Feature: proto-api-update, Property 7: getTaskList propagates exception as Result.failure") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { filePath, ex ->
+        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { taskListId, ex ->
             val repo = TaskListRepositoryImpl(
                 networkDataSource = ThrowingDataSource(ex),
                 dispatcher = Dispatchers.Unconfined
             )
-            val result = repo.getTaskList(filePath)
+            val result = repo.getTaskList(taskListId)
             result.shouldBeFailure { it shouldBe ex }
         }
     }
@@ -135,12 +135,12 @@ class TaskListRepositoryPropertyTest : FunSpec({
     }
 
     test("Feature: proto-api-update, Property 7: deleteTaskList propagates exception as Result.failure") {
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { filePath, ex ->
+        checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { taskListId, ex ->
             val repo = TaskListRepositoryImpl(
                 networkDataSource = ThrowingDataSource(ex),
                 dispatcher = Dispatchers.Unconfined
             )
-            val result = repo.deleteTaskList(filePath)
+            val result = repo.deleteTaskList(taskListId)
             result.shouldBeFailure { it shouldBe ex }
         }
     }

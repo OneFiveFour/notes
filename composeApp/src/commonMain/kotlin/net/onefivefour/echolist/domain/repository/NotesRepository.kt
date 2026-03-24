@@ -12,7 +12,7 @@ import net.onefivefour.echolist.data.dto.UpdateNoteParams
 interface NotesRepository {
     suspend fun createNote(params: CreateNoteParams): Result<Note>
     suspend fun listNotes(parentDir: String = ""): Result<ListNotesResult>
-    suspend fun getNote(filePath: String): Result<Note>
+    suspend fun getNote(noteId: String): Result<Note>
     suspend fun updateNote(params: UpdateNoteParams): Result<Note>
-    suspend fun deleteNote(filePath: String): Result<Unit>
+    suspend fun deleteNote(noteId: String): Result<Unit>
 }

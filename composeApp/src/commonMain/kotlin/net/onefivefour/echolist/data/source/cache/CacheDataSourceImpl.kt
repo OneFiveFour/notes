@@ -13,6 +13,7 @@ internal class CacheDataSourceImpl(
 
     override suspend fun saveNote(note: Note) {
         noteQueries.insertOrReplace(
+            id = note.id,
             filePath = note.filePath,
             title = note.title,
             content = note.content,
@@ -25,6 +26,7 @@ internal class CacheDataSourceImpl(
         database.transaction {
             notes.forEach { note ->
                 noteQueries.insertOrReplace(
+                    id = note.id,
                     filePath = note.filePath,
                     title = note.title,
                     content = note.content,
@@ -35,8 +37,8 @@ internal class CacheDataSourceImpl(
         }
     }
 
-    override suspend fun getNote(filePath: String): Note? {
-        return noteQueries.selectByFilePath(filePath).executeAsOneOrNull()?.toDomain()
+    override suspend fun getNote(id: String): Note? {
+        return noteQueries.selectById(id).executeAsOneOrNull()?.toDomain()
     }
 
     override suspend fun listNotes(path: String): List<Note> {
@@ -47,8 +49,8 @@ internal class CacheDataSourceImpl(
         }
     }
 
-    override suspend fun deleteNote(filePath: String) {
-        noteQueries.deleteByFilePath(filePath)
+    override suspend fun deleteNote(id: String) {
+        noteQueries.deleteById(id)
     }
 
     override suspend fun saveEntries(parentPath: String, entries: List<String>) {
@@ -79,6 +81,7 @@ internal class CacheDataSourceImpl(
 
 private fun net.onefivefour.echolist.cache.Note.toDomain(): Note {
     return Note(
+        id = id,
         filePath = filePath,
         title = title,
         content = content,

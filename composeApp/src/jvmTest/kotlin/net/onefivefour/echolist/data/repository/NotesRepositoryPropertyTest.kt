@@ -56,6 +56,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
     val arbNote = arbitrary {
         Note(
+            id = Arb.string(1..50).bind(),
             filePath = Arb.string(1..50).bind(),
             title = Arb.string(1..50).bind(),
             content = Arb.string(0..200).bind(),
@@ -89,6 +90,7 @@ class NotesRepositoryPropertyTest : FunSpec({
         var createNoteHandler: suspend (CreateNoteRequest) -> CreateNoteResponse = { req ->
             CreateNoteResponse(
                 note = notes.v1.Note(
+                    id = "generated-${req.title}",
                     file_path = "${req.parent_dir}/${req.title}.md",
                     title = req.title,
                     content = req.content,
@@ -105,7 +107,8 @@ class NotesRepositoryPropertyTest : FunSpec({
         var updateNoteHandler: suspend (UpdateNoteRequest) -> UpdateNoteResponse = { req ->
             UpdateNoteResponse(
                 note = notes.v1.Note(
-                    file_path = req.file_path,
+                    id = req.id,
+                    file_path = "path/${req.id}.md",
                     title = "",
                     content = req.content,
                     updated_at = System.currentTimeMillis()
@@ -148,12 +151,14 @@ class NotesRepositoryPropertyTest : FunSpec({
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNoteRemoteDataSource()
 
+            val createdId = "generated-${params.title}"
             val createdFilePath = "${params.parentDir}/${params.title}.md"
             val createdTimestamp = System.currentTimeMillis()
 
             mockNetwork.createNoteHandler = { req ->
                 CreateNoteResponse(
                     note = notes.v1.Note(
+                        id = createdId,
                         file_path = createdFilePath,
                         title = req.title,
                         content = req.content,
@@ -164,7 +169,8 @@ class NotesRepositoryPropertyTest : FunSpec({
             mockNetwork.getNoteHandler = { req ->
                 GetNoteResponse(
                     note = notes.v1.Note(
-                        file_path = req.file_path,
+                        id = req.id,
+                        file_path = createdFilePath,
                         title = params.title,
                         content = params.content,
                         updated_at = createdTimestamp
@@ -181,7 +187,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             created.title shouldBe params.title
             created.content shouldBe params.content
 
-            val getResult = repo.getNote(created.filePath)
+            val getResult = repo.getNote(created.id)
             getResult.isSuccess shouldBe true
 
             val fetched = getResult.getOrThrow()
@@ -204,7 +210,8 @@ class NotesRepositoryPropertyTest : FunSpec({
             mockNetwork.updateNoteHandler = { req ->
                 UpdateNoteResponse(
                     note = notes.v1.Note(
-                        file_path = req.file_path,
+                        id = req.id,
+                        file_path = originalNote.filePath,
                         title = originalNote.title,
                         content = req.content,
                         updated_at = updatedTimestamp
@@ -214,7 +221,8 @@ class NotesRepositoryPropertyTest : FunSpec({
             mockNetwork.getNoteHandler = { req ->
                 GetNoteResponse(
                     note = notes.v1.Note(
-                        file_path = req.file_path,
+                        id = req.id,
+                        file_path = originalNote.filePath,
                         title = originalNote.title,
                         content = newContent,
                         updated_at = updatedTimestamp
@@ -227,7 +235,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Seed the cache with the original note
             cache.saveNote(originalNote)
 
-            val updateParams = UpdateNoteParams(filePath = originalNote.filePath, content = newContent)
+            val updateParams = UpdateNoteParams(id = originalNote.id, content = newContent)
             val updateResult = repo.updateNote(updateParams)
             updateResult.isSuccess shouldBe true
 
@@ -248,7 +256,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             mockNetwork.deleteNoteHandler = { DeleteNoteResponse() }
             mockNetwork.getNoteHandler = { req ->
-                throw NetworkException.ClientError(404, "not found: ${req.file_path}")
+                throw NetworkException.ClientError(404, "not found: ${req.id}")
             }
 
             val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
@@ -256,11 +264,11 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Seed the cache with the note
             cache.saveNote(note)
 
-            val deleteResult = repo.deleteNote(note.filePath)
+            val deleteResult = repo.deleteNote(note.id)
             deleteResult.isSuccess shouldBe true
 
             // getNote should fail — network returns 404 and cache was cleared by delete
-            val getResult = repo.getNote(note.filePath)
+            val getResult = repo.getNote(note.id)
             getResult.isFailure shouldBe true
         }
     }
@@ -278,7 +286,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            val result = repo.getNote("nonexistent/path.md")
+            val result = repo.getNote("nonexistent-id")
             result.isFailure shouldBe true
 
             val thrown = result.exceptionOrNull()
@@ -303,7 +311,7 @@ class NotesRepositoryPropertyTest : FunSpec({
 
             val repo = NotesRepositoryImpl(mockNetwork, cache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-            val result = repo.getNote(note.filePath)
+            val result = repo.getNote(note.id)
             result.isSuccess shouldBe true
 
             val fetched = result.getOrThrow()
@@ -367,6 +375,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 syncedOrder.add(req.title)
                 CreateNoteResponse(
                     note = notes.v1.Note(
+                        id = "synced-${req.title}",
                         file_path = "${req.parent_dir}/${req.title}.md",
                         title = req.title,
                         content = req.content,
@@ -391,7 +400,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     // -- Property 23: Coroutine Cancellation Propagation --
 
     test("Property 23: Cancelled repository operation cancels the underlying network request") {
-        checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { filePath ->
+        checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { noteId ->
             val db = createInMemoryDatabase()
             val cache: CacheDataSource = CacheDataSourceImpl(db)
             val mockNetwork = MockNoteRemoteDataSource()
@@ -416,7 +425,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             try {
                 supervisorScope {
                     val deferred = async {
-                        repo.getNote(filePath)
+                        repo.getNote(noteId)
                     }
                     // Give the coroutine time to start the network call
                     delay(50)

@@ -6,9 +6,9 @@ internal interface CacheDataSource {
     // Notes
     suspend fun saveNote(note: Note)
     suspend fun saveNotes(notes: List<Note>)
-    suspend fun getNote(filePath: String): Note?
+    suspend fun getNote(id: String): Note?
     suspend fun listNotes(path: String): List<Note>
-    suspend fun deleteNote(filePath: String)
+    suspend fun deleteNote(id: String)
 
     // Folders
     suspend fun saveEntries(parentPath: String, entries: List<String>)

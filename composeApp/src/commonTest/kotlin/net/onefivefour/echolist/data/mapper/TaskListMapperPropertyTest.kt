@@ -47,6 +47,7 @@ class TaskListMapperPropertyTest : FunSpec({
 
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
+            id = Arb.string(1..50).bind(),
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
@@ -130,6 +131,7 @@ class TaskListMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.CreateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
+            domain.id shouldBe protoTaskList.id
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
@@ -141,6 +143,7 @@ class TaskListMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.GetTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
+            domain.id shouldBe protoTaskList.id
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
@@ -152,6 +155,7 @@ class TaskListMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoTaskList) { protoTaskList ->
             val response = tasks.v1.UpdateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
+            domain.id shouldBe protoTaskList.id
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
@@ -173,6 +177,7 @@ class TaskListMapperPropertyTest : FunSpec({
             val result = TaskListMapper.toDomain(response)
             result.taskLists shouldHaveSize protoTaskLists.size
             result.taskLists.zip(protoTaskLists).forEach { (d, p) ->
+                d.id shouldBe p.id
                 d.filePath shouldBe p.file_path
                 d.name shouldBe p.title
                 d.updatedAt shouldBe p.updated_at

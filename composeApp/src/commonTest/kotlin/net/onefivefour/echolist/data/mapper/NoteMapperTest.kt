@@ -17,6 +17,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain transforms proto Note to domain Note with field name conversions") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-1",
             file_path = "/home/user/notes/meeting.md",
             title = "Meeting Notes",
             content = "Discussion about project timeline",
@@ -25,6 +26,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(protoNote)
 
+        domain.id shouldBe "note-uuid-1"
         domain.filePath shouldBe "/home/user/notes/meeting.md"
         domain.title shouldBe "Meeting Notes"
         domain.content shouldBe "Discussion about project timeline"
@@ -33,6 +35,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain transforms CreateNoteResponse to domain Note") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-2",
             file_path = "/home/user/notes/new.md",
             title = "New Note",
             content = "Fresh content",
@@ -42,6 +45,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(response)
 
+        domain.id shouldBe "note-uuid-2"
         domain.filePath shouldBe "/home/user/notes/new.md"
         domain.title shouldBe "New Note"
         domain.content shouldBe "Fresh content"
@@ -50,6 +54,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain transforms GetNoteResponse to domain Note") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-3",
             file_path = "/home/user/notes/existing.md",
             title = "Existing Note",
             content = "Existing content",
@@ -59,6 +64,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(response)
 
+        domain.id shouldBe "note-uuid-3"
         domain.filePath shouldBe "/home/user/notes/existing.md"
         domain.title shouldBe "Existing Note"
         domain.content shouldBe "Existing content"
@@ -67,6 +73,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain transforms UpdateNoteResponse to domain Note") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-4",
             file_path = "/home/user/notes/updated.md",
             title = "Updated Note",
             content = "Updated content",
@@ -76,6 +83,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(response)
 
+        domain.id shouldBe "note-uuid-4"
         domain.filePath shouldBe "/home/user/notes/updated.md"
         domain.title shouldBe "Updated Note"
         domain.content shouldBe "Updated content"
@@ -84,12 +92,14 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain transforms ListNotesResponse with multiple notes") {
         val note1 = notes.v1.Note(
+            id = "note-uuid-5",
             file_path = "/home/user/notes/note1.md",
             title = "Note 1",
             content = "Content 1",
             updated_at = 1704067200000L
         )
         val note2 = notes.v1.Note(
+            id = "note-uuid-6",
             file_path = "/home/user/notes/note2.md",
             title = "Note 2",
             content = "Content 2",
@@ -103,8 +113,10 @@ class NoteMapperTest : FunSpec({
         val result = NoteMapper.toDomain(response)
 
         result.notes shouldHaveSize 2
+        result.notes[0].id shouldBe "note-uuid-5"
         result.notes[0].filePath shouldBe "/home/user/notes/note1.md"
         result.notes[0].title shouldBe "Note 1"
+        result.notes[1].id shouldBe "note-uuid-6"
         result.notes[1].filePath shouldBe "/home/user/notes/note2.md"
         result.notes[1].title shouldBe "Note 2"
         result.entries shouldHaveSize 3
@@ -143,15 +155,15 @@ class NoteMapperTest : FunSpec({
         proto.parent_dir shouldBe "/home/user/notes"
     }
 
-    test("toProto transforms UpdateNoteParams to UpdateNoteRequest with snake_case fields") {
+    test("toProto transforms UpdateNoteParams to UpdateNoteRequest with id field") {
         val params = UpdateNoteParams(
-            filePath = "/home/user/notes/existing.md",
+            id = "note-uuid-existing",
             content = "Updated content here"
         )
 
         val proto = NoteMapper.toProto(params)
 
-        proto.file_path shouldBe "/home/user/notes/existing.md"
+        proto.id shouldBe "note-uuid-existing"
         proto.content shouldBe "Updated content here"
     }
 
@@ -159,6 +171,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain handles note with empty content") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-empty",
             file_path = "/home/user/notes/empty.md",
             title = "Empty Note",
             content = "",
@@ -167,6 +180,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(protoNote)
 
+        domain.id shouldBe "note-uuid-empty"
         domain.filePath shouldBe "/home/user/notes/empty.md"
         domain.title shouldBe "Empty Note"
         domain.content shouldBe ""
@@ -175,6 +189,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain handles note with empty title") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-untitled",
             file_path = "/home/user/notes/untitled.md",
             title = "",
             content = "Some content",
@@ -183,6 +198,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(protoNote)
 
+        domain.id shouldBe "note-uuid-untitled"
         domain.filePath shouldBe "/home/user/notes/untitled.md"
         domain.title shouldBe ""
         domain.content shouldBe "Some content"
@@ -190,6 +206,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain handles note with special characters in title and content") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-special",
             file_path = "/home/user/notes/special-chars_123.md",
             title = "Special: Title! @#$%",
             content = "Content with\nnewlines\tand\ttabs",
@@ -198,6 +215,7 @@ class NoteMapperTest : FunSpec({
 
         val domain = NoteMapper.toDomain(protoNote)
 
+        domain.id shouldBe "note-uuid-special"
         domain.filePath shouldBe "/home/user/notes/special-chars_123.md"
         domain.title shouldBe "Special: Title! @#$%"
         domain.content shouldBe "Content with\nnewlines\tand\ttabs"
@@ -205,6 +223,7 @@ class NoteMapperTest : FunSpec({
 
     test("toDomain handles ListNotesResponse with single note") {
         val note = notes.v1.Note(
+            id = "note-uuid-single",
             file_path = "/home/user/notes/single.md",
             title = "Single Note",
             content = "Single content",
@@ -218,12 +237,14 @@ class NoteMapperTest : FunSpec({
         val result = NoteMapper.toDomain(response)
 
         result.notes shouldHaveSize 1
+        result.notes[0].id shouldBe "note-uuid-single"
         result.notes[0].filePath shouldBe "/home/user/notes/single.md"
         result.entries shouldHaveSize 1
     }
 
     test("toDomain preserves timestamp precision") {
         val protoNote = notes.v1.Note(
+            id = "note-uuid-ts",
             file_path = "/home/user/notes/timestamp.md",
             title = "Timestamp Test",
             content = "Testing timestamp",
