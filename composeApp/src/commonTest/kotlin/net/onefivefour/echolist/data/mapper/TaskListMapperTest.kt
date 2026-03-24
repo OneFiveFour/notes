@@ -219,13 +219,13 @@ class TaskListMapperTest : FunSpec({
 
         val result = TaskListMapper.toDomain(response)
 
-        result.taskLists shouldHaveSize 2
-        result.taskLists[0].id shouldBe "tl-uuid-5"
-        result.taskLists[0].filePath shouldBe "/lists/list1.json"
-        result.taskLists[0].name shouldBe "List 1"
-        result.taskLists[1].id shouldBe "tl-uuid-6"
-        result.taskLists[1].filePath shouldBe "/lists/list2.json"
-        result.taskLists[1].name shouldBe "List 2"
+        result shouldHaveSize 2
+        result[0].id shouldBe "tl-uuid-5"
+        result[0].filePath shouldBe "/lists/list1.json"
+        result[0].name shouldBe "List 1"
+        result[1].id shouldBe "tl-uuid-6"
+        result[1].filePath shouldBe "/lists/list2.json"
+        result[1].name shouldBe "List 2"
     }
 
     test("toDomain transforms ListTaskListsResponse with empty list") {
@@ -233,7 +233,7 @@ class TaskListMapperTest : FunSpec({
 
         val result = TaskListMapper.toDomain(response)
 
-        result.taskLists.shouldBeEmpty()
+        result.shouldBeEmpty()
     }
 
     // -- Domain -> Proto transformations --
@@ -415,8 +415,8 @@ class TaskListMapperTest : FunSpec({
 
         val result = TaskListMapper.toDomain(response)
 
-        result.taskLists shouldHaveSize 1
-        result.taskLists[0].id shouldBe "tl-uuid-single"
-        result.taskLists[0].filePath shouldBe "/lists/single.json"
+        result shouldHaveSize 1
+        result[0].id shouldBe "tl-uuid-single"
+        result[0].filePath shouldBe "/lists/single.json"
     }
 })

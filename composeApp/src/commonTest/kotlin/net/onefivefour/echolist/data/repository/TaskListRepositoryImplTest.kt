@@ -216,14 +216,14 @@ class TaskListRepositoryImplTest : FunSpec({
         val result = repo.listTaskLists("/lists")
 
         result.isSuccess shouldBe true
-        val listResult = result.getOrThrow()
-        listResult.taskLists.size shouldBe 2
-        listResult.taskLists[0].id shouldBe "tl-uuid-1"
-        listResult.taskLists[0].filePath shouldBe "/lists/list1.json"
-        listResult.taskLists[0].name shouldBe "List 1"
-        listResult.taskLists[1].id shouldBe "tl-uuid-2"
-        listResult.taskLists[1].filePath shouldBe "/lists/list2.json"
-        listResult.taskLists[1].name shouldBe "List 2"
+        val taskLists = result.getOrThrow()
+        taskLists.size shouldBe 2
+        taskLists[0].id shouldBe "tl-uuid-1"
+        taskLists[0].filePath shouldBe "/lists/list1.json"
+        taskLists[0].name shouldBe "List 1"
+        taskLists[1].id shouldBe "tl-uuid-2"
+        taskLists[1].filePath shouldBe "/lists/list2.json"
+        taskLists[1].name shouldBe "List 2"
     }
 
     test("listTaskLists forwards correct parent_dir to data source") {
@@ -244,7 +244,7 @@ class TaskListRepositoryImplTest : FunSpec({
         val result = repo.listTaskLists("")
 
         result.isSuccess shouldBe true
-        result.getOrThrow().taskLists shouldBe emptyList()
+        result.getOrThrow() shouldBe emptyList()
     }
 
     test("listTaskLists returns failure when network throws") {

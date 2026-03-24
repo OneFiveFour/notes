@@ -16,8 +16,8 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.dto.ListTaskListsResult
 import net.onefivefour.echolist.domain.model.TaskList
+import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 
@@ -57,8 +57,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         override suspend fun getTaskList(taskListId: String): Result<TaskList> =
             Result.failure(UnsupportedOperationException())
 
-        override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
-            Result.success(ListTaskListsResult(taskLists = emptyList(), entries = emptyList()))
+        override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
+            Result.success(emptyList())
 
         override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
             Result.failure(UnsupportedOperationException())
@@ -151,8 +151,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                     override suspend fun getTaskList(taskListId: String): Result<TaskList> =
                         Result.failure(UnsupportedOperationException())
 
-                    override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
-                        Result.success(ListTaskListsResult(taskLists = emptyList(), entries = emptyList()))
+                    override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
+                        Result.success(emptyList())
 
                     override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
                         Result.failure(UnsupportedOperationException())

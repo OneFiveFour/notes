@@ -221,9 +221,9 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             val result = repo.listTaskLists(path)
 
             result.isSuccess shouldBe true
-            val listResult = result.getOrThrow()
-            listResult.taskLists.size shouldBe protoTaskLists.size
-            listResult.taskLists.forEachIndexed { i, entry ->
+            val taskLists = result.getOrThrow()
+            taskLists.size shouldBe protoTaskLists.size
+            taskLists.forEachIndexed { i, entry ->
                 entry.id shouldBe protoTaskLists[i].id
                 entry.filePath shouldBe protoTaskLists[i].file_path
                 entry.name shouldBe protoTaskLists[i].title

@@ -5,8 +5,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.TaskListMapper
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.dto.ListTaskListsResult
 import net.onefivefour.echolist.domain.model.TaskList
+import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.domain.repository.TaskListRepository
@@ -41,7 +41,7 @@ internal class TaskListRepositoryImpl(
             }
         }
 
-    override suspend fun listTaskLists(parentDir: String): Result<ListTaskListsResult> =
+    override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
         withContext(dispatcher) {
             try {
                 val request = ListTaskListsRequest(parent_dir = parentDir)

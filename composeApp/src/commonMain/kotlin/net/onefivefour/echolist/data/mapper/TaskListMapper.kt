@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.data.mapper
 
 import net.onefivefour.echolist.data.models.CreateTaskListParams
-import net.onefivefour.echolist.data.dto.ListTaskListsResult
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.domain.model.TaskList
@@ -53,10 +52,8 @@ internal object TaskListMapper {
         return toDomain(taskList)
     }
 
-    fun toDomain(proto: ListTaskListsResponse): ListTaskListsResult = ListTaskListsResult(
-        taskLists = proto.task_lists.map { toEntry(it) },
-        entries = emptyList()
-    )
+    fun toDomain(proto: ListTaskListsResponse): List<TaskListEntry> =
+        proto.task_lists.map { toEntry(it) }
 
     fun toEntry(proto: tasks.v1.TaskList): TaskListEntry = TaskListEntry(
         id = proto.id,
