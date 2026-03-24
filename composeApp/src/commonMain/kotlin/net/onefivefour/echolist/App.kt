@@ -108,6 +108,7 @@ fun App() {
                                             backStack.add(HomeRoute(path))
                                         }
                                     },
+                                    onRefresh = homeViewModel::refresh,
                                     createItemCallbacks = CreateItemCallbacks(
                                         onCreateFolder = createFolderViewModel::showDialog,
                                         onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },

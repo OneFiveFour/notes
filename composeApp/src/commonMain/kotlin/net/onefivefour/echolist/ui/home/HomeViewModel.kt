@@ -40,8 +40,21 @@ class HomeViewModel(
         }
     }
 
+    fun refresh() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isRefreshing = true) }
+            loadData()
+            _uiState.update { it.copy(isRefreshing = false) }
+        }
+    }
+
     private suspend fun loadData() {
         val homeTitle = getString(Res.string.home_title)
+        _uiState.update { current ->
+            current.copy(
+                breadcrumbs = buildBreadcrumbs(path, homeTitle)
+            )
+        }
         val result = fileRepository.listFiles(path)
         result.fold(
             onSuccess = { entries ->

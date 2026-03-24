@@ -40,10 +40,6 @@ internal fun BreadcrumbBar(
             ),
         shape = RoundedCornerShape(50)
     ) {
-        if (breadcrumbs.isEmpty()) {
-            return@Surface
-        }
-
         Row(
             modifier = Modifier.padding(
                 horizontal = EchoListTheme.dimensions.m,
@@ -61,6 +57,10 @@ internal fun BreadcrumbBar(
                     else -> EchoListTheme.materialColors.onSurface
                 }
             )
+
+            if (breadcrumbs.isEmpty()) {
+                return@Row
+            }
 
             breadcrumbs.dropLast(1).forEach { bc ->
                 Text(

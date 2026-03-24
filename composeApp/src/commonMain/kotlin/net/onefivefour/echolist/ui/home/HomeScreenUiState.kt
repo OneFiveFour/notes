@@ -6,6 +6,7 @@ data class HomeScreenUiState(
     val breadcrumbs: List<BreadcrumbItem>,
     val fileEntries: List<FileEntry> = emptyList(),
     val isLoading: Boolean = false,
+    val isRefreshing: Boolean = false,
     val error: String? = null
 )
 

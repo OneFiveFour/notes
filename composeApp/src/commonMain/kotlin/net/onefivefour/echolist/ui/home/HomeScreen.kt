@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,10 +17,12 @@ import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.stringResource
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     uiState: HomeScreenUiState,
     onBreadcrumbClick: (path: String) -> Unit,
+    onRefresh: () -> Unit = {},
     onFolderClick: (path: String) -> Unit = {},
     onNoteClick: (noteId: String) -> Unit = {},
     onTaskClick: (taskListId: String) -> Unit = {},
@@ -43,24 +47,28 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
 
-        FileOverview(
-            title = uiState.breadcrumbs.lastOrNull()?.label ?: "",
-            fileEntries = uiState.fileEntries,
-            isLoading = uiState.isLoading,
-            error = uiState.error,
-            onFolderClick = onFolderClick,
-            onNoteClick = onNoteClick,
-            onTaskClick = onTaskClick,
-            modifier = Modifier.weight(1f)
-        )
-
-        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
-
         Text(
-            text = stringResource(Res.string.recent),
+            text = uiState.breadcrumbs.lastOrNull()?.label ?: "",
             color = EchoListTheme.materialColors.primary,
             style = EchoListTheme.typography.titleLarge
         )
+
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+
+        PullToRefreshBox(
+            modifier = Modifier.weight(1f),
+            isRefreshing = uiState.isRefreshing,
+            onRefresh = onRefresh
+        ) {
+            FileOverview(
+                fileEntries = uiState.fileEntries,
+                isLoading = uiState.isLoading,
+                error = uiState.error,
+                onFolderClick = onFolderClick,
+                onNoteClick = onNoteClick,
+                onTaskClick = onTaskClick
+            )
+        }
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
 
