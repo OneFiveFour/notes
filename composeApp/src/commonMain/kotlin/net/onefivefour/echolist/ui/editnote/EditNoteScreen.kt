@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
@@ -31,6 +32,7 @@ fun EditNoteScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .imePadding()
             .padding(
                 horizontal = dimensions.xl,
                 vertical = dimensions.l
@@ -38,7 +40,8 @@ fun EditNoteScreen(
     ) {
 
         EditNoteTitle(
-            textFieldState = uiState.titleState
+            textFieldState = uiState.titleState,
+            requestFocus = uiState.isCreateMode
         )
 
         Spacer(modifier = Modifier.height(dimensions.m))
@@ -60,7 +63,10 @@ fun EditNoteScreen(
 
                     uiState.isPreview -> EditNotePreview(uiState)
 
-                    else -> EditNoteTextField(textFieldState = uiState.contentState)
+                    else -> EditNoteTextField(
+                        textFieldState = uiState.contentState,
+                        requestFocus = !uiState.isCreateMode
+                    )
                 }
             }
         }

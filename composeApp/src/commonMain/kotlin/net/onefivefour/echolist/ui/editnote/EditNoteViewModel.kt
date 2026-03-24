@@ -27,7 +27,8 @@ class EditNoteViewModel(
         EditNoteUiState(
             titleState = titleState,
             mode = mode,
-            isLoading = mode is EditNoteMode.Edit
+            isLoading = mode is EditNoteMode.Edit,
+            isPreview = mode is EditNoteMode.Edit
         )
     )
     val uiState: StateFlow<EditNoteUiState> = _uiState.asStateFlow()
@@ -108,6 +109,7 @@ class EditNoteViewModel(
                     }
                     _uiState.value.contentState.edit {
                         replace(0, length, note.content)
+                        selection = TextRange(note.content.length)
                     }
                     _uiState.update { it.copy(isLoading = false, error = null) }
                 },
