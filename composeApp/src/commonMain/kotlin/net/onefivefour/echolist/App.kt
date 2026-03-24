@@ -114,6 +114,9 @@ fun App() {
                                         onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
                                         onCreateTaskList = { backStack.add(EditTaskListRoute) }
                                     ),
+                                    onFolderClick = { folderPath ->
+                                        backStack.add(HomeRoute(folderPath))
+                                    },
                                     onNoteClick = { noteId ->
                                         backStack.add(
                                             EditNoteRoute(

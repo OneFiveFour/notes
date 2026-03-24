@@ -11,5 +11,12 @@ internal class DirectoryChangeNotifierImpl : DirectoryChangeNotifier {
 
     override suspend fun notifyChanged(path: String) {
         _directoryChanged.emit(path)
+        // Also notify all ancestor directories so parent ViewModels refresh
+        var remaining = path
+        while (remaining.isNotEmpty()) {
+            val lastSep = remaining.lastIndexOf('/')
+            remaining = if (lastSep >= 0) remaining.substring(0, lastSep) else ""
+            _directoryChanged.emit(remaining)
+        }
     }
 }
