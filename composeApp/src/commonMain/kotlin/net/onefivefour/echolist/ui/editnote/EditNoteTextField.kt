@@ -16,10 +16,9 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun EditNoteTextField(
     textFieldState: TextFieldState,
-    requestFocus: Boolean = true
+    requestFocus: Boolean = true,
+    focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
-
-    val focusRequester = remember { FocusRequester() }
 
     if (requestFocus) {
         LaunchedEffect(Unit) {

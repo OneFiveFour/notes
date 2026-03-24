@@ -13,7 +13,9 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.common.GradientBackground
@@ -28,6 +30,7 @@ fun EditNoteScreen(
     modifier: Modifier = Modifier
 ) {
     val dimensions = EchoListTheme.dimensions
+    val contentFocusRequester = remember { FocusRequester() }
 
     Column(
         modifier = modifier
@@ -41,7 +44,8 @@ fun EditNoteScreen(
 
         EditNoteTitle(
             textFieldState = uiState.titleState,
-            requestFocus = uiState.isCreateMode
+            requestFocus = uiState.isCreateMode,
+            onNext = { contentFocusRequester.requestFocus() }
         )
 
         Spacer(modifier = Modifier.height(dimensions.m))
@@ -65,7 +69,8 @@ fun EditNoteScreen(
 
                     else -> EditNoteTextField(
                         textFieldState = uiState.contentState,
-                        requestFocus = !uiState.isCreateMode
+                        requestFocus = !uiState.isCreateMode,
+                        focusRequester = contentFocusRequester
                     )
                 }
             }
