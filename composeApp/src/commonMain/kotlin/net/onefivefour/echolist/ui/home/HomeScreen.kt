@@ -8,7 +8,10 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
@@ -55,10 +58,22 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
 
+        val pullToRefreshState = rememberPullToRefreshState()
+
         PullToRefreshBox(
             modifier = Modifier.weight(1f),
             isRefreshing = uiState.isRefreshing,
-            onRefresh = onRefresh
+            onRefresh = onRefresh,
+            state = pullToRefreshState,
+            indicator = {
+                PullToRefreshDefaults.Indicator(
+                    state = pullToRefreshState,
+                    isRefreshing = uiState.isRefreshing,
+                    modifier = Modifier.align(Alignment.TopCenter),
+                    containerColor = EchoListTheme.materialColors.primary,
+                    color = EchoListTheme.materialColors.onPrimary
+                )
+            }
         ) {
             FileOverview(
                 fileEntries = uiState.fileEntries,
