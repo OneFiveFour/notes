@@ -77,6 +77,7 @@ internal object TaskListMapper {
 
     fun toProto(params: UpdateTaskListParams): UpdateTaskListRequest = UpdateTaskListRequest(
         id = params.id,
+        title = params.title,
         tasks = params.tasks.map { toProto(it) }
     )
 

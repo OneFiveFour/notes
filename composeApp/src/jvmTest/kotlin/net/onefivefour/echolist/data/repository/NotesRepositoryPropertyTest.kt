@@ -109,7 +109,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 note = notes.v1.Note(
                     id = req.id,
                     file_path = "path/${req.id}.md",
-                    title = "",
+                    title = req.title,
                     content = req.content,
                     updated_at = System.currentTimeMillis()
                 )
@@ -235,7 +235,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             // Seed the cache with the original note
             cache.saveNote(originalNote)
 
-            val updateParams = UpdateNoteParams(id = originalNote.id, content = newContent)
+            val updateParams = UpdateNoteParams(id = originalNote.id, title = originalNote.title, content = newContent)
             val updateResult = repo.updateNote(updateParams)
             updateResult.isSuccess shouldBe true
 

@@ -46,6 +46,7 @@ class NotesRepositoryImplTest : FunSpec({
     val arbUpdateNoteParams = arbitrary {
         UpdateNoteParams(
             id = Arb.string(1..50).bind(),
+            title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind()
         )
     }
@@ -262,6 +263,7 @@ class NotesRepositoryImplTest : FunSpec({
             repo.updateNote(params)
 
             fakeNetwork.lastUpdateRequest?.id shouldBe params.id
+            fakeNetwork.lastUpdateRequest?.title shouldBe params.title
             fakeNetwork.lastUpdateRequest?.content shouldBe params.content
         }
     }
@@ -272,7 +274,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
-        val result = repo.updateNote(UpdateNoteParams("some-uuid", "c"))
+        val result = repo.updateNote(UpdateNoteParams("some-uuid", "t", "c"))
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()

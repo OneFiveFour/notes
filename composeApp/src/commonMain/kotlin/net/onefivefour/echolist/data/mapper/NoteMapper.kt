@@ -44,6 +44,7 @@ internal object NoteMapper {
 
     fun toProto(params: UpdateNoteParams): UpdateNoteRequest = UpdateNoteRequest(
         id = params.id,
+        title = params.title,
         content = params.content
     )
 }

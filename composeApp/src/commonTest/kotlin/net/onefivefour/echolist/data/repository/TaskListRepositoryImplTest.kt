@@ -82,6 +82,7 @@ class TaskListRepositoryImplTest : FunSpec({
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
             id = Arb.string(1..50).bind(),
+            title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }
@@ -297,6 +298,7 @@ class TaskListRepositoryImplTest : FunSpec({
             repo.updateTaskList(params)
 
             fake.lastUpdateRequest?.id shouldBe params.id
+            fake.lastUpdateRequest?.title shouldBe params.title
             fake.lastUpdateRequest?.tasks?.size shouldBe params.tasks.size
         }
     }
@@ -306,7 +308,7 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.updateTaskListResult = Result.failure(NetworkException.ClientError(400, "bad request"))
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", emptyList()))
+        val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", "title", emptyList()))
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()

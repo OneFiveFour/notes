@@ -73,7 +73,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             updateNoteCalls.add(params)
             val existing = notes[params.id]
                 ?: return Result.failure(NoSuchElementException("Note not found: ${params.id}"))
-            val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
+            val updated = existing.copy(title = params.title, content = params.content, updatedAt = existing.updatedAt + 1)
             notes[updated.id] = updated
             return Result.success(updated)
         }
@@ -264,6 +264,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             fakeRepo.updateNoteCalls shouldBe listOf(
                 UpdateNoteParams(
                     id = note.id,
+                    title = note.title,
                     content = "after"
                 )
             )

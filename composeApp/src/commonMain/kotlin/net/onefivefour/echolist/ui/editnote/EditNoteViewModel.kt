@@ -81,6 +81,7 @@ class EditNoteViewModel(
                 is EditNoteMode.Edit -> notesRepository.updateNote(
                     UpdateNoteParams(
                         id = currentMode.noteId,
+                        title = trimmedTitle,
                         content = content
                     )
                 )

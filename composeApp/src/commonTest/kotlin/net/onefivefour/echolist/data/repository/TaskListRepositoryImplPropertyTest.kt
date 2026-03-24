@@ -91,6 +91,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
             id = Arb.string(1..100).bind(),
+            title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }
@@ -294,6 +295,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             repo.updateTaskList(params)
 
             fake.lastUpdateRequest?.id shouldBe params.id
+            fake.lastUpdateRequest?.title shouldBe params.title
             fake.lastUpdateRequest?.tasks?.size shouldBe params.tasks.size
         }
     }

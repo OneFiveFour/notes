@@ -146,15 +146,17 @@ class NoteMapperTest : FunSpec({
         proto.parent_dir shouldBe "/home/user/notes"
     }
 
-    test("toProto transforms UpdateNoteParams to UpdateNoteRequest with id field") {
+    test("toProto transforms UpdateNoteParams to UpdateNoteRequest with id and title fields") {
         val params = UpdateNoteParams(
             id = "note-uuid-existing",
+            title = "Updated Title",
             content = "Updated content here"
         )
 
         val proto = NoteMapper.toProto(params)
 
         proto.id shouldBe "note-uuid-existing"
+        proto.title shouldBe "Updated Title"
         proto.content shouldBe "Updated content here"
     }
 

@@ -65,6 +65,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
     val arbUpdateTaskListParams = arbitrary {
         UpdateTaskListParams(
             id = Arb.string(1..100).bind(),
+            title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind()
         )
     }

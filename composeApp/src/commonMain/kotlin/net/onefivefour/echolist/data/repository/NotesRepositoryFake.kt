@@ -68,13 +68,13 @@ class NotesRepositoryFake : NotesRepository {
     }
 
     override suspend fun updateNote(params: UpdateNoteParams): Result<Note> {
-        callLog.add("updateNote(${params.id}, ${params.content})")
+        callLog.add("updateNote(${params.id}, ${params.title}, ${params.content})")
         shouldFail?.let { return Result.failure(it) }
 
         val existing = notes[params.id]
             ?: return Result.failure(NoSuchElementException("Note not found: ${params.id}"))
 
-        val updated = existing.copy(content = params.content, updatedAt = existing.updatedAt + 1)
+        val updated = existing.copy(title = params.title, content = params.content, updatedAt = existing.updatedAt + 1)
         notes[updated.id] = updated
         return Result.success(updated)
     }

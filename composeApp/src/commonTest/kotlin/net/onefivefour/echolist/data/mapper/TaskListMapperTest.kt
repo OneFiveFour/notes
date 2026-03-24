@@ -264,9 +264,10 @@ class TaskListMapperTest : FunSpec({
         proto.tasks[0].sub_tasks[0].description shouldBe "Sub 1"
     }
 
-    test("toProto transforms UpdateTaskListParams to UpdateTaskListRequest with id field") {
+    test("toProto transforms UpdateTaskListParams to UpdateTaskListRequest with id and title fields") {
         val params = UpdateTaskListParams(
             id = "tl-uuid-existing",
+            title = "Updated List Name",
             tasks = listOf(
                 MainTask(
                     description = "Updated task",
@@ -281,6 +282,7 @@ class TaskListMapperTest : FunSpec({
         val proto = TaskListMapper.toProto(params)
 
         proto.id shouldBe "tl-uuid-existing"
+        proto.title shouldBe "Updated List Name"
         proto.tasks shouldHaveSize 1
         proto.tasks[0].description shouldBe "Updated task"
         proto.tasks[0].done shouldBe true

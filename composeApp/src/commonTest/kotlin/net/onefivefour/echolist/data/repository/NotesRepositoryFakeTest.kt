@@ -66,7 +66,7 @@ class NotesRepositoryFakeTest {
         assertTrue(repo.createNote(CreateNoteParams("t", "c", "/p")).isFailure)
         assertTrue(repo.listNotes().isFailure)
         assertTrue(repo.getNote("any").isFailure)
-        assertTrue(repo.updateNote(UpdateNoteParams("any", "c")).isFailure)
+        assertTrue(repo.updateNote(UpdateNoteParams("any", "t", "c")).isFailure)
         assertTrue(repo.deleteNote("any").isFailure)
     }
 
@@ -91,7 +91,7 @@ class NotesRepositoryFakeTest {
         repo.createNote(CreateNoteParams("t", "c", "/p"))
         repo.listNotes("docs")
         repo.getNote("docs/hello.md")
-        repo.updateNote(UpdateNoteParams("docs/hello.md", "new"))
+        repo.updateNote(UpdateNoteParams("docs/hello.md", "updated title", "new"))
         repo.deleteNote("docs/hello.md")
 
         assertEquals(5, repo.callLog.size)
