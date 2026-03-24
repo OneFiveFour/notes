@@ -16,34 +16,25 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
 internal fun EditNoteTitle(
-    isCreateMode: Boolean,
     textFieldState: TextFieldState
 ) {
-    if (isCreateMode) {
-        Surface(
-            shape = EchoListTheme.shapes.medium,
-            color = EchoListTheme.materialColors.surface,
-            modifier = Modifier
-                .fillMaxWidth()
-                .border(
-                    width = EchoListTheme.dimensions.borderWidth,
-                    color = EchoListTheme.materialColors.surfaceVariant,
-                    shape = EchoListTheme.shapes.medium
-                )
-        ) {
-            BasicTextField(
-                modifier = Modifier.padding(EchoListTheme.dimensions.m),
-                state = textFieldState,
-                textStyle = EchoListTheme.typography.titleLarge.copy(
-                    color = EchoListTheme.materialColors.onSurface
-                )
+    Surface(
+        shape = EchoListTheme.shapes.medium,
+        color = EchoListTheme.materialColors.surface,
+        modifier = Modifier
+            .fillMaxWidth()
+            .border(
+                width = EchoListTheme.dimensions.borderWidth,
+                color = EchoListTheme.materialColors.surfaceVariant,
+                shape = EchoListTheme.shapes.medium
             )
-        }
-    } else {
-        Text(
-            text = textFieldState.text.toString(),
-            style = EchoListTheme.typography.titleLarge,
-            color = EchoListTheme.materialColors.primary
+    ) {
+        BasicTextField(
+            modifier = Modifier.padding(EchoListTheme.dimensions.m),
+            state = textFieldState,
+            textStyle = EchoListTheme.typography.titleLarge.copy(
+                color = EchoListTheme.materialColors.onSurface
+            )
         )
     }
 }

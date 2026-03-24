@@ -38,7 +38,6 @@ fun EditNoteScreen(
     ) {
 
         EditNoteTitle(
-            isCreateMode = uiState.isCreateMode,
             textFieldState = uiState.titleState
         )
 
