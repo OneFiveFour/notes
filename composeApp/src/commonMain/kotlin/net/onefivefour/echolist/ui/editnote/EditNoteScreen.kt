@@ -103,7 +103,7 @@ private fun EditNoteScreenPreview() {
                 uiState = EditNoteUiState(
                     titleState = TextFieldState(initialText = "Title"),
                     contentState = TextFieldState(initialText = "Content"),
-                    mode = EditNoteMode.Edit(filePath = "/path/to/file"),
+                    mode = EditNoteMode.Edit(noteId = "preview-note-id"),
                     isLoading = false,
                     isSaving = false,
                     isPreview = true

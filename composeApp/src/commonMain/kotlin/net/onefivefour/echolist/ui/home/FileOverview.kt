@@ -47,17 +47,32 @@ internal fun FileOverview(
                             metadata = entry.metadata as? FileMetadata.Folder,
                             onClick = { onFolderClick(entry.path) }
                         )
-                        ItemType.NOTE -> NoteItem(
-                            title = entry.title,
-                            metadata = entry.metadata as? FileMetadata.Note,
-                            onClick = { onNoteClick(entry.path) }
-                        )
-                        ItemType.TASK_LIST -> TaskItem(
-                            title = entry.title,
-                            metadata = entry.metadata as? FileMetadata.TaskList,
-                            onClick = { onTaskClick(entry.path) }
-                        )
-                        ItemType.UNSPECIFIED -> { /* skip */ }
+
+                        ItemType.NOTE -> {
+                            (entry.metadata as? FileMetadata.Note)?.let { noteMetadata ->
+                                NoteItem(
+                                    id = noteMetadata.id,
+                                    title = entry.title,
+                                    preview = noteMetadata.preview,
+                                    onClick = onNoteClick
+                                )
+                            }
+                        }
+
+                        ItemType.TASK_LIST -> {
+                            (entry.metadata as? FileMetadata.TaskList)?.let { taskListMetadata ->
+                                TaskItem(
+                                    id = taskListMetadata.id,
+                                    title = entry.title,
+                                    doneTaskCount = taskListMetadata.doneTaskCount,
+                                    totalTaskCount = taskListMetadata.totalTaskCount,
+                                    onClick = onTaskClick
+                                )
+                            }
+                        }
+
+                        ItemType.UNSPECIFIED -> { /* skip */
+                        }
                     }
                 }
             }

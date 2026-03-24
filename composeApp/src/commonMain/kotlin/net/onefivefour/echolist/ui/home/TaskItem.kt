@@ -11,12 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import net.onefivefour.echolist.data.models.FileMetadata
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.koin.core.scope.ScopeID
 
 @Composable
 internal fun TaskItem(
+    id: String,
     title: String,
-    metadata: FileMetadata.TaskList?,
-    onClick: () -> Unit,
+    doneTaskCount: Int,
+    totalTaskCount: Int,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -27,7 +30,7 @@ internal fun TaskItem(
                 color = EchoListTheme.materialColors.secondary,
                 shape = EchoListTheme.shapes.small
             )
-            .clickable(onClick = onClick),
+            .clickable { onClick(id) },
         shape = EchoListTheme.shapes.small
     ) {
         Column(
@@ -39,14 +42,12 @@ internal fun TaskItem(
                 color = EchoListTheme.materialColors.onSurface
             )
 
-            if (metadata != null) {
-                Text(
-                    text = "${metadata.doneTaskCount}/${metadata.totalTaskCount}",
-                    style = EchoListTheme.typography.labelSmall,
-                    color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
-                )
-            }
+            Text(
+                text = "${doneTaskCount}/${totalTaskCount}",
+                style = EchoListTheme.typography.labelSmall,
+                color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
+            )
         }
     }
 }

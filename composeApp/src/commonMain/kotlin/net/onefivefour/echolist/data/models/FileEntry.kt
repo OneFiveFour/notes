@@ -16,8 +16,13 @@ enum class ItemType {
 
 sealed interface FileMetadata {
     data class Folder(val childCount: Int) : FileMetadata
-    data class Note(val updatedAt: Long, val preview: String) : FileMetadata
+    data class Note(
+        val id: String,
+        val updatedAt: Long,
+        val preview: String
+    ) : FileMetadata
     data class TaskList(
+        val id: String,
         val updatedAt: Long,
         val totalTaskCount: Int,
         val doneTaskCount: Int

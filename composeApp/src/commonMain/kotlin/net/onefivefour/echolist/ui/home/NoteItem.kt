@@ -15,9 +15,10 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
 internal fun NoteItem(
+    id: String,
     title: String,
-    metadata: FileMetadata.Note?,
-    onClick: () -> Unit,
+    preview: String?,
+    onClick: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -28,7 +29,7 @@ internal fun NoteItem(
                 color = EchoListTheme.materialColors.secondary,
                 shape = EchoListTheme.shapes.small
             )
-            .clickable(onClick = onClick),
+            .clickable { onClick(id) },
         shape = EchoListTheme.shapes.small
     ) {
         Column(
@@ -40,9 +41,9 @@ internal fun NoteItem(
                 color = EchoListTheme.materialColors.onSurface
             )
 
-            if (metadata != null && metadata.preview.isNotEmpty()) {
+            if (!preview.isNullOrEmpty()) {
                 Text(
-                    text = metadata.preview,
+                    text = preview,
                     style = EchoListTheme.typography.bodySmall,
                     color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.6f),
                     maxLines = 2,

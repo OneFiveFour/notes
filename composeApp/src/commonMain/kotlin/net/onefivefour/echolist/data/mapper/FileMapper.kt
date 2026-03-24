@@ -41,10 +41,12 @@ internal object FileMapper {
                 childCount = proto.folder_metadata.child_count
             )
             proto.note_metadata != null -> FileMetadata.Note(
+                id = proto.note_metadata.id,
                 updatedAt = proto.note_metadata.updated_at,
                 preview = proto.note_metadata.preview
             )
             proto.task_list_metadata != null -> FileMetadata.TaskList(
+                id = proto.task_list_metadata.id,
                 updatedAt = proto.task_list_metadata.updated_at,
                 totalTaskCount = proto.task_list_metadata.total_task_count,
                 doneTaskCount = proto.task_list_metadata.done_task_count
