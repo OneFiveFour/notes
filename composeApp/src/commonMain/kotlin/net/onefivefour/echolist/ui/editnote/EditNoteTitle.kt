@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -49,6 +50,7 @@ internal fun EditNoteTitle(
             textStyle = EchoListTheme.typography.titleLarge.copy(
                 color = EchoListTheme.materialColors.onSurface
             ),
+            lineLimits = TextFieldLineLimits.SingleLine,
             keyboardOptions = KeyboardOptions(imeAction = ImeAction.Next),
             onKeyboardAction = { onNext() }
         )
