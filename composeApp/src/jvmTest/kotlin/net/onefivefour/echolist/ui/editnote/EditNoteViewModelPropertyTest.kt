@@ -16,7 +16,6 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.dto.CreateNoteParams
-import net.onefivefour.echolist.data.dto.ListNotesResult
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.domain.repository.NotesRepository
@@ -61,8 +60,8 @@ class EditNoteViewModelPropertyTest : FunSpec({
             return Result.success(note)
         }
 
-        override suspend fun listNotes(parentDir: String): Result<ListNotesResult> =
-            Result.success(ListNotesResult(notes = emptyList(), entries = emptyList()))
+        override suspend fun listNotes(parentDir: String): Result<List<Note>> =
+            Result.success(emptyList())
 
         override suspend fun getNote(noteId: String): Result<Note> {
             getNoteCalls.add(noteId)
@@ -174,8 +173,8 @@ class EditNoteViewModelPropertyTest : FunSpec({
                         return Result.failure(RuntimeException(errorMessage))
                     }
 
-                    override suspend fun listNotes(parentDir: String): Result<ListNotesResult> =
-                        Result.success(ListNotesResult(notes = emptyList(), entries = emptyList()))
+                    override suspend fun listNotes(parentDir: String): Result<List<Note>> =
+                        Result.success(emptyList())
 
                     override suspend fun getNote(noteId: String): Result<Note> =
                         Result.failure(UnsupportedOperationException())

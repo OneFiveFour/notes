@@ -116,8 +116,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.success(
             ListNotesResponse(
-                notes = listOf(note1, note2),
-                entries = listOf("/n1.md", "/n2.md", "/subfolder/")
+                notes = listOf(note1, note2)
             )
         )
         val fakeCache = FakeCacheDataSource()
@@ -126,13 +125,12 @@ class NotesRepositoryImplTest : FunSpec({
         val result = repo.listNotes("/parent")
 
         result.isSuccess shouldBe true
-        val listResult = result.getOrThrow()
-        listResult.notes.size shouldBe 2
-        listResult.notes[0].id shouldBe "id-1"
-        listResult.notes[0].filePath shouldBe "/n1.md"
-        listResult.notes[1].id shouldBe "id-2"
-        listResult.notes[1].filePath shouldBe "/n2.md"
-        listResult.entries shouldBe listOf("/n1.md", "/n2.md", "/subfolder/")
+        val notesList = result.getOrThrow()
+        notesList.size shouldBe 2
+        notesList[0].id shouldBe "id-1"
+        notesList[0].filePath shouldBe "/n1.md"
+        notesList[1].id shouldBe "id-2"
+        notesList[1].filePath shouldBe "/n2.md"
     }
 
     test("listNotes forwards correct parent_dir to data source") {
@@ -148,15 +146,14 @@ class NotesRepositoryImplTest : FunSpec({
 
     test("listNotes returns empty result when response has no notes") {
         val fakeNetwork = FakeNoteRemoteDataSource()
-        fakeNetwork.listNotesResult = Result.success(ListNotesResponse(notes = emptyList(), entries = emptyList()))
+        fakeNetwork.listNotesResult = Result.success(ListNotesResponse(notes = emptyList()))
         val fakeCache = FakeCacheDataSource()
         val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
         val result = repo.listNotes("")
 
         result.isSuccess shouldBe true
-        result.getOrThrow().notes shouldBe emptyList()
-        result.getOrThrow().entries shouldBe emptyList()
+        result.getOrThrow() shouldBe emptyList()
     }
 
     test("listNotes returns failure when network throws and no cache") {

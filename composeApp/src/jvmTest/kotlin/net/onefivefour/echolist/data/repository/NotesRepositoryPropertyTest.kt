@@ -99,7 +99,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             )
         }
         var listNotesHandler: suspend (ListNotesRequest) -> ListNotesResponse = {
-            ListNotesResponse(notes = emptyList(), entries = emptyList())
+            ListNotesResponse(notes = emptyList())
         }
         var getNoteHandler: suspend (GetNoteRequest) -> GetNoteResponse = { req ->
             throw NetworkException.ClientError(404, "not found")

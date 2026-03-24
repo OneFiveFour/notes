@@ -11,7 +11,6 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.NoteMapper
 import net.onefivefour.echolist.data.dto.CreateNoteParams
-import net.onefivefour.echolist.data.dto.ListNotesResult
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
@@ -55,32 +54,29 @@ internal class NotesRepositoryImpl(
         }
     }
 
-    override suspend fun listNotes(parentDir: String): Result<ListNotesResult> = withContext(dispatcher) {
+    override suspend fun listNotes(parentDir: String): Result<List<Note>> = withContext(dispatcher) {
         val cachedNotes = cacheDataSource.listNotes(parentDir)
-        val cachedEntries = cacheDataSource.listEntries(parentDir)
-        if (cachedNotes.isNotEmpty() || cachedEntries.isNotEmpty()) {
+        if (cachedNotes.isNotEmpty()) {
             // Return cached data immediately, refresh in background
             backgroundScope.launch {
                 try {
                     val request = ListNotesRequest(parent_dir = parentDir)
                     val response = noteRemoteDataSource.listNotes(request)
-                    val result = NoteMapper.toDomain(response)
-                    cacheDataSource.saveNotes(result.notes)
-                    cacheDataSource.saveEntries(parentDir, result.entries)
+                    val notes = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNotes(notes)
                 } catch (_: Exception) {
                     // Background refresh failure is non-fatal
                 }
             }
-            Result.success(ListNotesResult(notes = cachedNotes, entries = cachedEntries))
+            Result.success(cachedNotes)
         } else {
             // No cache — go to network directly
             try {
                 val request = ListNotesRequest(parent_dir = parentDir)
                 val response = noteRemoteDataSource.listNotes(request)
-                val result = NoteMapper.toDomain(response)
-                cacheDataSource.saveNotes(result.notes)
-                cacheDataSource.saveEntries(parentDir, result.entries)
-                Result.success(result)
+                val notes = NoteMapper.toDomain(response)
+                cacheDataSource.saveNotes(notes)
+                Result.success(notes)
             } catch (e: NetworkException) {
                 Result.failure(e)
             }

@@ -116,12 +116,11 @@ class NotesRepositoryImplPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(0..100),
-            Arb.list(arbProtoNote, 0..20),
-            Arb.list(Arb.string(1..100), 0..20)
-        ) { parentDir, protoNotes, entries ->
+            Arb.list(arbProtoNote, 0..20)
+        ) { parentDir, protoNotes ->
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.listNotesResult = Result.success(
-                ListNotesResponse(notes = protoNotes, entries = entries)
+                ListNotesResponse(notes = protoNotes)
             )
             val fakeCache = FakeCacheDataSource()
             val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
@@ -129,16 +128,15 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             val result = repo.listNotes(parentDir)
 
             result.isSuccess shouldBe true
-            val listResult = result.getOrThrow()
-            listResult.notes.size shouldBe protoNotes.size
-            listResult.notes.forEachIndexed { i, note ->
+            val notesList = result.getOrThrow()
+            notesList.size shouldBe protoNotes.size
+            notesList.forEachIndexed { i, note ->
                 note.id shouldBe protoNotes[i].id
                 note.filePath shouldBe protoNotes[i].file_path
                 note.title shouldBe protoNotes[i].title
                 note.content shouldBe protoNotes[i].content
                 note.updatedAt shouldBe protoNotes[i].updated_at
             }
-            listResult.entries shouldBe entries
         }
     }
 

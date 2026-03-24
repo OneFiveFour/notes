@@ -106,37 +106,28 @@ class NoteMapperTest : FunSpec({
             updated_at = 1704153600000L
         )
         val response = notes.v1.ListNotesResponse(
-            notes = listOf(note1, note2),
-            entries = listOf("/home/user/notes/note1.md", "/home/user/notes/note2.md", "/home/user/notes/subfolder/")
+            notes = listOf(note1, note2)
         )
 
         val result = NoteMapper.toDomain(response)
 
-        result.notes shouldHaveSize 2
-        result.notes[0].id shouldBe "note-uuid-5"
-        result.notes[0].filePath shouldBe "/home/user/notes/note1.md"
-        result.notes[0].title shouldBe "Note 1"
-        result.notes[1].id shouldBe "note-uuid-6"
-        result.notes[1].filePath shouldBe "/home/user/notes/note2.md"
-        result.notes[1].title shouldBe "Note 2"
-        result.entries shouldHaveSize 3
-        result.entries shouldBe listOf(
-            "/home/user/notes/note1.md",
-            "/home/user/notes/note2.md",
-            "/home/user/notes/subfolder/"
-        )
+        result shouldHaveSize 2
+        result[0].id shouldBe "note-uuid-5"
+        result[0].filePath shouldBe "/home/user/notes/note1.md"
+        result[0].title shouldBe "Note 1"
+        result[1].id shouldBe "note-uuid-6"
+        result[1].filePath shouldBe "/home/user/notes/note2.md"
+        result[1].title shouldBe "Note 2"
     }
 
     test("toDomain transforms ListNotesResponse with empty notes list") {
         val response = notes.v1.ListNotesResponse(
-            notes = emptyList(),
-            entries = emptyList()
+            notes = emptyList()
         )
 
         val result = NoteMapper.toDomain(response)
 
-        result.notes.shouldBeEmpty()
-        result.entries.shouldBeEmpty()
+        result.shouldBeEmpty()
     }
 
     // -- Domain -> Proto transformations --
@@ -208,7 +199,7 @@ class NoteMapperTest : FunSpec({
         val protoNote = notes.v1.Note(
             id = "note-uuid-special",
             file_path = "/home/user/notes/special-chars_123.md",
-            title = "Special: Title! @#$%",
+            title = "Special: Title! @#\$%",
             content = "Content with\nnewlines\tand\ttabs",
             updated_at = 1704067200000L
         )
@@ -217,7 +208,7 @@ class NoteMapperTest : FunSpec({
 
         domain.id shouldBe "note-uuid-special"
         domain.filePath shouldBe "/home/user/notes/special-chars_123.md"
-        domain.title shouldBe "Special: Title! @#$%"
+        domain.title shouldBe "Special: Title! @#\$%"
         domain.content shouldBe "Content with\nnewlines\tand\ttabs"
     }
 
@@ -230,16 +221,14 @@ class NoteMapperTest : FunSpec({
             updated_at = 1704067200000L
         )
         val response = notes.v1.ListNotesResponse(
-            notes = listOf(note),
-            entries = listOf("/home/user/notes/single.md")
+            notes = listOf(note)
         )
 
         val result = NoteMapper.toDomain(response)
 
-        result.notes shouldHaveSize 1
-        result.notes[0].id shouldBe "note-uuid-single"
-        result.notes[0].filePath shouldBe "/home/user/notes/single.md"
-        result.entries shouldHaveSize 1
+        result shouldHaveSize 1
+        result[0].id shouldBe "note-uuid-single"
+        result[0].filePath shouldBe "/home/user/notes/single.md"
     }
 
     test("toDomain preserves timestamp precision") {

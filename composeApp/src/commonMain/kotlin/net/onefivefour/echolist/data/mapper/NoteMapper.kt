@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.data.mapper
 
 import net.onefivefour.echolist.data.dto.CreateNoteParams
-import net.onefivefour.echolist.data.dto.ListNotesResult
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import notes.v1.CreateNoteRequest
@@ -33,10 +32,7 @@ internal object NoteMapper {
 
     fun toDomain(proto: UpdateNoteResponse): Note = toDomain(proto.note!!)
 
-    fun toDomain(proto: ListNotesResponse): ListNotesResult = ListNotesResult(
-        notes = proto.notes.map { toDomain(it) },
-        entries = proto.entries
-    )
+    fun toDomain(proto: ListNotesResponse): List<Note> = proto.notes.map { toDomain(it) }
 
     // Domain -> Proto
 

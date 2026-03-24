@@ -53,10 +53,8 @@ class NoteMapperPropertyTest : FunSpec({
 
     val arbListNotesResponse = arbitrary {
         val notesList = Arb.list(arbProtoNote, 0..100).bind()
-        val entriesList = Arb.list(Arb.string(1..100), 0..100).bind()
         notes.v1.ListNotesResponse(
-            notes = notesList,
-            entries = entriesList
+            notes = notesList
         )
     }
 
@@ -123,16 +121,16 @@ class NoteMapperPropertyTest : FunSpec({
     // -- Property 10: NoteMapper transforms ListNotesResponse correctly --
 
     test(
-        "Feature: proto-api-update, Property 10: ListNotesResponse -> ListNotesResult preserves all notes and entries"
+        "Feature: proto-api-update, Property 10: ListNotesResponse -> List<Note> preserves all notes"
     ) {
         checkAll(PropTestConfig(iterations = 100), arbListNotesResponse) { response ->
             val result = NoteMapper.toDomain(response)
 
             // Verify all notes transformed
-            result.notes shouldHaveSize response.notes.size
+            result shouldHaveSize response.notes.size
 
             // Verify order and count preserved
-            result.notes.forEachIndexed { index, note ->
+            result.forEachIndexed { index, note ->
                 val protoNote = response.notes[index]
                 note.id shouldBe protoNote.id
                 note.filePath shouldBe protoNote.file_path
@@ -140,10 +138,6 @@ class NoteMapperPropertyTest : FunSpec({
                 note.content shouldBe protoNote.content
                 note.updatedAt shouldBe protoNote.updated_at
             }
-
-            // Verify entries field correctly mapped
-            result.entries shouldHaveSize response.entries.size
-            result.entries shouldBe response.entries
         }
     }
 })

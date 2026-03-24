@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.data.repository
 
 import net.onefivefour.echolist.data.dto.CreateNoteParams
-import net.onefivefour.echolist.data.dto.ListNotesResult
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.domain.repository.NotesRepository
@@ -27,16 +26,9 @@ class NotesRepositoryFake : NotesRepository {
         shouldFail = exception
     }
 
-    private val entries = mutableListOf<String>()
-
     /** Pre-populate the in-memory store with notes. */
     fun addNotes(vararg notesToAdd: Note) {
         notesToAdd.forEach { notes[it.id] = it }
-    }
-
-    /** Pre-populate the entries list. */
-    fun addEntries(vararg entriesToAdd: String) {
-        entries.addAll(entriesToAdd)
     }
 
     override suspend fun createNote(params: CreateNoteParams): Result<Note> {
@@ -54,7 +46,7 @@ class NotesRepositoryFake : NotesRepository {
         return Result.success(note)
     }
 
-    override suspend fun listNotes(parentDir: String): Result<ListNotesResult> {
+    override suspend fun listNotes(parentDir: String): Result<List<Note>> {
         callLog.add("listNotes($parentDir)")
         shouldFail?.let { return Result.failure(it) }
 
@@ -63,7 +55,7 @@ class NotesRepositoryFake : NotesRepository {
         } else {
             notes.values.filter { it.filePath.startsWith(parentDir) }
         }
-        return Result.success(ListNotesResult(notes = filteredNotes, entries = entries.toList()))
+        return Result.success(filteredNotes)
     }
 
     override suspend fun getNote(noteId: String): Result<Note> {
