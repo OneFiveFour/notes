@@ -61,6 +61,24 @@ class EditNoteViewModel(
         }
     }
 
+    fun onDeleteClick() {
+        val editMode = _uiState.value.mode as? EditNoteMode.Edit ?: return
+
+        _uiState.update { it.copy(isSaving = true, error = null) }
+
+        viewModelScope.launch {
+            notesRepository.deleteNote(editMode.noteId).fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isSaving = false) }
+                    _navigateBack.emit(Unit)
+                },
+                onFailure = { e ->
+                    _uiState.update { it.copy(isSaving = false, error = e.message) }
+                }
+            )
+        }
+    }
+
     fun onSaveClick() {
         val currentMode = _uiState.value.mode
         val trimmedTitle = titleState.text.toString().trim()

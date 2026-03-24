@@ -42,7 +42,7 @@ private fun Arb.detailRoute(): Arb<NavKey> =
 
 class NavigationPropertyTest : FunSpec({
 
-    test("Feature: unified-edit-screens, Property 3: Create actions push routes - add note") {
+    test("Feature: unified-ic_edit-screens, Property 3: Create actions push routes - add note") {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(Arb.navKey(), 1..20),
@@ -60,7 +60,7 @@ class NavigationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: unified-edit-screens, Property 3: Create actions push routes - add tasklist") {
+    test("Feature: unified-ic_edit-screens, Property 3: Create actions push routes - add tasklist") {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(Arb.navKey(), 1..20)
@@ -77,7 +77,7 @@ class NavigationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: unified-edit-screens, Property 4: File click pushes EditNoteRoute") {
+    test("Feature: unified-ic_edit-screens, Property 4: File click pushes EditNoteRoute") {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(Arb.navKey(), 1..20),
@@ -97,7 +97,7 @@ class NavigationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: unified-edit-screens, Property 5: Back navigation pops top entry") {
+    test("Feature: unified-ic_edit-screens, Property 5: Back navigation pops top entry") {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(Arb.navKey(), 1..19),

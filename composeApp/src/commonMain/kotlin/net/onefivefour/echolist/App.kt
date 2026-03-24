@@ -145,7 +145,8 @@ fun App() {
                                     uiState = uiState,
                                     onPreviewToggle = viewModel::onPreviewToggle,
                                     onToolbarAction = viewModel::onToolbarAction,
-                                    onSaveClick = viewModel::onSaveClick
+                                    onSaveClick = viewModel::onSaveClick,
+                                    onDeleteClick = viewModel::onDeleteClick
                                 )
                             }
 

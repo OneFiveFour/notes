@@ -11,13 +11,11 @@ import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -27,6 +25,7 @@ fun EditNoteScreen(
     onPreviewToggle: () -> Unit,
     onToolbarAction: (MarkdownToolbarAction) -> Unit,
     onSaveClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val dimensions = EchoListTheme.dimensions
@@ -80,29 +79,24 @@ fun EditNoteScreen(
             EditNoteError(errorMessage)
         }
 
+        if (!uiState.isPreview) {
+            Spacer(modifier = Modifier.height(dimensions.m))
+            MarkdownToolbar(
+                modifier = Modifier.fillMaxWidth(),
+                onToolbarAction = onToolbarAction
+            )
+        }
+
         Spacer(modifier = Modifier.height(dimensions.m))
 
         EditNoteToolbar(
-            uiState = uiState,
-            onToolbarAction = onToolbarAction,
-            onPreviewToggle = onPreviewToggle
+            onSaveClick = onSaveClick,
+            onDeleteClick = onDeleteClick,
+            onPreviewToggle = onPreviewToggle,
+            uiState = uiState
         )
-
-        Spacer(modifier = Modifier.height(dimensions.m))
-
-        ElButton(
-            onClick = onSaveClick,
-            isEnabled = uiState.isSaveEnabled,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                text = if (uiState.isSaving) "Saving..." else "Save",
-                style = EchoListTheme.typography.labelMedium
-            )
-        }
     }
 }
-
 
 @Preview
 @Composable
@@ -121,7 +115,8 @@ private fun EditNoteScreenPreview() {
 
                 onPreviewToggle = {},
                 onToolbarAction = {},
-                onSaveClick = {}
+                onSaveClick = {},
+                onDeleteClick = {}
             )
         }
     }
