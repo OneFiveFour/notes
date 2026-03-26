@@ -4,18 +4,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
@@ -23,7 +25,6 @@ internal fun MarkdownPreview(
     document: String,
     modifier: Modifier = Modifier,
 ) {
-    val uriHandler = LocalUriHandler.current
     val blocks = remember(document) { MarkdownSubsetParser.parse(document) }
     val linkColor = EchoListTheme.materialColors.primary
 
@@ -39,14 +40,12 @@ internal fun MarkdownPreview(
                         1 -> EchoListTheme.typography.titleLarge
                         2 -> EchoListTheme.typography.titleMedium
                         else -> EchoListTheme.typography.titleSmall
-                    },
-                    onOpenUrl = uriHandler::openUri
+                    }
                 )
 
                 is MarkdownBlock.Paragraph -> MarkdownText(
                     annotatedString = block.content.toAnnotatedString(linkColor),
-                    style = EchoListTheme.typography.bodyMedium,
-                    onOpenUrl = uriHandler::openUri
+                    style = EchoListTheme.typography.bodyMedium
                 )
 
                 is MarkdownBlock.BulletList -> Column(
@@ -56,7 +55,6 @@ internal fun MarkdownPreview(
                         MarkdownListRow(
                             prefix = "-",
                             content = item.toAnnotatedString(linkColor),
-                            onOpenUrl = uriHandler::openUri
                         )
                     }
                 }
@@ -68,7 +66,6 @@ internal fun MarkdownPreview(
                         MarkdownListRow(
                             prefix = if (item.isChecked) "[x]" else "[ ]",
                             content = item.content.toAnnotatedString(linkColor),
-                            onOpenUrl = uriHandler::openUri
                         )
                     }
                 }
@@ -81,7 +78,6 @@ internal fun MarkdownPreview(
 private fun MarkdownListRow(
     prefix: String,
     content: AnnotatedString,
-    onOpenUrl: (String) -> Unit
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -95,7 +91,6 @@ private fun MarkdownListRow(
         MarkdownText(
             annotatedString = content,
             style = EchoListTheme.typography.bodyMedium,
-            onOpenUrl = onOpenUrl,
             modifier = Modifier.weight(1f)
         )
     }
@@ -104,31 +99,15 @@ private fun MarkdownListRow(
 @Composable
 private fun MarkdownText(
     annotatedString: AnnotatedString,
-    style: androidx.compose.ui.text.TextStyle,
-    onOpenUrl: (String) -> Unit,
+    style: TextStyle,
     modifier: Modifier = Modifier
 ) {
-    val hasLinks = annotatedString.getStringAnnotations(URL_TAG, 0, annotatedString.length).isNotEmpty()
-    if (hasLinks) {
-        ClickableText(
-            text = annotatedString,
-            style = style.copy(color = EchoListTheme.materialColors.onSurface),
-            modifier = modifier,
-            onClick = { offset ->
-                annotatedString
-                    .getStringAnnotations(URL_TAG, offset, offset)
-                    .firstOrNull()
-                    ?.let { onOpenUrl(it.item) }
-            }
-        )
-    } else {
-        Text(
-            text = annotatedString,
-            style = style,
-            color = EchoListTheme.materialColors.onSurface,
-            modifier = modifier
-        )
-    }
+    Text(
+        text = annotatedString,
+        style = style,
+        color = EchoListTheme.materialColors.onSurface,
+        modifier = modifier
+    )
 }
 
 private fun List<MarkdownInline>.toAnnotatedString(linkColor: Color): AnnotatedString = buildAnnotatedString {
@@ -149,19 +128,20 @@ private fun AnnotatedString.Builder.appendInlineContent(
             }
 
             is MarkdownInline.Link -> {
-                pushStringAnnotation(URL_TAG, inline.url)
-                pushStyle(
-                    SpanStyle(
-                        color = linkColor,
-                        textDecoration = TextDecoration.Underline
+                withLink(
+                    LinkAnnotation.Url(
+                        url = inline.url,
+                        styles = TextLinkStyles(
+                            style = SpanStyle(
+                                color = linkColor,
+                                textDecoration = TextDecoration.Underline
+                            )
+                        )
                     )
-                )
-                append(inline.label)
-                pop()
-                pop()
+                ) {
+                    append(inline.label)
+                }
             }
         }
     }
 }
-
-private const val URL_TAG = "url"
