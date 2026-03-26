@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -14,8 +15,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.common.ElOutlinedTextField
+import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @Composable
@@ -36,7 +40,7 @@ fun CreateFolderDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        containerColor = EchoListTheme.materialColors.surface,
+        containerColor = EchoListTheme.echoListColorScheme.folderColor,
         titleContentColor = EchoListTheme.materialColors.onSurface,
         shape = EchoListTheme.shapes.medium,
         title = {
@@ -52,7 +56,9 @@ fun CreateFolderDialog(
                     label = "Folder name",
                     onValueChange = onNameChange,
                     isError = uiState.error != null,
-                    modifier = Modifier.focusRequester(focusRequester)
+                    modifier = Modifier.focusRequester(focusRequester),
+                    imeAction = ImeAction.Done,
+                    keyboardActions = KeyboardActions(onDone = { onConfirm() })
                 )
                 if (uiState.error != null) {
                     Spacer(modifier = Modifier.height(dimensions.xs))
@@ -89,4 +95,24 @@ fun CreateFolderDialog(
             }
         }
     )
+}
+
+@Preview
+@Composable
+fun CreateFolderDialogPreview() {
+    EchoListTheme {
+        GradientBackground {
+            CreateFolderDialog(
+                uiState = CreateFolderUiState(
+                    isVisible = true,
+                    folderName = "Foldername",
+                    isLoading = false,
+                    error = null
+                ),
+                onNameChange = {  },
+                onConfirm = {  },
+                onDismiss = {  }
+            )
+        }
+    }
 }
