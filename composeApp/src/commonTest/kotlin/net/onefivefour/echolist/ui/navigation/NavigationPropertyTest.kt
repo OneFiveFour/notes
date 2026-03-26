@@ -11,12 +11,12 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 
-private fun Arb.homeRoute(): Arb<HomeRoute> =
+private fun arbHomeRoute(): Arb<HomeRoute> =
     Arb.int(0..50).map { index ->
         if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
     }
 
-private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
+private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         EditNoteRoute(
             parentPath = "folder-$index",
@@ -24,20 +24,20 @@ private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
         )
     }
 
-private fun Arb.editTaskListRoute(): Arb<EditTaskListRoute> =
+private fun arbEditTaskListRoute(): Arb<EditTaskListRoute> =
     Arb.choice(Arb.list(Arb.int(1..1), 1..1).map { EditTaskListRoute })
 
-private fun Arb.navKey(): Arb<NavKey> =
+private fun arbNavKey(): Arb<NavKey> =
     Arb.choice(
-        Arb.homeRoute(),
-        Arb.editNoteRoute(),
-        Arb.editTaskListRoute()
+        arbHomeRoute(),
+        arbEditNoteRoute(),
+        arbEditTaskListRoute()
     )
 
-private fun Arb.detailRoute(): Arb<NavKey> =
+private fun arbDetailRoute(): Arb<NavKey> =
     Arb.choice(
-        Arb.editNoteRoute(),
-        Arb.editTaskListRoute()
+        arbEditNoteRoute(),
+        arbEditTaskListRoute()
     )
 
 class NavigationPropertyTest : FunSpec({
@@ -45,8 +45,8 @@ class NavigationPropertyTest : FunSpec({
     test("Feature: unified-ic_edit-screens, Property 3: Create actions push routes - add note") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(Arb.navKey(), 1..20),
-            Arb.homeRoute()
+            Arb.list(arbNavKey(), 1..20),
+            arbHomeRoute()
         ) { initial, currentHome ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
@@ -63,7 +63,7 @@ class NavigationPropertyTest : FunSpec({
     test("Feature: unified-ic_edit-screens, Property 3: Create actions push routes - add tasklist") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(Arb.navKey(), 1..20)
+            Arb.list(arbNavKey(), 1..20)
         ) { initial ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
@@ -80,8 +80,8 @@ class NavigationPropertyTest : FunSpec({
     test("Feature: unified-ic_edit-screens, Property 4: File click pushes EditNoteRoute") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(Arb.navKey(), 1..20),
-            Arb.homeRoute(),
+            Arb.list(arbNavKey(), 1..20),
+            arbHomeRoute(),
             Arb.int(1..50)
         ) { initial, currentHome, fileIndex ->
             val backStack = initial.toMutableList()
@@ -100,8 +100,8 @@ class NavigationPropertyTest : FunSpec({
     test("Feature: unified-ic_edit-screens, Property 5: Back navigation pops top entry") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.list(Arb.navKey(), 1..19),
-            Arb.detailRoute()
+            Arb.list(arbNavKey(), 1..19),
+            arbDetailRoute()
         ) { base, detailRoute ->
             val backStack = (base + detailRoute).toMutableList()
             val sizeBefore = backStack.size

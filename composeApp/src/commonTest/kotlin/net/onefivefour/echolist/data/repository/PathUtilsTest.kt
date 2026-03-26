@@ -5,15 +5,15 @@ import io.kotest.matchers.shouldBe
 
 class PathUtilsTest : FunSpec({
 
-    test("normalizePath collapses repeated leading slashes to a single root slash") {
-        normalizePath("//note_MyNote.md") shouldBe "/note_MyNote.md"
+    test("normalizePath trims leading slashes so repository paths stay relative") {
+        normalizePath("//note_MyNote.md") shouldBe "note_MyNote.md"
     }
 
-    test("normalizePath leaves non-root internal slashes untouched") {
-        normalizePath("folder//note_MyNote.md") shouldBe "folder//note_MyNote.md"
+    test("normalizePath collapses repeated internal slashes to a single separator") {
+        normalizePath("folder//note_MyNote.md") shouldBe "folder/note_MyNote.md"
     }
 
-    test("joinPath uses a single slash for root parent paths") {
-        joinPath("/", "note_MyNote.md") shouldBe "/note_MyNote.md"
+    test("joinPath treats the root parent path as an empty relative base") {
+        joinPath("/", "note_MyNote.md") shouldBe "note_MyNote.md"
     }
 })

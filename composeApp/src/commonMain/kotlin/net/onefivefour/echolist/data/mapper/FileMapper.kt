@@ -27,7 +27,7 @@ internal object FileMapper {
     )
 
     fun toDomain(proto: CreateFolderResponse): Folder =
-        toDomain(proto.folder!!)
+        toDomain(requireFolder(proto.folder, "CreateFolderResponse"))
 
     fun toDomain(proto: ListFilesResponse): List<FileEntry> =
         proto.entries.map { toDomain(it) }
@@ -63,7 +63,7 @@ internal object FileMapper {
     }
 
     fun toDomain(proto: UpdateFolderResponse): Folder =
-        toDomain(proto.folder!!)
+        toDomain(requireFolder(proto.folder, "UpdateFolderResponse"))
 
     // Domain -> Proto
 
@@ -80,4 +80,7 @@ internal object FileMapper {
     fun toProto(params: DeleteFolderParams): DeleteFolderRequest = DeleteFolderRequest(
         folder_path = params.folderPath
     )
+
+    private fun requireFolder(folder: `file`.v1.Folder?, responseType: String): `file`.v1.Folder =
+        requireNotNull(folder) { "$responseType did not include a folder payload" }
 }

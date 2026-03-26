@@ -44,6 +44,11 @@ kotlin {
     }
 
     sourceSets {
+        all {
+            if (name.endsWith("Test")) {
+                languageSettings.optIn("io.kotest.common.ExperimentalKotest")
+            }
+        }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
@@ -195,7 +200,7 @@ sqldelight {
     }
 }
 
-// JVM tests use JUnit 5 for Kotest
+// JVM tests use JUnit 5 for Kotest.
 tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }

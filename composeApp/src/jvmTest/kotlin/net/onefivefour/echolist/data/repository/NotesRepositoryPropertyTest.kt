@@ -340,7 +340,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             result.isSuccess shouldBe true
 
             val listResult = result.getOrThrow()
-            listResult.notes.any { it.filePath == note.filePath } shouldBe true
+            listResult.any { it.filePath == note.filePath } shouldBe true
         }
     }
 

@@ -10,14 +10,20 @@ import kotlin.test.assertTrue
 
 class NotesRepositoryFakeTest {
 
-    private val sampleNote = Note("docs/hello.md", "hello", "world", 100L)
+    private val sampleNote = Note(
+        id = "hello-note",
+        filePath = "docs/hello.md",
+        title = "hello",
+        content = "world",
+        updatedAt = 100L
+    )
 
     @Test
     fun preConfiguredNoteIsReturnedByGetNote() = runTest {
         val repo = NotesRepositoryFake()
         repo.addNotes(sampleNote)
 
-        val result = repo.getNote(sampleNote.filePath)
+        val result = repo.getNote(sampleNote.id)
 
         assertTrue(result.isSuccess)
         assertEquals(sampleNote, result.getOrNull())
@@ -26,13 +32,19 @@ class NotesRepositoryFakeTest {
     @Test
     fun preConfiguredNotesAreReturnedByListNotes() = runTest {
         val repo = NotesRepositoryFake()
-        val note2 = Note("docs/second.md", "second", "content", 200L)
+        val note2 = Note(
+            id = "second-note",
+            filePath = "docs/second.md",
+            title = "second",
+            content = "content",
+            updatedAt = 200L
+        )
         repo.addNotes(sampleNote, note2)
 
         val result = repo.listNotes()
 
         assertTrue(result.isSuccess)
-        assertEquals(2, result.getOrNull()?.notes?.size)
+        assertEquals(2, result.getOrNull()?.size)
     }
 
     @Test
@@ -54,7 +66,7 @@ class NotesRepositoryFakeTest {
         val result = repo.createNote(CreateNoteParams("title", "body", "/"))
 
         assertTrue(result.isSuccess)
-        assertEquals("/title", result.getOrNull()?.filePath)
+        assertEquals("title", result.getOrNull()?.filePath)
     }
 
     @Test
@@ -76,11 +88,11 @@ class NotesRepositoryFakeTest {
         repo.addNotes(sampleNote)
         repo.setShouldFail(RuntimeException("fail"))
 
-        assertTrue(repo.getNote(sampleNote.filePath).isFailure)
+        assertTrue(repo.getNote(sampleNote.id).isFailure)
 
         repo.setShouldFail(null)
 
-        assertTrue(repo.getNote(sampleNote.filePath).isSuccess)
+        assertTrue(repo.getNote(sampleNote.id).isSuccess)
     }
 
     @Test
@@ -90,9 +102,9 @@ class NotesRepositoryFakeTest {
 
         repo.createNote(CreateNoteParams("t", "c", "/p"))
         repo.listNotes("docs")
-        repo.getNote("docs/hello.md")
-        repo.updateNote(UpdateNoteParams("docs/hello.md", "updated title", "new"))
-        repo.deleteNote("docs/hello.md")
+        repo.getNote(sampleNote.id)
+        repo.updateNote(UpdateNoteParams(sampleNote.id, "updated title", "new"))
+        repo.deleteNote(sampleNote.id)
 
         assertEquals(5, repo.callLog.size)
         assertTrue(repo.callLog[0].startsWith("createNote("))

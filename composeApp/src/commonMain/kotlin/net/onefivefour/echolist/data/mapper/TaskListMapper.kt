@@ -43,12 +43,12 @@ internal object TaskListMapper {
     )
 
     fun toDomain(proto: CreateTaskListResponse): TaskList {
-        val taskList = proto.task_list!!
+        val taskList = requireTaskList(proto.task_list, "CreateTaskListResponse")
         return toDomain(taskList)
     }
 
     fun toDomain(proto: GetTaskListResponse): TaskList {
-        val taskList = proto.task_list!!
+        val taskList = requireTaskList(proto.task_list, "GetTaskListResponse")
         return toDomain(taskList)
     }
 
@@ -63,7 +63,7 @@ internal object TaskListMapper {
     )
 
     fun toDomain(proto: UpdateTaskListResponse): TaskList {
-        val taskList = proto.task_list!!
+        val taskList = requireTaskList(proto.task_list, "UpdateTaskListResponse")
         return toDomain(taskList)
     }
 
@@ -93,4 +93,7 @@ internal object TaskListMapper {
         description = domain.description,
         done = domain.done
     )
+
+    private fun requireTaskList(taskList: tasks.v1.TaskList?, responseType: String): tasks.v1.TaskList =
+        requireNotNull(taskList) { "$responseType did not include a task list payload" }
 }

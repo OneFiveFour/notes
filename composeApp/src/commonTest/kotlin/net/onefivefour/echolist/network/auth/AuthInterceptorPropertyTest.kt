@@ -16,8 +16,6 @@ import io.ktor.client.request.get
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import net.onefivefour.echolist.data.network.auth.AuthEvent
 import net.onefivefour.echolist.data.network.auth.AuthInterceptor
@@ -96,9 +94,12 @@ class AuthInterceptorPropertyTest : FunSpec({
                 }
             }
 
-            client.get("http://localhost:$port$path")
-
-            capturedAuthHeader shouldBe "Bearer $token"
+            try {
+                client.get("http://localhost:$port$path")
+                capturedAuthHeader shouldBe "Bearer $token"
+            } finally {
+                client.close()
+            }
         }
     }
 
@@ -148,13 +149,17 @@ class AuthInterceptorPropertyTest : FunSpec({
                 }
             }
 
-            client.get("http://localhost:$port$path")
+            try {
+                client.get("http://localhost:$port$path")
 
-            // Verify: refresh was called (new token stored)
-            storage.get(StorageKeys.ACCESS_TOKEN) shouldBe newToken
-            // Verify: retry happened with new token
-            requestCount shouldBe 2
-            retryAuthHeader shouldBe "Bearer $newToken"
+                // Verify: refresh was called (new token stored)
+                storage.get(StorageKeys.ACCESS_TOKEN) shouldBe newToken
+                // Verify: retry happened with new token
+                requestCount shouldBe 2
+                retryAuthHeader shouldBe "Bearer $newToken"
+            } finally {
+                client.close()
+            }
         }
     }
 
@@ -174,7 +179,7 @@ class AuthInterceptorPropertyTest : FunSpec({
                     respond(content = "unauthorized", status = HttpStatusCode.Unauthorized)
                 }
 
-                val authEventFlow = MutableSharedFlow<AuthEvent>(extraBufferCapacity = 1)
+                val authEventFlow = MutableSharedFlow<AuthEvent>(replay = 1, extraBufferCapacity = 1)
                 val repo = fakeAuthRepository(storage) {
                     Result.failure(Exception("refresh failed"))
                 }
@@ -186,22 +191,18 @@ class AuthInterceptorPropertyTest : FunSpec({
                     }
                 }
 
-                // Collect the event in a separate coroutine
-                var emittedEvent: AuthEvent? = null
-                val collectJob = launch {
-                    emittedEvent = authEventFlow.first()
+                try {
+                    client.get("http://localhost:$port$path")
+
+                    // Verify: tokens cleared
+                    storage.get(StorageKeys.ACCESS_TOKEN) shouldBe null
+                    storage.get(StorageKeys.REFRESH_TOKEN) shouldBe null
+                    // Verify: ReAuthRequired emitted
+                    authEventFlow.replayCache.singleOrNull() shouldNotBe null
+                    authEventFlow.replayCache.single() shouldBe AuthEvent.ReAuthRequired
+                } finally {
+                    client.close()
                 }
-
-                client.get("http://localhost:$port$path")
-
-                collectJob.join()
-
-                // Verify: tokens cleared
-                storage.get(StorageKeys.ACCESS_TOKEN) shouldBe null
-                storage.get(StorageKeys.REFRESH_TOKEN) shouldBe null
-                // Verify: ReAuthRequired emitted
-                emittedEvent shouldNotBe null
-                emittedEvent shouldBe AuthEvent.ReAuthRequired
             }
         }
     }

@@ -8,14 +8,12 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
@@ -51,18 +49,11 @@ class HomeViewModelPropertyTest : FunSpec({
     // -- Mock --
 
     class MockFileRepository : FileRepository {
-        private val _directoryChanged = MutableSharedFlow<String>()
-        override val directoryChanged: SharedFlow<String> = _directoryChanged.asSharedFlow()
-
         val listFilesCallCount = AtomicInteger(0)
 
         override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
             listFilesCallCount.incrementAndGet()
             return Result.success(emptyList())
-        }
-
-        suspend fun emitDirectoryChanged(path: String) {
-            _directoryChanged.emit(path)
         }
 
         override suspend fun createFolder(params: CreateFolderParams): Result<Folder> =
@@ -81,14 +72,15 @@ class HomeViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbPath, arbPath) { vmPath, emittedPath ->
             runTest(testDispatcher) {
                 val repo = MockFileRepository()
-                val vm = HomeViewModel(path = vmPath, fileRepository = repo)
+                val notifier = FakeDirectoryChangeNotifier()
+                val vm = HomeViewModel(path = vmPath, fileRepository = repo, directoryChangeNotifier = notifier)
 
                 // Let init's loadData() complete
                 advanceUntilIdle()
                 val callsAfterInit = repo.listFilesCallCount.get()
 
                 // Emit a path on directoryChanged
-                repo.emitDirectoryChanged(emittedPath)
+                notifier.notifyChanged(emittedPath)
                 advanceUntilIdle()
 
                 val callsAfterEmit = repo.listFilesCallCount.get()

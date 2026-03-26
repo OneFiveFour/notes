@@ -43,42 +43,49 @@ class HomeViewModel(
     fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }
-            loadData()
-            _uiState.update { it.copy(isRefreshing = false) }
+            try {
+                loadData()
+            } finally {
+                _uiState.update { it.copy(isRefreshing = false) }
+            }
         }
     }
 
     private suspend fun loadData() {
-        val homeTitle = getString(Res.string.home_title)
+        val breadcrumbs = resolveBreadcrumbs()
         _uiState.update { current ->
             current.copy(
-                breadcrumbs = buildBreadcrumbs(path, homeTitle)
+                breadcrumbs = breadcrumbs
             )
         }
         val result = fileRepository.listFiles(path)
-        result.fold(
-            onSuccess = { entries ->
-                _uiState.update { current ->
+        _uiState.update { current ->
+            result.fold(
+                onSuccess = { entries ->
                     current.copy(
-                        breadcrumbs = buildBreadcrumbs(path, homeTitle),
+                        breadcrumbs = breadcrumbs,
                         fileEntries = entries,
                         isLoading = false,
                         error = null
                     )
-                }
-            },
-            onFailure = { exception ->
-                _uiState.update { current ->
+                },
+                onFailure = { exception ->
                     current.copy(
-                        breadcrumbs = buildBreadcrumbs(path, homeTitle),
+                        breadcrumbs = breadcrumbs,
                         fileEntries = emptyList(),
                         isLoading = false,
                         error = exception.message
                     )
                 }
-            }
-        )
+            )
+        }
     }
+
+    private suspend fun resolveBreadcrumbs(): List<BreadcrumbItem> =
+        buildBreadcrumbs(
+            path = path,
+            homeTitle = getString(Res.string.home_title)
+        )
 }
 
 internal fun buildBreadcrumbs(path: String, homeTitle: String): List<BreadcrumbItem> {

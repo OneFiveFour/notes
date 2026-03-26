@@ -12,6 +12,15 @@ private val StartTimeMark = AttributeKey<TimeMark>("NetworkLoggingStartTime")
 
 val NetworkLoggingPlugin = createClientPlugin("NetworkLoggingPlugin", ::NetworkLoggingConfig) {
     val minLogLevel = pluginConfig.minLogLevel
+    val logSink = pluginConfig.logSink
+
+    fun emitLog(entry: String) {
+        try {
+            logSink(entry)
+        } catch (_: Throwable) {
+            // Logging must never break the HTTP pipeline
+        }
+    }
 
     onRequest { request, _ ->
         try {
@@ -31,7 +40,7 @@ val NetworkLoggingPlugin = createClientPlugin("NetworkLoggingPlugin", ::NetworkL
                     byteArrayOf()
                 }
                 val logEntry = LogEntryFormatter.formatRequest(method, url, headers, bodyBytes)
-                println(logEntry)
+                emitLog(logEntry)
             }
         } catch (_: Throwable) {
             // Logging must never break the HTTP pipeline
@@ -47,7 +56,7 @@ val NetworkLoggingPlugin = createClientPlugin("NetworkLoggingPlugin", ::NetworkL
                     if (LogLevel.ERROR >= minLogLevel) {
                         val url = request.url.buildString()
                         val logEntry = LogEntryFormatter.formatError(url, e.message ?: "Unknown error")
-                        println(logEntry)
+                        emitLog(logEntry)
                     }
                 } catch (_: Throwable) {
                     // Logging must never break the HTTP pipeline
@@ -70,7 +79,7 @@ val NetworkLoggingPlugin = createClientPlugin("NetworkLoggingPlugin", ::NetworkL
                         byteArrayOf()
                     }
                     val logEntry = LogEntryFormatter.formatResponse(statusCode, headers, bodyBytes, elapsedMs)
-                    println(logEntry)
+                    emitLog(logEntry)
                 }
             } catch (_: Throwable) {
                 // Logging must never break the HTTP pipeline

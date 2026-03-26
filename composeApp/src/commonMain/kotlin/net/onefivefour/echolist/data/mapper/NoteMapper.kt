@@ -26,11 +26,11 @@ internal object NoteMapper {
         updatedAt = proto.updated_at
     )
 
-    fun toDomain(proto: CreateNoteResponse): Note = toDomain(proto.note!!)
+    fun toDomain(proto: CreateNoteResponse): Note = toDomain(requireNote(proto.note, "CreateNoteResponse"))
 
-    fun toDomain(proto: GetNoteResponse): Note = toDomain(proto.note!!)
+    fun toDomain(proto: GetNoteResponse): Note = toDomain(requireNote(proto.note, "GetNoteResponse"))
 
-    fun toDomain(proto: UpdateNoteResponse): Note = toDomain(proto.note!!)
+    fun toDomain(proto: UpdateNoteResponse): Note = toDomain(requireNote(proto.note, "UpdateNoteResponse"))
 
     fun toDomain(proto: ListNotesResponse): List<Note> = proto.notes.map { toDomain(it) }
 
@@ -47,4 +47,7 @@ internal object NoteMapper {
         title = params.title,
         content = params.content
     )
+
+    private fun requireNote(note: notes.v1.Note?, responseType: String): notes.v1.Note =
+        requireNotNull(note) { "$responseType did not include a note payload" }
 }

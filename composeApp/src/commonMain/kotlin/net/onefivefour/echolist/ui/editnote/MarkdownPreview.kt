@@ -21,7 +21,7 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun MarkdownPreview(
     document: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val uriHandler = LocalUriHandler.current
     val blocks = remember(document) { MarkdownSubsetParser.parse(document) }

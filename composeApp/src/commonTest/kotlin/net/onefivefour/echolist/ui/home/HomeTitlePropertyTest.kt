@@ -31,7 +31,7 @@ class HomeTitlePropertyTest : FunSpec({
 
             // The first breadcrumb should always have homeTitle as the label
             breadcrumbs.first().label shouldBe homeTitle
-            breadcrumbs.first().path shouldBe "/"
+            breadcrumbs.first().path shouldBe ""
         }
     }
 })

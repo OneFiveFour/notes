@@ -23,6 +23,7 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 fun EditNoteScreen(
     uiState: EditNoteUiState,
     onPreviewToggle: () -> Unit,
+    onBeginEdit: () -> Unit,
     onToolbarAction: (MarkdownToolbarAction) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
@@ -60,11 +61,17 @@ fun EditNoteScreen(
                     shape = EchoListTheme.shapes.medium
                 )
         ) {
-            Box(modifier = Modifier.padding(dimensions.m)) {
+            Box(modifier = Modifier
+                .padding(dimensions.m)
+                .fillMaxSize()
+            ) {
                 when {
                     uiState.isLoading -> EditNoteLoading()
 
-                    uiState.isPreview -> EditNotePreview(uiState)
+                    uiState.isPreview -> EditNotePreview(
+                        uiState,
+                        onBeginEdit = onBeginEdit
+                    )
 
                     else -> EditNoteTextField(
                         textFieldState = uiState.contentState,
@@ -116,7 +123,8 @@ private fun EditNoteScreenPreview() {
                 onPreviewToggle = {},
                 onToolbarAction = {},
                 onSaveClick = {},
-                onDeleteClick = {}
+                onDeleteClick = {},
+                onBeginEdit = {}
             )
         }
     }

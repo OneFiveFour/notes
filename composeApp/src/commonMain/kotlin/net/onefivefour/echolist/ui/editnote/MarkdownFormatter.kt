@@ -76,7 +76,7 @@ internal object MarkdownFormatter {
         val newText = text.replaceRange(lineRange.start, lineRange.endExclusive, updated)
         return MarkdownTextEdit(
             text = newText,
-            selectionStart = lineRange.start,
+            selectionStart = lineRange.start + updated.length,
             selectionEnd = lineRange.start + updated.length
         )
     }
@@ -98,7 +98,7 @@ internal object MarkdownFormatter {
         val newText = text.replaceRange(lineRange.start, lineRange.endExclusive, updated)
         return MarkdownTextEdit(
             text = newText,
-            selectionStart = lineRange.start,
+            selectionStart = lineRange.start + updated.length,
             selectionEnd = lineRange.start + updated.length
         )
     }
@@ -128,7 +128,7 @@ internal object MarkdownFormatter {
     private fun String.removeMarkdownListPrefix(): String = replaceFirst(listPrefixRegex, "")
 
     private val headingMatch = Regex("^(#{1,3})\\s+")
-    private val listPrefixRegex = Regex("^- (\\[( |x|X)])? ?")
+    private val listPrefixRegex = Regex("^- (\\[([ xX])])? ?")
 }
 
 private data class TextSegment(

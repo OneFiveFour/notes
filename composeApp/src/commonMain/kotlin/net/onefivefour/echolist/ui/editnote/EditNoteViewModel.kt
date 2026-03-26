@@ -46,6 +46,10 @@ class EditNoteViewModel(
         _uiState.update { it.copy(isPreview = !it.isPreview) }
     }
 
+    fun onBeginEdit() {
+        _uiState.update { it.copy(isPreview = false) }
+    }
+
     fun onToolbarAction(action: MarkdownToolbarAction) {
         val contentState = _uiState.value.contentState
         val text = contentState.text.toString()

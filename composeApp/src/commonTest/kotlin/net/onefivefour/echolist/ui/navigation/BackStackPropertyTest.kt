@@ -11,12 +11,12 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 
-private fun Arb.homeRoute(): Arb<HomeRoute> =
+private fun arbHomeRoute(): Arb<HomeRoute> =
     Arb.int(0..50).map { index ->
         if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
     }
 
-private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
+private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         if (index % 2 == 0) {
             EditNoteRoute(parentPath = "folder-$index")
@@ -28,16 +28,16 @@ private fun Arb.editNoteRoute(): Arb<EditNoteRoute> =
         }
     }
 
-private fun Arb.navKey(): Arb<NavKey> =
-    Arb.choice(Arb.homeRoute(), Arb.editNoteRoute())
+private fun arbNavKey(): Arb<NavKey> =
+    Arb.choice(arbHomeRoute(), arbEditNoteRoute())
 
 class BackStackPropertyTest : FunSpec({
 
     test("Property 2: pushing a NavKey increases stack size by one") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.list(Arb.navKey(), 1..20),
-            Arb.navKey()
+            Arb.list(arbNavKey(), 1..20),
+            arbNavKey()
         ) { initial, newKey ->
             val stack = initial.toMutableList()
             val sizeBefore = stack.size
@@ -61,7 +61,7 @@ class BackStackPropertyTest : FunSpec({
             val targetPath = stack[targetIndex].path
             val entriesBefore = stack.toList()
 
-            val index = stack.indexOfLast { it is HomeRoute && it.path == targetPath }
+            val index = stack.indexOfLast { it.path == targetPath }
             if (index >= 0) {
                 while (stack.size > index + 1) stack.removeLast()
             } else {
@@ -77,7 +77,7 @@ class BackStackPropertyTest : FunSpec({
     test("Property 4: back on multi-entry stack removes top entry") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.list(Arb.navKey(), 2..20)
+            Arb.list(arbNavKey(), 2..20)
         ) { initial ->
             val stack = initial.toMutableList()
             val sizeBefore = stack.size
@@ -93,7 +93,7 @@ class BackStackPropertyTest : FunSpec({
     test("Property 4: back on single-entry stack leaves it unchanged") {
         checkAll(
             PropTestConfig(iterations = 20),
-            Arb.navKey()
+            arbNavKey()
         ) { singleKey ->
             val stack = mutableListOf<NavKey>(singleKey)
 

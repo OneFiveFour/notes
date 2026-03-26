@@ -175,8 +175,8 @@ class TaskListMapperPropertyTest : FunSpec({
         ) { protoTaskLists ->
             val response = tasks.v1.ListTaskListsResponse(task_lists = protoTaskLists)
             val result = TaskListMapper.toDomain(response)
-            result.taskLists shouldHaveSize protoTaskLists.size
-            result.taskLists.zip(protoTaskLists).forEach { (d, p) ->
+            result shouldHaveSize protoTaskLists.size
+            result.zip(protoTaskLists).forEach { (d, p) ->
                 d.id shouldBe p.id
                 d.filePath shouldBe p.file_path
                 d.name shouldBe p.title

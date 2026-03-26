@@ -48,8 +48,7 @@ class AuthRepositoryPropertyTest : FunSpec({
                         refresh_token = refreshToken
                     )
                     val bytes = auth.v1.LoginResponse.ADAPTER.encode(response)
-                    @Suppress("UNCHECKED_CAST")
-                    return Result.success(responseDeserializer(bytes) as Res)
+                    return Result.success(responseDeserializer(bytes))
                 }
             }
 
@@ -106,8 +105,7 @@ class AuthRepositoryPropertyTest : FunSpec({
                         refresh_token = "refresh"
                     )
                     val bytes = auth.v1.LoginResponse.ADAPTER.encode(response)
-                    @Suppress("UNCHECKED_CAST")
-                    return Result.success(responseDeserializer(bytes) as Res)
+                    return Result.success(responseDeserializer(bytes))
                 }
             }
 

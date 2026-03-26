@@ -10,9 +10,6 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -59,9 +56,6 @@ class CreateFolderViewModelPropertyTest : FunSpec({
     // -- Mock --
 
     class MockFileRepository : FileRepository {
-        private val _directoryChanged = MutableSharedFlow<String>()
-        override val directoryChanged: SharedFlow<String> = _directoryChanged.asSharedFlow()
-
         var createFolderHandler: suspend (CreateFolderParams) -> Result<Folder> = {
             Result.success(Folder(path = "${it.parentDir}/${it.name}", name = it.name))
         }

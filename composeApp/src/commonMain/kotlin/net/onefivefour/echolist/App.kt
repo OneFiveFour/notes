@@ -6,7 +6,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -37,7 +36,6 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun App() {
     EchoListTheme {
@@ -46,133 +44,134 @@ fun App() {
             val authState by authViewModel.authState.collectAsStateWithLifecycle()
 
             when (authState) {
-                AuthState.Loading -> {
-                    // Empty / splash while checking auth state
-                }
-
-                AuthState.Unauthenticated -> {
-                    val loginViewModel = koinViewModel<LoginViewModel>()
-                    val loginState by loginViewModel.uiState.collectAsStateWithLifecycle()
-
-                    LaunchedEffect(Unit) {
-                        loginViewModel.loginSuccess.collect {
-                            authViewModel.onAuthenticated()
-                        }
-                    }
-
-                    LoginScreen(
-                        uiState = loginState,
-                        onBackendUrlChange = loginViewModel::onBackendUrlChanged,
-                        onUsernameChange = loginViewModel::onUsernameChanged,
-                        onPasswordChange = loginViewModel::onPasswordChanged,
-                        onLoginClick = loginViewModel::onLoginClick
-                    )
-                }
-
-                AuthState.Authenticated -> {
-                    val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
-
-                    NavigationBackHandler(
-                        state = rememberNavigationEventState(NavigationEventInfo.None),
-                        isBackEnabled = backStack.size > 1,
-                        onBackCompleted = { backStack.removeLastOrNull() }
-                    )
-
-                    NavDisplay(
-                        backStack = backStack,
-                        onBack = { backStack.removeLastOrNull() },
-                        transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
-                        popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
-                        predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
-                        entryProvider = entryProvider {
-                            entry<HomeRoute> { route ->
-                                val homeViewModel =
-                                    koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
-                                val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-
-                                val createFolderViewModel =
-                                    koinViewModel<CreateFolderViewModel>(
-                                        key = "createFolder-${route.path}"
-                                    ) { parametersOf(route.path) }
-                                val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
-
-                                HomeScreen(
-                                    uiState = homeUiState,
-                                    createFolderUiState = createFolderUiState,
-                                    onBreadcrumbClick = { path ->
-                                        val index =
-                                            backStack.indexOfLast { it is HomeRoute && it.path == path }
-                                        if (index >= 0) {
-                                            while (backStack.size > index + 1) backStack.removeLast()
-                                        } else {
-                                            backStack.add(HomeRoute(path))
-                                        }
-                                    },
-                                    onRefresh = homeViewModel::refresh,
-                                    createItemCallbacks = CreateItemCallbacks(
-                                        onCreateFolder = createFolderViewModel::showDialog,
-                                        onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
-                                        onCreateTaskList = { backStack.add(EditTaskListRoute) }
-                                    ),
-                                    onFolderClick = { folderPath ->
-                                        backStack.add(HomeRoute(folderPath))
-                                    },
-                                    onNoteClick = { noteId ->
-                                        backStack.add(
-                                            EditNoteRoute(
-                                                parentPath = route.path,
-                                                noteId = noteId
-                                            )
-                                        )
-                                    },
-                                    onFolderNameChange = createFolderViewModel::onNameChange,
-                                    onConfirmCreateFolder = createFolderViewModel::onConfirm,
-                                    onDismissCreateFolder = createFolderViewModel::dismissDialog
-                                )
-                            }
-
-                            entry<EditNoteRoute> { route ->
-                                val mode = route.noteId?.let { noteId ->
-                                    EditNoteMode.Edit(noteId)
-                                } ?: EditNoteMode.Create(normalizePath(route.parentPath))
-                                val viewModel = koinViewModel<EditNoteViewModel>(
-                                    key = "editNote-${route.parentPath}-${route.noteId.orEmpty()}"
-                                ) { parametersOf(mode) }
-                                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                                LaunchedEffect(Unit) {
-                                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
-                                }
-
-                                EditNoteScreen(
-                                    uiState = uiState,
-                                    onPreviewToggle = viewModel::onPreviewToggle,
-                                    onToolbarAction = viewModel::onToolbarAction,
-                                    onSaveClick = viewModel::onSaveClick,
-                                    onDeleteClick = viewModel::onDeleteClick
-                                )
-                            }
-
-                            entry<EditTaskListRoute> {
-                                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path ?: ""
-                                val viewModel = koinViewModel<EditTaskListViewModel>(
-                                    key = "editTaskList-$currentPath"
-                                ) { parametersOf(currentPath) }
-                                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                                LaunchedEffect(Unit) {
-                                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
-                                }
-
-                                EditTaskListScreen(
-                                    uiState = uiState,
-                                    onSaveClick = viewModel::onSaveClick
-                                )
-                            }
-                        }
-                    )
-                }
+                AuthState.Loading -> Unit
+                AuthState.Unauthenticated -> UnauthenticatedApp(authViewModel)
+                AuthState.Authenticated -> AuthenticatedApp()
             }
         }
     }
+}
+
+@Composable
+private fun UnauthenticatedApp(authViewModel: AuthViewModel) {
+    val loginViewModel = koinViewModel<LoginViewModel>()
+    val loginState by loginViewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(loginViewModel) {
+        loginViewModel.loginSuccess.collect {
+            authViewModel.onAuthenticated()
+        }
+    }
+
+    LoginScreen(
+        uiState = loginState,
+        onBackendUrlChange = loginViewModel::onBackendUrlChanged,
+        onUsernameChange = loginViewModel::onUsernameChanged,
+        onPasswordChange = loginViewModel::onPasswordChanged,
+        onLoginClick = loginViewModel::onLoginClick
+    )
+}
+
+@Composable
+private fun AuthenticatedApp() {
+    val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
+
+    NavigationBackHandler(
+        state = rememberNavigationEventState(NavigationEventInfo.None),
+        isBackEnabled = backStack.size > 1,
+        onBackCompleted = { backStack.removeLastOrNull() }
+    )
+
+    NavDisplay(
+        backStack = backStack,
+        onBack = { backStack.removeLastOrNull() },
+        transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+        popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+        predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
+        entryProvider = entryProvider {
+            entry<HomeRoute> { route ->
+                val homeViewModel =
+                    koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
+                val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
+
+                val createFolderViewModel =
+                    koinViewModel<CreateFolderViewModel>(
+                        key = "createFolder-${route.path}"
+                    ) { parametersOf(route.path) }
+                val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
+
+                HomeScreen(
+                    uiState = homeUiState,
+                    createFolderUiState = createFolderUiState,
+                    onBreadcrumbClick = { path ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.path == path }
+                        if (index >= 0) {
+                            while (backStack.size > index + 1) backStack.removeLast()
+                        } else {
+                            backStack.add(HomeRoute(path))
+                        }
+                    },
+                    onRefresh = homeViewModel::refresh,
+                    createItemCallbacks = CreateItemCallbacks(
+                        onCreateFolder = createFolderViewModel::showDialog,
+                        onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
+                        onCreateTaskList = { backStack.add(EditTaskListRoute) }
+                    ),
+                    onFolderClick = { folderPath ->
+                        backStack.add(HomeRoute(folderPath))
+                    },
+                    onNoteClick = { noteId ->
+                        backStack.add(
+                            EditNoteRoute(
+                                parentPath = route.path,
+                                noteId = noteId
+                            )
+                        )
+                    },
+                    onFolderNameChange = createFolderViewModel::onNameChange,
+                    onConfirmCreateFolder = createFolderViewModel::onConfirm,
+                    onDismissCreateFolder = createFolderViewModel::dismissDialog
+                )
+            }
+
+            entry<EditNoteRoute> { route ->
+                val mode = route.noteId?.let(EditNoteMode::Edit)
+                    ?: EditNoteMode.Create(normalizePath(route.parentPath))
+                val viewModel = koinViewModel<EditNoteViewModel>(
+                    key = "editNote-${route.parentPath}-${route.noteId.orEmpty()}"
+                ) { parametersOf(mode) }
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                LaunchedEffect(viewModel) {
+                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
+                }
+
+                EditNoteScreen(
+                    uiState = uiState,
+                    onPreviewToggle = viewModel::onPreviewToggle,
+                    onBeginEdit = viewModel::onBeginEdit,
+                    onToolbarAction = viewModel::onToolbarAction,
+                    onSaveClick = viewModel::onSaveClick,
+                    onDeleteClick = viewModel::onDeleteClick
+                )
+            }
+
+            entry<EditTaskListRoute> {
+                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path.orEmpty()
+                val viewModel = koinViewModel<EditTaskListViewModel>(
+                    key = "editTaskList-$currentPath"
+                ) { parametersOf(currentPath) }
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                LaunchedEffect(viewModel) {
+                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
+                }
+
+                EditTaskListScreen(
+                    uiState = uiState,
+                    onSaveClick = viewModel::onSaveClick
+                )
+            }
+        }
+    )
 }
