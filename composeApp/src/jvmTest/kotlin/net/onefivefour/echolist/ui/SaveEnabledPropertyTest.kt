@@ -1,6 +1,7 @@
 package net.onefivefour.echolist.ui
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.mutableStateListOf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -10,6 +11,7 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.editnote.EditNoteUiState
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListUiState
 
 // Feature: note-tasklist-editors, Property 4: Save-enabled computation
@@ -52,6 +54,8 @@ class SaveEnabledPropertyTest : FunSpec({
 
             val uiState = EditTaskListUiState(
                 titleState = titleState,
+                tasks = mutableStateListOf(),
+                mode = EditTaskListMode.Create(""),
                 isLoading = isLoading
             )
 

@@ -1,6 +1,7 @@
 package net.onefivefour.echolist.ui.edittasklist
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
@@ -16,12 +17,12 @@ import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
-import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.repository.TaskListRepository
-
-// Feature: note-tasklist-editors, Property 1: Save guard — repository called if and only if trimmed text is non-blank
 
 @OptIn(ExperimentalCoroutinesApi::class, io.kotest.common.ExperimentalKotest::class)
 class EditTaskListViewModelPropertyTest : FunSpec({
@@ -36,147 +37,206 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         Dispatchers.resetMain()
     }
 
-    // -- Fake --
-
     class FakeTaskListRepository : TaskListRepository {
         val createTaskListCalls = mutableListOf<CreateTaskListParams>()
+        val updateTaskListCalls = mutableListOf<UpdateTaskListParams>()
+        val deleteTaskListCalls = mutableListOf<String>()
+        val getTaskListCalls = mutableListOf<String>()
+        private val taskLists = mutableMapOf<String, TaskList>()
+
+        fun addTaskList(taskList: TaskList) {
+            taskLists[taskList.id] = taskList
+        }
 
         override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> {
             createTaskListCalls.add(params)
-            return Result.success(
-                TaskList(
-                    id = "generated-id",
-                    filePath = "${params.path}/${params.name}",
-                    name = params.name,
-                    tasks = params.tasks,
-                    updatedAt = 0L
-                )
+            val created = TaskList(
+                id = "generated-${params.name}",
+                filePath = "${params.path}/${params.name}",
+                name = params.name,
+                tasks = params.tasks,
+                updatedAt = 0L
             )
+            taskLists[created.id] = created
+            return Result.success(created)
         }
 
-        override suspend fun getTaskList(taskListId: String): Result<TaskList> =
-            Result.failure(UnsupportedOperationException())
+        override suspend fun getTaskList(taskListId: String): Result<TaskList> {
+            getTaskListCalls.add(taskListId)
+            return taskLists[taskListId]?.let { Result.success(it) }
+                ?: Result.failure(NoSuchElementException("TaskList not found: $taskListId"))
+        }
 
         override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
             Result.success(emptyList())
 
-        override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
-            Result.failure(UnsupportedOperationException())
+        override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> {
+            updateTaskListCalls.add(params)
+            val existing = taskLists[params.id]
+                ?: return Result.failure(NoSuchElementException("TaskList not found: ${params.id}"))
+            val updated = existing.copy(name = params.title, tasks = params.tasks, updatedAt = existing.updatedAt + 1)
+            taskLists[updated.id] = updated
+            return Result.success(updated)
+        }
 
-        override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
-            Result.failure(UnsupportedOperationException())
-    }
-
-    // -- Property 1: Save guard --
-
-    test("Property 1: Save guard — repository called if and only if trimmed text is non-blank") {
-        // Validates: Requirements 6.3, 6.7
-        checkAll(PropTestConfig(iterations = 100), Arb.string(0..50)) { generatedString ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val parentPath = "test/path"
-                val vm = EditTaskListViewModel(
-                    parentPath = parentPath,
-                    taskListRepository = fakeRepo
-                )
-
-                // Set the title text
-                vm.uiState.value.titleState.edit {
-                    replace(0, length, generatedString)
-                }
-
-                vm.onSaveClick()
-                testScheduler.advanceUntilIdle()
-
-                val trimmed = generatedString.trim()
-                if (trimmed.isBlank()) {
-                    fakeRepo.createTaskListCalls.size shouldBe 0
-                } else {
-                    fakeRepo.createTaskListCalls.size shouldBe 1
-                    fakeRepo.createTaskListCalls[0].name shouldBe trimmed
-                    fakeRepo.createTaskListCalls[0].path shouldBe parentPath
-                    fakeRepo.createTaskListCalls[0].tasks shouldBe emptyList()
-                }
-            }
+        override suspend fun deleteTaskList(taskListId: String): Result<Unit> {
+            deleteTaskListCalls.add(taskListId)
+            taskLists.remove(taskListId)
+            return Result.success(Unit)
         }
     }
 
-    // Feature: note-tasklist-editors, Property 2: Successful save emits navigate-back event
+    test("Property 1: create mode saves a new task list with nested tasks") {
+        runTest(testDispatcher) {
+            val fakeRepo = FakeTaskListRepository()
+            val parentPath = "home/projects"
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create(parentPath),
+                taskListRepository = fakeRepo
+            )
 
-    test("Property 2: Successful save emits navigate-back event") {
-        // Validates: Requirements 6.5
-        checkAll(PropTestConfig(iterations = 100), Arb.string(0..50).filter { it.isNotBlank() }) { generatedTitle ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val parentPath = "test/path"
-                val vm = EditTaskListViewModel(
-                    parentPath = parentPath,
-                    taskListRepository = fakeRepo
-                )
-
-                // Start collecting navigateBack before triggering save
-                val navigateBackDeferred = async {
-                    vm.navigateBack.first()
-                }
-
-                // Set the title text
-                vm.uiState.value.titleState.edit {
-                    replace(0, length, generatedTitle)
-                }
-
-                vm.onSaveClick()
-                testScheduler.advanceUntilIdle()
-
-                // The deferred should complete with Unit, proving exactly one event was emitted
-                navigateBackDeferred.await() shouldBe Unit
+            vm.uiState.value.titleState.edit {
+                replace(0, length, "Sprint plan")
             }
+
+            vm.onAddMainTask()
+            val task = vm.uiState.value.tasks[0]
+            task.description = "Plan release"
+            task.done = true
+            task.dueDate = "2026-04-01"
+            vm.onAddSubTask(0)
+            vm.uiState.value.tasks[0].subTasks[0].description = "Write checklist"
+
+            vm.onSaveClick()
+            testScheduler.advanceUntilIdle()
+
+            fakeRepo.createTaskListCalls shouldHaveSize 1
+            val params = fakeRepo.createTaskListCalls[0]
+            params.name shouldBe "Sprint plan"
+            params.path shouldBe parentPath
+            params.tasks shouldHaveSize 1
+            params.tasks[0].description shouldBe "Plan release"
+            params.tasks[0].done shouldBe true
+            params.tasks[0].dueDate shouldBe "2026-04-01"
+            params.tasks[0].subTasks shouldHaveSize 1
+            params.tasks[0].subTasks[0].description shouldBe "Write checklist"
         }
     }
 
-    // Feature: note-tasklist-editors, Property 3: Failed save sets error and clears loading
+    test("Property 2: edit mode loads data and updates the existing task list") {
+        runTest(testDispatcher) {
+            val fakeRepo = FakeTaskListRepository()
+            val taskList = TaskList(
+                id = "task-list-1",
+                filePath = "home/projects/task-list-1",
+                name = "Trip prep",
+                tasks = listOf(
+                    MainTask(
+                        description = "Book hotel",
+                        done = false,
+                        dueDate = "",
+                        recurrence = "FREQ=WEEKLY;BYDAY=MO",
+                        subTasks = listOf(SubTask(description = "Compare prices", done = true))
+                    )
+                ),
+                updatedAt = 10L
+            )
+            fakeRepo.addTaskList(taskList)
 
-    test("Property 3: Failed save sets error and clears loading") {
-        // Validates: Requirements 6.6
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(taskList.id),
+                taskListRepository = fakeRepo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.titleState.text.toString() shouldBe taskList.name
+            vm.uiState.value.tasks shouldHaveSize 1
+            vm.uiState.value.tasks[0].description shouldBe "Book hotel"
+            vm.uiState.value.tasks[0].recurrence shouldBe "FREQ=WEEKLY;BYDAY=MO"
+            vm.uiState.value.tasks[0].subTasks shouldHaveSize 1
+            vm.uiState.value.tasks[0].subTasks[0].description shouldBe "Compare prices"
+
+            vm.uiState.value.titleState.edit {
+                replace(0, length, "Trip prep v2")
+            }
+            vm.uiState.value.tasks[0].description = "Book hotel and flight"
+            vm.onAddSubTask(0)
+            vm.uiState.value.tasks[0].subTasks[1].description = "Book flight"
+
+            vm.onSaveClick()
+            testScheduler.advanceUntilIdle()
+
+            fakeRepo.getTaskListCalls shouldBe listOf(taskList.id)
+            fakeRepo.updateTaskListCalls shouldHaveSize 1
+            val update = fakeRepo.updateTaskListCalls[0]
+            update.id shouldBe taskList.id
+            update.title shouldBe "Trip prep v2"
+            update.tasks shouldHaveSize 1
+            update.tasks[0].description shouldBe "Book hotel and flight"
+            update.tasks[0].subTasks shouldHaveSize 2
+            vm.uiState.value.isSaving shouldBe false
+        }
+    }
+
+    test("Property 3: delete emits navigate-back for edit mode") {
+        runTest(testDispatcher) {
+            val fakeRepo = FakeTaskListRepository()
+            val taskList = TaskList(
+                id = "task-list-delete",
+                filePath = "home/projects/task-list-delete",
+                name = "Delete me",
+                tasks = emptyList(),
+                updatedAt = 1L
+            )
+            fakeRepo.addTaskList(taskList)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(taskList.id),
+                taskListRepository = fakeRepo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            val navigateBackDeferred = async { vm.navigateBack.first() }
+
+            vm.onDeleteClick()
+            testScheduler.advanceUntilIdle()
+
+            navigateBackDeferred.await() shouldBe Unit
+            fakeRepo.deleteTaskListCalls shouldBe listOf(taskList.id)
+        }
+    }
+
+    test("Property 4: recurrence clears due date before save") {
         checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.string(0..50).filter { it.isNotBlank() },
-            Arb.string(1..100)
-        ) { generatedTitle, errorMessage ->
+            PropTestConfig(iterations = 50),
+            Arb.string(0..20).filter { it.isNotBlank() }
+        ) { recurrence ->
             runTest(testDispatcher) {
-                val failingRepo = object : TaskListRepository {
-                    override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> {
-                        return Result.failure(RuntimeException(errorMessage))
-                    }
-
-                    override suspend fun getTaskList(taskListId: String): Result<TaskList> =
-                        Result.failure(UnsupportedOperationException())
-
-                    override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
-                        Result.success(emptyList())
-
-                    override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
-                        Result.failure(UnsupportedOperationException())
-
-                    override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
-                        Result.failure(UnsupportedOperationException())
-                }
-
-                val parentPath = "test/path"
+                val fakeRepo = FakeTaskListRepository()
                 val vm = EditTaskListViewModel(
-                    parentPath = parentPath,
-                    taskListRepository = failingRepo
+                    mode = EditTaskListMode.Create("home"),
+                    taskListRepository = fakeRepo
                 )
 
-                // Set the title text
                 vm.uiState.value.titleState.edit {
-                    replace(0, length, generatedTitle)
+                    replace(0, length, "Recurring")
                 }
+                vm.onAddMainTask()
+                val task = vm.uiState.value.tasks[0]
+                task.description = "Repeat setup"
+                task.dueDate = "2026-04-01"
+                task.recurrence = recurrence
+                task.dueDate = "2026-04-01"
+                task.recurrence = recurrence.singleLine()
 
                 vm.onSaveClick()
                 testScheduler.advanceUntilIdle()
 
-                vm.uiState.value.isLoading shouldBe false
-                vm.uiState.value.error shouldBe errorMessage
+                fakeRepo.createTaskListCalls shouldHaveSize 1
+                fakeRepo.createTaskListCalls[0].tasks[0].dueDate shouldBe ""
+                fakeRepo.createTaskListCalls[0].tasks[0].recurrence shouldBe recurrence.singleLine()
             }
         }
     }

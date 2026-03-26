@@ -9,7 +9,6 @@ import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
-import net.onefivefour.echolist.data.repository.joinPath
 
 /**
  * Feature: note-tasklist-editors, Property 5: Route serialization round-trip
@@ -36,9 +35,12 @@ class EditorRouteSerializationPropertyTest : FunSpec({
     }
 
     test("Feature: note-tasklist-editors, Property 5: EditTaskListRoute serialization round-trip produces equal object") {
-        // Feature: note-tasklist-editors, Property 5: Route serialization round-trip
-        val json = Json.encodeToString(EditTaskListRoute)
+        val route = EditTaskListRoute(
+            parentPath = "folder-1",
+            taskListId = "task-list-1"
+        )
+        val json = Json.encodeToString(route)
         val decoded = Json.decodeFromString<EditTaskListRoute>(json)
-        decoded shouldBe EditTaskListRoute
+        decoded shouldBe route
     }
 })

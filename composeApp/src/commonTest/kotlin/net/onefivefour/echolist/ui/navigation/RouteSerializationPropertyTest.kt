@@ -70,13 +70,20 @@ class RouteSerializationPropertyTest : FunSpec({
     }
 
     test("Property 1: EditTaskListRoute serialization round-trip") {
-        val encoded = json.encodeToString(kotlinx.serialization.serializer<EditTaskListRoute>(), EditTaskListRoute)
+        val route = EditTaskListRoute(
+            parentPath = "folder-1",
+            taskListId = "task-list-1"
+        )
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<EditTaskListRoute>(), route)
         val decoded = json.decodeFromString(kotlinx.serialization.serializer<EditTaskListRoute>(), encoded)
-        decoded shouldBe EditTaskListRoute
+        decoded shouldBe route
     }
 
     test("Property 1: Polymorphic NavKey serialization round-trip for EditTaskListRoute") {
-        val route: NavKey = EditTaskListRoute
+        val route: NavKey = EditTaskListRoute(
+            parentPath = "folder-1",
+            taskListId = "task-list-1"
+        )
         val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
         val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
         decoded shouldBe route

@@ -18,6 +18,7 @@ import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
+import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.CreateItemCallbacks
 import net.onefivefour.echolist.ui.home.HomeScreen
@@ -115,7 +116,7 @@ private fun AuthenticatedApp() {
                     createItemCallbacks = CreateItemCallbacks(
                         onCreateFolder = createFolderViewModel::showDialog,
                         onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
-                        onCreateTaskList = { backStack.add(EditTaskListRoute) }
+                        onCreateTaskList = { backStack.add(EditTaskListRoute(parentPath = route.path)) }
                     ),
                     onFolderClick = { folderPath ->
                         backStack.add(HomeRoute(folderPath))
@@ -125,6 +126,14 @@ private fun AuthenticatedApp() {
                             EditNoteRoute(
                                 parentPath = route.path,
                                 noteId = noteId
+                            )
+                        )
+                    },
+                    onTaskClick = { taskListId ->
+                        backStack.add(
+                            EditTaskListRoute(
+                                parentPath = route.path,
+                                taskListId = taskListId
                             )
                         )
                     },
@@ -156,11 +165,12 @@ private fun AuthenticatedApp() {
                 )
             }
 
-            entry<EditTaskListRoute> {
-                val currentPath = backStack.filterIsInstance<HomeRoute>().lastOrNull()?.path.orEmpty()
+            entry<EditTaskListRoute> { route ->
+                val mode = route.taskListId?.let(EditTaskListMode::Edit)
+                    ?: EditTaskListMode.Create(normalizePath(route.parentPath))
                 val viewModel = koinViewModel<EditTaskListViewModel>(
-                    key = "editTaskList-$currentPath"
-                ) { parametersOf(currentPath) }
+                    key = "editTaskList-${route.parentPath}-${route.taskListId.orEmpty()}"
+                ) { parametersOf(mode) }
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 LaunchedEffect(viewModel) {
@@ -169,6 +179,10 @@ private fun AuthenticatedApp() {
 
                 EditTaskListScreen(
                     uiState = uiState,
+                    onAddMainTask = viewModel::onAddMainTask,
+                    onRemoveMainTask = viewModel::onRemoveMainTask,
+                    onAddSubTask = viewModel::onAddSubTask,
+                    onRemoveSubTask = viewModel::onRemoveSubTask,
                     onSaveClick = viewModel::onSaveClick
                 )
             }

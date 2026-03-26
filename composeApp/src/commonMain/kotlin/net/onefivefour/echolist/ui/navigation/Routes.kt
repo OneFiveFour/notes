@@ -19,7 +19,10 @@ data class EditNoteRoute(
 ) : NavKey
 
 @Serializable
-data object EditTaskListRoute : NavKey
+data class EditTaskListRoute(
+    val parentPath: String,
+    val taskListId: String? = null
+) : NavKey
 
 val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
