@@ -40,6 +40,18 @@ class HomeViewModel(
         }
     }
 
+    /**
+     * Clears any stale error and reloads data.
+     * Called when the composable re-enters composition (e.g. after re-authentication)
+     * to ensure a reused ViewModel does not show errors from a previous session.
+     */
+    fun clearErrorAndReload() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(error = null) }
+            loadData()
+        }
+    }
+
     fun refresh() {
         viewModelScope.launch {
             _uiState.update { it.copy(isRefreshing = true) }

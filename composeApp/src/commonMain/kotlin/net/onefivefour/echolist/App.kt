@@ -95,6 +95,10 @@ private fun AuthenticatedApp() {
                     koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
+                LaunchedEffect(Unit) {
+                    homeViewModel.clearErrorAndReload()
+                }
+
                 val createFolderViewModel =
                     koinViewModel<CreateFolderViewModel>(
                         key = "createFolder-${route.path}"
