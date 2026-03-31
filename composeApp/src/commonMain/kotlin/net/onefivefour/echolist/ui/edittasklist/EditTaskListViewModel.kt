@@ -1,7 +1,9 @@
 package net.onefivefour.echolist.ui.edittasklist
 
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -10,6 +12,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.models.CreateTaskListParams
@@ -48,7 +51,9 @@ class EditTaskListViewModel(
     }
 
     fun onAddMainTask() {
-        tasks.add(MainTaskDraft(id = nextDraftId++))
+        val draft = MainTaskDraft(id = nextDraftId++)
+        tasks.add(draft)
+        observeDueDateRecurrenceExclusion(draft)
         _uiState.update { it.copy(error = null) }
     }
 
@@ -139,7 +144,9 @@ class EditTaskListViewModel(
                     }
                     tasks.clear()
                     taskList.tasks.forEach { task ->
-                        tasks.add(MainTaskDraft.fromDomain(nextDraftId++, task))
+                        val draft = MainTaskDraft.fromDomain(nextDraftId++, task)
+                        tasks.add(draft)
+                        observeDueDateRecurrenceExclusion(draft)
                     }
                     _uiState.update { it.copy(isLoading = false, error = null) }
                 },
@@ -150,10 +157,35 @@ class EditTaskListViewModel(
         }
     }
 
+    private fun observeDueDateRecurrenceExclusion(draft: MainTaskDraft) {
+        viewModelScope.launch {
+            snapshotFlow { draft.dueDateState.text.toString() }
+                .drop(1)
+                .collect { value ->
+                    if (value.trim().isNotBlank()) {
+                        draft.recurrenceState.setTextAndPlaceCursorAtEnd("")
+                    }
+                }
+        }
+        viewModelScope.launch {
+            snapshotFlow { draft.recurrenceState.text.toString() }
+                .drop(1)
+                .collect { value ->
+                    val sanitized = value.singleLine()
+                    if (sanitized != value) {
+                        draft.recurrenceState.setTextAndPlaceCursorAtEnd(sanitized)
+                    }
+                    if (sanitized.isNotBlank()) {
+                        draft.dueDateState.setTextAndPlaceCursorAtEnd("")
+                    }
+                }
+        }
+    }
+
     private fun validateDrafts(): String? {
         tasks.forEach { task ->
-            val recurrence = task.recurrence
-            val dueDate = task.dueDate.trim()
+            val recurrence = task.recurrenceState.text.toString()
+            val dueDate = task.dueDateState.text.toString().trim()
 
             if (recurrence.isNotBlank() && recurrence.any { it == '\n' || it == '\r' }) {
                 return "Recurrence must be a single-line RRULE."

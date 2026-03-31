@@ -1,5 +1,6 @@
 package net.onefivefour.echolist.ui.edittasklist
 
+import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -15,21 +16,20 @@ class MainTaskDraft(
     recurrence: String = "",
     subTasks: List<SubTaskDraft> = emptyList()
 ) {
-
-    var description by mutableStateOf(description)
+    val descriptionState = TextFieldState(initialText = description)
     var done by mutableStateOf(done)
-    var dueDate by mutableStateOf(dueDate)
-    var recurrence by mutableStateOf(recurrence)
+    val dueDateState = TextFieldState(initialText = dueDate)
+    val recurrenceState = TextFieldState(initialText = recurrence)
     val subTasks = mutableStateListOf<SubTaskDraft>().apply {
         addAll(subTasks)
     }
 
     fun toDomain(): MainTask? {
-        val trimmedDescription = description.trim()
+        val trimmedDescription = descriptionState.text.toString().trim()
         if (trimmedDescription.isBlank()) return null
 
-        val normalizedRecurrence = recurrence.singleLine()
-        val normalizedDueDate = dueDate.trim()
+        val normalizedRecurrence = recurrenceState.text.toString().singleLine()
+        val normalizedDueDate = dueDateState.text.toString().trim()
 
         return MainTask(
             description = trimmedDescription,
@@ -59,11 +59,11 @@ class SubTaskDraft(
     description: String = "",
     done: Boolean = false
 ) {
-    var description by mutableStateOf(description)
+    val descriptionState = TextFieldState(initialText = description)
     var done by mutableStateOf(done)
 
     fun toDomain(): SubTask? {
-        val trimmedDescription = description.trim()
+        val trimmedDescription = descriptionState.text.toString().trim()
         if (trimmedDescription.isBlank()) return null
 
         return SubTask(

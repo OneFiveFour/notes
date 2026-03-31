@@ -1,5 +1,6 @@
 package net.onefivefour.echolist.ui.edittasklist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -29,13 +30,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
 import echolist.composeapp.generated.resources.ic_plus
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.ui.common.ElButton
-import net.onefivefour.echolist.ui.common.ElOutlinedTextField
+import net.onefivefour.echolist.ui.common.ElTextField
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.common.RoundIconButton
 import net.onefivefour.echolist.ui.editnote.EditNoteTitle
@@ -146,6 +152,7 @@ private fun EditTaskListContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainTaskEditorCard(
     task: MainTaskDraft,
@@ -168,24 +175,43 @@ private fun MainTaskEditorCard(
             )
     ) {
         Column(
-            modifier = Modifier.padding(dimensions.m),
-            verticalArrangement = Arrangement.spacedBy(dimensions.s)
+            modifier = Modifier.padding(dimensions.s)
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(dimensions.s)
             ) {
-                Checkbox(
-                    checked = task.done,
-                    onCheckedChange = { task.done = it }
-                )
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
+                    Checkbox(
+                        checked = task.done,
+                        onCheckedChange = { task.done = it }
+                    )
+                }
 
-                ElOutlinedTextField(
-                    text = task.description,
-                    label = "Main task",
-                    onValueChange = { task.description = it },
-                    modifier = Modifier.weight(1f)
-                )
+                Column(
+                    modifier = Modifier.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    ElTextField(
+                        state = task.descriptionState,
+                        style = EchoListTheme.typography.bodyLarge
+                    )
+
+                    if (task.dueDateState.text.isNotEmpty()) {
+                        ElTextField(
+                            state = task.dueDateState,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    if (task.recurrenceState.text.isNotEmpty()) {
+                        ElTextField(
+                            state = task.recurrenceState,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                }
 
                 Icon(
                     painter = painterResource(Res.drawable.ic_delete),
@@ -200,46 +226,10 @@ private fun MainTaskEditorCard(
                 )
             }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(dimensions.s)
-            ) {
-                ElOutlinedTextField(
-                    text = task.dueDate,
-                    label = "Due date (YYYY-MM-DD)",
-                    onValueChange = { value ->
-                        task.dueDate = value
-                        if (value.trim().isNotBlank()) {
-                            task.recurrence = ""
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
 
-                ElOutlinedTextField(
-                    text = task.recurrence,
-                    label = "RRULE recurrence",
-                    onValueChange = { value ->
-                        val sanitized = value.singleLine()
-                        task.recurrence = sanitized
-                        if (sanitized.isNotBlank()) {
-                            task.dueDate = ""
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
             if (task.subTasks.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(dimensions.xs))
-                Text(
-                    text = "Subtasks",
-                    style = EchoListTheme.typography.labelMedium,
-                    color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.7f)
-                )
-
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(dimensions.xs)
-                ) {
+                Column {
                     task.subTasks.forEachIndexed { subTaskIndex, subTask ->
                         SubTaskRow(
                             subTask = subTask,
@@ -266,35 +256,28 @@ private fun SubTaskRow(
     subTask: SubTaskDraft,
     onRemoveSubTask: () -> Unit
 ) {
-    val dimensions = EchoListTheme.dimensions
-
     Row(
-        modifier = Modifier.fillMaxWidth(),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(dimensions.s)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = EchoListTheme.dimensions.m),
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Checkbox(
-            checked = subTask.done,
-            onCheckedChange = { subTask.done = it }
-        )
+        CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
+            Checkbox(
+                checked = subTask.done,
+                onCheckedChange = { subTask.done = it }
+            )
+        }
 
-        ElOutlinedTextField(
-            text = subTask.description,
-            label = "Subtask",
-            onValueChange = { subTask.description = it },
+        ElTextField(
+            state = subTask.descriptionState,
             modifier = Modifier.weight(1f)
         )
 
         Icon(
             painter = painterResource(Res.drawable.ic_delete),
             contentDescription = "Delete subtask",
-            modifier = Modifier
-                .clip(RoundedCornerShape(50))
-                .clickable { onRemoveSubTask() }
-                .padding(
-                    horizontal = dimensions.m,
-                    vertical = dimensions.m
-                )
+            modifier = Modifier.clickable { onRemoveSubTask() }
         )
     }
 }
@@ -395,6 +378,88 @@ private fun EditTaskListEmptyState(onAddMainTask: () -> Unit) {
                     style = EchoListTheme.typography.labelMedium
                 )
             }
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SubTaskRowPreview() {
+    val subTask = remember {
+        SubTaskDraft(id = 1, description = "Review copy", done = false)
+    }
+    EchoListTheme {
+        GradientBackground {
+            SubTaskRow(
+                subTask = subTask,
+                onRemoveSubTask = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun SubTaskRowDonePreview() {
+    val subTask = remember {
+        SubTaskDraft(id = 2, description = "Draft checklist", done = true)
+    }
+    EchoListTheme {
+        GradientBackground {
+            SubTaskRow(
+                subTask = subTask,
+                onRemoveSubTask = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MainTaskEditorCardPreview() {
+    val task = remember {
+        MainTaskDraft.fromDomain(
+            id = 1,
+            domain = MainTask(
+                description = "Plan launch",
+                done = false,
+                dueDate = "2026-04-01",
+                recurrence = "",
+                subTasks = listOf(
+                    SubTask(description = "Draft checklist", done = true),
+                    SubTask(description = "Review copy", done = false)
+                )
+            )
+        )
+    }
+    EchoListTheme {
+        GradientBackground {
+            MainTaskEditorCard(
+                task = task,
+                taskIndex = 0,
+                onRemoveMainTask = {},
+                onAddSubTask = {},
+                onRemoveSubTask = { _, _ -> }
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MainTaskEditorCardEmptyPreview() {
+    val task = remember {
+        MainTaskDraft(id = 2)
+    }
+    EchoListTheme {
+        GradientBackground {
+            MainTaskEditorCard(
+                task = task,
+                taskIndex = 0,
+                onRemoveMainTask = {},
+                onAddSubTask = {},
+                onRemoveSubTask = { _, _ -> }
+            )
         }
     }
 }

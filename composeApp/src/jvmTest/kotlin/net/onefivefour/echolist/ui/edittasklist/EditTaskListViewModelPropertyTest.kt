@@ -101,11 +101,11 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.onAddMainTask()
             val task = vm.uiState.value.tasks[0]
-            task.description = "Plan release"
+            task.descriptionState.edit { replace(0, length, "Plan release") }
             task.done = true
-            task.dueDate = "2026-04-01"
+            task.dueDateState.edit { replace(0, length, "2026-04-01") }
             vm.onAddSubTask(0)
-            vm.uiState.value.tasks[0].subTasks[0].description = "Write checklist"
+            vm.uiState.value.tasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Write checklist") }
 
             vm.onSaveClick()
             testScheduler.advanceUntilIdle()
@@ -152,17 +152,17 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.titleState.text.toString() shouldBe taskList.name
             vm.uiState.value.tasks shouldHaveSize 1
-            vm.uiState.value.tasks[0].description shouldBe "Book hotel"
-            vm.uiState.value.tasks[0].recurrence shouldBe "FREQ=WEEKLY;BYDAY=MO"
+            vm.uiState.value.tasks[0].descriptionState.text.toString() shouldBe "Book hotel"
+            vm.uiState.value.tasks[0].recurrenceState.text.toString() shouldBe "FREQ=WEEKLY;BYDAY=MO"
             vm.uiState.value.tasks[0].subTasks shouldHaveSize 1
-            vm.uiState.value.tasks[0].subTasks[0].description shouldBe "Compare prices"
+            vm.uiState.value.tasks[0].subTasks[0].descriptionState.text.toString() shouldBe "Compare prices"
 
             vm.uiState.value.titleState.edit {
                 replace(0, length, "Trip prep v2")
             }
-            vm.uiState.value.tasks[0].description = "Book hotel and flight"
+            vm.uiState.value.tasks[0].descriptionState.edit { replace(0, length, "Book hotel and flight") }
             vm.onAddSubTask(0)
-            vm.uiState.value.tasks[0].subTasks[1].description = "Book flight"
+            vm.uiState.value.tasks[0].subTasks[1].descriptionState.edit { replace(0, length, "Book flight") }
 
             vm.onSaveClick()
             testScheduler.advanceUntilIdle()
@@ -225,11 +225,10 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 }
                 vm.onAddMainTask()
                 val task = vm.uiState.value.tasks[0]
-                task.description = "Repeat setup"
-                task.dueDate = "2026-04-01"
-                task.recurrence = recurrence
-                task.dueDate = "2026-04-01"
-                task.recurrence = recurrence.singleLine()
+                task.descriptionState.edit { replace(0, length, "Repeat setup") }
+                task.dueDateState.edit { replace(0, length, "2026-04-01") }
+                task.recurrenceState.edit { replace(0, length, recurrence.singleLine()) }
+                testScheduler.advanceUntilIdle()
 
                 vm.onSaveClick()
                 testScheduler.advanceUntilIdle()
