@@ -34,7 +34,7 @@ class EditTaskListViewModel(
     private val _uiState = MutableStateFlow(
         EditTaskListUiState(
             titleState = titleState,
-            tasks = tasks,
+            mainTasks = tasks,
             mode = mode,
             isLoading = mode is EditTaskListMode.Edit
         )
@@ -65,7 +65,7 @@ class EditTaskListViewModel(
 
     fun onAddSubTask(mainTaskIndex: Int) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
-        task.subTasks.add(SubTaskDraft(id = nextSubTaskDraftId++))
+        task.subTasks.add(SubTaskDraft(subTaskId = nextSubTaskDraftId++))
         _uiState.update { it.copy(error = null) }
     }
 

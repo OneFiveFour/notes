@@ -11,13 +11,13 @@ import net.onefivefour.echolist.domain.model.SubTask
 class MainTaskDraft(
     val id: Long,
     description: String = "",
-    done: Boolean = false,
+    isDone: Boolean = false,
     dueDate: String = "",
     recurrence: String = "",
     subTasks: List<SubTaskDraft> = emptyList()
 ) {
     val descriptionState = TextFieldState(initialText = description)
-    var done by mutableStateOf(done)
+    var isDone by mutableStateOf(isDone)
     val dueDateState = TextFieldState(initialText = dueDate)
     val recurrenceState = TextFieldState(initialText = recurrence)
     val subTasks = mutableStateListOf<SubTaskDraft>().apply {
@@ -33,7 +33,7 @@ class MainTaskDraft(
 
         return MainTask(
             description = trimmedDescription,
-            done = done,
+            isDone = isDone,
             dueDate = if (normalizedRecurrence.isNotBlank()) "" else normalizedDueDate,
             recurrence = normalizedRecurrence,
             subTasks = subTasks.mapNotNull { it.toDomain() }
@@ -44,7 +44,7 @@ class MainTaskDraft(
         fun fromDomain(id: Long, domain: MainTask): MainTaskDraft = MainTaskDraft(
             id = id,
             description = domain.description,
-            done = domain.done,
+            isDone = domain.isDone,
             dueDate = if (domain.recurrence.isNotBlank()) "" else domain.dueDate,
             recurrence = domain.recurrence.singleLine(),
             subTasks = domain.subTasks.mapIndexed { index, subTask ->
@@ -55,12 +55,12 @@ class MainTaskDraft(
 }
 
 class SubTaskDraft(
-    val id: Long,
+    val subTaskId: Long,
     description: String = "",
-    done: Boolean = false
+    isDone: Boolean = false
 ) {
     val descriptionState = TextFieldState(initialText = description)
-    var done by mutableStateOf(done)
+    var isDone by mutableStateOf(isDone)
 
     fun toDomain(): SubTask? {
         val trimmedDescription = descriptionState.text.toString().trim()
@@ -68,15 +68,15 @@ class SubTaskDraft(
 
         return SubTask(
             description = trimmedDescription,
-            done = done
+            isDone = isDone
         )
     }
 
     companion object {
         fun fromDomain(id: Long, domain: SubTask): SubTaskDraft = SubTaskDraft(
-            id = id,
+            subTaskId = id,
             description = domain.description,
-            done = domain.done
+            isDone = domain.isDone
         )
     }
 }

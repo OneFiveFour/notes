@@ -54,7 +54,7 @@ class SaveEnabledPropertyTest : FunSpec({
 
             val uiState = EditTaskListUiState(
                 titleState = titleState,
-                tasks = mutableStateListOf(),
+                mainTasks = mutableStateListOf(),
                 mode = EditTaskListMode.Create(""),
                 isLoading = isLoading
             )

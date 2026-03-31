@@ -1,6 +1,5 @@
 package net.onefivefour.echolist.ui.edittasklist
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,17 +23,21 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.text.input.ImeAction
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
 import echolist.composeapp.generated.resources.ic_plus
@@ -60,6 +63,32 @@ fun EditTaskListScreen(
     modifier: Modifier = Modifier
 ) {
     val dimensions = EchoListTheme.dimensions
+    var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
+    val resolvedFocusTarget = resolveFocusTarget(
+        tasks = uiState.mainTasks,
+        focusTarget = pendingFocusTarget
+    )
+
+    val onFocusHandled = {
+        pendingFocusTarget = null
+    }
+    val onAddMainTaskAndFocus = {
+        pendingFocusTarget = FocusTarget.LastMainTask
+        onAddMainTask()
+    }
+    val onSubTaskKeyboardAction: (Int, MainTaskDraft, Long) -> Unit = { mainTaskIndex, mainTask, subTaskId ->
+        val advance = resolveSubTaskAdvance(
+            mainTasks = uiState.mainTasks,
+            mainTaskId = mainTask.id,
+            currentSubTaskId = subTaskId
+        )
+        if (advance != null) {
+            pendingFocusTarget = advance.focusTarget
+            if (advance.shouldAddSubTask) {
+                onAddSubTask(mainTaskIndex)
+            }
+        }
+    }
 
     Column(
         modifier = modifier
@@ -73,7 +102,7 @@ fun EditTaskListScreen(
         EditNoteTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
-            onNext = onAddMainTask
+            onNext = onAddMainTaskAndFocus
         )
 
         Spacer(modifier = Modifier.height(dimensions.m))
@@ -96,12 +125,16 @@ fun EditTaskListScreen(
             ) {
                 when {
                     uiState.isLoading -> EditTaskListLoading()
-                    uiState.tasks.isEmpty() -> EditTaskListEmptyState(onAddMainTask)
+                    uiState.mainTasks.isEmpty() -> EditTaskListEmptyState(onAddMainTaskAndFocus)
                     else -> EditTaskListContent(
-                        tasks = uiState.tasks,
+                        mainTasks = uiState.mainTasks,
                         onRemoveMainTask = onRemoveMainTask,
+                        onAddMainTask = onAddMainTaskAndFocus,
                         onAddSubTask = onAddSubTask,
-                        onRemoveSubTask = onRemoveSubTask
+                        onRemoveSubTask = onRemoveSubTask,
+                        focusTarget = resolvedFocusTarget,
+                        onFocusHandled = onFocusHandled,
+                        onSubTaskKeyboardAction = onSubTaskKeyboardAction
                     )
                 }
             }
@@ -120,7 +153,7 @@ fun EditTaskListScreen(
 
         EditTaskListToolbar(
             uiState = uiState,
-            onAddMainTask = onAddMainTask,
+            onAddMainTask = onAddMainTaskAndFocus,
             onSaveClick = onSaveClick,
             onDeleteClick = onDeleteClick
         )
@@ -129,24 +162,38 @@ fun EditTaskListScreen(
 
 @Composable
 private fun EditTaskListContent(
-    tasks: List<MainTaskDraft>,
+    mainTasks: List<MainTaskDraft>,
     onRemoveMainTask: (Int) -> Unit,
+    onAddMainTask: () -> Unit,
     onAddSubTask: (Int) -> Unit,
-    onRemoveSubTask: (Int, Int) -> Unit
+    onRemoveSubTask: (Int, Int) -> Unit,
+    focusTarget: FocusTarget?,
+    onFocusHandled: () -> Unit,
+    onSubTaskKeyboardAction: (Int, MainTaskDraft, Long) -> Unit
 ) {
     val dimensions = EchoListTheme.dimensions
+    val mainTaskToFocus = focusTarget as? FocusTarget.MainTask
+    val subTaskToFocus = focusTarget as? FocusTarget.SubTask
 
     LazyColumn(
         verticalArrangement = Arrangement.spacedBy(dimensions.m),
         contentPadding = PaddingValues(bottom = dimensions.s)
     ) {
-        itemsIndexed(tasks, key = { _, task -> task.id }) { index, task ->
+        itemsIndexed(mainTasks, key = { _, mainTask -> mainTask.id }) { mainTaskIndex, mainTask ->
             MainTaskEditorCard(
-                task = task,
-                taskIndex = index,
+                mainTask = mainTask,
+                mainTaskIndex = mainTaskIndex,
                 onRemoveMainTask = onRemoveMainTask,
+                onAddMainTask = onAddMainTask,
                 onAddSubTask = onAddSubTask,
-                onRemoveSubTask = onRemoveSubTask
+                onRemoveSubTask = onRemoveSubTask,
+                requestDescriptionFocus = mainTaskToFocus?.mainTaskId == mainTask.id,
+                onDescriptionFocusHandled = onFocusHandled,
+                focusedSubTaskId = subTaskToFocus?.id?.takeIf { subTaskToFocus.mainTaskId == mainTask.id },
+                onSubTaskFocusHandled = onFocusHandled,
+                onSubTaskKeyboardAction = { subTaskId ->
+                    onSubTaskKeyboardAction(mainTaskIndex, mainTask, subTaskId)
+                }
             )
         }
     }
@@ -155,13 +202,27 @@ private fun EditTaskListContent(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun MainTaskEditorCard(
-    task: MainTaskDraft,
-    taskIndex: Int,
+    mainTask: MainTaskDraft,
+    mainTaskIndex: Int,
     onRemoveMainTask: (Int) -> Unit,
+    onAddMainTask: () -> Unit,
     onAddSubTask: (Int) -> Unit,
-    onRemoveSubTask: (Int, Int) -> Unit
+    onRemoveSubTask: (Int, Int) -> Unit,
+    requestDescriptionFocus: Boolean,
+    onDescriptionFocusHandled: () -> Unit,
+    focusedSubTaskId: Long?,
+    onSubTaskFocusHandled: () -> Unit,
+    onSubTaskKeyboardAction: (Long) -> Unit
 ) {
     val dimensions = EchoListTheme.dimensions
+    val descriptionFocusRequester = remember(mainTask.id) { FocusRequester() }
+
+    LaunchedEffect(requestDescriptionFocus) {
+        if (requestDescriptionFocus) {
+            descriptionFocusRequester.requestFocus()
+            onDescriptionFocusHandled()
+        }
+    }
 
     Surface(
         shape = EchoListTheme.shapes.medium,
@@ -183,8 +244,8 @@ private fun MainTaskEditorCard(
             ) {
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
                     Checkbox(
-                        checked = task.done,
-                        onCheckedChange = { task.done = it }
+                        checked = mainTask.isDone,
+                        onCheckedChange = { isChecked -> mainTask.isDone = isChecked }
                     )
                 }
 
@@ -194,20 +255,24 @@ private fun MainTaskEditorCard(
                 ) {
 
                     ElTextField(
-                        state = task.descriptionState,
-                        style = EchoListTheme.typography.bodyLarge
+                        state = mainTask.descriptionState,
+                        style = EchoListTheme.typography.bodyLarge,
+                        singleLine = true,
+                        imeAction = ImeAction.Next,
+                        onKeyboardAction = onAddMainTask,
+                        focusRequester = descriptionFocusRequester
                     )
 
-                    if (task.dueDateState.text.isNotEmpty()) {
+                    if (mainTask.dueDateState.text.isNotEmpty()) {
                         ElTextField(
-                            state = task.dueDateState,
+                            state = mainTask.dueDateState,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
 
-                    if (task.recurrenceState.text.isNotEmpty()) {
+                    if (mainTask.recurrenceState.text.isNotEmpty()) {
                         ElTextField(
-                            state = task.recurrenceState,
+                            state = mainTask.recurrenceState,
                             modifier = Modifier.fillMaxWidth()
                         )
                     }
@@ -218,7 +283,7 @@ private fun MainTaskEditorCard(
                     contentDescription = "Delete main task",
                     modifier = Modifier
                         .clip(RoundedCornerShape(50))
-                        .clickable { onRemoveMainTask(taskIndex) }
+                        .clickable { onRemoveMainTask(mainTaskIndex) }
                         .padding(
                             horizontal = dimensions.m,
                             vertical = dimensions.m
@@ -226,21 +291,22 @@ private fun MainTaskEditorCard(
                 )
             }
 
-
-
-            if (task.subTasks.isNotEmpty()) {
+            if (mainTask.subTasks.isNotEmpty()) {
                 Column {
-                    task.subTasks.forEachIndexed { subTaskIndex, subTask ->
+                    mainTask.subTasks.forEachIndexed { subTaskIndex, subTask ->
                         SubTaskRow(
                             subTask = subTask,
-                            onRemoveSubTask = { onRemoveSubTask(taskIndex, subTaskIndex) }
+                            shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
+                            onFocusHandled = onSubTaskFocusHandled,
+                            onKeyboardAction = { onSubTaskKeyboardAction(subTask.subTaskId) },
+                            onRemoveSubTask = { onRemoveSubTask(mainTaskIndex, subTaskIndex) }
                         )
                     }
                 }
             }
 
             TextButton(
-                onClick = { onAddSubTask(taskIndex) }
+                onClick = { onAddSubTask(mainTaskIndex) }
             ) {
                 Text(
                     text = "Add subtask",
@@ -254,8 +320,20 @@ private fun MainTaskEditorCard(
 @Composable
 private fun SubTaskRow(
     subTask: SubTaskDraft,
+    shouldRequestFocus: Boolean,
+    onFocusHandled: () -> Unit,
+    onKeyboardAction: () -> Unit,
     onRemoveSubTask: () -> Unit
 ) {
+    val focusRequester = remember(subTask.subTaskId) { FocusRequester() }
+
+    LaunchedEffect(shouldRequestFocus) {
+        if (shouldRequestFocus) {
+            focusRequester.requestFocus()
+            onFocusHandled()
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -264,14 +342,18 @@ private fun SubTaskRow(
     ) {
         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
             Checkbox(
-                checked = subTask.done,
-                onCheckedChange = { subTask.done = it }
+                checked = subTask.isDone,
+                onCheckedChange = { isChecked -> subTask.isDone = isChecked }
             )
         }
 
         ElTextField(
             state = subTask.descriptionState,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            singleLine = true,
+            imeAction = ImeAction.Next,
+            onKeyboardAction = onKeyboardAction,
+            focusRequester = focusRequester
         )
 
         Icon(
@@ -386,12 +468,15 @@ private fun EditTaskListEmptyState(onAddMainTask: () -> Unit) {
 @Composable
 private fun SubTaskRowPreview() {
     val subTask = remember {
-        SubTaskDraft(id = 1, description = "Review copy", done = false)
+        SubTaskDraft(subTaskId = 1, description = "Review copy", isDone = false)
     }
     EchoListTheme {
         GradientBackground {
             SubTaskRow(
                 subTask = subTask,
+                shouldRequestFocus = false,
+                onFocusHandled = {},
+                onKeyboardAction = {},
                 onRemoveSubTask = {}
             )
         }
@@ -402,12 +487,15 @@ private fun SubTaskRowPreview() {
 @Composable
 private fun SubTaskRowDonePreview() {
     val subTask = remember {
-        SubTaskDraft(id = 2, description = "Draft checklist", done = true)
+        SubTaskDraft(subTaskId = 2, description = "Draft checklist", isDone = true)
     }
     EchoListTheme {
         GradientBackground {
             SubTaskRow(
                 subTask = subTask,
+                shouldRequestFocus = false,
+                onFocusHandled = {},
+                onKeyboardAction = {},
                 onRemoveSubTask = {}
             )
         }
@@ -422,12 +510,12 @@ private fun MainTaskEditorCardPreview() {
             id = 1,
             domain = MainTask(
                 description = "Plan launch",
-                done = false,
+                isDone = false,
                 dueDate = "2026-04-01",
                 recurrence = "",
                 subTasks = listOf(
-                    SubTask(description = "Draft checklist", done = true),
-                    SubTask(description = "Review copy", done = false)
+                    SubTask(description = "Draft checklist", isDone = true),
+                    SubTask(description = "Review copy", isDone = false)
                 )
             )
         )
@@ -435,11 +523,17 @@ private fun MainTaskEditorCardPreview() {
     EchoListTheme {
         GradientBackground {
             MainTaskEditorCard(
-                task = task,
-                taskIndex = 0,
+                mainTask = task,
+                mainTaskIndex = 0,
                 onRemoveMainTask = {},
+                onAddMainTask = {},
                 onAddSubTask = {},
-                onRemoveSubTask = { _, _ -> }
+                onRemoveSubTask = { _, _ -> },
+                requestDescriptionFocus = false,
+                onDescriptionFocusHandled = {},
+                focusedSubTaskId = null,
+                onSubTaskFocusHandled = {},
+                onSubTaskKeyboardAction = {}
             )
         }
     }
@@ -454,11 +548,17 @@ private fun MainTaskEditorCardEmptyPreview() {
     EchoListTheme {
         GradientBackground {
             MainTaskEditorCard(
-                task = task,
-                taskIndex = 0,
+                mainTask = task,
+                mainTaskIndex = 0,
                 onRemoveMainTask = {},
+                onAddMainTask = {},
                 onAddSubTask = {},
-                onRemoveSubTask = { _, _ -> }
+                onRemoveSubTask = { _, _ -> },
+                requestDescriptionFocus = false,
+                onDescriptionFocusHandled = {},
+                focusedSubTaskId = null,
+                onSubTaskFocusHandled = {},
+                onSubTaskKeyboardAction = {}
             )
         }
     }
@@ -473,12 +573,12 @@ private fun EditTaskListScreenPreview() {
                 id = 1,
                 domain = MainTask(
                     description = "Plan launch",
-                    done = false,
+                    isDone = false,
                     dueDate = "2026-04-01",
                     recurrence = "",
                     subTasks = listOf(
-                        SubTask(description = "Draft checklist", done = true),
-                        SubTask(description = "Review copy", done = false)
+                        SubTask(description = "Draft checklist", isDone = true),
+                        SubTask(description = "Review copy", isDone = false)
                     )
                 )
             )
@@ -490,7 +590,7 @@ private fun EditTaskListScreenPreview() {
             EditTaskListScreen(
                 uiState = EditTaskListUiState(
                     titleState = TextFieldState(initialText = "Launch plan"),
-                    tasks = tasks,
+                    mainTasks = tasks,
                     mode = EditTaskListMode.Create(parentPath = "")
                 ),
                 onAddMainTask = {},

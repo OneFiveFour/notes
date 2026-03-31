@@ -40,14 +40,14 @@ class TaskListRepositoryPropertyTest : FunSpec({
     val arbDomainSubTask = arbitrary {
         SubTask(
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind()
+            isDone = Arb.boolean().bind()
         )
     }
 
     val arbDomainMainTask = arbitrary {
         MainTask(
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind(),
+            isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             subTasks = Arb.list(arbDomainSubTask, 0..3).bind()

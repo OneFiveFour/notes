@@ -5,7 +5,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 
 data class EditTaskListUiState(
     val titleState: TextFieldState,
-    val tasks: SnapshotStateList<MainTaskDraft>,
+    val mainTasks: SnapshotStateList<MainTaskDraft>,
     val mode: EditTaskListMode,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,

@@ -23,12 +23,12 @@ internal object TaskListMapper {
 
     fun toDomain(proto: tasks.v1.SubTask): SubTask = SubTask(
         description = proto.description,
-        done = proto.done
+        isDone = proto.done
     )
 
     fun toDomain(proto: tasks.v1.MainTask): MainTask = MainTask(
         description = proto.description,
-        done = proto.done,
+        isDone = proto.done,
         dueDate = proto.due_date,
         recurrence = proto.recurrence,
         subTasks = proto.sub_tasks.map { toDomain(it) }
@@ -83,7 +83,7 @@ internal object TaskListMapper {
 
     fun toProto(domain: MainTask): tasks.v1.MainTask = tasks.v1.MainTask(
         description = domain.description,
-        done = domain.done,
+        done = domain.isDone,
         due_date = domain.dueDate,
         recurrence = domain.recurrence,
         sub_tasks = domain.subTasks.map { toProto(it) }
@@ -91,7 +91,7 @@ internal object TaskListMapper {
 
     fun toProto(domain: SubTask): tasks.v1.SubTask = tasks.v1.SubTask(
         description = domain.description,
-        done = domain.done
+        done = domain.isDone
     )
 
     private fun requireTaskList(taskList: tasks.v1.TaskList?, responseType: String): tasks.v1.TaskList =

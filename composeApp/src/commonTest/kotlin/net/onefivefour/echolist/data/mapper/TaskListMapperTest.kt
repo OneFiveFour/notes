@@ -27,7 +27,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(proto)
 
         domain.description shouldBe "Buy groceries"
-        domain.done shouldBe false
+        domain.isDone shouldBe false
     }
 
     test("toDomain transforms completed proto SubTask") {
@@ -39,7 +39,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(proto)
 
         domain.description shouldBe "Send email"
-        domain.done shouldBe true
+        domain.isDone shouldBe true
     }
 
     // -- Proto -> Domain: MainTask --
@@ -57,12 +57,12 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(proto)
 
         domain.description shouldBe "Main task"
-        domain.done shouldBe false
+        domain.isDone shouldBe false
         domain.dueDate shouldBe "2026-03-15"
         domain.recurrence shouldBe "weekly"
         domain.subTasks shouldHaveSize 1
         domain.subTasks[0].description shouldBe "Sub item"
-        domain.subTasks[0].done shouldBe false
+        domain.subTasks[0].isDone shouldBe false
     }
 
     test("toDomain transforms proto MainTask with multiple sub_tasks") {
@@ -82,7 +82,7 @@ class TaskListMapperTest : FunSpec({
 
         domain.subTasks shouldHaveSize 3
         domain.subTasks[0].description shouldBe "Define scope"
-        domain.subTasks[0].done shouldBe true
+        domain.subTasks[0].isDone shouldBe true
         domain.subTasks[1].description shouldBe "Create timeline"
         domain.subTasks[2].description shouldBe "Assign resources"
     }
@@ -99,7 +99,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(proto)
 
         domain.description shouldBe "Simple task"
-        domain.done shouldBe true
+        domain.isDone shouldBe true
         domain.subTasks.shouldBeEmpty()
     }
 
@@ -245,10 +245,10 @@ class TaskListMapperTest : FunSpec({
             tasks = listOf(
                 MainTask(
                     description = "First task",
-                    done = false,
+                    isDone = false,
                     dueDate = "2026-03-20",
                     recurrence = "",
-                    subTasks = listOf(SubTask(description = "Sub 1", done = false))
+                    subTasks = listOf(SubTask(description = "Sub 1", isDone = false))
                 )
             )
         )
@@ -271,7 +271,7 @@ class TaskListMapperTest : FunSpec({
             tasks = listOf(
                 MainTask(
                     description = "Updated task",
-                    done = true,
+                    isDone = true,
                     dueDate = "",
                     recurrence = "monthly",
                     subTasks = emptyList()
@@ -292,10 +292,10 @@ class TaskListMapperTest : FunSpec({
     test("toProto transforms domain MainTask to proto MainTask with snake_case fields") {
         val domain = MainTask(
             description = "Test task",
-            done = false,
+            isDone = false,
             dueDate = "2026-06-15",
             recurrence = "weekly",
-            subTasks = listOf(SubTask(description = "Child", done = true))
+            subTasks = listOf(SubTask(description = "Child", isDone = true))
         )
 
         val proto = TaskListMapper.toProto(domain)
@@ -310,7 +310,7 @@ class TaskListMapperTest : FunSpec({
     }
 
     test("toProto transforms domain SubTask to proto SubTask") {
-        val domain = SubTask(description = "Pick up package", done = false)
+        val domain = SubTask(description = "Pick up package", isDone = false)
 
         val proto = TaskListMapper.toProto(domain)
 
@@ -323,12 +323,12 @@ class TaskListMapperTest : FunSpec({
     test("round-trip: domain MainTask -> proto -> domain produces equivalent object") {
         val original = MainTask(
             description = "Round trip task",
-            done = true,
+            isDone = true,
             dueDate = "2026-12-25",
             recurrence = "yearly",
             subTasks = listOf(
-                SubTask(description = "Wrap gifts", done = false),
-                SubTask(description = "Send cards", done = true)
+                SubTask(description = "Wrap gifts", isDone = false),
+                SubTask(description = "Send cards", isDone = true)
             )
         )
 
@@ -338,7 +338,7 @@ class TaskListMapperTest : FunSpec({
     }
 
     test("round-trip: domain SubTask -> proto -> domain produces equivalent object") {
-        val original = SubTask(description = "Round trip sub", done = true)
+        val original = SubTask(description = "Round trip sub", isDone = true)
 
         val roundTripped = TaskListMapper.toDomain(TaskListMapper.toProto(original))
 
@@ -370,7 +370,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(proto)
 
         domain.description shouldBe ""
-        domain.done shouldBe true
+        domain.isDone shouldBe true
     }
 
     test("toDomain handles MainTask with special characters") {

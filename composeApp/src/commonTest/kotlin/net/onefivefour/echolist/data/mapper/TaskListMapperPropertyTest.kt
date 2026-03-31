@@ -58,14 +58,14 @@ class TaskListMapperPropertyTest : FunSpec({
     val arbDomainSubTask = arbitrary {
         SubTask(
             description = Arb.string(0..200).bind(),
-            done = Arb.boolean().bind()
+            isDone = Arb.boolean().bind()
         )
     }
 
     val arbDomainMainTask = arbitrary {
         MainTask(
             description = Arb.string(0..200).bind(),
-            done = Arb.boolean().bind(),
+            isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             subTasks = Arb.list(arbDomainSubTask, 0..10).bind()
@@ -78,7 +78,7 @@ class TaskListMapperPropertyTest : FunSpec({
         domainList shouldHaveSize protoList.size
         domainList.zip(protoList).forEach { (d, p) ->
             d.description shouldBe p.description
-            d.done shouldBe p.done
+            d.isDone shouldBe p.done
         }
     }
 
@@ -86,7 +86,7 @@ class TaskListMapperPropertyTest : FunSpec({
         domainList shouldHaveSize protoList.size
         domainList.zip(protoList).forEach { (d, p) ->
             d.description shouldBe p.description
-            d.done shouldBe p.done
+            d.isDone shouldBe p.done
             d.dueDate shouldBe p.due_date
             d.recurrence shouldBe p.recurrence
             assertSubTasksMatch(d.subTasks, p.sub_tasks)
@@ -102,7 +102,7 @@ class TaskListMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoMainTask) { protoTask ->
             val domain = TaskListMapper.toDomain(protoTask)
             domain.description shouldBe protoTask.description
-            domain.done shouldBe protoTask.done
+            domain.isDone shouldBe protoTask.done
             domain.dueDate shouldBe protoTask.due_date
             domain.recurrence shouldBe protoTask.recurrence
             assertSubTasksMatch(domain.subTasks, protoTask.sub_tasks)
@@ -118,7 +118,7 @@ class TaskListMapperPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbProtoSubTask) { protoSubTask ->
             val domain = TaskListMapper.toDomain(protoSubTask)
             domain.description shouldBe protoSubTask.description
-            domain.done shouldBe protoSubTask.done
+            domain.isDone shouldBe protoSubTask.done
         }
     }
 
