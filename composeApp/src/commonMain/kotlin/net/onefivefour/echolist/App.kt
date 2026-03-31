@@ -187,7 +187,8 @@ private fun AuthenticatedApp() {
                     onRemoveMainTask = viewModel::onRemoveMainTask,
                     onAddSubTask = viewModel::onAddSubTask,
                     onRemoveSubTask = viewModel::onRemoveSubTask,
-                    onSaveClick = viewModel::onSaveClick
+                    onSaveClick = viewModel::onSaveClick,
+                    onDeleteClick = viewModel::onDeleteClick
                 )
             }
         }

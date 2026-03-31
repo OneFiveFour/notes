@@ -33,7 +33,7 @@ internal fun EditTaskListScreen(
     onAddSubTask: (Int) -> Unit,
     onRemoveSubTask: (Int, Int) -> Unit,
     onSaveClick: () -> Unit,
-    onDeleteClick: () -> Unit = {},
+    onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -161,7 +161,8 @@ private fun EditTaskListScreenPreview() {
                 onRemoveMainTask = {},
                 onAddSubTask = {},
                 onRemoveSubTask = { _, _ -> },
-                onSaveClick = {}
+                onSaveClick = {},
+                onDeleteClick = {}
             )
         }
     }
