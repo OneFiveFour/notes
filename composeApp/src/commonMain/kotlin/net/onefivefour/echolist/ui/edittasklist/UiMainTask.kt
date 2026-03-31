@@ -6,21 +6,20 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.SubTask
 
-class MainTaskDraft(
+internal class UiMainTask(
     val id: Long,
     description: String = "",
     isDone: Boolean = false,
     dueDate: String = "",
     recurrence: String = "",
-    subTasks: List<SubTaskDraft> = emptyList()
+    subTasks: List<UiSubTask> = emptyList()
 ) {
     val descriptionState = TextFieldState(initialText = description)
     var isDone by mutableStateOf(isDone)
     val dueDateState = TextFieldState(initialText = dueDate)
     val recurrenceState = TextFieldState(initialText = recurrence)
-    val subTasks = mutableStateListOf<SubTaskDraft>().apply {
+    val subTasks = mutableStateListOf<UiSubTask>().apply {
         addAll(subTasks)
     }
 
@@ -41,44 +40,16 @@ class MainTaskDraft(
     }
 
     companion object {
-        fun fromDomain(id: Long, domain: MainTask): MainTaskDraft = MainTaskDraft(
+        fun fromDomain(id: Long, domain: MainTask): UiMainTask = UiMainTask(
             id = id,
             description = domain.description,
             isDone = domain.isDone,
             dueDate = if (domain.recurrence.isNotBlank()) "" else domain.dueDate,
             recurrence = domain.recurrence.singleLine(),
             subTasks = domain.subTasks.mapIndexed { index, subTask ->
-                SubTaskDraft.fromDomain(id = id * 1000L + index.toLong(), domain = subTask)
+                UiSubTask.fromDomain(id = id * 1000L + index.toLong(), domain = subTask)
             }
         )
     }
 }
 
-class SubTaskDraft(
-    val subTaskId: Long,
-    description: String = "",
-    isDone: Boolean = false
-) {
-    val descriptionState = TextFieldState(initialText = description)
-    var isDone by mutableStateOf(isDone)
-
-    fun toDomain(): SubTask? {
-        val trimmedDescription = descriptionState.text.toString().trim()
-        if (trimmedDescription.isBlank()) return null
-
-        return SubTask(
-            description = trimmedDescription,
-            isDone = isDone
-        )
-    }
-
-    companion object {
-        fun fromDomain(id: Long, domain: SubTask): SubTaskDraft = SubTaskDraft(
-            subTaskId = id,
-            description = domain.description,
-            isDone = domain.isDone
-        )
-    }
-}
-
-internal fun String.singleLine(): String = trim().replace("\r", "").replace("\n", "")

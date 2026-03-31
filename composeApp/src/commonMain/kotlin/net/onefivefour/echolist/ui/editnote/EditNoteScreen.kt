@@ -32,15 +32,7 @@ fun EditNoteScreen(
     val dimensions = EchoListTheme.dimensions
     val contentFocusRequester = remember { FocusRequester() }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .imePadding()
-            .padding(
-                horizontal = dimensions.xl,
-                vertical = dimensions.l
-            )
-    ) {
+    Column(modifier = modifier.fillMaxSize().imePadding()) {
 
         EditNoteTitle(
             textFieldState = uiState.titleState,

@@ -19,13 +19,13 @@ import net.onefivefour.echolist.data.models.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 
-class EditTaskListViewModel(
+internal class EditTaskListViewModel(
     private val mode: EditTaskListMode,
     private val taskListRepository: TaskListRepository
 ) : ViewModel() {
 
     private val titleState = TextFieldState()
-    private val tasks = mutableStateListOf<MainTaskDraft>()
+    private val tasks = mutableStateListOf<UiMainTask>()
     private var nextDraftId = 1L
     private var nextSubTaskDraftId = 1L
 
@@ -51,7 +51,7 @@ class EditTaskListViewModel(
     }
 
     fun onAddMainTask() {
-        val draft = MainTaskDraft(id = nextDraftId++)
+        val draft = UiMainTask(id = nextDraftId++)
         tasks.add(draft)
         observeDueDateRecurrenceExclusion(draft)
         _uiState.update { it.copy(error = null) }
@@ -65,7 +65,7 @@ class EditTaskListViewModel(
 
     fun onAddSubTask(mainTaskIndex: Int) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
-        task.subTasks.add(SubTaskDraft(subTaskId = nextSubTaskDraftId++))
+        task.subTasks.add(UiSubTask(subTaskId = nextSubTaskDraftId++))
         _uiState.update { it.copy(error = null) }
     }
 
@@ -144,7 +144,7 @@ class EditTaskListViewModel(
                     }
                     tasks.clear()
                     taskList.tasks.forEach { task ->
-                        val draft = MainTaskDraft.fromDomain(nextDraftId++, task)
+                        val draft = UiMainTask.fromDomain(nextDraftId++, task)
                         tasks.add(draft)
                         observeDueDateRecurrenceExclusion(draft)
                     }
@@ -157,7 +157,7 @@ class EditTaskListViewModel(
         }
     }
 
-    private fun observeDueDateRecurrenceExclusion(draft: MainTaskDraft) {
+    private fun observeDueDateRecurrenceExclusion(draft: UiMainTask) {
         viewModelScope.launch {
             snapshotFlow { draft.dueDateState.text.toString() }
                 .drop(1)

@@ -38,7 +38,7 @@ class EditTaskListFocusTest : FunSpec({
             shouldAddSubTask = true
         )
 
-        task.subTasks.add(SubTaskDraft(subTaskId = 12L))
+        task.subTasks.add(UiSubTask(subTaskId = 12L))
 
         resolveFocusTarget(
             tasks = listOf(task),
@@ -75,7 +75,7 @@ class EditTaskListFocusTest : FunSpec({
 private fun mainTask(
     id: Long,
     subTaskIds: List<Long> = emptyList()
-): MainTaskDraft = MainTaskDraft(
+): UiMainTask = UiMainTask(
     id = id,
-    subTasks = subTaskIds.map(::SubTaskDraft)
+    subTasks = subTaskIds.map(::UiSubTask)
 )

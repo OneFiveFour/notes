@@ -1,0 +1,202 @@
+package net.onefivefour.echolist.ui.edittasklist
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.tooling.preview.Preview
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.ic_delete
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.SubTask
+import net.onefivefour.echolist.ui.common.ElTextField
+import net.onefivefour.echolist.ui.common.GradientBackground
+import net.onefivefour.echolist.ui.theme.EchoListTheme
+import org.jetbrains.compose.resources.painterResource
+
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@Composable
+internal fun MainTaskCard(
+    mainTask: UiMainTask,
+    mainTaskIndex: Int,
+    onRemoveMainTask: (Int) -> Unit,
+    onAddMainTask: () -> Unit,
+    onRemoveSubTask: (Int, Int) -> Unit,
+    shouldFocusMainTask: Boolean,
+    onMainTaskFocusHandled: () -> Unit,
+    focusedSubTaskId: Long?,
+    onSubTaskFocusHandled: () -> Unit,
+    onSubTaskKeyboardAction: (Long) -> Unit
+) {
+
+    val mainTaskFocusRequester = remember(mainTask.id) { FocusRequester() }
+
+    LaunchedEffect(shouldFocusMainTask) {
+        if (shouldFocusMainTask) {
+            mainTaskFocusRequester.requestFocus()
+            onMainTaskFocusHandled()
+        }
+    }
+
+    Surface(
+        shape = EchoListTheme.shapes.medium,
+        color = EchoListTheme.materialColors.surface,
+        modifier = Modifier.Companion
+            .fillMaxWidth()
+            .border(
+                width = EchoListTheme.dimensions.borderWidth,
+                color = EchoListTheme.materialColors.surfaceVariant,
+                shape = EchoListTheme.shapes.medium
+            )
+    ) {
+        Column(
+            modifier = Modifier.Companion.padding(EchoListTheme.dimensions.s)
+        ) {
+            Row(
+                verticalAlignment = Alignment.Companion.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
+            ) {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
+                    Checkbox(
+                        checked = mainTask.isDone,
+                        onCheckedChange = { isChecked -> mainTask.isDone = isChecked }
+                    )
+                }
+
+                Column(
+                    modifier = Modifier.Companion.weight(1f),
+                    verticalArrangement = Arrangement.Center
+                ) {
+
+                    ElTextField(
+                        state = mainTask.descriptionState,
+                        style = EchoListTheme.typography.bodyLarge,
+                        singleLine = true,
+                        imeAction = ImeAction.Companion.Next,
+                        onKeyboardAction = onAddMainTask,
+                        focusRequester = mainTaskFocusRequester
+                    )
+
+                    if (mainTask.dueDateState.text.isNotEmpty()) {
+                        ElTextField(
+                            state = mainTask.dueDateState,
+                            modifier = Modifier.Companion.fillMaxWidth()
+                        )
+                    }
+
+                    if (mainTask.recurrenceState.text.isNotEmpty()) {
+                        ElTextField(
+                            state = mainTask.recurrenceState,
+                            modifier = Modifier.Companion.fillMaxWidth()
+                        )
+                    }
+                }
+
+                Icon(
+                    painter = painterResource(Res.drawable.ic_delete),
+                    contentDescription = "Delete main task",
+                    modifier = Modifier.Companion
+                        .clip(RoundedCornerShape(50))
+                        .clickable { onRemoveMainTask(mainTaskIndex) }
+                        .padding(
+                            horizontal = EchoListTheme.dimensions.m,
+                            vertical = EchoListTheme.dimensions.m
+                        )
+                )
+            }
+
+            if (mainTask.subTasks.isNotEmpty()) {
+                Column {
+                    mainTask.subTasks.forEachIndexed { subTaskIndex, subTask ->
+                        SubTaskRow(
+                            subTask = subTask,
+                            shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
+                            onFocusHandled = onSubTaskFocusHandled,
+                            onKeyboardAction = { onSubTaskKeyboardAction(subTask.subTaskId) },
+                            onRemoveSubTask = { onRemoveSubTask(mainTaskIndex, subTaskIndex) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+@Preview
+@Composable
+private fun MainTaskCardPreview() {
+    val task = remember {
+        UiMainTask.fromDomain(
+            id = 1,
+            domain = MainTask(
+                description = "Plan launch",
+                isDone = false,
+                dueDate = "2026-04-01",
+                recurrence = "",
+                subTasks = listOf(
+                    SubTask(description = "Draft checklist", isDone = true),
+                    SubTask(description = "Review copy", isDone = false)
+                )
+            )
+        )
+    }
+    EchoListTheme {
+        GradientBackground {
+            MainTaskCard(
+                mainTask = task,
+                mainTaskIndex = 0,
+                onRemoveMainTask = {},
+                onAddMainTask = {},
+                onRemoveSubTask = { _, _ -> },
+                shouldFocusMainTask = false,
+                onMainTaskFocusHandled = {},
+                focusedSubTaskId = null,
+                onSubTaskFocusHandled = {},
+                onSubTaskKeyboardAction = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MainTaskCardEmptyPreview() {
+    val task = remember {
+        UiMainTask(id = 2)
+    }
+    EchoListTheme {
+        GradientBackground {
+            MainTaskCard(
+                mainTask = task,
+                mainTaskIndex = 0,
+                onRemoveMainTask = {},
+                onAddMainTask = {},
+                onRemoveSubTask = { _, _ -> },
+                shouldFocusMainTask = false,
+                onMainTaskFocusHandled = {},
+                focusedSubTaskId = null,
+                onSubTaskFocusHandled = {},
+                onSubTaskKeyboardAction = {}
+            )
+        }
+    }
+}

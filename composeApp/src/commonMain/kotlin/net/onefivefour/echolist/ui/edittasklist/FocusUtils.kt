@@ -1,19 +1,7 @@
 package net.onefivefour.echolist.ui.edittasklist
 
-internal sealed interface FocusTarget {
-    data class MainTask(val mainTaskId: Long) : FocusTarget
-    data class SubTask(val mainTaskId: Long, val id: Long) : FocusTarget
-    data object LastMainTask : FocusTarget
-    data class LastSubTask(val mainTaskId: Long) : FocusTarget
-}
-
-internal data class SubTaskAdvanceResult(
-    val focusTarget: FocusTarget,
-    val shouldAddSubTask: Boolean
-)
-
 internal fun resolveFocusTarget(
-    tasks: List<MainTaskDraft>,
+    tasks: List<UiMainTask>,
     focusTarget: FocusTarget?
 ): FocusTarget? = when (focusTarget) {
     null -> null
@@ -41,7 +29,7 @@ internal fun resolveFocusTarget(
 }
 
 internal fun resolveSubTaskAdvance(
-    mainTasks: List<MainTaskDraft>,
+    mainTasks: List<UiMainTask>,
     mainTaskId: Long,
     currentSubTaskId: Long
 ): SubTaskAdvanceResult? {

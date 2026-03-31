@@ -3,9 +3,9 @@ package net.onefivefour.echolist.ui.edittasklist
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-data class EditTaskListUiState(
+internal data class EditTaskListUiState(
     val titleState: TextFieldState,
-    val mainTasks: SnapshotStateList<MainTaskDraft>,
+    val mainTasks: SnapshotStateList<UiMainTask>,
     val mode: EditTaskListMode,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
