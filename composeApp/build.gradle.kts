@@ -164,7 +164,7 @@ dependencies {
 
 compose.desktop {
     application {
-        mainClass = "net.onefivefour.echolist.MainKt"
+        mainClass = "net.onefivefour.echolist.MainAppKt"
 
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)

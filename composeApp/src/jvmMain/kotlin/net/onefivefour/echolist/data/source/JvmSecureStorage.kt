@@ -1,20 +1,62 @@
 package net.onefivefour.echolist.data.source
 
+import net.onefivefour.echolist.platform.echoListSecureStoragePath
+import java.io.IOException
+import java.nio.file.Files
+import java.nio.file.Path
+import java.nio.file.StandardOpenOption.CREATE
+import java.nio.file.StandardOpenOption.READ
+import java.nio.file.StandardOpenOption.TRUNCATE_EXISTING
+import java.nio.file.StandardOpenOption.WRITE
+import java.util.Properties
+
 /**
- * JVM Desktop SecureStorage stub — uses in-memory map.
- * TODO: Replace with a file-backed or keystore-backed implementation.
+ * JVM desktop SecureStorage backed by a local properties file.
  */
-class JvmSecureStorage : SecureStorage {
+class JvmSecureStorage(
+    private val storagePath: Path = echoListSecureStoragePath()
+) : SecureStorage {
 
-    private val store = mutableMapOf<String, String>()
+    private val properties = Properties()
 
-    override fun get(key: String): String? = store[key]
-
-    override fun put(key: String, value: String) {
-        store[key] = value
+    init {
+        storagePath.parent?.let(Files::createDirectories)
+        loadFromDisk()
     }
 
+    @Synchronized
+    override fun get(key: String): String? = properties.getProperty(key)
+
+    @Synchronized
+    override fun put(key: String, value: String) {
+        properties.setProperty(key, value)
+        persist()
+    }
+
+    @Synchronized
     override fun delete(key: String) {
-        store.remove(key)
+        properties.remove(key)
+        persist()
+    }
+
+    private fun loadFromDisk() {
+        if (!Files.exists(storagePath)) return
+
+        try {
+            Files.newInputStream(storagePath, READ).use(properties::load)
+        } catch (exception: IOException) {
+            throw IllegalStateException("Failed to read desktop secure storage at $storagePath", exception)
+        }
+    }
+
+    private fun persist() {
+        try {
+            storagePath.parent?.let(Files::createDirectories)
+            Files.newOutputStream(storagePath, CREATE, WRITE, TRUNCATE_EXISTING).use { output ->
+                properties.store(output, "EchoList desktop secure storage")
+            }
+        } catch (exception: IOException) {
+            throw IllegalStateException("Failed to persist desktop secure storage at $storagePath", exception)
+        }
     }
 }
