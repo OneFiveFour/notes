@@ -36,10 +36,11 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun MainTaskCard(
     mainTask: UiMainTask,
-    mainTaskIndex: Int,
-    onRemoveMainTask: (Int) -> Unit,
+    isAutoDelete: Boolean,
+    onRemoveMainTask: () -> Unit,
+    onMainTaskCheckedChange: (Boolean) -> Unit,
     onAddMainTask: () -> Unit,
-    onRemoveSubTask: (Int, Int) -> Unit,
+    onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     shouldFocusMainTask: Boolean,
     onMainTaskFocusHandled: () -> Unit,
     focusedSubTaskId: Long?,
@@ -77,7 +78,7 @@ internal fun MainTaskCard(
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
                     Checkbox(
                         checked = mainTask.isDone,
-                        onCheckedChange = { isChecked -> mainTask.isDone = isChecked }
+                        onCheckedChange = onMainTaskCheckedChange
                     )
                 }
 
@@ -110,17 +111,19 @@ internal fun MainTaskCard(
                     }
                 }
 
-                Icon(
-                    painter = painterResource(Res.drawable.ic_delete),
-                    contentDescription = "Delete main task",
-                    modifier = Modifier.Companion
-                        .clip(RoundedCornerShape(50))
-                        .clickable { onRemoveMainTask(mainTaskIndex) }
-                        .padding(
-                            horizontal = EchoListTheme.dimensions.m,
-                            vertical = EchoListTheme.dimensions.m
-                        )
-                )
+                if (!isAutoDelete) {
+                    Icon(
+                        painter = painterResource(Res.drawable.ic_delete),
+                        contentDescription = "Delete main task",
+                        modifier = Modifier.Companion
+                            .clip(RoundedCornerShape(50))
+                            .clickable { onRemoveMainTask() }
+                            .padding(
+                                horizontal = EchoListTheme.dimensions.m,
+                                vertical = EchoListTheme.dimensions.m
+                            )
+                    )
+                }
             }
 
             if (mainTask.subTasks.isNotEmpty()) {
@@ -131,7 +134,9 @@ internal fun MainTaskCard(
                             shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
                             onFocusHandled = onSubTaskFocusHandled,
                             onKeyboardAction = { onSubTaskKeyboardAction(subTask.subTaskId) },
-                            onRemoveSubTask = { onRemoveSubTask(mainTaskIndex, subTaskIndex) }
+                            onCheckedChange = { isChecked ->
+                                onSubTaskCheckedChange(subTaskIndex, isChecked)
+                            }
                         )
                     }
                 }
@@ -163,10 +168,11 @@ private fun MainTaskCardPreview() {
         GradientBackground {
             MainTaskCard(
                 mainTask = task,
-                mainTaskIndex = 0,
+                isAutoDelete = false,
                 onRemoveMainTask = {},
+                onMainTaskCheckedChange = {},
                 onAddMainTask = {},
-                onRemoveSubTask = { _, _ -> },
+                onSubTaskCheckedChange = { _, _ -> },
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 focusedSubTaskId = null,
@@ -187,10 +193,11 @@ private fun MainTaskCardEmptyPreview() {
         GradientBackground {
             MainTaskCard(
                 mainTask = task,
-                mainTaskIndex = 0,
+                isAutoDelete = false,
                 onRemoveMainTask = {},
+                onMainTaskCheckedChange = {},
                 onAddMainTask = {},
-                onRemoveSubTask = { _, _ -> },
+                onSubTaskCheckedChange = { _, _ -> },
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 focusedSubTaskId = null,

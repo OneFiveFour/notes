@@ -63,17 +63,27 @@ internal class EditTaskListViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
+    fun onMainTaskCheckedChange(index: Int, isChecked: Boolean) {
+        val task = tasks.getOrNull(index) ?: return
+        task.isDone = isChecked
+        _uiState.update { it.copy(error = null) }
+    }
+
     fun onAddSubTask(mainTaskIndex: Int) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
         task.subTasks.add(UiSubTask(subTaskId = nextSubTaskDraftId++))
         _uiState.update { it.copy(error = null) }
     }
 
-    fun onRemoveSubTask(mainTaskIndex: Int, subTaskIndex: Int) {
+    fun onSubTaskCheckedChange(mainTaskIndex: Int, subTaskIndex: Int, isChecked: Boolean) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
         if (subTaskIndex !in task.subTasks.indices) return
-        task.subTasks.removeAt(subTaskIndex)
+        task.subTasks[subTaskIndex].isDone = isChecked
         _uiState.update { it.copy(error = null) }
+    }
+
+    fun onToggleAutoDelete(isAutoDelete: Boolean) {
+        _uiState.update { it.copy(isAutoDelete = isAutoDelete, error = null) }
     }
 
     fun onSaveClick() {
@@ -93,7 +103,8 @@ internal class EditTaskListViewModel(
                     CreateTaskListParams(
                         name = trimmedTitle,
                         path = currentMode.parentPath,
-                        tasks = tasks.mapNotNull { it.toDomain() }
+                        tasks = tasks.mapNotNull { it.toDomain() },
+                        isAutoDelete = _uiState.value.isAutoDelete
                     )
                 )
 
@@ -101,7 +112,8 @@ internal class EditTaskListViewModel(
                     UpdateTaskListParams(
                         id = currentMode.taskListId,
                         title = trimmedTitle,
-                        tasks = tasks.mapNotNull { it.toDomain() }
+                        tasks = tasks.mapNotNull { it.toDomain() },
+                        isAutoDelete = _uiState.value.isAutoDelete
                     )
                 )
             }
@@ -148,7 +160,13 @@ internal class EditTaskListViewModel(
                         tasks.add(draft)
                         observeDueDateRecurrenceExclusion(draft)
                     }
-                    _uiState.update { it.copy(isLoading = false, error = null) }
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isAutoDelete = taskList.isAutoDelete,
+                            error = null
+                        )
+                    }
                 },
                 onFailure = { e ->
                     _uiState.update { it.copy(isLoading = false, error = e.message) }

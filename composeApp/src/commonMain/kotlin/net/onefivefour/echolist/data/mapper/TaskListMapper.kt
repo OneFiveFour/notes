@@ -39,7 +39,8 @@ internal object TaskListMapper {
         filePath = proto.file_path,
         name = proto.title,
         tasks = proto.tasks.map { toDomain(it) },
-        updatedAt = proto.updated_at
+        updatedAt = proto.updated_at,
+        isAutoDelete = proto.is_auto_delete
     )
 
     fun toDomain(proto: CreateTaskListResponse): TaskList {
@@ -72,13 +73,15 @@ internal object TaskListMapper {
     fun toProto(params: CreateTaskListParams): CreateTaskListRequest = CreateTaskListRequest(
         title = params.name,
         parent_dir = params.path,
-        tasks = params.tasks.map { toProto(it) }
+        tasks = params.tasks.map { toProto(it) },
+        is_auto_delete = params.isAutoDelete
     )
 
     fun toProto(params: UpdateTaskListParams): UpdateTaskListRequest = UpdateTaskListRequest(
         id = params.id,
         title = params.title,
-        tasks = params.tasks.map { toProto(it) }
+        tasks = params.tasks.map { toProto(it) },
+        is_auto_delete = params.isAutoDelete
     )
 
     fun toProto(domain: MainTask): tasks.v1.MainTask = tasks.v1.MainTask(

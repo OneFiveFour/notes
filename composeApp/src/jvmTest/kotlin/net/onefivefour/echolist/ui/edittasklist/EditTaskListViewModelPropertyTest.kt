@@ -55,7 +55,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 filePath = "${params.path}/${params.name}",
                 name = params.name,
                 tasks = params.tasks,
-                updatedAt = 0L
+                updatedAt = 0L,
+                isAutoDelete = params.isAutoDelete
             )
             taskLists[created.id] = created
             return Result.success(created)
@@ -75,6 +76,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskLists[params.id]
                 ?: return Result.failure(NoSuchElementException("TaskList not found: ${params.id}"))
             val updated = existing.copy(name = params.title, tasks = params.tasks, updatedAt = existing.updatedAt + 1)
+                .copy(isAutoDelete = params.isAutoDelete)
             taskLists[updated.id] = updated
             return Result.success(updated)
         }
@@ -120,6 +122,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             params.tasks[0].dueDate shouldBe "2026-04-01"
             params.tasks[0].subTasks shouldHaveSize 1
             params.tasks[0].subTasks[0].description shouldBe "Write checklist"
+            params.isAutoDelete shouldBe false
         }
     }
 
@@ -139,7 +142,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                         subTasks = listOf(SubTask(description = "Compare prices", isDone = true))
                     )
                 ),
-                updatedAt = 10L
+                updatedAt = 10L,
+                isAutoDelete = true
             )
             fakeRepo.addTaskList(taskList)
 
@@ -160,6 +164,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             vm.uiState.value.titleState.edit {
                 replace(0, length, "Trip prep v2")
             }
+            vm.uiState.value.isAutoDelete shouldBe true
+            vm.onToggleAutoDelete(false)
             vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Book hotel and flight") }
             vm.onAddSubTask(0)
             vm.uiState.value.mainTasks[0].subTasks[1].descriptionState.edit { replace(0, length, "Book flight") }
@@ -175,7 +181,84 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             update.tasks shouldHaveSize 1
             update.tasks[0].description shouldBe "Book hotel and flight"
             update.tasks[0].subTasks shouldHaveSize 2
+            update.isAutoDelete shouldBe false
             vm.uiState.value.isSaving shouldBe false
+        }
+    }
+
+    test("main task stays and updates done state when isAutoDelete is false") {
+        runTest(testDispatcher) {
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = FakeTaskListRepository()
+            )
+
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Keep me") }
+
+            vm.onMainTaskCheckedChange(0, true)
+
+            vm.uiState.value.mainTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].isDone shouldBe true
+        }
+    }
+
+    test("subtask stays and updates done state when isAutoDelete is false") {
+        runTest(testDispatcher) {
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = FakeTaskListRepository()
+            )
+
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Parent") }
+            vm.onAddSubTask(0)
+            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Keep me") }
+
+            vm.onSubTaskCheckedChange(0, 0, true)
+
+            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe true
+        }
+    }
+
+    test("main task stays and updates done state when isAutoDelete is true") {
+        runTest(testDispatcher) {
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = FakeTaskListRepository()
+            )
+
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Delete me") }
+            vm.onAddSubTask(0)
+            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Child") }
+            vm.onToggleAutoDelete(true)
+
+            vm.onMainTaskCheckedChange(0, true)
+
+            vm.uiState.value.mainTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].isDone shouldBe true
+        }
+    }
+
+    test("subtask stays and updates done state when isAutoDelete is true") {
+        runTest(testDispatcher) {
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = FakeTaskListRepository()
+            )
+
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Parent") }
+            vm.onAddSubTask(0)
+            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Delete me") }
+            vm.onToggleAutoDelete(true)
+
+            vm.onSubTaskCheckedChange(0, 0, true)
+
+            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe true
         }
     }
 
@@ -187,7 +270,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 filePath = "home/projects/task-list-delete",
                 name = "Delete me",
                 tasks = emptyList(),
-                updatedAt = 1L
+                updatedAt = 1L,
+                isAutoDelete = false
             )
             fakeRepo.addTaskList(taskList)
 

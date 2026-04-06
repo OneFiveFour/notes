@@ -119,7 +119,8 @@ class TaskListMapperTest : FunSpec({
                     sub_tasks = emptyList()
                 )
             ),
-            updated_at = 1704067200000L
+            updated_at = 1704067200000L,
+            is_auto_delete = true
         )
 
         val domain = TaskListMapper.toDomain(protoTaskList)
@@ -130,6 +131,7 @@ class TaskListMapperTest : FunSpec({
         domain.tasks shouldHaveSize 1
         domain.tasks[0].description shouldBe "Buy milk"
         domain.updatedAt shouldBe 1704067200000L
+        domain.isAutoDelete shouldBe true
     }
 
     // -- Proto -> Domain: Response types --
@@ -140,7 +142,8 @@ class TaskListMapperTest : FunSpec({
             file_path = "/lists/new.json",
             title = "New List",
             tasks = emptyList(),
-            updated_at = 1704153600000L
+            updated_at = 1704153600000L,
+            is_auto_delete = false
         )
         val response = tasks.v1.CreateTaskListResponse(task_list = protoTaskList)
 
@@ -151,6 +154,7 @@ class TaskListMapperTest : FunSpec({
         domain.name shouldBe "New List"
         domain.tasks.shouldBeEmpty()
         domain.updatedAt shouldBe 1704153600000L
+        domain.isAutoDelete shouldBe false
     }
 
     test("toDomain transforms GetTaskListResponse to domain TaskList") {
@@ -167,7 +171,8 @@ class TaskListMapperTest : FunSpec({
                     sub_tasks = listOf(tasks.v1.SubTask(description = "Sub A", done = true))
                 )
             ),
-            updated_at = 1704240000000L
+            updated_at = 1704240000000L,
+            is_auto_delete = true
         )
         val response = tasks.v1.GetTaskListResponse(task_list = protoTaskList)
 
@@ -180,6 +185,7 @@ class TaskListMapperTest : FunSpec({
         domain.tasks[0].description shouldBe "Task A"
         domain.tasks[0].subTasks shouldHaveSize 1
         domain.updatedAt shouldBe 1704240000000L
+        domain.isAutoDelete shouldBe true
     }
 
     test("toDomain transforms UpdateTaskListResponse to domain TaskList") {
@@ -188,7 +194,8 @@ class TaskListMapperTest : FunSpec({
             file_path = "/lists/updated.json",
             title = "Updated List",
             tasks = emptyList(),
-            updated_at = 1704326400000L
+            updated_at = 1704326400000L,
+            is_auto_delete = true
         )
         val response = tasks.v1.UpdateTaskListResponse(task_list = protoTaskList)
 
@@ -198,6 +205,7 @@ class TaskListMapperTest : FunSpec({
         domain.filePath shouldBe "/lists/updated.json"
         domain.name shouldBe "Updated List"
         domain.updatedAt shouldBe 1704326400000L
+        domain.isAutoDelete shouldBe true
     }
 
     test("toDomain transforms ListTaskListsResponse with multiple task lists") {
@@ -242,6 +250,7 @@ class TaskListMapperTest : FunSpec({
         val params = CreateTaskListParams(
             name = "My Tasks",
             path = "/home/user/lists",
+            isAutoDelete = true,
             tasks = listOf(
                 MainTask(
                     description = "First task",
@@ -257,6 +266,7 @@ class TaskListMapperTest : FunSpec({
 
         proto.title shouldBe "My Tasks"
         proto.parent_dir shouldBe "/home/user/lists"
+        proto.is_auto_delete shouldBe true
         proto.tasks shouldHaveSize 1
         proto.tasks[0].description shouldBe "First task"
         proto.tasks[0].due_date shouldBe "2026-03-20"
@@ -268,6 +278,7 @@ class TaskListMapperTest : FunSpec({
         val params = UpdateTaskListParams(
             id = "tl-uuid-existing",
             title = "Updated List Name",
+            isAutoDelete = true,
             tasks = listOf(
                 MainTask(
                     description = "Updated task",
@@ -283,6 +294,7 @@ class TaskListMapperTest : FunSpec({
 
         proto.id shouldBe "tl-uuid-existing"
         proto.title shouldBe "Updated List Name"
+        proto.is_auto_delete shouldBe true
         proto.tasks shouldHaveSize 1
         proto.tasks[0].description shouldBe "Updated task"
         proto.tasks[0].done shouldBe true

@@ -7,6 +7,7 @@ internal data class EditTaskListUiState(
     val titleState: TextFieldState,
     val mainTasks: SnapshotStateList<UiMainTask>,
     val mode: EditTaskListMode,
+    val isAutoDelete: Boolean = false,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null

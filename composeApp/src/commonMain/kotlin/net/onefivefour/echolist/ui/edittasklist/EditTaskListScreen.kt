@@ -1,14 +1,16 @@
 package net.onefivefour.echolist.ui.edittasklist
 
 import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +33,9 @@ internal fun EditTaskListScreen(
     onAddMainTask: () -> Unit,
     onRemoveMainTask: (Int) -> Unit,
     onAddSubTask: (Int) -> Unit,
-    onRemoveSubTask: (Int, Int) -> Unit,
+    onMainTaskCheckedChange: (Int, Boolean) -> Unit,
+    onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
+    onToggleAutoDelete: (Boolean) -> Unit,
     onSaveClick: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -87,19 +91,38 @@ internal fun EditTaskListScreen(
                     shape = EchoListTheme.shapes.medium
                 )
         ) {
-            Box(
+            Column(
                 modifier = Modifier
                     .padding(EchoListTheme.dimensions.m)
                     .fillMaxSize()
             ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Auto Delete",
+                        style = EchoListTheme.typography.titleSmall,
+                        color = EchoListTheme.materialColors.onSurface,
+                        modifier = Modifier.weight(1f)
+                    )
+
+                    Switch(
+                        checked = uiState.isAutoDelete,
+                        onCheckedChange = onToggleAutoDelete,
+                        enabled = !uiState.isLoading && !uiState.isSaving
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+
                 when {
                     uiState.isLoading -> TaskListLoading()
                     uiState.mainTasks.isEmpty() -> EmptyTaskList(onAddMainTaskAndFocus)
                     else -> TaskList(
                         mainTasks = uiState.mainTasks,
+                        isAutoDelete = uiState.isAutoDelete,
                         onRemoveMainTask = onRemoveMainTask,
+                        onMainTaskCheckedChange = onMainTaskCheckedChange,
                         onAddMainTask = onAddMainTaskAndFocus,
-                        onRemoveSubTask = onRemoveSubTask,
+                        onSubTaskCheckedChange = onSubTaskCheckedChange,
                         focusTarget = resolvedFocusTarget,
                         onFocusHandled = onFocusHandled,
                         onSubTaskKeyboardAction = onSubTaskKeyboardAction
@@ -155,12 +178,15 @@ private fun EditTaskListScreenPreview() {
                 uiState = EditTaskListUiState(
                     titleState = TextFieldState(initialText = "Launch plan"),
                     mainTasks = tasks,
+                    isAutoDelete = false,
                     mode = EditTaskListMode.Create(parentPath = "")
                 ),
                 onAddMainTask = {},
                 onRemoveMainTask = {},
                 onAddSubTask = {},
-                onRemoveSubTask = { _, _ -> },
+                onMainTaskCheckedChange = { _, _ -> },
+                onSubTaskCheckedChange = { _, _, _ -> },
+                onToggleAutoDelete = {},
                 onSaveClick = {},
                 onDeleteClick = {}
             )

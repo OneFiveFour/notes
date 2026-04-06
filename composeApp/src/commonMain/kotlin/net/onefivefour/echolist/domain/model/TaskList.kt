@@ -5,5 +5,6 @@ data class TaskList(
     val filePath: String,
     val name: String,
     val tasks: List<MainTask>,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val isAutoDelete: Boolean
 )

@@ -11,6 +11,8 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 
@@ -51,7 +53,8 @@ class TaskListMapperPropertyTest : FunSpec({
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
-            updated_at = Arb.long(0L..Long.MAX_VALUE).bind()
+            updated_at = Arb.long(0L..Long.MAX_VALUE).bind(),
+            is_auto_delete = Arb.boolean().bind()
         )
     }
 
@@ -69,6 +72,24 @@ class TaskListMapperPropertyTest : FunSpec({
             dueDate = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             subTasks = Arb.list(arbDomainSubTask, 0..10).bind()
+        )
+    }
+
+    val arbCreateTaskListParams = arbitrary {
+        CreateTaskListParams(
+            name = Arb.string(1..100).bind(),
+            path = Arb.string(0..100).bind(),
+            tasks = Arb.list(arbDomainMainTask, 0..5).bind(),
+            isAutoDelete = Arb.boolean().bind()
+        )
+    }
+
+    val arbUpdateTaskListParams = arbitrary {
+        UpdateTaskListParams(
+            id = Arb.string(1..100).bind(),
+            title = Arb.string(1..100).bind(),
+            tasks = Arb.list(arbDomainMainTask, 0..5).bind(),
+            isAutoDelete = Arb.boolean().bind()
         )
     }
 
@@ -135,6 +156,7 @@ class TaskListMapperPropertyTest : FunSpec({
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
+            domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
             assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
         }
     }
@@ -147,6 +169,7 @@ class TaskListMapperPropertyTest : FunSpec({
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
+            domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
             assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
         }
     }
@@ -159,7 +182,20 @@ class TaskListMapperPropertyTest : FunSpec({
             domain.filePath shouldBe protoTaskList.file_path
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
+            domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
             assertMainTasksMatch(domain.tasks, protoTaskList.tasks)
+        }
+    }
+
+    test("Feature: proto-api-update, Property 18: CreateTaskListParams -> proto request preserves isAutoDelete") {
+        checkAll(PropTestConfig(iterations = 100), arbCreateTaskListParams) { params ->
+            TaskListMapper.toProto(params).is_auto_delete shouldBe params.isAutoDelete
+        }
+    }
+
+    test("Feature: proto-api-update, Property 18: UpdateTaskListParams -> proto request preserves isAutoDelete") {
+        checkAll(PropTestConfig(iterations = 100), arbUpdateTaskListParams) { params ->
+            TaskListMapper.toProto(params).is_auto_delete shouldBe params.isAutoDelete
         }
     }
 

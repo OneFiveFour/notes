@@ -50,7 +50,8 @@ class TaskListRepositoryImplTest : FunSpec({
             file_path = Arb.string(1..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
-            updated_at = Arb.long(0..Long.MAX_VALUE).bind()
+            updated_at = Arb.long(0..Long.MAX_VALUE).bind(),
+            is_auto_delete = Arb.boolean().bind()
         )
     }
 
@@ -75,7 +76,8 @@ class TaskListRepositoryImplTest : FunSpec({
         CreateTaskListParams(
             name = Arb.string(1..100).bind(),
             path = Arb.string(1..100).bind(),
-            tasks = Arb.list(arbDomainMainTask, 0..3).bind()
+            tasks = Arb.list(arbDomainMainTask, 0..3).bind(),
+            isAutoDelete = Arb.boolean().bind()
         )
     }
 
@@ -83,7 +85,8 @@ class TaskListRepositoryImplTest : FunSpec({
         UpdateTaskListParams(
             id = Arb.string(1..50).bind(),
             title = Arb.string(1..100).bind(),
-            tasks = Arb.list(arbDomainMainTask, 0..3).bind()
+            tasks = Arb.list(arbDomainMainTask, 0..3).bind(),
+            isAutoDelete = Arb.boolean().bind()
         )
     }
 
@@ -104,6 +107,7 @@ class TaskListRepositoryImplTest : FunSpec({
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
+            taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
         }
     }
 
@@ -128,6 +132,7 @@ class TaskListRepositoryImplTest : FunSpec({
             fake.lastCreateRequest?.title shouldBe params.name
             fake.lastCreateRequest?.parent_dir shouldBe params.path
             fake.lastCreateRequest?.tasks?.size shouldBe params.tasks.size
+            fake.lastCreateRequest?.is_auto_delete shouldBe params.isAutoDelete
         }
     }
 
@@ -159,6 +164,7 @@ class TaskListRepositoryImplTest : FunSpec({
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
+            taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
         }
     }
 
@@ -276,6 +282,7 @@ class TaskListRepositoryImplTest : FunSpec({
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
+            taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
         }
     }
 
@@ -300,6 +307,7 @@ class TaskListRepositoryImplTest : FunSpec({
             fake.lastUpdateRequest?.id shouldBe params.id
             fake.lastUpdateRequest?.title shouldBe params.title
             fake.lastUpdateRequest?.tasks?.size shouldBe params.tasks.size
+            fake.lastUpdateRequest?.is_auto_delete shouldBe params.isAutoDelete
         }
     }
 
