@@ -11,7 +11,7 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
@@ -225,6 +225,66 @@ class TaskListMapperPropertyTest : FunSpec({
     // Property 20: TaskListMapper round-trip transformation preserves data
     // Validates: Requirements 9.7
     // ---------------------------------------------------------------
+
+    // ---------------------------------------------------------------
+    // Feature: tasklist-auto-delete, Property 3: Mapper create round-trip preserves isAutoDelete
+    // Validates: Requirements 6.1, 3.3
+    // ---------------------------------------------------------------
+
+    test(
+        "Feature: tasklist-auto-delete, Property 3: Mapper create round-trip preserves isAutoDelete"
+    ) {
+        checkAll(
+            PropTestConfig(iterations = 100),
+            arbCreateTaskListParams,
+            arbProtoTaskList
+        ) { params, baseProtoTaskList ->
+            // Step 1: Map CreateTaskListParams -> CreateTaskListRequest
+            val request = TaskListMapper.toProto(params)
+
+            // Step 2: Simulate backend response by constructing a TaskList proto
+            // with the same is_auto_delete as the request
+            val responseProto = baseProtoTaskList.copy(
+                is_auto_delete = request.is_auto_delete
+            )
+
+            // Step 3: Map the response TaskList proto back to domain
+            val domain = TaskListMapper.toDomain(responseProto)
+
+            // The round-tripped isAutoDelete must equal the original
+            domain.isAutoDelete shouldBe params.isAutoDelete
+        }
+    }
+
+    // ---------------------------------------------------------------
+    // Feature: tasklist-auto-delete, Property 4: Mapper update round-trip preserves isAutoDelete
+    // Validates: Requirements 6.2, 4.2
+    // ---------------------------------------------------------------
+
+    test(
+        "Feature: tasklist-auto-delete, Property 4: Mapper update round-trip preserves isAutoDelete"
+    ) {
+        checkAll(
+            PropTestConfig(iterations = 100),
+            arbUpdateTaskListParams,
+            arbProtoTaskList
+        ) { params, baseProtoTaskList ->
+            // Step 1: Map UpdateTaskListParams -> UpdateTaskListRequest
+            val request = TaskListMapper.toProto(params)
+
+            // Step 2: Simulate backend response by constructing a TaskList proto
+            // with the same is_auto_delete as the request
+            val responseProto = baseProtoTaskList.copy(
+                is_auto_delete = request.is_auto_delete
+            )
+
+            // Step 3: Map the response TaskList proto back to domain
+            val domain = TaskListMapper.toDomain(responseProto)
+
+            // The round-tripped isAutoDelete must equal the original
+            domain.isAutoDelete shouldBe params.isAutoDelete
+        }
+    }
 
     test(
         "Feature: proto-api-update, Property 20: domain MainTask -> proto -> " +

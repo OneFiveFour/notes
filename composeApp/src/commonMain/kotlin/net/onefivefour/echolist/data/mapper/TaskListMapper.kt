@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.data.mapper
 
-import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.domain.model.TaskList

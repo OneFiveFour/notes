@@ -5,6 +5,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
+import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
@@ -16,7 +17,7 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
@@ -123,6 +124,123 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             params.tasks[0].subTasks shouldHaveSize 1
             params.tasks[0].subTasks[0].description shouldBe "Write checklist"
             params.isAutoDelete shouldBe false
+        }
+    }
+
+    // Feature: tasklist-auto-delete, Property 1: Create-mode isAutoDelete propagation
+    test("Property 1 (PBT): create-mode isAutoDelete propagation") {
+        // **Validates: Requirements 3.1, 3.2**
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.boolean()
+        ) { isAutoDelete ->
+            runTest(testDispatcher) {
+                val fakeRepo = FakeTaskListRepository()
+                val vm = EditTaskListViewModel(
+                    mode = EditTaskListMode.Create("home"),
+                    taskListRepository = fakeRepo
+                )
+
+                vm.uiState.value.titleState.edit {
+                    replace(0, length, "Test list")
+                }
+                vm.onAddMainTask()
+                vm.uiState.value.mainTasks[0].descriptionState.edit {
+                    replace(0, length, "Task")
+                }
+
+                vm.onToggleAutoDelete(isAutoDelete)
+
+                vm.onSaveClick()
+                testScheduler.advanceUntilIdle()
+
+                fakeRepo.createTaskListCalls shouldHaveSize 1
+                fakeRepo.createTaskListCalls[0].isAutoDelete shouldBe isAutoDelete
+            }
+        }
+    }
+
+    // Feature: tasklist-auto-delete, Property 2: Update-mode isAutoDelete propagation
+    test("Property 2 (PBT): update-mode isAutoDelete propagation") {
+        // **Validates: Requirements 4.1**
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.boolean()
+        ) { isAutoDelete ->
+            runTest(testDispatcher) {
+                val fakeRepo = FakeTaskListRepository()
+                val existingTaskList = TaskList(
+                    id = "task-list-update",
+                    filePath = "home/task-list-update",
+                    name = "Existing list",
+                    tasks = listOf(
+                        MainTask(
+                            description = "Some task",
+                            isDone = false,
+                            dueDate = "",
+                            recurrence = "",
+                            subTasks = emptyList()
+                        )
+                    ),
+                    updatedAt = 1L,
+                    isAutoDelete = !isAutoDelete // start with opposite value
+                )
+                fakeRepo.addTaskList(existingTaskList)
+
+                val vm = EditTaskListViewModel(
+                    mode = EditTaskListMode.Edit(existingTaskList.id),
+                    taskListRepository = fakeRepo
+                )
+
+                testScheduler.advanceUntilIdle()
+
+                vm.onToggleAutoDelete(isAutoDelete)
+
+                vm.onSaveClick()
+                testScheduler.advanceUntilIdle()
+
+                fakeRepo.updateTaskListCalls shouldHaveSize 1
+                fakeRepo.updateTaskListCalls[0].isAutoDelete shouldBe isAutoDelete
+            }
+        }
+    }
+
+    // Feature: tasklist-auto-delete, Property 5: Load restores isAutoDelete from backend
+    test("Property 5 (PBT): load restores isAutoDelete from backend") {
+        // **Validates: Requirements 5.1, 5.2**
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.boolean()
+        ) { isAutoDelete ->
+            runTest(testDispatcher) {
+                val fakeRepo = FakeTaskListRepository()
+                val taskList = TaskList(
+                    id = "task-list-load",
+                    filePath = "home/task-list-load",
+                    name = "Load test",
+                    tasks = listOf(
+                        MainTask(
+                            description = "Some task",
+                            isDone = false,
+                            dueDate = "",
+                            recurrence = "",
+                            subTasks = emptyList()
+                        )
+                    ),
+                    updatedAt = 1L,
+                    isAutoDelete = isAutoDelete
+                )
+                fakeRepo.addTaskList(taskList)
+
+                val vm = EditTaskListViewModel(
+                    mode = EditTaskListMode.Edit(taskList.id),
+                    taskListRepository = fakeRepo
+                )
+
+                testScheduler.advanceUntilIdle()
+
+                vm.uiState.value.isAutoDelete shouldBe isAutoDelete
+            }
         }
     }
 
@@ -259,6 +377,52 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
             vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe true
+        }
+    }
+
+    // Feature: tasklist-auto-delete, Property 7: Task check/uncheck is independent of isAutoDelete
+    test("Property 7 (PBT): task check/uncheck is independent of isAutoDelete") {
+        // **Validates: Requirements 8.1, 8.2, 8.3, 8.4**
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.boolean(),
+            Arb.boolean()
+        ) { isAutoDelete, isDone ->
+            runTest(testDispatcher) {
+                val fakeRepo = FakeTaskListRepository()
+                val vm = EditTaskListViewModel(
+                    mode = EditTaskListMode.Create("home"),
+                    taskListRepository = fakeRepo
+                )
+
+                // Add a MainTask with a SubTask
+                vm.onAddMainTask()
+                vm.uiState.value.mainTasks[0].descriptionState.edit {
+                    replace(0, length, "Main task")
+                }
+                vm.onAddSubTask(0)
+                vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit {
+                    replace(0, length, "Sub task")
+                }
+
+                // Toggle isAutoDelete to the random value
+                vm.onToggleAutoDelete(isAutoDelete)
+
+                val mainTaskCountBefore = vm.uiState.value.mainTasks.size
+                val subTaskCountBefore = vm.uiState.value.mainTasks[0].subTasks.size
+
+                // Check/uncheck the MainTask
+                vm.onMainTaskCheckedChange(0, isDone)
+
+                vm.uiState.value.mainTasks.size shouldBe mainTaskCountBefore
+                vm.uiState.value.mainTasks[0].isDone shouldBe isDone
+
+                // Check/uncheck the SubTask
+                vm.onSubTaskCheckedChange(0, 0, isDone)
+
+                vm.uiState.value.mainTasks[0].subTasks.size shouldBe subTaskCountBefore
+                vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe isDone
+            }
         }
     }
 

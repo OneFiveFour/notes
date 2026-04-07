@@ -93,6 +93,7 @@ private fun AuthenticatedApp() {
             entry<HomeRoute> { route ->
                 val homeViewModel =
                     koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
+
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
                 LaunchedEffect(Unit) {
@@ -103,6 +104,7 @@ private fun AuthenticatedApp() {
                     koinViewModel<CreateFolderViewModel>(
                         key = "createFolder-${route.path}"
                     ) { parametersOf(route.path) }
+
                 val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
 
                 HomeScreen(
@@ -148,10 +150,12 @@ private fun AuthenticatedApp() {
             }
 
             entry<EditNoteRoute> { route ->
-                val mode = route.noteId?.let(EditNoteMode::Edit)
+                val noteId = route.noteId?.takeIf { it.isNotBlank() }
+
+                val mode = noteId?.let(EditNoteMode::Edit)
                     ?: EditNoteMode.Create(normalizePath(route.parentPath))
                 val viewModel = koinViewModel<EditNoteViewModel>(
-                    key = "editNote-${route.parentPath}-${route.noteId.orEmpty()}"
+                    key = "editNote-${route.parentPath}-${noteId.orEmpty()}"
                 ) { parametersOf(mode) }
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -170,11 +174,16 @@ private fun AuthenticatedApp() {
             }
 
             entry<EditTaskListRoute> { route ->
-                val mode = route.taskListId?.let(EditTaskListMode::Edit)
+
+                val taskListId = route.taskListId?.takeIf { it.isNotBlank() }
+
+                val mode = taskListId?.let(EditTaskListMode::Edit)
                     ?: EditTaskListMode.Create(normalizePath(route.parentPath))
+
                 val viewModel = koinViewModel<EditTaskListViewModel>(
-                    key = "editTaskList-${route.parentPath}-${route.taskListId.orEmpty()}"
+                    key = "editTaskList-${route.parentPath}-${taskListId.orEmpty()}"
                 ) { parametersOf(mode) }
+
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
                 LaunchedEffect(viewModel) {

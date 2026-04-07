@@ -111,6 +111,7 @@ internal fun MainTaskCard(
                     }
                 }
 
+                // Property 6: Delete icon visibility is inverse of isAutoDelete (tasklist-auto-delete)
                 if (!isAutoDelete) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_delete),

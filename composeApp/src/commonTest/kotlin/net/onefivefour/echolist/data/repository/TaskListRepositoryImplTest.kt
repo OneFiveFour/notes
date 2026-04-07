@@ -11,7 +11,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
-import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
@@ -316,7 +316,7 @@ class TaskListRepositoryImplTest : FunSpec({
         fake.updateTaskListResult = Result.failure(NetworkException.ClientError(400, "bad request"))
         val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
 
-        val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", "title", emptyList()))
+        val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", "title", emptyList(), isAutoDelete = false))
 
         result.isFailure shouldBe true
         result.exceptionOrNull().shouldBeInstanceOf<NetworkException.ClientError>()

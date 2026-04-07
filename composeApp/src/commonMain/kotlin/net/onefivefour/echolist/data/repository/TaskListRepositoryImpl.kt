@@ -4,7 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.TaskListMapper
-import net.onefivefour.echolist.data.models.CreateTaskListParams
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
