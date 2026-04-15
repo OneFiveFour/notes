@@ -11,11 +11,13 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.FakeTaskListRemoteDataSource
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.data.network.error.NetworkException
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListResponse
@@ -90,13 +92,36 @@ class TaskListRepositoryImplTest : FunSpec({
         )
     }
 
+    class RecordingDirectoryChangeNotifier : DirectoryChangeNotifier {
+        val notifiedPaths = mutableListOf<String>()
+        override val directoryChanged = MutableSharedFlow<String>()
+
+        override suspend fun notifyChanged(path: String) {
+            notifiedPaths.add(path)
+        }
+    }
+
+    fun newRepo(
+        fake: FakeTaskListRemoteDataSource,
+        notifier: DirectoryChangeNotifier = RecordingDirectoryChangeNotifier()
+    ): TaskListRepositoryImpl = TaskListRepositoryImpl(
+        networkDataSource = fake,
+        dispatcher = Dispatchers.Unconfined,
+        directoryChangeNotifier = notifier
+    )
+
     // -- CreateTaskList --
 
     test("createTaskList returns mapped task list on success").config(invocations = 20) {
         checkAll(arbCreateTaskListParams, arbProtoTaskList) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.createTaskListResult = Result.success(CreateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val notifier = RecordingDirectoryChangeNotifier()
+            val repo = TaskListRepositoryImpl(
+                networkDataSource = fake,
+                dispatcher = Dispatchers.Unconfined,
+                directoryChangeNotifier = notifier
+            )
 
             val result = repo.createTaskList(params)
 
@@ -108,6 +133,7 @@ class TaskListRepositoryImplTest : FunSpec({
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
             taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
+            notifier.notifiedPaths shouldBe listOf(normalizePath(params.path))
         }
     }
 
@@ -125,7 +151,7 @@ class TaskListRepositoryImplTest : FunSpec({
                     )
                 )
             )
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.createTaskList(params)
 
@@ -139,7 +165,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("createTaskList returns failure when network throws") {
         val fake = FakeTaskListRemoteDataSource()
         fake.createTaskListResult = Result.failure(NetworkException.ServerError(500, "boom"))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.createTaskList(CreateTaskListParams("n", "/p", emptyList()))
 
@@ -153,7 +179,7 @@ class TaskListRepositoryImplTest : FunSpec({
         checkAll(Arb.string(1..50), arbProtoTaskList) { taskListId, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.getTaskListResult = Result.success(GetTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.getTaskList(taskListId)
 
@@ -181,7 +207,7 @@ class TaskListRepositoryImplTest : FunSpec({
                 )
             )
         )
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         repo.getTaskList("uuid-x")
 
@@ -191,7 +217,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("getTaskList returns failure when network throws") {
         val fake = FakeTaskListRemoteDataSource()
         fake.getTaskListResult = Result.failure(NetworkException.ClientError(404, "not found"))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.getTaskList("missing-uuid")
 
@@ -218,7 +244,7 @@ class TaskListRepositoryImplTest : FunSpec({
         )
         val fake = FakeTaskListRemoteDataSource()
         fake.listTaskListsResult = Result.success(ListTaskListsResponse(task_lists = listOf(tl1, tl2)))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.listTaskLists("/lists")
 
@@ -236,7 +262,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("listTaskLists forwards correct parent_dir to data source") {
         val fake = FakeTaskListRemoteDataSource()
         fake.listTaskListsResult = Result.success(ListTaskListsResponse())
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         repo.listTaskLists("/some/path")
 
@@ -246,7 +272,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("listTaskLists returns empty result when response has no task lists") {
         val fake = FakeTaskListRemoteDataSource()
         fake.listTaskListsResult = Result.success(ListTaskListsResponse(task_lists = emptyList()))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.listTaskLists("")
 
@@ -257,7 +283,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("listTaskLists returns failure when network throws") {
         val fake = FakeTaskListRemoteDataSource()
         fake.listTaskListsResult = Result.failure(NetworkException.TimeoutError("timed out"))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.listTaskLists("/any")
 
@@ -271,7 +297,12 @@ class TaskListRepositoryImplTest : FunSpec({
         checkAll(arbUpdateTaskListParams, arbProtoTaskList) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.updateTaskListResult = Result.success(UpdateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val notifier = RecordingDirectoryChangeNotifier()
+            val repo = TaskListRepositoryImpl(
+                networkDataSource = fake,
+                dispatcher = Dispatchers.Unconfined,
+                directoryChangeNotifier = notifier
+            )
 
             val result = repo.updateTaskList(params)
 
@@ -283,6 +314,9 @@ class TaskListRepositoryImplTest : FunSpec({
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
             taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
+            notifier.notifiedPaths shouldBe listOf(
+                normalizePath(protoTaskList.file_path.substringBeforeLast('/', ""))
+            )
         }
     }
 
@@ -300,7 +334,7 @@ class TaskListRepositoryImplTest : FunSpec({
                     )
                 )
             )
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.updateTaskList(params)
 
@@ -314,7 +348,7 @@ class TaskListRepositoryImplTest : FunSpec({
     test("updateTaskList returns failure when network throws") {
         val fake = FakeTaskListRemoteDataSource()
         fake.updateTaskListResult = Result.failure(NetworkException.ClientError(400, "bad request"))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.updateTaskList(UpdateTaskListParams("some-uuid", "title", emptyList(), isAutoDelete = false))
 
@@ -326,19 +360,42 @@ class TaskListRepositoryImplTest : FunSpec({
 
     test("deleteTaskList returns Unit on success") {
         val fake = FakeTaskListRemoteDataSource()
+        val taskList = tasks.v1.TaskList(
+            id = "tl-uuid-del",
+            file_path = "home/projects/tl-uuid-del.json",
+            title = "Delete me",
+            tasks = emptyList(),
+            updated_at = 1L,
+            is_auto_delete = false
+        )
+        fake.getTaskListResult = Result.success(GetTaskListResponse(task_list = taskList))
         fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val notifier = RecordingDirectoryChangeNotifier()
+        val repo = newRepo(fake, notifier)
 
         val result = repo.deleteTaskList("tl-uuid-del")
 
         result.isSuccess shouldBe true
         result.getOrThrow() shouldBe Unit
+        notifier.notifiedPaths shouldBe listOf("home/projects")
     }
 
     test("deleteTaskList forwards correct id to data source") {
         val fake = FakeTaskListRemoteDataSource()
+        fake.getTaskListResult = Result.success(
+            GetTaskListResponse(
+                task_list = tasks.v1.TaskList(
+                    id = "target-uuid",
+                    file_path = "home/projects/target-uuid.json",
+                    title = "Delete me",
+                    tasks = emptyList(),
+                    updated_at = 1L,
+                    is_auto_delete = false
+                )
+            )
+        )
         fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         repo.deleteTaskList("target-uuid")
 
@@ -347,8 +404,20 @@ class TaskListRepositoryImplTest : FunSpec({
 
     test("deleteTaskList returns failure when network throws") {
         val fake = FakeTaskListRemoteDataSource()
+        fake.getTaskListResult = Result.success(
+            GetTaskListResponse(
+                task_list = tasks.v1.TaskList(
+                    id = "some-uuid",
+                    file_path = "home/projects/some-uuid.json",
+                    title = "Delete me",
+                    tasks = emptyList(),
+                    updated_at = 1L,
+                    is_auto_delete = false
+                )
+            )
+        )
         fake.deleteTaskListResult = Result.failure(NetworkException.NetworkError("timeout"))
-        val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+        val repo = newRepo(fake)
 
         val result = repo.deleteTaskList("some-uuid")
 

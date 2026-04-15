@@ -2,6 +2,7 @@ package net.onefivefour.echolist.di
 
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import net.onefivefour.echolist.data.DirectoryChangeNotifierImpl
@@ -109,6 +110,8 @@ val networkModule: Module = module {
 }
 
 val dataModule: Module = module {
+    single<CoroutineDispatcher> { Dispatchers.Default }
+
     single<CacheDataSource> {
         CacheDataSourceImpl(database = get())
     }
@@ -139,7 +142,8 @@ val dataModule: Module = module {
     single<TaskListRepository> {
         TaskListRepositoryImpl(
             networkDataSource = get(),
-            dispatcher = Dispatchers.Default
+            dispatcher = get(),
+            directoryChangeNotifier = get()
         )
     }
 }

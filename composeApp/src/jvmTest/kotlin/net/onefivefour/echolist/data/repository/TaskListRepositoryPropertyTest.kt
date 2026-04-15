@@ -11,11 +11,13 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableSharedFlow
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest
@@ -34,6 +36,19 @@ import tasks.v1.UpdateTaskListResponse
  * Validates: Requirements 12.7
  */
 class TaskListRepositoryPropertyTest : FunSpec({
+
+    class NoOpDirectoryChangeNotifier : DirectoryChangeNotifier {
+        override val directoryChanged = MutableSharedFlow<String>()
+
+        override suspend fun notifyChanged(path: String) = Unit
+    }
+
+    fun newRepo(dataSource: TaskListRemoteDataSource): TaskListRepositoryImpl =
+        TaskListRepositoryImpl(
+            networkDataSource = dataSource,
+            dispatcher = Dispatchers.Unconfined,
+            directoryChangeNotifier = NoOpDirectoryChangeNotifier()
+        )
 
     // -- Generators --
 
@@ -95,10 +110,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     test("Feature: proto-api-update, Property 7: createTaskList propagates exception as Result.failure") {
         checkAll(PropTestConfig(iterations = 100), arbCreateTaskListParams, arbException) { params, ex ->
-            val repo = TaskListRepositoryImpl(
-                networkDataSource = ThrowingDataSource(ex),
-                dispatcher = Dispatchers.Unconfined
-            )
+            val repo = newRepo(ThrowingDataSource(ex))
             val result = repo.createTaskList(params)
             result.shouldBeFailure { it shouldBe ex }
         }
@@ -106,10 +118,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     test("Feature: proto-api-update, Property 7: getTaskList propagates exception as Result.failure") {
         checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { taskListId, ex ->
-            val repo = TaskListRepositoryImpl(
-                networkDataSource = ThrowingDataSource(ex),
-                dispatcher = Dispatchers.Unconfined
-            )
+            val repo = newRepo(ThrowingDataSource(ex))
             val result = repo.getTaskList(taskListId)
             result.shouldBeFailure { it shouldBe ex }
         }
@@ -117,10 +126,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     test("Feature: proto-api-update, Property 7: listTaskLists propagates exception as Result.failure") {
         checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { path, ex ->
-            val repo = TaskListRepositoryImpl(
-                networkDataSource = ThrowingDataSource(ex),
-                dispatcher = Dispatchers.Unconfined
-            )
+            val repo = newRepo(ThrowingDataSource(ex))
             val result = repo.listTaskLists(path)
             result.shouldBeFailure { it shouldBe ex }
         }
@@ -128,10 +134,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     test("Feature: proto-api-update, Property 7: updateTaskList propagates exception as Result.failure") {
         checkAll(PropTestConfig(iterations = 100), arbUpdateTaskListParams, arbException) { params, ex ->
-            val repo = TaskListRepositoryImpl(
-                networkDataSource = ThrowingDataSource(ex),
-                dispatcher = Dispatchers.Unconfined
-            )
+            val repo = newRepo(ThrowingDataSource(ex))
             val result = repo.updateTaskList(params)
             result.shouldBeFailure { it shouldBe ex }
         }
@@ -139,10 +142,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     test("Feature: proto-api-update, Property 7: deleteTaskList propagates exception as Result.failure") {
         checkAll(PropTestConfig(iterations = 100), Arb.string(1..100), arbException) { taskListId, ex ->
-            val repo = TaskListRepositoryImpl(
-                networkDataSource = ThrowingDataSource(ex),
-                dispatcher = Dispatchers.Unconfined
-            )
+            val repo = newRepo(ThrowingDataSource(ex))
             val result = repo.deleteTaskList(taskListId)
             result.shouldBeFailure { it shouldBe ex }
         }

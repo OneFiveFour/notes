@@ -34,6 +34,19 @@ import tasks.v1.UpdateTaskListResponse
  */
 class TaskListRepositoryImplPropertyTest : FunSpec({
 
+    class NoOpDirectoryChangeNotifier : net.onefivefour.echolist.domain.DirectoryChangeNotifier {
+        override val directoryChanged = kotlinx.coroutines.flow.MutableSharedFlow<String>()
+
+        override suspend fun notifyChanged(path: String) = Unit
+    }
+
+    fun newRepo(fake: FakeTaskListRemoteDataSource): TaskListRepositoryImpl =
+        TaskListRepositoryImpl(
+            networkDataSource = fake,
+            dispatcher = Dispatchers.Unconfined,
+            directoryChangeNotifier = NoOpDirectoryChangeNotifier()
+        )
+
     // -- Generators --
 
     val arbProtoSubTask = arbitrary {
@@ -115,7 +128,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.createTaskListResult = Result.success(CreateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.createTaskList(params)
 
@@ -140,7 +153,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.createTaskListResult = Result.success(CreateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.createTaskList(params)
 
@@ -166,7 +179,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { taskListId, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.getTaskListResult = Result.success(GetTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.getTaskList(taskListId)
 
@@ -198,7 +211,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
                     )
                 )
             )
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.getTaskList(taskListId)
 
@@ -223,7 +236,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             fake.listTaskListsResult = Result.success(
                 ListTaskListsResponse(task_lists = protoTaskLists)
             )
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.listTaskLists(path)
 
@@ -248,7 +261,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { path ->
             val fake = FakeTaskListRemoteDataSource()
             fake.listTaskListsResult = Result.success(ListTaskListsResponse())
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.listTaskLists(path)
 
@@ -272,7 +285,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.updateTaskListResult = Result.success(UpdateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.updateTaskList(params)
 
@@ -296,7 +309,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
         ) { params, protoTaskList ->
             val fake = FakeTaskListRemoteDataSource()
             fake.updateTaskListResult = Result.success(UpdateTaskListResponse(task_list = protoTaskList))
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.updateTaskList(params)
 
@@ -318,8 +331,20 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             Arb.string(1..100)
         ) { taskListId ->
             val fake = FakeTaskListRemoteDataSource()
+            fake.getTaskListResult = Result.success(
+                GetTaskListResponse(
+                    task_list = tasks.v1.TaskList(
+                        id = taskListId,
+                        file_path = "home/projects/$taskListId.json",
+                        title = "Delete me",
+                        tasks = emptyList(),
+                        updated_at = 1L,
+                        is_auto_delete = false
+                    )
+                )
+            )
             fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             val result = repo.deleteTaskList(taskListId)
 
@@ -336,8 +361,20 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             Arb.string(1..100)
         ) { taskListId ->
             val fake = FakeTaskListRemoteDataSource()
+            fake.getTaskListResult = Result.success(
+                GetTaskListResponse(
+                    task_list = tasks.v1.TaskList(
+                        id = taskListId,
+                        file_path = "home/projects/$taskListId.json",
+                        title = "Delete me",
+                        tasks = emptyList(),
+                        updated_at = 1L,
+                        is_auto_delete = false
+                    )
+                )
+            )
             fake.deleteTaskListResult = Result.success(DeleteTaskListResponse())
-            val repo = TaskListRepositoryImpl(fake, Dispatchers.Unconfined)
+            val repo = newRepo(fake)
 
             repo.deleteTaskList(taskListId)
 

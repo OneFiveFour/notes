@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.data.repository
 
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.TaskListMapper
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
@@ -9,6 +8,7 @@ import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
+import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 import tasks.v1.DeleteTaskListRequest
 import tasks.v1.GetTaskListRequest
@@ -16,7 +16,8 @@ import tasks.v1.ListTaskListsRequest
 
 internal class TaskListRepositoryImpl(
     private val networkDataSource: TaskListRemoteDataSource,
-    private val dispatcher: CoroutineDispatcher = Dispatchers.Default
+    private val dispatcher: CoroutineDispatcher,
+    private val directoryChangeNotifier: DirectoryChangeNotifier
 ) : TaskListRepository {
 
     override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> =
@@ -24,7 +25,9 @@ internal class TaskListRepositoryImpl(
             try {
                 val request = TaskListMapper.toProto(params)
                 val response = networkDataSource.createTaskList(request)
-                Result.success(TaskListMapper.toDomain(response))
+                val taskList = TaskListMapper.toDomain(response)
+                directoryChangeNotifier.notifyChanged(normalizePath(params.path))
+                Result.success(taskList)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -57,7 +60,11 @@ internal class TaskListRepositoryImpl(
             try {
                 val request = TaskListMapper.toProto(params)
                 val response = networkDataSource.updateTaskList(request)
-                Result.success(TaskListMapper.toDomain(response))
+                val taskList = TaskListMapper.toDomain(response)
+                directoryChangeNotifier.notifyChanged(
+                    normalizePath(taskList.filePath.substringBeforeLast('/', ""))
+                )
+                Result.success(taskList)
             } catch (e: Exception) {
                 Result.failure(e)
             }
@@ -66,8 +73,13 @@ internal class TaskListRepositoryImpl(
     override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
         withContext(dispatcher) {
             try {
+                val taskListResponse = networkDataSource.getTaskList(GetTaskListRequest(id = taskListId))
+                val filePath = TaskListMapper.toDomain(taskListResponse).filePath
                 val request = DeleteTaskListRequest(id = taskListId)
                 networkDataSource.deleteTaskList(request)
+                directoryChangeNotifier.notifyChanged(
+                    normalizePath(filePath.substringBeforeLast('/', ""))
+                )
                 Result.success(Unit)
             } catch (e: Exception) {
                 Result.failure(e)
