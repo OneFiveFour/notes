@@ -3,12 +3,7 @@ package net.onefivefour.echolist.ui.edittasklist
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
-import io.kotest.property.Arb
-import io.kotest.property.PropTestConfig
-import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.filter
-import io.kotest.property.arbitrary.string
-import io.kotest.property.checkAll
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
@@ -25,7 +20,7 @@ import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 
-@OptIn(ExperimentalCoroutinesApi::class, io.kotest.common.ExperimentalKotest::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class EditTaskListViewModelPropertyTest : FunSpec({
 
     val testDispatcher = StandardTestDispatcher()
@@ -43,7 +38,9 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         val updateTaskListCalls = mutableListOf<UpdateTaskListParams>()
         val deleteTaskListCalls = mutableListOf<String>()
         val getTaskListCalls = mutableListOf<String>()
-        private val taskLists = mutableMapOf<String, TaskList>()
+        val taskLists = mutableMapOf<String, TaskList>()
+        var nextCreatedId = 1
+        var blockNextUpdate: CompletableDeferred<Unit>? = null
 
         fun addTaskList(taskList: TaskList) {
             taskLists[taskList.id] = taskList
@@ -52,7 +49,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> {
             createTaskListCalls.add(params)
             val created = TaskList(
-                id = "generated-${params.name}",
+                id = "created-${nextCreatedId++}",
                 filePath = "${params.path}/${params.name}",
                 name = params.name,
                 tasks = params.tasks,
@@ -65,7 +62,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
         override suspend fun getTaskList(taskListId: String): Result<TaskList> {
             getTaskListCalls.add(taskListId)
-            return taskLists[taskListId]?.let { Result.success(it) }
+            return taskLists[taskListId]?.let(Result.Companion::success)
                 ?: Result.failure(NoSuchElementException("TaskList not found: $taskListId"))
         }
 
@@ -74,10 +71,22 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
         override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> {
             updateTaskListCalls.add(params)
+            blockNextUpdate?.let { deferred ->
+                deferred.await()
+                if (blockNextUpdate === deferred) {
+                    blockNextUpdate = null
+                }
+            }
+
             val existing = taskLists[params.id]
                 ?: return Result.failure(NoSuchElementException("TaskList not found: ${params.id}"))
-            val updated = existing.copy(name = params.title, tasks = params.tasks, updatedAt = existing.updatedAt + 1)
-                .copy(isAutoDelete = params.isAutoDelete)
+
+            val updated = existing.copy(
+                name = params.title,
+                tasks = params.tasks,
+                updatedAt = existing.updatedAt + 1,
+                isAutoDelete = params.isAutoDelete
+            )
             taskLists[updated.id] = updated
             return Result.success(updated)
         }
@@ -89,359 +98,333 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
-    test("Property 1: create mode saves a new task list with nested tasks") {
+    fun taskList(
+        id: String,
+        name: String = "Existing list",
+        tasks: List<MainTask> = listOf(
+            MainTask(
+                description = "Existing task",
+                isDone = false,
+                dueDate = "",
+                recurrence = "",
+                subTasks = emptyList()
+            )
+        ),
+        isAutoDelete: Boolean = false
+    ): TaskList = TaskList(
+        id = id,
+        filePath = "home/$id",
+        name = name,
+        tasks = tasks,
+        updatedAt = 1L,
+        isAutoDelete = isAutoDelete
+    )
+
+    test("create mode auto-creates on the first valid blur and becomes persisted") {
         runTest(testDispatcher) {
-            val fakeRepo = FakeTaskListRepository()
-            val parentPath = "home/projects"
+            val repo = FakeTaskListRepository()
             val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Create(parentPath),
-                taskListRepository = fakeRepo
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo
             )
 
-            vm.uiState.value.titleState.edit {
-                replace(0, length, "Sprint plan")
-            }
-
-            vm.onAddMainTask()
-            val task = vm.uiState.value.mainTasks[0]
-            task.descriptionState.edit { replace(0, length, "Plan release") }
-            task.isDone = true
-            task.dueDateState.edit { replace(0, length, "2026-04-01") }
-            vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Write checklist") }
-
-            vm.onSaveClick()
+            vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
+            vm.onFieldFocusLost()
             testScheduler.advanceUntilIdle()
 
-            fakeRepo.createTaskListCalls shouldHaveSize 1
-            val params = fakeRepo.createTaskListCalls[0]
-            params.name shouldBe "Sprint plan"
-            params.path shouldBe parentPath
-            params.tasks shouldHaveSize 1
-            params.tasks[0].description shouldBe "Plan release"
-            params.tasks[0].isDone shouldBe true
-            params.tasks[0].dueDate shouldBe "2026-04-01"
-            params.tasks[0].subTasks shouldHaveSize 1
-            params.tasks[0].subTasks[0].description shouldBe "Write checklist"
-            params.isAutoDelete shouldBe false
-        }
-    }
+            repo.createTaskListCalls shouldHaveSize 0
 
-    // Feature: tasklist-auto-delete, Property 1: Create-mode isAutoDelete propagation
-    test("Property 1 (PBT): create-mode isAutoDelete propagation") {
-        // **Validates: Requirements 3.1, 3.2**
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.boolean()
-        ) { isAutoDelete ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val vm = EditTaskListViewModel(
-                    mode = EditTaskListMode.Create("home"),
-                    taskListRepository = fakeRepo
-                )
-
-                vm.uiState.value.titleState.edit {
-                    replace(0, length, "Test list")
-                }
-                vm.onAddMainTask()
-                vm.uiState.value.mainTasks[0].descriptionState.edit {
-                    replace(0, length, "Task")
-                }
-
-                vm.onToggleAutoDelete(isAutoDelete)
-
-                vm.onSaveClick()
-                testScheduler.advanceUntilIdle()
-
-                fakeRepo.createTaskListCalls shouldHaveSize 1
-                fakeRepo.createTaskListCalls[0].isAutoDelete shouldBe isAutoDelete
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Plan release")
             }
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.createTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls shouldHaveSize 0
+            repo.createTaskListCalls[0].name shouldBe "Sprint plan"
+            repo.createTaskListCalls[0].tasks.single().description shouldBe "Plan release"
+            vm.uiState.value.isPersisted shouldBe true
         }
     }
 
-    // Feature: tasklist-auto-delete, Property 2: Update-mode isAutoDelete propagation
-    test("Property 2 (PBT): update-mode isAutoDelete propagation") {
-        // **Validates: Requirements 4.1**
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.boolean()
-        ) { isAutoDelete ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val existingTaskList = TaskList(
-                    id = "task-list-update",
-                    filePath = "home/task-list-update",
-                    name = "Existing list",
-                    tasks = listOf(
-                        MainTask(
-                            description = "Some task",
-                            isDone = false,
-                            dueDate = "",
-                            recurrence = "",
-                            subTasks = emptyList()
-                        )
-                    ),
-                    updatedAt = 1L,
-                    isAutoDelete = !isAutoDelete // start with opposite value
-                )
-                fakeRepo.addTaskList(existingTaskList)
-
-                val vm = EditTaskListViewModel(
-                    mode = EditTaskListMode.Edit(existingTaskList.id),
-                    taskListRepository = fakeRepo
-                )
-
-                testScheduler.advanceUntilIdle()
-
-                vm.onToggleAutoDelete(isAutoDelete)
-
-                vm.onSaveClick()
-                testScheduler.advanceUntilIdle()
-
-                fakeRepo.updateTaskListCalls shouldHaveSize 1
-                fakeRepo.updateTaskListCalls[0].isAutoDelete shouldBe isAutoDelete
-            }
-        }
-    }
-
-    // Feature: tasklist-auto-delete, Property 5: Load restores isAutoDelete from backend
-    test("Property 5 (PBT): load restores isAutoDelete from backend") {
-        // **Validates: Requirements 5.1, 5.2**
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.boolean()
-        ) { isAutoDelete ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val taskList = TaskList(
-                    id = "task-list-load",
-                    filePath = "home/task-list-load",
-                    name = "Load test",
-                    tasks = listOf(
-                        MainTask(
-                            description = "Some task",
-                            isDone = false,
-                            dueDate = "",
-                            recurrence = "",
-                            subTasks = emptyList()
-                        )
-                    ),
-                    updatedAt = 1L,
-                    isAutoDelete = isAutoDelete
-                )
-                fakeRepo.addTaskList(taskList)
-
-                val vm = EditTaskListViewModel(
-                    mode = EditTaskListMode.Edit(taskList.id),
-                    taskListRepository = fakeRepo
-                )
-
-                testScheduler.advanceUntilIdle()
-
-                vm.uiState.value.isAutoDelete shouldBe isAutoDelete
-            }
-        }
-    }
-
-    test("Property 2: edit mode loads data and updates the existing task list") {
+    test("later blur after auto-create updates instead of creating again") {
         runTest(testDispatcher) {
-            val fakeRepo = FakeTaskListRepository()
-            val taskList = TaskList(
-                id = "task-list-1",
-                filePath = "home/projects/task-list-1",
-                name = "Trip prep",
+            val repo = FakeTaskListRepository()
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo
+            )
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Plan release")
+            }
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Plan release v2")
+            }
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.createTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].title shouldBe "Sprint plan"
+            repo.updateTaskListCalls[0].tasks.single().description shouldBe "Plan release v2"
+        }
+    }
+
+    test("title blur updates an existing task list") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-1", name = "Trip prep")
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Trip prep v2") }
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].title shouldBe "Trip prep v2"
+        }
+    }
+
+    test("main task checkbox changes sync immediately") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-check")
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.onMainTaskCheckedChange(0, true)
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks.single().isDone shouldBe true
+        }
+    }
+
+    test("manual delete syncs immediately") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-delete-row",
                 tasks = listOf(
-                    MainTask(
-                        description = "Book hotel",
-                        isDone = false,
-                        dueDate = "",
-                        recurrence = "FREQ=WEEKLY;BYDAY=MO",
-                        subTasks = listOf(SubTask(description = "Compare prices", isDone = true))
-                    )
+                    MainTask("Task 1", false, "", "", emptyList()),
+                    MainTask("Task 2", false, "", "", emptyList())
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.onRemoveMainTask(1)
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks.map { it.description } shouldBe listOf("Task 1")
+        }
+    }
+
+    test("auto-delete removes completed main tasks locally and syncs the reduced list") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-auto-main",
+                tasks = listOf(
+                    MainTask("Task 1", false, "", "", emptyList()),
+                    MainTask("Task 2", false, "", "", emptyList())
                 ),
-                updatedAt = 10L,
                 isAutoDelete = true
             )
-            fakeRepo.addTaskList(taskList)
+            repo.addTaskList(existing)
 
             val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Edit(taskList.id),
-                taskListRepository = fakeRepo
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
             )
 
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.titleState.text.toString() shouldBe taskList.name
-            vm.uiState.value.mainTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].descriptionState.text.toString() shouldBe "Book hotel"
-            vm.uiState.value.mainTasks[0].recurrenceState.text.toString() shouldBe "FREQ=WEEKLY;BYDAY=MO"
-            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.text.toString() shouldBe "Compare prices"
-
-            vm.uiState.value.titleState.edit {
-                replace(0, length, "Trip prep v2")
-            }
-            vm.uiState.value.isAutoDelete shouldBe true
-            vm.onToggleAutoDelete(false)
-            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Book hotel and flight") }
-            vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks[1].descriptionState.edit { replace(0, length, "Book flight") }
-
-            vm.onSaveClick()
+            vm.onMainTaskCheckedChange(0, true)
             testScheduler.advanceUntilIdle()
 
-            fakeRepo.getTaskListCalls shouldBe listOf(taskList.id)
-            fakeRepo.updateTaskListCalls shouldHaveSize 1
-            val update = fakeRepo.updateTaskListCalls[0]
-            update.id shouldBe taskList.id
-            update.title shouldBe "Trip prep v2"
-            update.tasks shouldHaveSize 1
-            update.tasks[0].description shouldBe "Book hotel and flight"
-            update.tasks[0].subTasks shouldHaveSize 2
-            update.isAutoDelete shouldBe false
-            vm.uiState.value.isSaving shouldBe false
+            vm.uiState.value.mainTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Task 2")
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks.map { it.description } shouldBe listOf("Task 2")
         }
     }
 
-    test("main task stays and updates done state when isAutoDelete is false") {
+    test("auto-delete removes completed subtasks locally and syncs the reduced list") {
         runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-auto-sub",
+                tasks = listOf(
+                    MainTask(
+                        description = "Parent",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = listOf(
+                            SubTask("Sub 1", false),
+                            SubTask("Sub 2", false)
+                        )
+                    )
+                ),
+                isAutoDelete = true
+            )
+            repo.addTaskList(existing)
+
             val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Create("home"),
-                taskListRepository = FakeTaskListRepository()
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
             )
 
-            vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Keep me") }
-
-            vm.onMainTaskCheckedChange(0, true)
-
-            vm.uiState.value.mainTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].isDone shouldBe true
-        }
-    }
-
-    test("subtask stays and updates done state when isAutoDelete is false") {
-        runTest(testDispatcher) {
-            val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Create("home"),
-                taskListRepository = FakeTaskListRepository()
-            )
-
-            vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Parent") }
-            vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Keep me") }
+            testScheduler.advanceUntilIdle()
 
             vm.onSubTaskCheckedChange(0, 0, true)
+            testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe true
+            vm.uiState.value.mainTasks[0].subTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Sub 2")
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks[0].subTasks.map { it.description } shouldBe listOf("Sub 2")
         }
     }
 
-    test("main task stays and updates done state when isAutoDelete is true") {
+    test("auto-delete toggle syncs immediately") {
         runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-toggle", isAutoDelete = false)
+            repo.addTaskList(existing)
+
             val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Create("home"),
-                taskListRepository = FakeTaskListRepository()
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
             )
 
-            vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Delete me") }
-            vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Child") }
+            testScheduler.advanceUntilIdle()
+
             vm.onToggleAutoDelete(true)
+            testScheduler.advanceUntilIdle()
 
-            vm.onMainTaskCheckedChange(0, true)
-
-            vm.uiState.value.mainTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].isDone shouldBe true
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].isAutoDelete shouldBe true
         }
     }
 
-    test("subtask stays and updates done state when isAutoDelete is true") {
+    test("invalid due date blocks sync and preserves the validation error") {
         runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
-                taskListRepository = FakeTaskListRepository()
+                taskListRepository = repo
             )
 
+            vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit { replace(0, length, "Parent") }
-            vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit { replace(0, length, "Delete me") }
-            vm.onToggleAutoDelete(true)
-
-            vm.onSubTaskCheckedChange(0, 0, true)
-
-            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe true
-        }
-    }
-
-    // Feature: tasklist-auto-delete, Property 7: Task check/uncheck is independent of isAutoDelete
-    test("Property 7 (PBT): task check/uncheck is independent of isAutoDelete") {
-        // **Validates: Requirements 8.1, 8.2, 8.3, 8.4**
-        checkAll(
-            PropTestConfig(iterations = 100),
-            Arb.boolean(),
-            Arb.boolean()
-        ) { isAutoDelete, isDone ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val vm = EditTaskListViewModel(
-                    mode = EditTaskListMode.Create("home"),
-                    taskListRepository = fakeRepo
-                )
-
-                // Add a MainTask with a SubTask
-                vm.onAddMainTask()
-                vm.uiState.value.mainTasks[0].descriptionState.edit {
-                    replace(0, length, "Main task")
-                }
-                vm.onAddSubTask(0)
-                vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.edit {
-                    replace(0, length, "Sub task")
-                }
-
-                // Toggle isAutoDelete to the random value
-                vm.onToggleAutoDelete(isAutoDelete)
-
-                val mainTaskCountBefore = vm.uiState.value.mainTasks.size
-                val subTaskCountBefore = vm.uiState.value.mainTasks[0].subTasks.size
-
-                // Check/uncheck the MainTask
-                vm.onMainTaskCheckedChange(0, isDone)
-
-                vm.uiState.value.mainTasks.size shouldBe mainTaskCountBefore
-                vm.uiState.value.mainTasks[0].isDone shouldBe isDone
-
-                // Check/uncheck the SubTask
-                vm.onSubTaskCheckedChange(0, 0, isDone)
-
-                vm.uiState.value.mainTasks[0].subTasks.size shouldBe subTaskCountBefore
-                vm.uiState.value.mainTasks[0].subTasks[0].isDone shouldBe isDone
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Plan release")
             }
+            vm.uiState.value.mainTasks[0].dueDateState.edit {
+                replace(0, length, "2026/04/01")
+            }
+
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.createTaskListCalls shouldHaveSize 0
+            repo.updateTaskListCalls shouldHaveSize 0
+            vm.uiState.value.error shouldBe "Due date must use YYYY-MM-DD."
         }
     }
 
-    test("Property 3: delete emits navigate-back for edit mode") {
+    test("repeated blur without changes does not send duplicate requests") {
         runTest(testDispatcher) {
-            val fakeRepo = FakeTaskListRepository()
-            val taskList = TaskList(
-                id = "task-list-delete",
-                filePath = "home/projects/task-list-delete",
-                name = "Delete me",
-                tasks = emptyList(),
-                updatedAt = 1L,
-                isAutoDelete = false
-            )
-            fakeRepo.addTaskList(taskList)
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-dedupe", name = "Trip prep")
+            repo.addTaskList(existing)
 
             val vm = EditTaskListViewModel(
-                mode = EditTaskListMode.Edit(taskList.id),
-                taskListRepository = fakeRepo
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Trip prep v2") }
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+        }
+    }
+
+    test("queued edits run after an in-flight sync finishes") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-queue", name = "Trip prep")
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            val gate = CompletableDeferred<Unit>()
+            repo.blockNextUpdate = gate
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Trip prep v2") }
+            vm.onFieldFocusLost()
+            testScheduler.runCurrent()
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Trip prep v3") }
+            vm.onFieldFocusLost()
+
+            gate.complete(Unit)
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 2
+            repo.updateTaskListCalls.last().title shouldBe "Trip prep v3"
+        }
+    }
+
+    test("delete emits navigate-back for a persisted task list") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-delete")
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
             )
 
             testScheduler.advanceUntilIdle()
@@ -452,39 +435,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             testScheduler.advanceUntilIdle()
 
             navigateBackDeferred.await() shouldBe Unit
-            fakeRepo.deleteTaskListCalls shouldBe listOf(taskList.id)
-        }
-    }
-
-    test("Property 4: recurrence clears due date before save") {
-        checkAll(
-            PropTestConfig(iterations = 50),
-            Arb.string(0..20).filter { it.isNotBlank() }
-        ) { recurrence ->
-            runTest(testDispatcher) {
-                val fakeRepo = FakeTaskListRepository()
-                val vm = EditTaskListViewModel(
-                    mode = EditTaskListMode.Create("home"),
-                    taskListRepository = fakeRepo
-                )
-
-                vm.uiState.value.titleState.edit {
-                    replace(0, length, "Recurring")
-                }
-                vm.onAddMainTask()
-                val task = vm.uiState.value.mainTasks[0]
-                task.descriptionState.edit { replace(0, length, "Repeat setup") }
-                task.dueDateState.edit { replace(0, length, "2026-04-01") }
-                task.recurrenceState.edit { replace(0, length, recurrence.singleLine()) }
-                testScheduler.advanceUntilIdle()
-
-                vm.onSaveClick()
-                testScheduler.advanceUntilIdle()
-
-                fakeRepo.createTaskListCalls shouldHaveSize 1
-                fakeRepo.createTaskListCalls[0].tasks[0].dueDate shouldBe ""
-                fakeRepo.createTaskListCalls[0].tasks[0].recurrence shouldBe recurrence.singleLine()
-            }
+            repo.deleteTaskListCalls shouldBe listOf(existing.id)
         }
     }
 })

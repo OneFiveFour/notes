@@ -8,13 +8,11 @@ internal data class EditTaskListUiState(
     val mainTasks: SnapshotStateList<UiMainTask>,
     val mode: EditTaskListMode,
     val isAutoDelete: Boolean = false,
+    val isPersisted: Boolean = false,
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null
 ) {
-    val isSaveEnabled: Boolean
-        get() = titleState.text.isNotBlank() && !isLoading && !isSaving
-
     val isCreateMode: Boolean
         get() = mode is EditTaskListMode.Create
 

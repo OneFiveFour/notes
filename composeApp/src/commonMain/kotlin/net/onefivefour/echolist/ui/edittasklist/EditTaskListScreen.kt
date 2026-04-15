@@ -38,7 +38,7 @@ internal fun EditTaskListScreen(
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
-    onSaveClick: () -> Unit,
+    onFieldFocusLost: () -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -82,7 +82,8 @@ internal fun EditTaskListScreen(
         EditNoteTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
-            onNext = onAddMainTaskAndFocus
+            onNext = onAddMainTaskAndFocus,
+            onFocusLost = onFieldFocusLost
         )
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
@@ -130,6 +131,7 @@ internal fun EditTaskListScreen(
                         onMainTaskCheckedChange = onMainTaskCheckedChange,
                         onAddMainTask = onAddMainTaskAndFocus,
                         onSubTaskCheckedChange = onSubTaskCheckedChange,
+                        onFieldFocusLost = onFieldFocusLost,
                         focusTarget = resolvedFocusTarget,
                         onFocusHandled = onFocusHandled,
                         onSubTaskKeyboardAction = onSubTaskKeyboardAction
@@ -147,14 +149,14 @@ internal fun EditTaskListScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+        if (uiState.isPersisted) {
+            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
 
-        TaskListToolbar(
-            uiState = uiState,
-            onAddMainTask = onAddMainTaskAndFocus,
-            onSaveClick = onSaveClick,
-            onDeleteClick = onDeleteClick
-        )
+            TaskListToolbar(
+                isEnabled = !uiState.isLoading && !uiState.isSaving,
+                onDeleteClick = onDeleteClick
+            )
+        }
     }
 }
 
@@ -194,7 +196,7 @@ private fun EditTaskListScreenPreview() {
                 onMainTaskCheckedChange = { _, _ -> },
                 onSubTaskCheckedChange = { _, _, _ -> },
                 onToggleAutoDelete = {},
-                onSaveClick = {},
+                onFieldFocusLost = {},
                 onDeleteClick = {}
             )
         }

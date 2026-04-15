@@ -25,6 +25,7 @@ internal fun SubTaskRow(
     shouldRequestFocus: Boolean,
     onFocusHandled: () -> Unit,
     onKeyboardAction: () -> Unit,
+    onFocusLost: () -> Unit,
     onCheckedChange: (Boolean) -> Unit
 ) {
     val focusRequester = remember(subTask.subTaskId) { FocusRequester() }
@@ -62,6 +63,7 @@ internal fun SubTaskRow(
             singleLine = true,
             imeAction = ImeAction.Companion.Next,
             onKeyboardAction = onKeyboardAction,
+            onFocusLost = onFocusLost,
             focusRequester = focusRequester
         )
     }
@@ -81,6 +83,7 @@ private fun SubTaskRowPreview() {
                 shouldRequestFocus = false,
                 onFocusHandled = {},
                 onKeyboardAction = {},
+                onFocusLost = {},
                 onCheckedChange = {}
             )
         }
@@ -100,6 +103,7 @@ private fun SubTaskRowDonePreview() {
                 shouldRequestFocus = false,
                 onFocusHandled = {},
                 onKeyboardAction = {},
+                onFocusLost = {},
                 onCheckedChange = {}
             )
         }

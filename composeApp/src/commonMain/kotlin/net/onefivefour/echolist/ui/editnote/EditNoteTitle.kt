@@ -10,10 +10,14 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.input.ImeAction
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -21,9 +25,11 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 internal fun EditNoteTitle(
     textFieldState: TextFieldState,
     requestFocus: Boolean = false,
-    onNext: () -> Unit = {}
+    onNext: () -> Unit = {},
+    onFocusLost: (() -> Unit)? = null
 ) {
     val focusRequester = remember { FocusRequester() }
+    var wasFocused by remember(textFieldState) { mutableStateOf(false) }
 
     if (requestFocus) {
         LaunchedEffect(Unit) {
@@ -45,7 +51,19 @@ internal fun EditNoteTitle(
         BasicTextField(
             modifier = Modifier
                 .padding(EchoListTheme.dimensions.m)
-                .focusRequester(focusRequester),
+                .focusRequester(focusRequester)
+                .then(
+                    if (onFocusLost == null) {
+                        Modifier
+                    } else {
+                        Modifier.onFocusChanged { focusState ->
+                            if (wasFocused && !focusState.isFocused) {
+                                onFocusLost()
+                            }
+                            wasFocused = focusState.isFocused
+                        }
+                    }
+                ),
             state = textFieldState,
             textStyle = EchoListTheme.typography.titleLarge.copy(
                 color = EchoListTheme.materialColors.onSurface

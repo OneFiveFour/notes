@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 
 internal class EditTaskListViewModel(
@@ -24,18 +27,30 @@ internal class EditTaskListViewModel(
     private val taskListRepository: TaskListRepository
 ) : ViewModel() {
 
+    private data class SyncSnapshot(
+        val title: String,
+        val tasks: List<MainTask>,
+        val isAutoDelete: Boolean
+    )
+
     private val titleState = TextFieldState()
     private val tasks = mutableStateListOf<UiMainTask>()
     private var nextDraftId = 1L
     private var nextSubTaskDraftId = 1L
+    private var persistedTaskListId: String? = (mode as? EditTaskListMode.Edit)?.taskListId
+    private var lastSuccessfulSnapshot: SyncSnapshot? = null
+    private var syncQueued = false
+    private var syncJob: Job? = null
 
     private val dueDatePattern = Regex("""^\d{4}-\d{2}-\d{2}$""")
+    private val titleRequiredMessage = "Title cannot be blank."
 
     private val _uiState = MutableStateFlow(
         EditTaskListUiState(
             titleState = titleState,
             mainTasks = tasks,
             mode = mode,
+            isPersisted = mode is EditTaskListMode.Edit,
             isLoading = mode is EditTaskListMode.Edit
         )
     )
@@ -60,13 +75,19 @@ internal class EditTaskListViewModel(
     fun onRemoveMainTask(index: Int) {
         if (index !in tasks.indices) return
         tasks.removeAt(index)
-        _uiState.update { it.copy(error = null) }
+        requestSync()
     }
 
     fun onMainTaskCheckedChange(index: Int, isChecked: Boolean) {
         val task = tasks.getOrNull(index) ?: return
-        task.isDone = isChecked
-        _uiState.update { it.copy(error = null) }
+
+        if (_uiState.value.isAutoDelete && isChecked) {
+            tasks.removeAt(index)
+        } else {
+            task.isDone = isChecked
+        }
+
+        requestSync()
     }
 
     fun onAddSubTask(mainTaskIndex: Int) {
@@ -78,64 +99,32 @@ internal class EditTaskListViewModel(
     fun onSubTaskCheckedChange(mainTaskIndex: Int, subTaskIndex: Int, isChecked: Boolean) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
         if (subTaskIndex !in task.subTasks.indices) return
-        task.subTasks[subTaskIndex].isDone = isChecked
-        _uiState.update { it.copy(error = null) }
+
+        if (_uiState.value.isAutoDelete && isChecked) {
+            task.subTasks.removeAt(subTaskIndex)
+        } else {
+            task.subTasks[subTaskIndex].isDone = isChecked
+        }
+
+        requestSync()
     }
 
     fun onToggleAutoDelete(isAutoDelete: Boolean) {
-        _uiState.update { it.copy(isAutoDelete = isAutoDelete, error = null) }
+        _uiState.update { it.copy(isAutoDelete = isAutoDelete) }
+        requestSync()
     }
 
-    fun onSaveClick() {
-        val trimmedTitle = titleState.text.toString().trim()
-        if (trimmedTitle.isBlank()) return
-
-        validateDrafts()?.let { message ->
-            _uiState.update { it.copy(error = message) }
-            return
-        }
-
-        _uiState.update { it.copy(isSaving = true, error = null) }
-
-        viewModelScope.launch {
-            val result = when (val currentMode = mode) {
-                is EditTaskListMode.Create -> taskListRepository.createTaskList(
-                    CreateTaskListParams(
-                        name = trimmedTitle,
-                        path = currentMode.parentPath,
-                        tasks = tasks.mapNotNull { it.toDomain() },
-                        isAutoDelete = _uiState.value.isAutoDelete
-                    )
-                )
-
-                is EditTaskListMode.Edit -> taskListRepository.updateTaskList(
-                    UpdateTaskListParams(
-                        id = currentMode.taskListId,
-                        title = trimmedTitle,
-                        tasks = tasks.mapNotNull { it.toDomain() },
-                        isAutoDelete = _uiState.value.isAutoDelete
-                    )
-                )
-            }
-            result.fold(
-                onSuccess = {
-                    _uiState.update { it.copy(isLoading = false, isSaving = false) }
-                    _navigateBack.emit(Unit)
-                },
-                onFailure = { e ->
-                    _uiState.update { it.copy(isLoading = false, isSaving = false, error = e.message) }
-                }
-            )
-        }
+    fun onFieldFocusLost() {
+        requestSync()
     }
 
     fun onDeleteClick() {
-        val editMode = mode as? EditTaskListMode.Edit ?: return
+        val taskListId = persistedTaskListId ?: return
 
         _uiState.update { it.copy(isSaving = true, error = null) }
 
         viewModelScope.launch {
-            taskListRepository.deleteTaskList(editMode.taskListId).fold(
+            taskListRepository.deleteTaskList(taskListId).fold(
                 onSuccess = {
                     _uiState.update { it.copy(isSaving = false) }
                     _navigateBack.emit(Unit)
@@ -154,16 +143,28 @@ internal class EditTaskListViewModel(
                     titleState.edit {
                         replace(0, length, taskList.name)
                     }
+
                     tasks.clear()
+
+                    var maxSubTaskId = 0L
                     taskList.tasks.forEach { task ->
                         val draft = UiMainTask.fromDomain(nextDraftId++, task)
                         tasks.add(draft)
+                        maxSubTaskId = maxOf(
+                            maxSubTaskId,
+                            draft.subTasks.maxOfOrNull { it.subTaskId } ?: 0L
+                        )
                         observeDueDateRecurrenceExclusion(draft)
                     }
+
+                    nextSubTaskDraftId = maxOf(nextSubTaskDraftId, maxSubTaskId + 1L)
+                    lastSuccessfulSnapshot = taskList.toSyncSnapshot()
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,
                             isAutoDelete = taskList.isAutoDelete,
+                            isPersisted = true,
                             error = null
                         )
                     }
@@ -173,6 +174,102 @@ internal class EditTaskListViewModel(
                 }
             )
         }
+    }
+
+    private fun requestSync() {
+        syncQueued = true
+        if (syncJob?.isActive == true) return
+
+        syncJob = viewModelScope.launch {
+            processSyncQueue()
+        }
+    }
+
+    private suspend fun processSyncQueue() {
+        while (syncQueued) {
+            syncQueued = false
+
+            val snapshot = buildSyncSnapshot() ?: continue
+            if (snapshot == lastSuccessfulSnapshot) {
+                _uiState.update { it.copy(error = null) }
+                continue
+            }
+
+            _uiState.update { it.copy(isSaving = true, error = null) }
+
+            val result = persistedTaskListId?.let { taskListId ->
+                taskListRepository.updateTaskList(
+                    UpdateTaskListParams(
+                        id = taskListId,
+                        title = snapshot.title,
+                        tasks = snapshot.tasks,
+                        isAutoDelete = snapshot.isAutoDelete
+                    )
+                )
+            } ?: taskListRepository.createTaskList(
+                CreateTaskListParams(
+                    name = snapshot.title,
+                    path = (mode as EditTaskListMode.Create).parentPath,
+                    tasks = snapshot.tasks,
+                    isAutoDelete = snapshot.isAutoDelete
+                )
+            )
+
+            result.fold(
+                onSuccess = { taskList ->
+                    persistedTaskListId = taskList.id
+                    lastSuccessfulSnapshot = taskList.toSyncSnapshot()
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSaving = false,
+                            isAutoDelete = taskList.isAutoDelete,
+                            isPersisted = true,
+                            error = null
+                        )
+                    }
+                },
+                onFailure = { e ->
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isSaving = false,
+                            error = e.message
+                        )
+                    }
+                }
+            )
+        }
+    }
+
+    private fun buildSyncSnapshot(): SyncSnapshot? {
+        validateDrafts()?.let { message ->
+            _uiState.update { it.copy(error = message, isSaving = false) }
+            return null
+        }
+
+        val trimmedTitle = titleState.text.toString().trim()
+        val normalizedTasks = tasks.mapNotNull { it.toDomain() }
+
+        if (trimmedTitle.isBlank()) {
+            if (persistedTaskListId != null) {
+                _uiState.update { it.copy(error = titleRequiredMessage, isSaving = false) }
+            } else {
+                _uiState.update { it.copy(error = null, isSaving = false) }
+            }
+            return null
+        }
+
+        if (persistedTaskListId == null && normalizedTasks.isEmpty()) {
+            _uiState.update { it.copy(error = null, isSaving = false) }
+            return null
+        }
+
+        return SyncSnapshot(
+            title = trimmedTitle,
+            tasks = normalizedTasks,
+            isAutoDelete = _uiState.value.isAutoDelete
+        )
     }
 
     private fun observeDueDateRecurrenceExclusion(draft: UiMainTask) {
@@ -185,6 +282,7 @@ internal class EditTaskListViewModel(
                     }
                 }
         }
+
         viewModelScope.launch {
             snapshotFlow { draft.recurrenceState.text.toString() }
                 .drop(1)
@@ -202,6 +300,8 @@ internal class EditTaskListViewModel(
 
     private fun validateDrafts(): String? {
         tasks.forEach { task ->
+            if (task.descriptionState.text.toString().trim().isBlank()) return@forEach
+
             val recurrence = task.recurrenceState.text.toString()
             val dueDate = task.dueDateState.text.toString().trim()
 
@@ -213,6 +313,13 @@ internal class EditTaskListViewModel(
                 return "Due date must use YYYY-MM-DD."
             }
         }
+
         return null
     }
+
+    private fun TaskList.toSyncSnapshot(): SyncSnapshot = SyncSnapshot(
+        title = name,
+        tasks = tasks,
+        isAutoDelete = isAutoDelete
+    )
 }

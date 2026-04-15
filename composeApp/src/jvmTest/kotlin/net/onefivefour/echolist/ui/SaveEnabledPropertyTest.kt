@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.ui
 
 import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.mutableStateListOf
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -14,7 +13,7 @@ import net.onefivefour.echolist.ui.editnote.EditNoteUiState
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListUiState
 
-// Feature: note-tasklist-editors, Property 4: Save-enabled computation
+// Feature: note-tasklist-editors, Property tests for editor UI state
 
 @OptIn(io.kotest.common.ExperimentalKotest::class)
 class SaveEnabledPropertyTest : FunSpec({
@@ -42,25 +41,23 @@ class SaveEnabledPropertyTest : FunSpec({
         }
     }
 
-    test("Property 4: EditTaskListUiState.isSaveEnabled iff text is non-blank and not loading") {
-        // **Validates: Requirements 8.3, 8.4**
+    test("EditTaskListUiState exposes persisted status explicitly") {
         checkAll(
             PropTestConfig(iterations = 100),
-            Arb.string(0..50),
+            Arb.boolean(),
+            Arb.boolean(),
             Arb.boolean()
-        ) { text, isLoading ->
-            val titleState = TextFieldState()
-            titleState.edit { replace(0, length, text) }
-
+        ) { isPersisted, isLoading, isSaving ->
             val uiState = EditTaskListUiState(
-                titleState = titleState,
-                mainTasks = mutableStateListOf(),
+                titleState = TextFieldState(),
+                mainTasks = androidx.compose.runtime.mutableStateListOf(),
                 mode = EditTaskListMode.Create(""),
-                isLoading = isLoading
+                isPersisted = isPersisted,
+                isLoading = isLoading,
+                isSaving = isSaving
             )
 
-            val expected = text.isNotBlank() && !isLoading
-            uiState.isSaveEnabled shouldBe expected
+            uiState.isPersisted shouldBe isPersisted
         }
     }
 })

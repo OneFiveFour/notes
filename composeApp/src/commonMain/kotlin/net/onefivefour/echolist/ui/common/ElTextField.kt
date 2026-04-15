@@ -7,11 +7,15 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
@@ -28,13 +32,27 @@ fun ElTextField(
     singleLine: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     onKeyboardAction: (() -> Unit)? = null,
+    onFocusLost: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null
 ) {
+    var wasFocused by remember(state) { mutableStateOf(false) }
+
     BasicTextField(
         state = state,
-        modifier = modifier.then(
-            if (focusRequester == null) Modifier else Modifier.focusRequester(focusRequester)
-        ),
+        modifier = modifier
+            .then(if (focusRequester == null) Modifier else Modifier.focusRequester(focusRequester))
+            .then(
+                if (onFocusLost == null) {
+                    Modifier
+                } else {
+                    Modifier.onFocusChanged { focusState ->
+                        if (wasFocused && !focusState.isFocused) {
+                            onFocusLost()
+                        }
+                        wasFocused = focusState.isFocused
+                    }
+                }
+            ),
         textStyle = style.copy(color = color),
         cursorBrush = SolidColor(EchoListTheme.materialColors.primary),
         lineLimits = if (singleLine) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(),

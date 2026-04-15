@@ -41,6 +41,7 @@ internal fun MainTaskCard(
     onMainTaskCheckedChange: (Boolean) -> Unit,
     onAddMainTask: () -> Unit,
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
+    onFieldFocusLost: () -> Unit,
     shouldFocusMainTask: Boolean,
     onMainTaskFocusHandled: () -> Unit,
     focusedSubTaskId: Long?,
@@ -93,20 +94,23 @@ internal fun MainTaskCard(
                         singleLine = true,
                         imeAction = ImeAction.Companion.Next,
                         onKeyboardAction = onAddMainTask,
+                        onFocusLost = onFieldFocusLost,
                         focusRequester = mainTaskFocusRequester
                     )
 
                     if (mainTask.dueDateState.text.isNotEmpty()) {
                         ElTextField(
                             state = mainTask.dueDateState,
-                            modifier = Modifier.Companion.fillMaxWidth()
+                            modifier = Modifier.Companion.fillMaxWidth(),
+                            onFocusLost = onFieldFocusLost
                         )
                     }
 
                     if (mainTask.recurrenceState.text.isNotEmpty()) {
                         ElTextField(
                             state = mainTask.recurrenceState,
-                            modifier = Modifier.Companion.fillMaxWidth()
+                            modifier = Modifier.Companion.fillMaxWidth(),
+                            onFocusLost = onFieldFocusLost
                         )
                     }
                 }
@@ -135,6 +139,7 @@ internal fun MainTaskCard(
                             shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
                             onFocusHandled = onSubTaskFocusHandled,
                             onKeyboardAction = { onSubTaskKeyboardAction(subTask.subTaskId) },
+                            onFocusLost = onFieldFocusLost,
                             onCheckedChange = { isChecked ->
                                 onSubTaskCheckedChange(subTaskIndex, isChecked)
                             }
@@ -174,6 +179,7 @@ private fun MainTaskCardPreview() {
                 onMainTaskCheckedChange = {},
                 onAddMainTask = {},
                 onSubTaskCheckedChange = { _, _ -> },
+                onFieldFocusLost = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 focusedSubTaskId = null,
@@ -199,6 +205,7 @@ private fun MainTaskCardEmptyPreview() {
                 onMainTaskCheckedChange = {},
                 onAddMainTask = {},
                 onSubTaskCheckedChange = { _, _ -> },
+                onFieldFocusLost = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 focusedSubTaskId = null,
