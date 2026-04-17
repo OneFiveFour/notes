@@ -195,6 +195,7 @@ private fun AuthenticatedApp() {
                     onAddMainTask = viewModel::onAddMainTask,
                     onRemoveMainTask = viewModel::onRemoveMainTask,
                     onAddSubTask = viewModel::onAddSubTask,
+                    onRemoveSubTask = viewModel::onRemoveSubTask,
                     onMainTaskCheckedChange = viewModel::onMainTaskCheckedChange,
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,

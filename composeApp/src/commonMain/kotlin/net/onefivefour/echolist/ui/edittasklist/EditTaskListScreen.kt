@@ -13,7 +13,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +34,7 @@ internal fun EditTaskListScreen(
     onAddMainTask: () -> Unit,
     onRemoveMainTask: (Int) -> Unit,
     onAddSubTask: (Int) -> Unit,
+    onRemoveSubTask: (Int, Int) -> Unit,
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
@@ -42,13 +42,8 @@ internal fun EditTaskListScreen(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-
+    val focusManager = LocalFocusManager.current
     var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
-
-
-    if (!uiState.isCreateMode) {
-        pendingFocusTarget = null
-    }
 
     val resolvedFocusTarget = resolveFocusTarget(
         tasks = uiState.mainTasks,
@@ -59,22 +54,79 @@ internal fun EditTaskListScreen(
         pendingFocusTarget = null
     }
 
-    val onAddMainTaskAndFocus = {
-        pendingFocusTarget = FocusTarget.LastMainTask
-        onAddMainTask()
-    }
+    val applyKeyboardAction = { action: KeyboardActionResolution? ->
+        if (action == null) {
+            Unit
+        } else {
+            pendingFocusTarget = action.focusTarget
 
-    val onSubTaskKeyboardAction: (Int, UiMainTask, Long) -> Unit = { mainTaskIndex, mainTask, subTaskId ->
-        resolveSubTaskAdvance(
-            mainTasks = uiState.mainTasks,
-            mainTaskId = mainTask.id,
-            currentSubTaskId = subTaskId
-        )?.let { advanceResult ->
-            pendingFocusTarget = advanceResult.focusTarget
-            if (advanceResult.shouldAddSubTask) {
-                onAddSubTask(mainTaskIndex)
+            when (val mutation = action.mutation) {
+                null -> Unit
+                KeyboardMutation.AddMainTask -> onAddMainTask()
+                is KeyboardMutation.RemoveMainTask -> {
+                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
+                    if (mainTaskIndex != -1) {
+                        onRemoveMainTask(mainTaskIndex)
+                    }
+                }
+
+                is KeyboardMutation.AddSubTask -> {
+                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
+                    if (mainTaskIndex != -1) {
+                        onAddSubTask(mainTaskIndex)
+                    }
+                }
+
+                is KeyboardMutation.RemoveSubTask -> {
+                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
+                    val subTaskIndex = uiState.mainTasks
+                        .getOrNull(mainTaskIndex)
+                        ?.subTasks
+                        ?.indexOfFirst { it.subTaskId == mutation.subTaskId }
+                        ?: -1
+
+                    if (mainTaskIndex != -1 && subTaskIndex != -1) {
+                        onRemoveSubTask(mainTaskIndex, subTaskIndex)
+                    }
+                }
+            }
+
+            if (action.shouldClearFocus) {
+                focusManager.clearFocus(force = true)
             }
         }
+    }
+
+    val onAddMainTaskAndFocus = {
+        applyKeyboardAction(
+            KeyboardActionResolution(
+                focusTarget = FocusTarget.LastMainTask,
+                mutation = KeyboardMutation.AddMainTask
+            )
+        )
+    }
+
+    val onTitleKeyboardAction = {
+        applyKeyboardAction(resolveTitleKeyboardAction(uiState.mainTasks))
+    }
+
+    val onMainTaskKeyboardAction: (Long) -> Unit = { mainTaskId ->
+        applyKeyboardAction(
+            resolveMainTaskKeyboardAction(
+                mainTasks = uiState.mainTasks,
+                currentMainTaskId = mainTaskId
+            )
+        )
+    }
+
+    val onSubTaskKeyboardAction: (Long, Long) -> Unit = { mainTaskId, subTaskId ->
+        applyKeyboardAction(
+            resolveSubTaskKeyboardAction(
+                mainTasks = uiState.mainTasks,
+                mainTaskId = mainTaskId,
+                currentSubTaskId = subTaskId
+            )
+        )
     }
 
     Column(modifier = modifier.fillMaxSize().imePadding()) {
@@ -82,7 +134,7 @@ internal fun EditTaskListScreen(
         EditNoteTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
-            onNext = onAddMainTaskAndFocus,
+            onNext = onTitleKeyboardAction,
             onFocusLost = onFieldFocusLost
         )
 
@@ -134,6 +186,7 @@ internal fun EditTaskListScreen(
                         onFieldFocusLost = onFieldFocusLost,
                         focusTarget = resolvedFocusTarget,
                         onFocusHandled = onFocusHandled,
+                        onMainTaskKeyboardAction = onMainTaskKeyboardAction,
                         onSubTaskKeyboardAction = onSubTaskKeyboardAction
                     )
                 }
@@ -193,6 +246,7 @@ private fun EditTaskListScreenPreview() {
                 onAddMainTask = {},
                 onRemoveMainTask = {},
                 onAddSubTask = {},
+                onRemoveSubTask = { _, _ -> },
                 onMainTaskCheckedChange = { _, _ -> },
                 onSubTaskCheckedChange = { _, _, _ -> },
                 onToggleAutoDelete = {},

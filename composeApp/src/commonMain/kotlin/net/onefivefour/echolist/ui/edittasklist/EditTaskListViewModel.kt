@@ -96,6 +96,14 @@ internal class EditTaskListViewModel(
         _uiState.update { it.copy(error = null) }
     }
 
+    fun onRemoveSubTask(mainTaskIndex: Int, subTaskIndex: Int) {
+        val task = tasks.getOrNull(mainTaskIndex) ?: return
+        if (subTaskIndex !in task.subTasks.indices) return
+
+        task.subTasks.removeAt(subTaskIndex)
+        requestSync()
+    }
+
     fun onSubTaskCheckedChange(mainTaskIndex: Int, subTaskIndex: Int, isChecked: Boolean) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
         if (subTaskIndex !in task.subTasks.indices) return

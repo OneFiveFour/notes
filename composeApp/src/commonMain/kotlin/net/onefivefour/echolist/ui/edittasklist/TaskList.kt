@@ -20,7 +20,8 @@ internal fun TaskList(
     onFieldFocusLost: () -> Unit,
     focusTarget: FocusTarget?,
     onFocusHandled: () -> Unit,
-    onSubTaskKeyboardAction: (Int, UiMainTask, Long) -> Unit
+    onMainTaskKeyboardAction: (Long) -> Unit,
+    onSubTaskKeyboardAction: (Long, Long) -> Unit
 ) {
     val mainTaskToFocus = focusTarget as? FocusTarget.MainTask
     val subTaskToFocus = focusTarget as? FocusTarget.SubTask
@@ -37,17 +38,17 @@ internal fun TaskList(
                 onMainTaskCheckedChange = { isChecked ->
                     onMainTaskCheckedChange(mainTaskIndex, isChecked)
                 },
-                onAddMainTask = onAddMainTask,
                 onSubTaskCheckedChange = { subTaskIndex, isChecked ->
                     onSubTaskCheckedChange(mainTaskIndex, subTaskIndex, isChecked)
                 },
                 onFieldFocusLost = onFieldFocusLost,
+                onMainTaskKeyboardAction = onMainTaskKeyboardAction,
                 shouldFocusMainTask = mainTaskToFocus?.mainTaskId == mainTask.id,
                 onMainTaskFocusHandled = onFocusHandled,
                 focusedSubTaskId = subTaskToFocus?.id?.takeIf { subTaskToFocus.mainTaskId == mainTask.id },
                 onSubTaskFocusHandled = onFocusHandled,
                 onSubTaskKeyboardAction = { subTaskId ->
-                    onSubTaskKeyboardAction(mainTaskIndex, mainTask, subTaskId)
+                    onSubTaskKeyboardAction(mainTask.id, subTaskId)
                 }
             )
         }

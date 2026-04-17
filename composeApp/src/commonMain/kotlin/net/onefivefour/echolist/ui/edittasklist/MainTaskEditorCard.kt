@@ -39,7 +39,7 @@ internal fun MainTaskCard(
     isAutoDelete: Boolean,
     onRemoveMainTask: () -> Unit,
     onMainTaskCheckedChange: (Boolean) -> Unit,
-    onAddMainTask: () -> Unit,
+    onMainTaskKeyboardAction: (Long) -> Unit,
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     shouldFocusMainTask: Boolean,
@@ -93,7 +93,7 @@ internal fun MainTaskCard(
                         style = EchoListTheme.typography.bodyLarge,
                         singleLine = true,
                         imeAction = ImeAction.Companion.Next,
-                        onKeyboardAction = onAddMainTask,
+                        onKeyboardAction = { onMainTaskKeyboardAction(mainTask.id) },
                         onFocusLost = onFieldFocusLost,
                         focusRequester = mainTaskFocusRequester
                     )
@@ -138,7 +138,7 @@ internal fun MainTaskCard(
                             subTask = subTask,
                             shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
                             onFocusHandled = onSubTaskFocusHandled,
-                            onKeyboardAction = { onSubTaskKeyboardAction(subTask.subTaskId) },
+                            onKeyboardAction = onSubTaskKeyboardAction,
                             onFocusLost = onFieldFocusLost,
                             onCheckedChange = { isChecked ->
                                 onSubTaskCheckedChange(subTaskIndex, isChecked)
@@ -177,7 +177,7 @@ private fun MainTaskCardPreview() {
                 isAutoDelete = false,
                 onRemoveMainTask = {},
                 onMainTaskCheckedChange = {},
-                onAddMainTask = {},
+                onMainTaskKeyboardAction = {},
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 shouldFocusMainTask = false,
@@ -203,7 +203,7 @@ private fun MainTaskCardEmptyPreview() {
                 isAutoDelete = false,
                 onRemoveMainTask = {},
                 onMainTaskCheckedChange = {},
-                onAddMainTask = {},
+                onMainTaskKeyboardAction = {},
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 shouldFocusMainTask = false,

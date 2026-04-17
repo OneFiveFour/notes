@@ -24,7 +24,7 @@ internal fun SubTaskRow(
     subTask: UiSubTask,
     shouldRequestFocus: Boolean,
     onFocusHandled: () -> Unit,
-    onKeyboardAction: () -> Unit,
+    onKeyboardAction: (Long) -> Unit,
     onFocusLost: () -> Unit,
     onCheckedChange: (Boolean) -> Unit
 ) {
@@ -62,7 +62,7 @@ internal fun SubTaskRow(
             ),
             singleLine = true,
             imeAction = ImeAction.Companion.Next,
-            onKeyboardAction = onKeyboardAction,
+            onKeyboardAction = { onKeyboardAction(subTask.subTaskId) },
             onFocusLost = onFocusLost,
             focusRequester = focusRequester
         )
