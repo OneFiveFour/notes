@@ -61,7 +61,7 @@ internal fun SubTaskRow(
                 }
             ),
             singleLine = true,
-            imeAction = ImeAction.Companion.Next,
+            imeAction = ImeAction.Next,
             onKeyboardAction = { onKeyboardAction(subTask.subTaskId) },
             onFocusLost = onFocusLost,
             focusRequester = focusRequester

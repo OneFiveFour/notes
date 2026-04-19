@@ -92,7 +92,7 @@ internal fun MainTaskCard(
                         state = mainTask.descriptionState,
                         style = EchoListTheme.typography.bodyLarge,
                         singleLine = true,
-                        imeAction = ImeAction.Companion.Next,
+                        imeAction = ImeAction.Next,
                         onKeyboardAction = { onMainTaskKeyboardAction(mainTask.id) },
                         onFocusLost = onFieldFocusLost,
                         focusRequester = mainTaskFocusRequester

@@ -1,6 +1,8 @@
 package net.onefivefour.echolist.ui.edittasklist
 
 import androidx.compose.foundation.border
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -9,16 +11,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableStateListOf
@@ -27,6 +35,7 @@ import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.editnote.EditNoteTitle
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun EditTaskListScreen(
@@ -43,7 +52,20 @@ internal fun EditTaskListScreen(
     modifier: Modifier = Modifier
 ) {
     val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
+    val blurFocusRequester = remember { FocusRequester() }
+    var clearFocusRequest by remember { mutableIntStateOf(0) }
     var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
+
+    LaunchedEffect(clearFocusRequest) {
+        if (clearFocusRequest == 0) return@LaunchedEffect
+
+        // Wait for the composition that removes the focused row, then focus a non-text sink so no
+        // other text field picks up focus as a fallback.
+        androidx.compose.runtime.withFrameNanos { }
+        blurFocusRequester.requestFocus()
+        keyboardController?.hide()
+    }
 
     val resolvedFocusTarget = resolveFocusTarget(
         tasks = uiState.mainTasks,
@@ -58,6 +80,14 @@ internal fun EditTaskListScreen(
         if (action == null) {
             Unit
         } else {
+            if (action.shouldClearFocus) {
+                // Clear immediately, then move focus to a non-text sink after the row removal.
+                focusManager.clearFocus(force = true)
+                blurFocusRequester.requestFocus()
+                keyboardController?.hide()
+                clearFocusRequest += 1
+            }
+
             pendingFocusTarget = action.focusTarget
 
             when (val mutation = action.mutation) {
@@ -89,10 +119,6 @@ internal fun EditTaskListScreen(
                         onRemoveSubTask(mainTaskIndex, subTaskIndex)
                     }
                 }
-            }
-
-            if (action.shouldClearFocus) {
-                focusManager.clearFocus(force = true)
             }
         }
     }
@@ -210,6 +236,13 @@ internal fun EditTaskListScreen(
                 onDeleteClick = onDeleteClick
             )
         }
+
+        Box(
+            modifier = Modifier
+                .size(1.dp)
+                .focusRequester(blurFocusRequester)
+                .focusable()
+        )
     }
 }
 
