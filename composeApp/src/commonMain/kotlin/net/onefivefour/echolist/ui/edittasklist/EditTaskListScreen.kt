@@ -4,36 +4,25 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.mutableStateListOf
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.editnote.EditNoteTitle
+import net.onefivefour.echolist.ui.common.EditTitle
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import androidx.compose.ui.unit.dp
 
@@ -51,197 +40,33 @@ internal fun EditTaskListScreen(
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
-    val keyboardController = LocalSoftwareKeyboardController.current
-    val blurFocusRequester = remember { FocusRequester() }
-    var clearFocusRequest by remember { mutableIntStateOf(0) }
-    var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
-    var focusedMainTaskId by remember { mutableStateOf<Long?>(null) }
-
-    LaunchedEffect(clearFocusRequest) {
-        if (clearFocusRequest == 0) return@LaunchedEffect
-
-        // Wait for the composition that removes the focused row, then focus a non-text sink so no
-        // other text field picks up focus as a fallback.
-        androidx.compose.runtime.withFrameNanos { }
-        blurFocusRequester.requestFocus()
-        keyboardController?.hide()
-    }
-
-    val resolvedFocusTarget = resolveFocusTarget(
-        tasks = uiState.mainTasks,
-        focusTarget = pendingFocusTarget
+    val controller = rememberEditTaskListScreenController(
+        mainTasks = uiState.mainTasks,
+        onAddMainTask = onAddMainTask,
+        onRemoveMainTask = onRemoveMainTask,
+        onAddSubTask = onAddSubTask,
+        onRemoveSubTask = onRemoveSubTask
     )
 
-    val onFocusHandled = {
-        pendingFocusTarget = null
-    }
-
-    val onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit = { mainTaskId, isFocused ->
-        focusedMainTaskId = if (isFocused) {
-            mainTaskId
-        } else if (focusedMainTaskId == mainTaskId) {
-            null
-        } else {
-            focusedMainTaskId
-        }
-    }
-
-    val applyKeyboardAction = { action: KeyboardActionResolution? ->
-        if (action == null) {
-            Unit
-        } else {
-            if (action.shouldClearFocus) {
-                // Clear immediately, then move focus to a non-text sink after the row removal.
-                focusManager.clearFocus(force = true)
-                blurFocusRequester.requestFocus()
-                keyboardController?.hide()
-                clearFocusRequest += 1
-            }
-
-            pendingFocusTarget = action.focusTarget
-
-            when (val mutation = action.mutation) {
-                null -> Unit
-                KeyboardMutation.AddMainTask -> onAddMainTask()
-                is KeyboardMutation.RemoveMainTask -> {
-                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
-                    if (mainTaskIndex != -1) {
-                        onRemoveMainTask(mainTaskIndex)
-                    }
-                }
-
-                is KeyboardMutation.AddSubTask -> {
-                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
-                    if (mainTaskIndex != -1) {
-                        onAddSubTask(mainTaskIndex)
-                    }
-                }
-
-                is KeyboardMutation.RemoveSubTask -> {
-                    val mainTaskIndex = uiState.mainTasks.indexOfFirst { it.id == mutation.mainTaskId }
-                    val subTaskIndex = uiState.mainTasks
-                        .getOrNull(mainTaskIndex)
-                        ?.subTasks
-                        ?.indexOfFirst { it.subTaskId == mutation.subTaskId }
-                        ?: -1
-
-                    if (mainTaskIndex != -1 && subTaskIndex != -1) {
-                        onRemoveSubTask(mainTaskIndex, subTaskIndex)
-                    }
-                }
-            }
-        }
-    }
-
-    val onAddMainTaskAndFocus = {
-        applyKeyboardAction(
-            KeyboardActionResolution(
-                focusTarget = FocusTarget.LastMainTask,
-                mutation = KeyboardMutation.AddMainTask
-            )
-        )
-    }
-
-    val onTitleKeyboardAction = {
-        applyKeyboardAction(resolveTitleKeyboardAction(uiState.mainTasks))
-    }
-
-    val onMainTaskKeyboardAction: (Long) -> Unit = { mainTaskId ->
-        applyKeyboardAction(
-            resolveMainTaskKeyboardAction(
-                mainTasks = uiState.mainTasks,
-                currentMainTaskId = mainTaskId
-            )
-        )
-    }
-
-    val onSubTaskKeyboardAction: (Long, Long) -> Unit = { mainTaskId, subTaskId ->
-        applyKeyboardAction(
-            resolveSubTaskKeyboardAction(
-                mainTasks = uiState.mainTasks,
-                mainTaskId = mainTaskId,
-                currentSubTaskId = subTaskId
-            )
-        )
-    }
-
-    val onAddFirstSubTaskAndFocus: (Long) -> Unit = { mainTaskId ->
-        applyKeyboardAction(
-            KeyboardActionResolution(
-                focusTarget = FocusTarget.LastSubTask(mainTaskId),
-                mutation = KeyboardMutation.AddSubTask(mainTaskId)
-            )
-        )
-    }
-
     Column(modifier = modifier.fillMaxSize().imePadding()) {
-
-        EditNoteTitle(
+        EditTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
-            onNext = onTitleKeyboardAction,
+            onNext = controller.onTitleKeyboardAction,
             onFocusLost = onFieldFocusLost
         )
 
-        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
-
-        Surface(
-            shape = EchoListTheme.shapes.medium,
-            color = EchoListTheme.materialColors.surface,
-            modifier = Modifier
-                .weight(1f)
-                .border(
-                    width = EchoListTheme.dimensions.borderWidth,
-                    color = EchoListTheme.materialColors.surfaceVariant,
-                    shape = EchoListTheme.shapes.medium
-                )
-        ) {
-            Column(
-                modifier = Modifier
-                    .padding(EchoListTheme.dimensions.m)
-                    .fillMaxSize()
-            ) {
-                Row(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = "Auto Delete",
-                        style = EchoListTheme.typography.titleSmall,
-                        color = EchoListTheme.materialColors.onSurface,
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    Switch(
-                        checked = uiState.isAutoDelete,
-                        onCheckedChange = onToggleAutoDelete,
-                        enabled = !uiState.isLoading && !uiState.isSaving
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
-
-                when {
-                    uiState.isLoading -> TaskListLoading()
-                    uiState.mainTasks.isEmpty() -> EmptyTaskList(onAddMainTaskAndFocus)
-                    else -> TaskList(
-                        mainTasks = uiState.mainTasks,
-                        isEditMode = uiState.isEditMode,
-                        focusedMainTaskId = focusedMainTaskId,
-                        isAutoDelete = uiState.isAutoDelete,
-                        onRemoveMainTask = onRemoveMainTask,
-                        onMainTaskCheckedChange = onMainTaskCheckedChange,
-                        onAddMainTask = onAddMainTaskAndFocus,
-                        onAddSubTask = onAddFirstSubTaskAndFocus,
-                        onSubTaskCheckedChange = onSubTaskCheckedChange,
-                        onFieldFocusLost = onFieldFocusLost,
-                        onMainTaskDescriptionFocusChanged = onMainTaskDescriptionFocusChanged,
-                        focusTarget = resolvedFocusTarget,
-                        onFocusHandled = onFocusHandled,
-                        onMainTaskKeyboardAction = onMainTaskKeyboardAction,
-                        onSubTaskKeyboardAction = onSubTaskKeyboardAction
-                    )
-                }
-            }
-        }
+        TaskListContentCard(
+            modifier = Modifier.weight(1f),
+            uiState = uiState,
+            controller = controller,
+            onToggleAutoDelete = onToggleAutoDelete,
+            onFieldFocusLost = onFieldFocusLost,
+            onMainTaskCheckedChange = onMainTaskCheckedChange,
+            onRemoveMainTask = onRemoveMainTask,
+            onSubTaskCheckedChange = onSubTaskCheckedChange,
+            onDeleteClick = onDeleteClick
+        )
 
         uiState.error?.let { errorMessage ->
             Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
@@ -252,21 +77,72 @@ internal fun EditTaskListScreen(
             )
         }
 
-        if (uiState.isPersisted) {
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
-
-            TaskListToolbar(
-                isEnabled = !uiState.isLoading && !uiState.isSaving,
-                onDeleteClick = onDeleteClick
-            )
-        }
-
         Box(
             modifier = Modifier
                 .size(1.dp)
-                .focusRequester(blurFocusRequester)
+                .focusRequester(controller.blurFocusRequester)
                 .focusable()
         )
+    }
+}
+
+@Composable
+private fun TaskListContentCard(
+    modifier: Modifier = Modifier,
+    uiState: EditTaskListUiState,
+    controller: EditTaskListScreenController,
+    onToggleAutoDelete: (Boolean) -> Unit,
+    onFieldFocusLost: () -> Unit,
+    onMainTaskCheckedChange: (Int, Boolean) -> Unit,
+    onRemoveMainTask: (Int) -> Unit,
+    onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
+    onDeleteClick: () -> Unit
+) {
+    Surface(
+        shape = EchoListTheme.shapes.medium,
+        color = EchoListTheme.materialColors.surface,
+        modifier = modifier
+            .border(
+                width = EchoListTheme.dimensions.borderWidth,
+                color = EchoListTheme.materialColors.surfaceVariant,
+                shape = EchoListTheme.shapes.medium
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(EchoListTheme.dimensions.m)
+                .fillMaxSize()
+        ) {
+            DeleteRow(
+                uiState = uiState,
+                onToggleAutoDelete = onToggleAutoDelete,
+                onDeleteTaskList = onDeleteClick
+            )
+
+            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+
+            when {
+                uiState.isLoading -> TaskListLoading()
+                uiState.mainTasks.isEmpty() -> EmptyTaskList(controller.onAddMainTaskAndFocus)
+                else -> TaskList(
+                    focusedMainTaskId = controller.focusedMainTaskId,
+                    focusTarget = controller.resolvedFocusTarget,
+                    isAutoDelete = uiState.isAutoDelete,
+                    isEditMode = uiState.isEditMode,
+                    mainTasks = uiState.mainTasks,
+                    onAddMainTask = controller.onAddMainTaskAndFocus,
+                    onAddSubTask = controller.onAddFirstSubTaskAndFocus,
+                    onFieldFocusLost = onFieldFocusLost,
+                    onFocusHandled = controller.onFocusHandled,
+                    onMainTaskCheckedChange = onMainTaskCheckedChange,
+                    onMainTaskDescriptionFocusChanged = controller.onMainTaskDescriptionFocusChanged,
+                    onMainTaskKeyboardAction = controller.onMainTaskKeyboardAction,
+                    onRemoveMainTask = onRemoveMainTask,
+                    onSubTaskCheckedChange = onSubTaskCheckedChange,
+                    onSubTaskKeyboardAction = controller.onSubTaskKeyboardAction
+                )
+            }
+        }
     }
 }
 

@@ -36,13 +36,7 @@ fun HomeScreen(
     onDismissCreateFolder: () -> Unit = {}
 ) {
 
-    Column(
-        modifier = Modifier
-            .padding(
-                horizontal = EchoListTheme.dimensions.xl,
-                vertical = EchoListTheme.dimensions.l
-            )
-    ) {
+    Column {
         BreadcrumbBar(
             breadcrumbs = uiState.breadcrumbs,
             onBreadcrumbClick = onBreadcrumbClick

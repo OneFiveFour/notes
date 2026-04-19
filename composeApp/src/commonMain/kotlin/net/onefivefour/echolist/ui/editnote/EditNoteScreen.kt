@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
+import net.onefivefour.echolist.ui.common.EditTitle
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -34,13 +35,11 @@ fun EditNoteScreen(
 
     Column(modifier = modifier.fillMaxSize().imePadding()) {
 
-        EditNoteTitle(
+        EditTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
             onNext = { contentFocusRequester.requestFocus() }
         )
-
-        Spacer(modifier = Modifier.height(dimensions.m))
 
         Surface(
             shape = EchoListTheme.shapes.medium,

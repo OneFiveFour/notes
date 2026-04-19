@@ -3,9 +3,11 @@ package net.onefivefour.echolist
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
@@ -84,6 +86,11 @@ private fun AuthenticatedApp() {
     )
 
     NavDisplay(
+        modifier = Modifier
+            .padding(
+                horizontal = EchoListTheme.dimensions.xl,
+                vertical = EchoListTheme.dimensions.l
+            ),
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },

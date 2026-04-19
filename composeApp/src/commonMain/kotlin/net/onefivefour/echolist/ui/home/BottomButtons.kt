@@ -21,14 +21,14 @@ fun BottomButtons(
         horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.m),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        RoundIconButton(
-            iconRes = Res.drawable.ic_search,
-            onClick = {}
-        )
-        RoundIconButton(
-            iconRes = Res.drawable.ic_settings,
-            onClick = {}
-        )
+//        RoundIconButton(
+//            iconRes = Res.drawable.ic_search,
+//            onClick = {}
+//        )
+//        RoundIconButton(
+//            iconRes = Res.drawable.ic_settings,
+//            onClick = {}
+//        )
         RoundIconButton(
             iconRes = Res.drawable.ic_plus,
             onClick = onOpenPills,
