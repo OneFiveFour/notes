@@ -95,6 +95,17 @@ class EditTaskListFocusTest : FunSpec({
         ) shouldBe FocusTarget.SubTask(mainTaskId = 1L, id = 12L)
     }
 
+    test("last subtask target resolves to the first appended subtask when the task was empty") {
+        val task = mainTask(id = 1L)
+
+        task.subTasks.add(UiSubTask(subTaskId = 10L))
+
+        resolveFocusTarget(
+            tasks = listOf(task),
+            focusTarget = FocusTarget.LastSubTask(mainTaskId = 1L)
+        ) shouldBe FocusTarget.SubTask(mainTaskId = 1L, id = 10L)
+    }
+
     test("add main task target resolves to the appended main task") {
         val tasks = listOf(
             mainTask(id = 1L),

@@ -13,6 +13,8 @@ import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -42,8 +44,11 @@ internal fun MainTaskCard(
     onMainTaskKeyboardAction: (Long) -> Unit,
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
+    onMainTaskDescriptionFocusChanged: (Boolean) -> Unit,
     shouldFocusMainTask: Boolean,
     onMainTaskFocusHandled: () -> Unit,
+    showAddFirstSubTask: Boolean,
+    onAddFirstSubTask: () -> Unit,
     focusedSubTaskId: Long?,
     onSubTaskFocusHandled: () -> Unit,
     onSubTaskKeyboardAction: (Long) -> Unit
@@ -94,6 +99,7 @@ internal fun MainTaskCard(
                         singleLine = true,
                         imeAction = ImeAction.Next,
                         onKeyboardAction = { onMainTaskKeyboardAction(mainTask.id) },
+                        onFocusChanged = onMainTaskDescriptionFocusChanged,
                         onFocusLost = onFieldFocusLost,
                         focusRequester = mainTaskFocusRequester
                     )
@@ -146,6 +152,14 @@ internal fun MainTaskCard(
                         )
                     }
                 }
+            } else if (showAddFirstSubTask) {
+                TextButton(onClick = onAddFirstSubTask) {
+                    Text(
+                        text = "Add first subtask",
+                        style = EchoListTheme.typography.labelMedium,
+                        color = EchoListTheme.materialColors.primary
+                    )
+                }
             }
         }
     }
@@ -180,8 +194,11 @@ private fun MainTaskCardPreview() {
                 onMainTaskKeyboardAction = {},
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
+                onMainTaskDescriptionFocusChanged = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
+                showAddFirstSubTask = false,
+                onAddFirstSubTask = {},
                 focusedSubTaskId = null,
                 onSubTaskFocusHandled = {},
                 onSubTaskKeyboardAction = {}
@@ -206,8 +223,11 @@ private fun MainTaskCardEmptyPreview() {
                 onMainTaskKeyboardAction = {},
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
+                onMainTaskDescriptionFocusChanged = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
+                showAddFirstSubTask = true,
+                onAddFirstSubTask = {},
                 focusedSubTaskId = null,
                 onSubTaskFocusHandled = {},
                 onSubTaskKeyboardAction = {}

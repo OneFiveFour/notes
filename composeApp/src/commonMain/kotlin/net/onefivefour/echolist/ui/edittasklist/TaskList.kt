@@ -12,12 +12,16 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun TaskList(
     mainTasks: List<UiMainTask>,
+    isEditMode: Boolean,
+    focusedMainTaskId: Long?,
     isAutoDelete: Boolean,
     onRemoveMainTask: (Int) -> Unit,
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onAddMainTask: () -> Unit,
+    onAddSubTask: (Long) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
+    onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit,
     focusTarget: FocusTarget?,
     onFocusHandled: () -> Unit,
     onMainTaskKeyboardAction: (Long) -> Unit,
@@ -42,9 +46,16 @@ internal fun TaskList(
                     onSubTaskCheckedChange(mainTaskIndex, subTaskIndex, isChecked)
                 },
                 onFieldFocusLost = onFieldFocusLost,
+                onMainTaskDescriptionFocusChanged = { isFocused ->
+                    onMainTaskDescriptionFocusChanged(mainTask.id, isFocused)
+                },
                 onMainTaskKeyboardAction = onMainTaskKeyboardAction,
                 shouldFocusMainTask = mainTaskToFocus?.mainTaskId == mainTask.id,
                 onMainTaskFocusHandled = onFocusHandled,
+                showAddFirstSubTask = isEditMode &&
+                    mainTask.subTasks.isEmpty() &&
+                    focusedMainTaskId == mainTask.id,
+                onAddFirstSubTask = { onAddSubTask(mainTask.id) },
                 focusedSubTaskId = subTaskToFocus?.id?.takeIf { subTaskToFocus.mainTaskId == mainTask.id },
                 onSubTaskFocusHandled = onFocusHandled,
                 onSubTaskKeyboardAction = { subTaskId ->

@@ -56,6 +56,7 @@ internal fun EditTaskListScreen(
     val blurFocusRequester = remember { FocusRequester() }
     var clearFocusRequest by remember { mutableIntStateOf(0) }
     var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
+    var focusedMainTaskId by remember { mutableStateOf<Long?>(null) }
 
     LaunchedEffect(clearFocusRequest) {
         if (clearFocusRequest == 0) return@LaunchedEffect
@@ -74,6 +75,16 @@ internal fun EditTaskListScreen(
 
     val onFocusHandled = {
         pendingFocusTarget = null
+    }
+
+    val onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit = { mainTaskId, isFocused ->
+        focusedMainTaskId = if (isFocused) {
+            mainTaskId
+        } else if (focusedMainTaskId == mainTaskId) {
+            null
+        } else {
+            focusedMainTaskId
+        }
     }
 
     val applyKeyboardAction = { action: KeyboardActionResolution? ->
@@ -155,6 +166,15 @@ internal fun EditTaskListScreen(
         )
     }
 
+    val onAddFirstSubTaskAndFocus: (Long) -> Unit = { mainTaskId ->
+        applyKeyboardAction(
+            KeyboardActionResolution(
+                focusTarget = FocusTarget.LastSubTask(mainTaskId),
+                mutation = KeyboardMutation.AddSubTask(mainTaskId)
+            )
+        )
+    }
+
     Column(modifier = modifier.fillMaxSize().imePadding()) {
 
         EditNoteTitle(
@@ -204,12 +224,16 @@ internal fun EditTaskListScreen(
                     uiState.mainTasks.isEmpty() -> EmptyTaskList(onAddMainTaskAndFocus)
                     else -> TaskList(
                         mainTasks = uiState.mainTasks,
+                        isEditMode = uiState.isEditMode,
+                        focusedMainTaskId = focusedMainTaskId,
                         isAutoDelete = uiState.isAutoDelete,
                         onRemoveMainTask = onRemoveMainTask,
                         onMainTaskCheckedChange = onMainTaskCheckedChange,
                         onAddMainTask = onAddMainTaskAndFocus,
+                        onAddSubTask = onAddFirstSubTaskAndFocus,
                         onSubTaskCheckedChange = onSubTaskCheckedChange,
                         onFieldFocusLost = onFieldFocusLost,
+                        onMainTaskDescriptionFocusChanged = onMainTaskDescriptionFocusChanged,
                         focusTarget = resolvedFocusTarget,
                         onFocusHandled = onFocusHandled,
                         onMainTaskKeyboardAction = onMainTaskKeyboardAction,

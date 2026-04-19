@@ -32,6 +32,7 @@ fun ElTextField(
     singleLine: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     onKeyboardAction: (() -> Unit)? = null,
+    onFocusChanged: ((Boolean) -> Unit)? = null,
     onFocusLost: (() -> Unit)? = null,
     focusRequester: FocusRequester? = null
 ) {
@@ -43,12 +44,19 @@ fun ElTextField(
             .then(if (focusRequester == null) Modifier else Modifier.focusRequester(focusRequester))
             .then(
                 if (onFocusLost == null) {
-                    Modifier
+                    if (onFocusChanged == null) {
+                        Modifier
+                    } else {
+                        Modifier.onFocusChanged { focusState ->
+                            onFocusChanged(focusState.isFocused)
+                        }
+                    }
                 } else {
                     Modifier.onFocusChanged { focusState ->
                         if (wasFocused && !focusState.isFocused) {
                             onFocusLost()
                         }
+                        onFocusChanged?.invoke(focusState.isFocused)
                         wasFocused = focusState.isFocused
                     }
                 }
