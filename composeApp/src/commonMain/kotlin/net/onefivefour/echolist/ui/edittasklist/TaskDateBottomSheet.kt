@@ -22,10 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atStartOfDayIn
+import kotlinx.datetime.toLocalDateTime
 import net.onefivefour.echolist.data.source.cache.currentEpochMillis
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
+import kotlin.time.Instant
 
 internal enum class TaskDateSheetTab(val label: String) {
     DueDate("Due date"),
@@ -103,73 +108,17 @@ internal fun TaskDateBottomSheet(
     }
 }
 
-private const val MillisPerDay = 86_400_000L
+internal fun dueDateToUtcMillis(dueDate: String): Long? = runCatching {
+    LocalDate.parse(dueDate)
+        .atStartOfDayIn(TimeZone.UTC)
+        .toEpochMilliseconds()
+}.getOrNull()
 
-internal fun dueDateToUtcMillis(dueDate: String): Long? {
-    val parts = dueDate.split('-')
-    if (parts.size != 3) return null
-
-    val year = parts[0].toIntOrNull() ?: return null
-    val month = parts[1].toIntOrNull() ?: return null
-    val day = parts[2].toIntOrNull() ?: return null
-
-    if (month !in 1..12 || day !in 1..31) return null
-
-    val epochDay = civilToEpochDay(year = year, month = month, day = day)
-    return utcMillisToDueDate(epochDay * MillisPerDay)
-        .takeIf { it == dueDate }
-        ?.let { epochDay * MillisPerDay }
-}
-
-internal fun utcMillisToDueDate(utcMillis: Long): String {
-    val date = epochDayToCivil(floorDiv(utcMillis, MillisPerDay))
-    return buildString(10) {
-        append(date.year.toString().padStart(4, '0'))
-        append('-')
-        append(date.month.toString().padStart(2, '0'))
-        append('-')
-        append(date.day.toString().padStart(2, '0'))
-    }
-}
-
-private fun floorDiv(dividend: Long, divisor: Long): Long =
-    if (dividend >= 0L) {
-        dividend / divisor
-    } else {
-        ((dividend + 1L) / divisor) - 1L
-    }
-
-private fun civilToEpochDay(year: Int, month: Int, day: Int): Long {
-    val adjustedYear = year - if (month <= 2) 1 else 0
-    val era = floorDiv(adjustedYear.toLong(), 400L)
-    val yearOfEra = adjustedYear - era.toInt() * 400
-    val monthIndex = month + if (month > 2) -3 else 9
-    val dayOfYear = (153 * monthIndex + 2) / 5 + day - 1
-    val dayOfEra = yearOfEra * 365 + yearOfEra / 4 - yearOfEra / 100 + dayOfYear
-
-    return era * 146097L + dayOfEra - 719468L
-}
-
-private fun epochDayToCivil(epochDay: Long): CivilDate {
-    val shifted = epochDay + 719468L
-    val era = floorDiv(shifted, 146097L)
-    val dayOfEra = (shifted - era * 146097L).toInt()
-    val yearOfEra = (dayOfEra - dayOfEra / 1460 + dayOfEra / 36524 - dayOfEra / 146096) / 365
-    var year = yearOfEra + era.toInt() * 400
-    val dayOfYear = dayOfEra - (365 * yearOfEra + yearOfEra / 4 - yearOfEra / 100)
-    val monthParam = (5 * dayOfYear + 2) / 153
-    val day = dayOfYear - (153 * monthParam + 2) / 5 + 1
-    val month = monthParam + if (monthParam < 10) 3 else -9
-    year += if (month <= 2) 1 else 0
-
-    return CivilDate(year = year, month = month, day = day)
-}
-
-private data class CivilDate(
-    val year: Int,
-    val month: Int,
-    val day: Int
-)
+internal fun utcMillisToDueDate(utcMillis: Long): String =
+    Instant.fromEpochMilliseconds(utcMillis)
+        .toLocalDateTime(TimeZone.UTC)
+        .date
+        .toString()
 
 @Preview
 @Composable
