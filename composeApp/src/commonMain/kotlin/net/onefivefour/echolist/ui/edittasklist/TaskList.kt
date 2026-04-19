@@ -22,6 +22,7 @@ internal fun TaskList(
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit,
+    onOpenTaskDateSheet: (Long) -> Unit,
     focusTarget: FocusTarget?,
     onFocusHandled: () -> Unit,
     onMainTaskKeyboardAction: (Long) -> Unit,
@@ -49,6 +50,7 @@ internal fun TaskList(
                 onMainTaskDescriptionFocusChanged = { isFocused ->
                     onMainTaskDescriptionFocusChanged(mainTask.id, isFocused)
                 },
+                onOpenTaskDateSheet = { onOpenTaskDateSheet(mainTask.id) },
                 onMainTaskKeyboardAction = onMainTaskKeyboardAction,
                 shouldFocusMainTask = mainTaskToFocus?.mainTaskId == mainTask.id,
                 onMainTaskFocusHandled = onFocusHandled,

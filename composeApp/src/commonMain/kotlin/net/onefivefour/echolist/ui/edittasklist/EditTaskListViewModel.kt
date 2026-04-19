@@ -126,6 +126,16 @@ internal class EditTaskListViewModel(
         requestSync()
     }
 
+    fun onDueDateSelected(mainTaskId: Long, dueDate: String) {
+        val task = tasks.firstOrNull { it.id == mainTaskId } ?: return
+        val normalizedDueDate = dueDate.trim()
+
+        task.recurrenceState.setTextAndPlaceCursorAtEnd("")
+        task.dueDateState.setTextAndPlaceCursorAtEnd(normalizedDueDate)
+        _uiState.update { it.copy(error = null) }
+        requestSync()
+    }
+
     fun onDeleteClick() {
         val taskListId = persistedTaskListId ?: return
 

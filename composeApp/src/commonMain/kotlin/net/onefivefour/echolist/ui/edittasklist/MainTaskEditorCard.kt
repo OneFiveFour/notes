@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -45,6 +47,7 @@ internal fun MainTaskCard(
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     onMainTaskDescriptionFocusChanged: (Boolean) -> Unit,
+    onOpenTaskDateSheet: () -> Unit,
     shouldFocusMainTask: Boolean,
     onMainTaskFocusHandled: () -> Unit,
     showAddFirstSubTask: Boolean,
@@ -105,35 +108,43 @@ internal fun MainTaskCard(
                     )
 
                     if (mainTask.dueDateState.text.isNotEmpty()) {
-                        ElTextField(
-                            state = mainTask.dueDateState,
-                            modifier = Modifier.Companion.fillMaxWidth(),
-                            onFocusLost = onFieldFocusLost
-                        )
-                    }
-
-                    if (mainTask.recurrenceState.text.isNotEmpty()) {
-                        ElTextField(
-                            state = mainTask.recurrenceState,
-                            modifier = Modifier.Companion.fillMaxWidth(),
-                            onFocusLost = onFieldFocusLost
+                        DueDateTag(
+                            dueDate = mainTask.dueDateState.text.toString(),
+                            onClick = onOpenTaskDateSheet
                         )
                     }
                 }
 
-                // Property 6: Delete icon visibility is inverse of isAutoDelete (tasklist-auto-delete)
-                if (!isAutoDelete) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.xs)
+                ) {
                     Icon(
-                        painter = painterResource(Res.drawable.ic_delete),
-                        contentDescription = "Delete main task",
+                        imageVector = Icons.Default.DateRange,
+                        contentDescription = "Set due date",
                         modifier = Modifier.Companion
                             .clip(RoundedCornerShape(50))
-                            .clickable { onRemoveMainTask() }
+                            .clickable { onOpenTaskDateSheet() }
                             .padding(
                                 horizontal = EchoListTheme.dimensions.m,
                                 vertical = EchoListTheme.dimensions.m
                             )
                     )
+
+                    // Property 6: Delete icon visibility is inverse of isAutoDelete (tasklist-auto-delete)
+                    if (!isAutoDelete) {
+                        Icon(
+                            painter = painterResource(Res.drawable.ic_delete),
+                            contentDescription = "Delete main task",
+                            modifier = Modifier.Companion
+                                .clip(RoundedCornerShape(50))
+                                .clickable { onRemoveMainTask() }
+                                .padding(
+                                    horizontal = EchoListTheme.dimensions.m,
+                                    vertical = EchoListTheme.dimensions.m
+                                )
+                        )
+                    }
                 }
             }
 
@@ -162,6 +173,29 @@ internal fun MainTaskCard(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun DueDateTag(
+    dueDate: String,
+    onClick: () -> Unit
+) {
+    Surface(
+        shape = RoundedCornerShape(50),
+        color = EchoListTheme.materialColors.surfaceVariant,
+        onClick = onClick,
+        modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
+    ) {
+        Text(
+            text = dueDate,
+            style = EchoListTheme.typography.labelMedium,
+            color = EchoListTheme.materialColors.onSurfaceVariant,
+            modifier = Modifier.padding(
+                horizontal = EchoListTheme.dimensions.m,
+                vertical = EchoListTheme.dimensions.xs
+            )
+        )
     }
 }
 
@@ -195,6 +229,7 @@ private fun MainTaskCardPreview() {
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 onMainTaskDescriptionFocusChanged = {},
+                onOpenTaskDateSheet = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 showAddFirstSubTask = false,
@@ -224,9 +259,40 @@ private fun MainTaskCardEmptyPreview() {
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 onMainTaskDescriptionFocusChanged = {},
+                onOpenTaskDateSheet = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 showAddFirstSubTask = true,
+                onAddFirstSubTask = {},
+                focusedSubTaskId = null,
+                onSubTaskFocusHandled = {},
+                onSubTaskKeyboardAction = {}
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun MainTaskCardNoDueDatePreview() {
+    val task = remember {
+        UiMainTask(id = 3, description = "Schedule follow-up")
+    }
+    EchoListTheme {
+        GradientBackground {
+            MainTaskCard(
+                mainTask = task,
+                isAutoDelete = false,
+                onRemoveMainTask = {},
+                onMainTaskCheckedChange = {},
+                onMainTaskKeyboardAction = {},
+                onSubTaskCheckedChange = { _, _ -> },
+                onFieldFocusLost = {},
+                onMainTaskDescriptionFocusChanged = {},
+                onOpenTaskDateSheet = {},
+                shouldFocusMainTask = false,
+                onMainTaskFocusHandled = {},
+                showAddFirstSubTask = false,
                 onAddFirstSubTask = {},
                 focusedSubTaskId = null,
                 onSubTaskFocusHandled = {},

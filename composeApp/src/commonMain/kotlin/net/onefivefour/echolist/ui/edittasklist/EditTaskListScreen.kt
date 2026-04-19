@@ -13,18 +13,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.foundation.text.input.TextFieldState
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.foundation.text.input.TextFieldState
-import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.ui.unit.dp
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
-import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.common.EditTitle
+import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
-import androidx.compose.ui.unit.dp
 
 @Composable
 internal fun EditTaskListScreen(
@@ -37,6 +41,7 @@ internal fun EditTaskListScreen(
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
+    onDueDateSelected: (Long, String) -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -47,6 +52,16 @@ internal fun EditTaskListScreen(
         onAddSubTask = onAddSubTask,
         onRemoveSubTask = onRemoveSubTask
     )
+    var activeDateSheet by remember { mutableStateOf<TaskDateSheetState?>(null) }
+    val sheetTask = activeDateSheet?.let { sheet ->
+        uiState.mainTasks.firstOrNull { it.id == sheet.mainTaskId }
+    }
+
+    LaunchedEffect(activeDateSheet?.mainTaskId, sheetTask) {
+        if (activeDateSheet != null && sheetTask == null) {
+            activeDateSheet = null
+        }
+    }
 
     Column(modifier = modifier.fillMaxSize().imePadding()) {
         EditTitle(
@@ -65,6 +80,9 @@ internal fun EditTaskListScreen(
             onMainTaskCheckedChange = onMainTaskCheckedChange,
             onRemoveMainTask = onRemoveMainTask,
             onSubTaskCheckedChange = onSubTaskCheckedChange,
+            onOpenTaskDateSheet = { mainTaskId ->
+                activeDateSheet = TaskDateSheetState(mainTaskId = mainTaskId)
+            },
             onDeleteClick = onDeleteClick
         )
 
@@ -84,6 +102,22 @@ internal fun EditTaskListScreen(
                 .focusable()
         )
     }
+
+    val currentSheetState = activeDateSheet
+    if (currentSheetState != null && sheetTask != null) {
+        TaskDateBottomSheet(
+            sheetState = currentSheetState,
+            mainTask = sheetTask,
+            onDismissRequest = { activeDateSheet = null },
+            onTabSelected = { selectedTab ->
+                activeDateSheet = currentSheetState.copy(selectedTab = selectedTab)
+            },
+            onDueDateSelected = { dueDate ->
+                activeDateSheet = null
+                onDueDateSelected(currentSheetState.mainTaskId, dueDate)
+            }
+        )
+    }
 }
 
 @Composable
@@ -96,6 +130,7 @@ private fun TaskListContentCard(
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onRemoveMainTask: (Int) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
+    onOpenTaskDateSheet: (Long) -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Surface(
@@ -136,6 +171,7 @@ private fun TaskListContentCard(
                     onFocusHandled = controller.onFocusHandled,
                     onMainTaskCheckedChange = onMainTaskCheckedChange,
                     onMainTaskDescriptionFocusChanged = controller.onMainTaskDescriptionFocusChanged,
+                    onOpenTaskDateSheet = onOpenTaskDateSheet,
                     onMainTaskKeyboardAction = controller.onMainTaskKeyboardAction,
                     onRemoveMainTask = onRemoveMainTask,
                     onSubTaskCheckedChange = onSubTaskCheckedChange,
@@ -184,6 +220,7 @@ private fun EditTaskListScreenPreview() {
                 onSubTaskCheckedChange = { _, _, _ -> },
                 onToggleAutoDelete = {},
                 onFieldFocusLost = {},
+                onDueDateSelected = { _, _ -> },
                 onDeleteClick = {}
             )
         }

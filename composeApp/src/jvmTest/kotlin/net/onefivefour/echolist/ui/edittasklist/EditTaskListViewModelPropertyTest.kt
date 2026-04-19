@@ -361,6 +361,117 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
+    test("selecting a due date in create mode immediately creates the task list") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo
+            )
+
+            vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
+            vm.onAddMainTask()
+            val taskId = vm.uiState.value.mainTasks[0].id
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Plan release")
+            }
+
+            vm.onDueDateSelected(taskId, "2026-04-01")
+            testScheduler.advanceUntilIdle()
+
+            repo.createTaskListCalls shouldHaveSize 1
+            repo.createTaskListCalls[0].tasks.single().dueDate shouldBe "2026-04-01"
+        }
+    }
+
+    test("selecting a due date on an existing task list sends an update") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(id = "task-list-due-date")
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            val taskId = vm.uiState.value.mainTasks[0].id
+            vm.onDueDateSelected(taskId, "2026-04-01")
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks.single().dueDate shouldBe "2026-04-01"
+        }
+    }
+
+    test("selecting a due date clears recurrence before syncing") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-recurrence",
+                tasks = listOf(
+                    MainTask(
+                        description = "Recurring task",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "FREQ=WEEKLY",
+                        subTasks = emptyList()
+                    )
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            val taskId = vm.uiState.value.mainTasks[0].id
+            vm.onDueDateSelected(taskId, "2026-05-10")
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls[0].tasks.single().dueDate shouldBe "2026-05-10"
+            repo.updateTaskListCalls[0].tasks.single().recurrence shouldBe ""
+        }
+    }
+
+    test("selecting the same due date again does not send a duplicate request") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-same-date",
+                tasks = listOf(
+                    MainTask(
+                        description = "Task",
+                        isDone = false,
+                        dueDate = "2026-04-01",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            val taskId = vm.uiState.value.mainTasks[0].id
+            vm.onDueDateSelected(taskId, "2026-04-01")
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 0
+        }
+    }
+
     test("repeated blur without changes does not send duplicate requests") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()

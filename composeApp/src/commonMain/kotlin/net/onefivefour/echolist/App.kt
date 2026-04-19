@@ -207,6 +207,7 @@ private fun AuthenticatedApp() {
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
+                    onDueDateSelected = viewModel::onDueDateSelected,
                     onDeleteClick = viewModel::onDeleteClick
                 )
             }
