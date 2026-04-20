@@ -109,13 +109,11 @@ internal fun EditTaskListScreen(
             sheetState = currentSheetState,
             mainTask = sheetTask,
             onDismissRequest = { activeDateSheet = null },
-            onTabSelected = { selectedTab ->
-                activeDateSheet = currentSheetState.copy(selectedTab = selectedTab)
-            },
             onDueDateSelected = { dueDate ->
                 activeDateSheet = null
                 onDueDateSelected(currentSheetState.mainTaskId, dueDate)
-            }
+            },
+            onRecurrenceChanged = { }
         )
     }
 }
