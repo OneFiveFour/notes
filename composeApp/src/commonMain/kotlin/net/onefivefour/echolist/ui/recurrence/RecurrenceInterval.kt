@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.ui.edittasklist
+package net.onefivefour.echolist.ui.recurrence
 
 sealed interface RecurrenceInterval {
     val shortLabel: String

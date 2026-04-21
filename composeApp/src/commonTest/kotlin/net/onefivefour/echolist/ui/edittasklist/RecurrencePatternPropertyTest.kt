@@ -14,6 +14,12 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 import io.kotest.property.exhaustive.collection
 import kotlinx.datetime.DayOfWeek
+import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
+import net.onefivefour.echolist.ui.recurrence.RecurrenceState
+import net.onefivefour.echolist.ui.recurrence.isValidDayOfMonth
+import net.onefivefour.echolist.ui.recurrence.isValidPositiveInt
+import net.onefivefour.echolist.ui.recurrence.monthlyFormatString
+import net.onefivefour.echolist.ui.recurrence.weeklyFormatString
 
 /**
  * Returns whether the given [state] treats the date as a base date (recurrence is active).

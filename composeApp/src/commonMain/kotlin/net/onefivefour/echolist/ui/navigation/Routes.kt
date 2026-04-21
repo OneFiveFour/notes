@@ -24,12 +24,20 @@ data class EditTaskListRoute(
     val taskListId: String? = null
 ) : NavKey
 
+@Serializable
+data class MainTaskSettingsRoute(
+    val mainTaskId: Long,
+    val currentDueDate: String,
+    val currentRecurrence: String
+) : NavKey
+
 val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(LoginRoute::class, LoginRoute.serializer())
         subclass(HomeRoute::class, HomeRoute.serializer())
         subclass(EditNoteRoute::class, EditNoteRoute.serializer())
         subclass(EditTaskListRoute::class, EditTaskListRoute.serializer())
+        subclass(MainTaskSettingsRoute::class, MainTaskSettingsRoute.serializer())
     }
 }
 

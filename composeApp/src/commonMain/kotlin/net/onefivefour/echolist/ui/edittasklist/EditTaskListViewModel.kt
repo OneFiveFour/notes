@@ -21,10 +21,12 @@ import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.repository.TaskListRepository
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
 
 internal class EditTaskListViewModel(
     private val mode: EditTaskListMode,
-    private val taskListRepository: TaskListRepository
+    private val taskListRepository: TaskListRepository,
+    private val settingsResultFlow: MutableSharedFlow<MainTaskSettingsResult>
 ) : ViewModel() {
 
     private data class SyncSnapshot(
@@ -62,6 +64,16 @@ internal class EditTaskListViewModel(
     init {
         if (mode is EditTaskListMode.Edit) {
             loadTaskList(mode.taskListId)
+        }
+
+        viewModelScope.launch {
+            settingsResultFlow.collect { result ->
+                val task = tasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
+                task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
+                task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)
+                _uiState.update { it.copy(error = null) }
+                requestSync()
+            }
         }
     }
 
@@ -123,16 +135,6 @@ internal class EditTaskListViewModel(
     }
 
     fun onFieldFocusLost() {
-        requestSync()
-    }
-
-    fun onDueDateSelected(mainTaskId: Long, dueDate: String) {
-        val task = tasks.firstOrNull { it.id == mainTaskId } ?: return
-        val normalizedDueDate = dueDate.trim()
-
-        task.recurrenceState.setTextAndPlaceCursorAtEnd("")
-        task.dueDateState.setTextAndPlaceCursorAtEnd(normalizedDueDate)
-        _uiState.update { it.copy(error = null) }
         requestSync()
     }
 

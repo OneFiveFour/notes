@@ -31,9 +31,12 @@ import net.onefivefour.echolist.ui.editnote.EditNoteScreen
 import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsScreen
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.HomeRoute
+import net.onefivefour.echolist.ui.navigation.MainTaskSettingsRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
@@ -207,8 +210,47 @@ private fun AuthenticatedApp() {
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
-                    onDueDateSelected = viewModel::onDueDateSelected,
+                    onNavigateToSettings = { mainTaskId ->
+                        val task = viewModel.uiState.value.mainTasks.firstOrNull { it.id == mainTaskId }
+                        if (task != null) {
+                            backStack.add(
+                                MainTaskSettingsRoute(
+                                    mainTaskId = mainTaskId,
+                                    currentDueDate = task.dueDateState.text.toString(),
+                                    currentRecurrence = task.recurrenceState.text.toString()
+                                )
+                            )
+                        }
+                    },
                     onDeleteClick = viewModel::onDeleteClick
+                )
+            }
+
+            entry<MainTaskSettingsRoute> { route ->
+                val viewModel = koinViewModel<MainTaskSettingsViewModel>(
+                    key = "mainTaskSettings-${route.mainTaskId}"
+                ) {
+                    parametersOf(
+                        route.mainTaskId,
+                        route.currentDueDate,
+                        route.currentRecurrence
+                    )
+                }
+
+                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                MainTaskSettingsScreen(
+                    uiState = uiState,
+                    onDateSelected = viewModel::onDateSelected,
+                    onRecurrenceIntervalSelected = viewModel::onRecurrenceIntervalSelected,
+                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
+                    onConfirm = {
+                        viewModel.onConfirm()
+                        backStack.removeLastOrNull()
+                    },
+                    onBack = {
+                        backStack.removeLastOrNull()
+                    }
                 )
             }
         }

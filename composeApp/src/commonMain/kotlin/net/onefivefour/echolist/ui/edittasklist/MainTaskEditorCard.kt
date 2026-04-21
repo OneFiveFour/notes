@@ -47,7 +47,7 @@ internal fun MainTaskCard(
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     onMainTaskDescriptionFocusChanged: (Boolean) -> Unit,
-    onOpenTaskDateSheet: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     shouldFocusMainTask: Boolean,
     onMainTaskFocusHandled: () -> Unit,
     showAddFirstSubTask: Boolean,
@@ -110,7 +110,7 @@ internal fun MainTaskCard(
                     if (mainTask.dueDateState.text.isNotEmpty()) {
                         DueDateTag(
                             dueDate = mainTask.dueDateState.text.toString(),
-                            onClick = onOpenTaskDateSheet
+                            onClick = onNavigateToSettings
                         )
                     }
                 }
@@ -124,7 +124,7 @@ internal fun MainTaskCard(
                         contentDescription = "Set due date",
                         modifier = Modifier.Companion
                             .clip(RoundedCornerShape(50))
-                            .clickable { onOpenTaskDateSheet() }
+                            .clickable { onNavigateToSettings() }
                             .padding(
                                 horizontal = EchoListTheme.dimensions.m,
                                 vertical = EchoListTheme.dimensions.m
@@ -229,7 +229,7 @@ private fun MainTaskCardPreview() {
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 onMainTaskDescriptionFocusChanged = {},
-                onOpenTaskDateSheet = {},
+                onNavigateToSettings = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 showAddFirstSubTask = false,
@@ -259,7 +259,7 @@ private fun MainTaskCardEmptyPreview() {
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 onMainTaskDescriptionFocusChanged = {},
-                onOpenTaskDateSheet = {},
+                onNavigateToSettings = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 showAddFirstSubTask = true,
@@ -289,7 +289,7 @@ private fun MainTaskCardNoDueDatePreview() {
                 onSubTaskCheckedChange = { _, _ -> },
                 onFieldFocusLost = {},
                 onMainTaskDescriptionFocusChanged = {},
-                onOpenTaskDateSheet = {},
+                onNavigateToSettings = {},
                 shouldFocusMainTask = false,
                 onMainTaskFocusHandled = {},
                 showAddFirstSubTask = false,

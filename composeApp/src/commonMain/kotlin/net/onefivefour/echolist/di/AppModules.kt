@@ -41,6 +41,8 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.viewModel
@@ -161,6 +163,7 @@ val uiModule: Module = module {
 }
 
 val navigationModule: Module = module {
+    single { MutableSharedFlow<MainTaskSettingsResult>() }
     viewModel { params ->
         HomeViewModel(
             path = params.get(),
@@ -183,7 +186,16 @@ val navigationModule: Module = module {
     viewModel { params ->
         EditTaskListViewModel(
             mode = params.get<EditTaskListMode>(),
-            taskListRepository = get()
+            taskListRepository = get(),
+            settingsResultFlow = get()
+        )
+    }
+    viewModel { params ->
+        MainTaskSettingsViewModel(
+            mainTaskId = params.get(),
+            initialDueDate = params.get(),
+            initialRecurrence = params.get(),
+            resultFlow = get()
         )
     }
 }

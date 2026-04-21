@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.ui.edittasklist
+package net.onefivefour.echolist.ui.recurrence
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
