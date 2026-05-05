@@ -24,11 +24,11 @@ internal fun SubTaskRow(
     subTask: UiSubTask,
     shouldRequestFocus: Boolean,
     onFocusHandled: () -> Unit,
-    onKeyboardAction: (Long) -> Unit,
+    onKeyboardAction: (String) -> Unit,
     onFocusLost: () -> Unit,
     onCheckedChange: (Boolean) -> Unit
 ) {
-    val focusRequester = remember(subTask.subTaskId) { FocusRequester() }
+    val focusRequester = remember(subTask.id) { FocusRequester() }
 
     LaunchedEffect(shouldRequestFocus) {
         if (shouldRequestFocus) {
@@ -62,7 +62,7 @@ internal fun SubTaskRow(
             ),
             singleLine = true,
             imeAction = ImeAction.Next,
-            onKeyboardAction = { onKeyboardAction(subTask.subTaskId) },
+            onKeyboardAction = { onKeyboardAction(subTask.id) },
             onFocusLost = onFocusLost,
             focusRequester = focusRequester
         )
@@ -74,7 +74,7 @@ internal fun SubTaskRow(
 @Composable
 private fun SubTaskRowPreview() {
     val subTask = remember {
-        UiSubTask(subTaskId = 1, description = "Review copy", isDone = false)
+        UiSubTask(id = "preview-sub-1", description = "Review copy", isDone = false)
     }
     EchoListTheme {
         GradientBackground {
@@ -94,7 +94,7 @@ private fun SubTaskRowPreview() {
 @Composable
 private fun SubTaskRowDonePreview() {
     val subTask = remember {
-        UiSubTask(subTaskId = 2, description = "Draft checklist", isDone = true)
+        UiSubTask(id = "preview-sub-2", description = "Draft checklist", isDone = true)
     }
     EchoListTheme {
         GradientBackground {

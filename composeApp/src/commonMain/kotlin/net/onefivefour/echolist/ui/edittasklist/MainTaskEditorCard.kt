@@ -43,7 +43,7 @@ internal fun MainTaskCard(
     isAutoDelete: Boolean,
     onRemoveMainTask: () -> Unit,
     onMainTaskCheckedChange: (Boolean) -> Unit,
-    onMainTaskKeyboardAction: (Long) -> Unit,
+    onMainTaskKeyboardAction: (String) -> Unit,
     onSubTaskCheckedChange: (Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     onMainTaskDescriptionFocusChanged: (Boolean) -> Unit,
@@ -52,9 +52,9 @@ internal fun MainTaskCard(
     onMainTaskFocusHandled: () -> Unit,
     showAddFirstSubTask: Boolean,
     onAddFirstSubTask: () -> Unit,
-    focusedSubTaskId: Long?,
+    focusedSubTaskId: String?,
     onSubTaskFocusHandled: () -> Unit,
-    onSubTaskKeyboardAction: (Long) -> Unit
+    onSubTaskKeyboardAction: (String) -> Unit
 ) {
 
     val mainTaskFocusRequester = remember(mainTask.id) { FocusRequester() }
@@ -153,7 +153,7 @@ internal fun MainTaskCard(
                     mainTask.subTasks.forEachIndexed { subTaskIndex, subTask ->
                         SubTaskRow(
                             subTask = subTask,
-                            shouldRequestFocus = focusedSubTaskId == subTask.subTaskId,
+                            shouldRequestFocus = focusedSubTaskId == subTask.id,
                             onFocusHandled = onSubTaskFocusHandled,
                             onKeyboardAction = onSubTaskKeyboardAction,
                             onFocusLost = onFieldFocusLost,
@@ -205,15 +205,15 @@ private fun DueDateTag(
 private fun MainTaskCardPreview() {
     val task = remember {
         UiMainTask.fromDomain(
-            id = 1,
             domain = MainTask(
+                id = "preview-1",
                 description = "Plan launch",
                 isDone = false,
                 dueDate = "2026-04-01",
                 recurrence = "",
                 subTasks = listOf(
-                    SubTask(description = "Draft checklist", isDone = true),
-                    SubTask(description = "Review copy", isDone = false)
+                    SubTask(id = "sub-1", description = "Draft checklist", isDone = true),
+                    SubTask(id = "sub-2", description = "Review copy", isDone = false)
                 )
             )
         )
@@ -246,7 +246,7 @@ private fun MainTaskCardPreview() {
 @Composable
 private fun MainTaskCardEmptyPreview() {
     val task = remember {
-        UiMainTask(id = 2)
+        UiMainTask(id = "preview-2")
     }
     EchoListTheme {
         GradientBackground {
@@ -276,7 +276,7 @@ private fun MainTaskCardEmptyPreview() {
 @Composable
 private fun MainTaskCardNoDueDatePreview() {
     val task = remember {
-        UiMainTask(id = 3, description = "Schedule follow-up")
+        UiMainTask(id = "preview-3", description = "Schedule follow-up")
     }
     EchoListTheme {
         GradientBackground {

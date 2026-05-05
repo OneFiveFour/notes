@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import net.onefivefour.echolist.domain.model.SubTask
 
 internal class UiSubTask(
-    val subTaskId: Long,
+    val id: String,
     description: String = "",
     isDone: Boolean = false
 ) {
@@ -19,14 +19,15 @@ internal class UiSubTask(
         if (trimmedDescription.isBlank()) return null
 
         return SubTask(
+            id = id,
             description = trimmedDescription,
             isDone = isDone
         )
     }
 
     companion object {
-        fun fromDomain(id: Long, domain: SubTask): UiSubTask = UiSubTask(
-            subTaskId = id,
+        fun fromDomain(domain: SubTask): UiSubTask = UiSubTask(
+            id = domain.id,
             description = domain.description,
             isDone = domain.isDone
         )

@@ -37,7 +37,7 @@ internal fun EditTaskListScreen(
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
-    onNavigateToSettings: (Long) -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -98,7 +98,7 @@ private fun TaskListContentCard(
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onRemoveMainTask: (Int) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
-    onNavigateToSettings: (Long) -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Surface(
@@ -156,15 +156,15 @@ private fun EditTaskListScreenPreview() {
     val tasks = remember {
         mutableStateListOf(
             UiMainTask.fromDomain(
-                id = 1,
                 domain = MainTask(
+                    id = "preview-1",
                     description = "Plan launch",
                     isDone = false,
                     dueDate = "2026-04-01",
                     recurrence = "",
                     subTasks = listOf(
-                        SubTask(description = "Draft checklist", isDone = true),
-                        SubTask(description = "Review copy", isDone = false)
+                        SubTask(id = "sub-1", description = "Draft checklist", isDone = true),
+                        SubTask(id = "sub-2", description = "Review copy", isDone = false)
                     )
                 )
             )

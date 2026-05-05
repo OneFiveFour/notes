@@ -13,20 +13,20 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 internal fun TaskList(
     mainTasks: List<UiMainTask>,
     isEditMode: Boolean,
-    focusedMainTaskId: Long?,
+    focusedMainTaskId: String?,
     isAutoDelete: Boolean,
     onRemoveMainTask: (Int) -> Unit,
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onAddMainTask: () -> Unit,
-    onAddSubTask: (Long) -> Unit,
+    onAddSubTask: (String) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
-    onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit,
-    onNavigateToSettings: (Long) -> Unit,
+    onMainTaskDescriptionFocusChanged: (String, Boolean) -> Unit,
+    onNavigateToSettings: (String) -> Unit,
     focusTarget: FocusTarget?,
     onFocusHandled: () -> Unit,
-    onMainTaskKeyboardAction: (Long) -> Unit,
-    onSubTaskKeyboardAction: (Long, Long) -> Unit
+    onMainTaskKeyboardAction: (String) -> Unit,
+    onSubTaskKeyboardAction: (String, String) -> Unit
 ) {
     val mainTaskToFocus = focusTarget as? FocusTarget.MainTask
     val subTaskToFocus = focusTarget as? FocusTarget.SubTask

@@ -5,6 +5,8 @@ import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest
 import tasks.v1.DeleteTaskListResponse
+import tasks.v1.GetMainTaskRequest
+import tasks.v1.GetMainTaskResponse
 import tasks.v1.GetTaskListRequest
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsRequest
@@ -31,6 +33,15 @@ internal class TaskListRemoteDataSourceImpl(
             request = request,
             requestSerializer = { GetTaskListRequest.ADAPTER.encode(it) },
             responseDeserializer = { GetTaskListResponse.ADAPTER.decode(it) }
+        ).getOrThrow()
+    }
+
+    override suspend fun getMainTask(request: GetMainTaskRequest): GetMainTaskResponse {
+        return client.call(
+            path = "/tasks.v1.TaskListService/GetMainTask",
+            request = request,
+            requestSerializer = { GetMainTaskRequest.ADAPTER.encode(it) },
+            responseDeserializer = { GetMainTaskResponse.ADAPTER.decode(it) }
         ).getOrThrow()
     }
 

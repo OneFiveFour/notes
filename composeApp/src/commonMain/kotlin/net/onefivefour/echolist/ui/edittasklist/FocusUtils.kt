@@ -11,7 +11,7 @@ internal fun resolveFocusTarget(
 
     is FocusTarget.SubTask -> focusTarget.takeIf { subTask ->
         tasks.any { task ->
-            task.id == subTask.mainTaskId && task.subTasks.any { it.subTaskId == subTask.id }
+            task.id == subTask.mainTaskId && task.subTasks.any { it.id == subTask.id }
         }
     }
 
@@ -24,7 +24,7 @@ internal fun resolveFocusTarget(
         ?.subTasks
         ?.lastOrNull()
         ?.let { subTask ->
-            FocusTarget.SubTask(focusTarget.mainTaskId, subTask.subTaskId)
+            FocusTarget.SubTask(focusTarget.mainTaskId, subTask.id)
         }
 }
 
@@ -40,7 +40,7 @@ internal fun resolveTitleKeyboardAction(mainTasks: List<UiMainTask>): KeyboardAc
 
 internal fun resolveMainTaskKeyboardAction(
     mainTasks: List<UiMainTask>,
-    currentMainTaskId: Long
+    currentMainTaskId: String
 ): KeyboardActionResolution? {
     val currentIndex = mainTasks.indexOfFirst { it.id == currentMainTaskId }
     if (currentIndex == -1) return null
@@ -67,17 +67,17 @@ internal fun resolveMainTaskKeyboardAction(
 
 internal fun resolveSubTaskKeyboardAction(
     mainTasks: List<UiMainTask>,
-    mainTaskId: Long,
-    currentSubTaskId: Long
+    mainTaskId: String,
+    currentSubTaskId: String
 ): KeyboardActionResolution? {
     val mainTask = mainTasks.firstOrNull { it.id == mainTaskId } ?: return null
-    val currentIndex = mainTask.subTasks.indexOfFirst { it.subTaskId == currentSubTaskId }
+    val currentIndex = mainTask.subTasks.indexOfFirst { it.id == currentSubTaskId }
     if (currentIndex == -1) return null
 
     val nextSubTask = mainTask.subTasks.getOrNull(currentIndex + 1)
     if (nextSubTask != null) {
         return KeyboardActionResolution(
-            focusTarget = FocusTarget.SubTask(mainTaskId, nextSubTask.subTaskId)
+            focusTarget = FocusTarget.SubTask(mainTaskId, nextSubTask.id)
         )
     }
 

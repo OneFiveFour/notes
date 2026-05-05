@@ -32,15 +32,17 @@ class TaskListMapperPropertyTest : FunSpec({
 
     val arbProtoSubTask = arbitrary {
         tasks.v1.SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..200).bind(),
-            done = Arb.boolean().bind()
+            is_done = Arb.boolean().bind()
         )
     }
 
     val arbProtoMainTask = arbitrary {
         tasks.v1.MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..200).bind(),
-            done = Arb.boolean().bind(),
+            is_done = Arb.boolean().bind(),
             due_date = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             sub_tasks = Arb.list(arbProtoSubTask, 0..10).bind()
@@ -50,7 +52,7 @@ class TaskListMapperPropertyTest : FunSpec({
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
             updated_at = Arb.long(0L..Long.MAX_VALUE).bind(),
@@ -60,6 +62,7 @@ class TaskListMapperPropertyTest : FunSpec({
 
     val arbDomainSubTask = arbitrary {
         SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..200).bind(),
             isDone = Arb.boolean().bind()
         )
@@ -67,6 +70,7 @@ class TaskListMapperPropertyTest : FunSpec({
 
     val arbDomainMainTask = arbitrary {
         MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..200).bind(),
             isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
@@ -98,16 +102,18 @@ class TaskListMapperPropertyTest : FunSpec({
     fun assertSubTasksMatch(domainList: List<SubTask>, protoList: List<tasks.v1.SubTask>) {
         domainList shouldHaveSize protoList.size
         domainList.zip(protoList).forEach { (d, p) ->
+            d.id shouldBe p.id
             d.description shouldBe p.description
-            d.isDone shouldBe p.done
+            d.isDone shouldBe p.is_done
         }
     }
 
     fun assertMainTasksMatch(domainList: List<MainTask>, protoList: List<tasks.v1.MainTask>) {
         domainList shouldHaveSize protoList.size
         domainList.zip(protoList).forEach { (d, p) ->
+            d.id shouldBe p.id
             d.description shouldBe p.description
-            d.isDone shouldBe p.done
+            d.isDone shouldBe p.is_done
             d.dueDate shouldBe p.due_date
             d.recurrence shouldBe p.recurrence
             assertSubTasksMatch(d.subTasks, p.sub_tasks)
@@ -122,8 +128,9 @@ class TaskListMapperPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 16: TaskListMapper transforms MainTask proto messages correctly") {
         checkAll(PropTestConfig(iterations = 100), arbProtoMainTask) { protoTask ->
             val domain = TaskListMapper.toDomain(protoTask)
+            domain.id shouldBe protoTask.id
             domain.description shouldBe protoTask.description
-            domain.isDone shouldBe protoTask.done
+            domain.isDone shouldBe protoTask.is_done
             domain.dueDate shouldBe protoTask.due_date
             domain.recurrence shouldBe protoTask.recurrence
             assertSubTasksMatch(domain.subTasks, protoTask.sub_tasks)
@@ -138,8 +145,9 @@ class TaskListMapperPropertyTest : FunSpec({
     test("Feature: proto-api-update, Property 17: TaskListMapper transforms SubTask proto messages correctly") {
         checkAll(PropTestConfig(iterations = 100), arbProtoSubTask) { protoSubTask ->
             val domain = TaskListMapper.toDomain(protoSubTask)
+            domain.id shouldBe protoSubTask.id
             domain.description shouldBe protoSubTask.description
-            domain.isDone shouldBe protoSubTask.done
+            domain.isDone shouldBe protoSubTask.is_done
         }
     }
 
@@ -153,7 +161,7 @@ class TaskListMapperPropertyTest : FunSpec({
             val response = tasks.v1.CreateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
             domain.id shouldBe protoTaskList.id
-            domain.filePath shouldBe protoTaskList.file_path
+            domain.parentDir shouldBe protoTaskList.parent_dir
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
             domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
@@ -166,7 +174,7 @@ class TaskListMapperPropertyTest : FunSpec({
             val response = tasks.v1.GetTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
             domain.id shouldBe protoTaskList.id
-            domain.filePath shouldBe protoTaskList.file_path
+            domain.parentDir shouldBe protoTaskList.parent_dir
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
             domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
@@ -179,7 +187,7 @@ class TaskListMapperPropertyTest : FunSpec({
             val response = tasks.v1.UpdateTaskListResponse(task_list = protoTaskList)
             val domain = TaskListMapper.toDomain(response)
             domain.id shouldBe protoTaskList.id
-            domain.filePath shouldBe protoTaskList.file_path
+            domain.parentDir shouldBe protoTaskList.parent_dir
             domain.name shouldBe protoTaskList.title
             domain.updatedAt shouldBe protoTaskList.updated_at
             domain.isAutoDelete shouldBe protoTaskList.is_auto_delete
@@ -214,7 +222,7 @@ class TaskListMapperPropertyTest : FunSpec({
             result shouldHaveSize protoTaskLists.size
             result.zip(protoTaskLists).forEach { (d, p) ->
                 d.id shouldBe p.id
-                d.filePath shouldBe p.file_path
+                d.parentDir shouldBe p.parent_dir
                 d.name shouldBe p.title
                 d.updatedAt shouldBe p.updated_at
             }

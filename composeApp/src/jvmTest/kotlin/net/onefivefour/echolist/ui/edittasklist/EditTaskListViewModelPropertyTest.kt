@@ -52,7 +52,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             createTaskListCalls.add(params)
             val created = TaskList(
                 id = "created-${nextCreatedId++}",
-                filePath = "${params.path}/${params.name}",
+                parentDir = params.path,
                 name = params.name,
                 tasks = params.tasks,
                 updatedAt = 0L,
@@ -66,6 +66,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             getTaskListCalls.add(taskListId)
             return taskLists[taskListId]?.let(Result.Companion::success)
                 ?: Result.failure(NoSuchElementException("TaskList not found: $taskListId"))
+        }
+
+        override suspend fun getMainTask(mainTaskId: String): Result<MainTask> {
+            val task = taskLists.values
+                .flatMap { it.tasks }
+                .firstOrNull { it.id == mainTaskId }
+            return task?.let(Result.Companion::success)
+                ?: Result.failure(NoSuchElementException("MainTask not found: $mainTaskId"))
         }
 
         override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
@@ -105,6 +113,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         name: String = "Existing list",
         tasks: List<MainTask> = listOf(
             MainTask(
+                id = "task-1",
                 description = "Existing task",
                 isDone = false,
                 dueDate = "",
@@ -115,7 +124,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         isAutoDelete: Boolean = false
     ): TaskList = TaskList(
         id = id,
-        filePath = "home/$id",
+        parentDir = "home",
         name = name,
         tasks = tasks,
         updatedAt = 1L,
@@ -233,8 +242,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-delete-row",
                 tasks = listOf(
-                    MainTask("Task 1", false, "", "", emptyList()),
-                    MainTask("Task 2", false, "", "", emptyList())
+                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList()),
+                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
                 )
             )
             repo.addTaskList(existing)
@@ -261,8 +270,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-auto-main",
                 tasks = listOf(
-                    MainTask("Task 1", false, "", "", emptyList()),
-                    MainTask("Task 2", false, "", "", emptyList())
+                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList()),
+                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
                 ),
                 isAutoDelete = true
             )
@@ -292,13 +301,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 id = "task-list-auto-sub",
                 tasks = listOf(
                     MainTask(
+                        id = "t1",
                         description = "Parent",
                         isDone = false,
                         dueDate = "",
                         recurrence = "",
                         subTasks = listOf(
-                            SubTask("Sub 1", false),
-                            SubTask("Sub 2", false)
+                            SubTask(id = "s1", description = "Sub 1", isDone = false),
+                            SubTask(id = "s2", description = "Sub 2", isDone = false)
                         )
                     )
                 ),
@@ -429,6 +439,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 id = "task-list-recurrence",
                 tasks = listOf(
                     MainTask(
+                        id = "t1",
                         description = "Recurring task",
                         isDone = false,
                         dueDate = "",
@@ -465,6 +476,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
                 id = "task-list-same-date",
                 tasks = listOf(
                     MainTask(
+                        id = "t1",
                         description = "Task",
                         isDone = false,
                         dueDate = "2026-04-01",

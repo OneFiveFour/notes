@@ -8,7 +8,7 @@ import androidx.compose.runtime.setValue
 import net.onefivefour.echolist.domain.model.MainTask
 
 internal class UiMainTask(
-    val id: Long,
+    val id: String,
     description: String = "",
     isDone: Boolean = false,
     dueDate: String = "",
@@ -31,6 +31,7 @@ internal class UiMainTask(
         val normalizedDueDate = dueDateState.text.toString().trim()
 
         return MainTask(
+            id = id,
             description = trimmedDescription,
             isDone = isDone,
             dueDate = if (normalizedRecurrence.isNotBlank()) "" else normalizedDueDate,
@@ -40,16 +41,13 @@ internal class UiMainTask(
     }
 
     companion object {
-        fun fromDomain(id: Long, domain: MainTask): UiMainTask = UiMainTask(
-            id = id,
+        fun fromDomain(domain: MainTask): UiMainTask = UiMainTask(
+            id = domain.id,
             description = domain.description,
             isDone = domain.isDone,
             dueDate = if (domain.recurrence.isNotBlank()) "" else domain.dueDate,
             recurrence = domain.recurrence.singleLine(),
-            subTasks = domain.subTasks.mapIndexed { index, subTask ->
-                UiSubTask.fromDomain(id = id * 1000L + index.toLong(), domain = subTask)
-            }
+            subTasks = domain.subTasks.map { UiSubTask.fromDomain(it) }
         )
     }
 }
-

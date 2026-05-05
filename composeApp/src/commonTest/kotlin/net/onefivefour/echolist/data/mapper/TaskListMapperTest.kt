@@ -20,24 +20,28 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms proto SubTask to domain SubTask") {
         val proto = tasks.v1.SubTask(
+            id = "sub-1",
             description = "Buy groceries",
-            done = false
+            is_done = false
         )
 
         val domain = TaskListMapper.toDomain(proto)
 
+        domain.id shouldBe "sub-1"
         domain.description shouldBe "Buy groceries"
         domain.isDone shouldBe false
     }
 
     test("toDomain transforms completed proto SubTask") {
         val proto = tasks.v1.SubTask(
+            id = "sub-2",
             description = "Send email",
-            done = true
+            is_done = true
         )
 
         val domain = TaskListMapper.toDomain(proto)
 
+        domain.id shouldBe "sub-2"
         domain.description shouldBe "Send email"
         domain.isDone shouldBe true
     }
@@ -45,10 +49,11 @@ class TaskListMapperTest : FunSpec({
     // -- Proto -> Domain: MainTask --
 
     test("toDomain transforms proto MainTask with field name conversions (due_date, sub_tasks)") {
-        val subTask = tasks.v1.SubTask(description = "Sub item", done = false)
+        val subTask = tasks.v1.SubTask(id = "sub-1", description = "Sub item", is_done = false)
         val proto = tasks.v1.MainTask(
+            id = "main-1",
             description = "Main task",
-            done = false,
+            is_done = false,
             due_date = "2026-03-15",
             recurrence = "weekly",
             sub_tasks = listOf(subTask)
@@ -56,25 +61,28 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(proto)
 
+        domain.id shouldBe "main-1"
         domain.description shouldBe "Main task"
         domain.isDone shouldBe false
         domain.dueDate shouldBe "2026-03-15"
         domain.recurrence shouldBe "weekly"
         domain.subTasks shouldHaveSize 1
+        domain.subTasks[0].id shouldBe "sub-1"
         domain.subTasks[0].description shouldBe "Sub item"
         domain.subTasks[0].isDone shouldBe false
     }
 
     test("toDomain transforms proto MainTask with multiple sub_tasks") {
         val proto = tasks.v1.MainTask(
+            id = "main-2",
             description = "Project planning",
-            done = false,
+            is_done = false,
             due_date = "2026-04-01",
             recurrence = "",
             sub_tasks = listOf(
-                tasks.v1.SubTask(description = "Define scope", done = true),
-                tasks.v1.SubTask(description = "Create timeline", done = false),
-                tasks.v1.SubTask(description = "Assign resources", done = false)
+                tasks.v1.SubTask(id = "s1", description = "Define scope", is_done = true),
+                tasks.v1.SubTask(id = "s2", description = "Create timeline", is_done = false),
+                tasks.v1.SubTask(id = "s3", description = "Assign resources", is_done = false)
             )
         )
 
@@ -89,8 +97,9 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain transforms proto MainTask with empty sub_tasks list") {
         val proto = tasks.v1.MainTask(
+            id = "main-3",
             description = "Simple task",
-            done = true,
+            is_done = true,
             due_date = "",
             recurrence = "",
             sub_tasks = emptyList()
@@ -108,12 +117,13 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms proto TaskList to domain TaskList with field name conversions") {
         val protoTaskList = tasks.v1.TaskList(
             id = "tl-uuid-1",
-            file_path = "/home/user/lists/shopping.json",
+            parent_dir = "home/user/lists",
             title = "Shopping List",
             tasks = listOf(
                 tasks.v1.MainTask(
+                    id = "main-1",
                     description = "Buy milk",
-                    done = false,
+                    is_done = false,
                     due_date = "2026-03-10",
                     recurrence = "",
                     sub_tasks = emptyList()
@@ -126,7 +136,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(protoTaskList)
 
         domain.id shouldBe "tl-uuid-1"
-        domain.filePath shouldBe "/home/user/lists/shopping.json"
+        domain.parentDir shouldBe "home/user/lists"
         domain.name shouldBe "Shopping List"
         domain.tasks shouldHaveSize 1
         domain.tasks[0].description shouldBe "Buy milk"
@@ -139,7 +149,7 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms CreateTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
             id = "tl-uuid-2",
-            file_path = "/lists/new.json",
+            parent_dir = "lists",
             title = "New List",
             tasks = emptyList(),
             updated_at = 1704153600000L,
@@ -150,7 +160,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(response)
 
         domain.id shouldBe "tl-uuid-2"
-        domain.filePath shouldBe "/lists/new.json"
+        domain.parentDir shouldBe "lists"
         domain.name shouldBe "New List"
         domain.tasks.shouldBeEmpty()
         domain.updatedAt shouldBe 1704153600000L
@@ -160,15 +170,16 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms GetTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
             id = "tl-uuid-3",
-            file_path = "/lists/existing.json",
+            parent_dir = "lists",
             title = "Existing List",
             tasks = listOf(
                 tasks.v1.MainTask(
+                    id = "main-1",
                     description = "Task A",
-                    done = true,
+                    is_done = true,
                     due_date = "",
                     recurrence = "daily",
-                    sub_tasks = listOf(tasks.v1.SubTask(description = "Sub A", done = true))
+                    sub_tasks = listOf(tasks.v1.SubTask(id = "s1", description = "Sub A", is_done = true))
                 )
             ),
             updated_at = 1704240000000L,
@@ -179,7 +190,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(response)
 
         domain.id shouldBe "tl-uuid-3"
-        domain.filePath shouldBe "/lists/existing.json"
+        domain.parentDir shouldBe "lists"
         domain.name shouldBe "Existing List"
         domain.tasks shouldHaveSize 1
         domain.tasks[0].description shouldBe "Task A"
@@ -191,7 +202,7 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms UpdateTaskListResponse to domain TaskList") {
         val protoTaskList = tasks.v1.TaskList(
             id = "tl-uuid-4",
-            file_path = "/lists/updated.json",
+            parent_dir = "lists",
             title = "Updated List",
             tasks = emptyList(),
             updated_at = 1704326400000L,
@@ -202,7 +213,7 @@ class TaskListMapperTest : FunSpec({
         val domain = TaskListMapper.toDomain(response)
 
         domain.id shouldBe "tl-uuid-4"
-        domain.filePath shouldBe "/lists/updated.json"
+        domain.parentDir shouldBe "lists"
         domain.name shouldBe "Updated List"
         domain.updatedAt shouldBe 1704326400000L
         domain.isAutoDelete shouldBe true
@@ -211,14 +222,14 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms ListTaskListsResponse with multiple task lists") {
         val tl1 = tasks.v1.TaskList(
             id = "tl-uuid-5",
-            file_path = "/lists/list1.json",
+            parent_dir = "lists",
             title = "List 1",
             tasks = emptyList(),
             updated_at = 1704067200000L
         )
         val tl2 = tasks.v1.TaskList(
             id = "tl-uuid-6",
-            file_path = "/lists/list2.json",
+            parent_dir = "lists",
             title = "List 2",
             tasks = emptyList(),
             updated_at = 1704153600000L
@@ -229,10 +240,10 @@ class TaskListMapperTest : FunSpec({
 
         result shouldHaveSize 2
         result[0].id shouldBe "tl-uuid-5"
-        result[0].filePath shouldBe "/lists/list1.json"
+        result[0].parentDir shouldBe "lists"
         result[0].name shouldBe "List 1"
         result[1].id shouldBe "tl-uuid-6"
-        result[1].filePath shouldBe "/lists/list2.json"
+        result[1].parentDir shouldBe "lists"
         result[1].name shouldBe "List 2"
     }
 
@@ -253,11 +264,12 @@ class TaskListMapperTest : FunSpec({
             isAutoDelete = true,
             tasks = listOf(
                 MainTask(
+                    id = "main-1",
                     description = "First task",
                     isDone = false,
                     dueDate = "2026-03-20",
                     recurrence = "",
-                    subTasks = listOf(SubTask(description = "Sub 1", isDone = false))
+                    subTasks = listOf(SubTask(id = "sub-1", description = "Sub 1", isDone = false))
                 )
             )
         )
@@ -268,9 +280,11 @@ class TaskListMapperTest : FunSpec({
         proto.parent_dir shouldBe "/home/user/lists"
         proto.is_auto_delete shouldBe true
         proto.tasks shouldHaveSize 1
+        proto.tasks[0].id shouldBe "main-1"
         proto.tasks[0].description shouldBe "First task"
         proto.tasks[0].due_date shouldBe "2026-03-20"
         proto.tasks[0].sub_tasks shouldHaveSize 1
+        proto.tasks[0].sub_tasks[0].id shouldBe "sub-1"
         proto.tasks[0].sub_tasks[0].description shouldBe "Sub 1"
     }
 
@@ -281,6 +295,7 @@ class TaskListMapperTest : FunSpec({
             isAutoDelete = true,
             tasks = listOf(
                 MainTask(
+                    id = "main-1",
                     description = "Updated task",
                     isDone = true,
                     dueDate = "",
@@ -296,51 +311,57 @@ class TaskListMapperTest : FunSpec({
         proto.title shouldBe "Updated List Name"
         proto.is_auto_delete shouldBe true
         proto.tasks shouldHaveSize 1
+        proto.tasks[0].id shouldBe "main-1"
         proto.tasks[0].description shouldBe "Updated task"
-        proto.tasks[0].done shouldBe true
+        proto.tasks[0].is_done shouldBe true
         proto.tasks[0].recurrence shouldBe "monthly"
     }
 
     test("toProto transforms domain MainTask to proto MainTask with snake_case fields") {
         val domain = MainTask(
+            id = "main-1",
             description = "Test task",
             isDone = false,
             dueDate = "2026-06-15",
             recurrence = "weekly",
-            subTasks = listOf(SubTask(description = "Child", isDone = true))
+            subTasks = listOf(SubTask(id = "sub-1", description = "Child", isDone = true))
         )
 
         val proto = TaskListMapper.toProto(domain)
 
+        proto.id shouldBe "main-1"
         proto.description shouldBe "Test task"
-        proto.done shouldBe false
+        proto.is_done shouldBe false
         proto.due_date shouldBe "2026-06-15"
         proto.recurrence shouldBe "weekly"
         proto.sub_tasks shouldHaveSize 1
+        proto.sub_tasks[0].id shouldBe "sub-1"
         proto.sub_tasks[0].description shouldBe "Child"
-        proto.sub_tasks[0].done shouldBe true
+        proto.sub_tasks[0].is_done shouldBe true
     }
 
     test("toProto transforms domain SubTask to proto SubTask") {
-        val domain = SubTask(description = "Pick up package", isDone = false)
+        val domain = SubTask(id = "sub-1", description = "Pick up package", isDone = false)
 
         val proto = TaskListMapper.toProto(domain)
 
+        proto.id shouldBe "sub-1"
         proto.description shouldBe "Pick up package"
-        proto.done shouldBe false
+        proto.is_done shouldBe false
     }
 
     // -- Bidirectional / round-trip transformations --
 
     test("round-trip: domain MainTask -> proto -> domain produces equivalent object") {
         val original = MainTask(
+            id = "main-1",
             description = "Round trip task",
             isDone = true,
             dueDate = "2026-12-25",
             recurrence = "yearly",
             subTasks = listOf(
-                SubTask(description = "Wrap gifts", isDone = false),
-                SubTask(description = "Send cards", isDone = true)
+                SubTask(id = "sub-1", description = "Wrap gifts", isDone = false),
+                SubTask(id = "sub-2", description = "Send cards", isDone = true)
             )
         )
 
@@ -350,7 +371,7 @@ class TaskListMapperTest : FunSpec({
     }
 
     test("round-trip: domain SubTask -> proto -> domain produces equivalent object") {
-        val original = SubTask(description = "Round trip sub", isDone = true)
+        val original = SubTask(id = "sub-1", description = "Round trip sub", isDone = true)
 
         val roundTripped = TaskListMapper.toDomain(TaskListMapper.toProto(original))
 
@@ -361,8 +382,9 @@ class TaskListMapperTest : FunSpec({
 
     test("toDomain handles MainTask with empty strings for all fields") {
         val proto = tasks.v1.MainTask(
+            id = "",
             description = "",
-            done = false,
+            is_done = false,
             due_date = "",
             recurrence = "",
             sub_tasks = emptyList()
@@ -370,6 +392,7 @@ class TaskListMapperTest : FunSpec({
 
         val domain = TaskListMapper.toDomain(proto)
 
+        domain.id shouldBe ""
         domain.description shouldBe ""
         domain.dueDate shouldBe ""
         domain.recurrence shouldBe ""
@@ -377,22 +400,24 @@ class TaskListMapperTest : FunSpec({
     }
 
     test("toDomain handles SubTask with empty description") {
-        val proto = tasks.v1.SubTask(description = "", done = true)
+        val proto = tasks.v1.SubTask(id = "sub-1", description = "", is_done = true)
 
         val domain = TaskListMapper.toDomain(proto)
 
+        domain.id shouldBe "sub-1"
         domain.description shouldBe ""
         domain.isDone shouldBe true
     }
 
     test("toDomain handles MainTask with special characters") {
         val proto = tasks.v1.MainTask(
+            id = "main-special",
             description = "Special: Task! @#$%",
-            done = false,
+            is_done = false,
             due_date = "2026-01-01T00:00:00Z",
             recurrence = "every 2 weeks",
             sub_tasks = listOf(
-                tasks.v1.SubTask(description = "Sub with\nnewline\tand\ttab", done = false)
+                tasks.v1.SubTask(id = "sub-special", description = "Sub with\nnewline\tand\ttab", is_done = false)
             )
         )
 
@@ -406,7 +431,7 @@ class TaskListMapperTest : FunSpec({
     test("toDomain preserves timestamp precision") {
         val protoTaskList = tasks.v1.TaskList(
             id = "tl-uuid-ts",
-            file_path = "/lists/ts.json",
+            parent_dir = "lists",
             title = "Timestamp Test",
             tasks = emptyList(),
             updated_at = 1704067234567L
@@ -420,7 +445,7 @@ class TaskListMapperTest : FunSpec({
     test("toDomain transforms ListTaskListsResponse with single task list") {
         val tl = tasks.v1.TaskList(
             id = "tl-uuid-single",
-            file_path = "/lists/single.json",
+            parent_dir = "lists",
             title = "Single",
             tasks = emptyList(),
             updated_at = 100L
@@ -431,6 +456,6 @@ class TaskListMapperTest : FunSpec({
 
         result shouldHaveSize 1
         result[0].id shouldBe "tl-uuid-single"
-        result[0].filePath shouldBe "/lists/single.json"
+        result[0].parentDir shouldBe "lists"
     }
 })

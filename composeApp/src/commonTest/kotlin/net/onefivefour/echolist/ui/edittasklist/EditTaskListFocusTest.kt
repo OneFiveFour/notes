@@ -14,7 +14,7 @@ class EditTaskListFocusTest : FunSpec({
 
     test("title action clears focus when main tasks already exist") {
         resolveTitleKeyboardAction(
-            listOf(mainTask(id = 1L))
+            listOf(mainTask(id = "1"))
         ) shouldBe KeyboardActionResolution(
             shouldClearFocus = true
         )
@@ -23,19 +23,19 @@ class EditTaskListFocusTest : FunSpec({
     test("non-last main task advances focus to the next main task") {
         resolveMainTaskKeyboardAction(
             mainTasks = listOf(
-                mainTask(id = 1L, description = "First"),
-                mainTask(id = 2L, description = "Second")
+                mainTask(id = "1", description = "First"),
+                mainTask(id = "2", description = "Second")
             ),
-            currentMainTaskId = 1L
+            currentMainTaskId = "1"
         ) shouldBe KeyboardActionResolution(
-            focusTarget = FocusTarget.MainTask(mainTaskId = 2L)
+            focusTarget = FocusTarget.MainTask(mainTaskId = "2")
         )
     }
 
     test("last main task appends a new row when it has content") {
         resolveMainTaskKeyboardAction(
-            mainTasks = listOf(mainTask(id = 1L, description = "First")),
-            currentMainTaskId = 1L
+            mainTasks = listOf(mainTask(id = "1", description = "First")),
+            currentMainTaskId = "1"
         ) shouldBe KeyboardActionResolution(
             focusTarget = FocusTarget.LastMainTask,
             mutation = KeyboardMutation.AddMainTask
@@ -44,10 +44,10 @@ class EditTaskListFocusTest : FunSpec({
 
     test("empty last main task is removed and focus is cleared") {
         resolveMainTaskKeyboardAction(
-            mainTasks = listOf(mainTask(id = 1L, description = "   ")),
-            currentMainTaskId = 1L
+            mainTasks = listOf(mainTask(id = "1", description = "   ")),
+            currentMainTaskId = "1"
         ) shouldBe KeyboardActionResolution(
-            mutation = KeyboardMutation.RemoveMainTask(mainTaskId = 1L),
+            mutation = KeyboardMutation.RemoveMainTask(mainTaskId = "1"),
             shouldClearFocus = true
         )
     }
@@ -55,104 +55,104 @@ class EditTaskListFocusTest : FunSpec({
     test("next subtask advances focus to the following subtask") {
         val tasks = listOf(
             mainTask(
-                id = 1L,
-                subTaskIds = listOf(10L, 11L, 12L)
+                id = "1",
+                subTaskIds = listOf("10", "11", "12")
             )
         )
 
         resolveSubTaskKeyboardAction(
             mainTasks = tasks,
-            mainTaskId = 1L,
-            currentSubTaskId = 10L
+            mainTaskId = "1",
+            currentSubTaskId = "10"
         ) shouldBe KeyboardActionResolution(
-            focusTarget = FocusTarget.SubTask(mainTaskId = 1L, id = 11L)
+            focusTarget = FocusTarget.SubTask(mainTaskId = "1", id = "11")
         )
     }
 
     test("last subtask requests a new subtask and focuses the appended row") {
         val task = mainTask(
-            id = 1L,
+            id = "1",
             subTasks = listOf(
-                UiSubTask(subTaskId = 10L, description = "First"),
-                UiSubTask(subTaskId = 11L, description = "Second")
+                UiSubTask(id = "10", description = "First"),
+                UiSubTask(id = "11", description = "Second")
             )
         )
 
         resolveSubTaskKeyboardAction(
             mainTasks = listOf(task),
-            mainTaskId = 1L,
-            currentSubTaskId = 11L
+            mainTaskId = "1",
+            currentSubTaskId = "11"
         ) shouldBe KeyboardActionResolution(
-            focusTarget = FocusTarget.LastSubTask(mainTaskId = 1L),
-            mutation = KeyboardMutation.AddSubTask(mainTaskId = 1L)
+            focusTarget = FocusTarget.LastSubTask(mainTaskId = "1"),
+            mutation = KeyboardMutation.AddSubTask(mainTaskId = "1")
         )
 
-        task.subTasks.add(UiSubTask(subTaskId = 12L))
+        task.subTasks.add(UiSubTask(id = "12"))
 
         resolveFocusTarget(
             tasks = listOf(task),
-            focusTarget = FocusTarget.LastSubTask(mainTaskId = 1L)
-        ) shouldBe FocusTarget.SubTask(mainTaskId = 1L, id = 12L)
+            focusTarget = FocusTarget.LastSubTask(mainTaskId = "1")
+        ) shouldBe FocusTarget.SubTask(mainTaskId = "1", id = "12")
     }
 
     test("last subtask target resolves to the first appended subtask when the task was empty") {
-        val task = mainTask(id = 1L)
+        val task = mainTask(id = "1")
 
-        task.subTasks.add(UiSubTask(subTaskId = 10L))
+        task.subTasks.add(UiSubTask(id = "10"))
 
         resolveFocusTarget(
             tasks = listOf(task),
-            focusTarget = FocusTarget.LastSubTask(mainTaskId = 1L)
-        ) shouldBe FocusTarget.SubTask(mainTaskId = 1L, id = 10L)
+            focusTarget = FocusTarget.LastSubTask(mainTaskId = "1")
+        ) shouldBe FocusTarget.SubTask(mainTaskId = "1", id = "10")
     }
 
     test("add main task target resolves to the appended main task") {
         val tasks = listOf(
-            mainTask(id = 1L),
-            mainTask(id = 2L)
+            mainTask(id = "1"),
+            mainTask(id = "2")
         )
 
         resolveFocusTarget(
             tasks = tasks,
             focusTarget = FocusTarget.LastMainTask
-        ) shouldBe FocusTarget.MainTask(mainTaskId = 2L)
+        ) shouldBe FocusTarget.MainTask(mainTaskId = "2")
     }
 
     test("main task keyboard flow always resolves to the newest appended main task") {
         val tasks = mutableListOf(
-            mainTask(id = 1L)
+            mainTask(id = "1")
         )
 
-        tasks.add(mainTask(id = 2L))
+        tasks.add(mainTask(id = "2"))
 
         resolveFocusTarget(
             tasks = tasks,
             focusTarget = FocusTarget.LastMainTask
-        ) shouldBe FocusTarget.MainTask(mainTaskId = 2L)
+        ) shouldBe FocusTarget.MainTask(mainTaskId = "2")
     }
 
     test("empty last subtask is removed and focus is cleared") {
         resolveSubTaskKeyboardAction(
             mainTasks = listOf(
                 mainTask(
-                    id = 1L,
-                    subTasks = listOf(UiSubTask(subTaskId = 10L, description = "   "))
+                    id = "1",
+                    subTasks = listOf(UiSubTask(id = "10", description = "   "))
                 )
             ),
-            mainTaskId = 1L,
-            currentSubTaskId = 10L
+            mainTaskId = "1",
+            currentSubTaskId = "10"
         ) shouldBe KeyboardActionResolution(
-            mutation = KeyboardMutation.RemoveSubTask(mainTaskId = 1L, subTaskId = 10L),
+            mutation = KeyboardMutation.RemoveSubTask(mainTaskId = "1", subTaskId = "10"),
             shouldClearFocus = true
         )
     }
 })
 
 private fun mainTask(
-    id: Long,
+    id: String,
     description: String = "",
-    subTaskIds: List<Long> = emptyList(),
-    subTasks: List<UiSubTask> = subTaskIds.map(::UiSubTask)
+    subTaskIds: List<String> = emptyList(),
+    subTasks: List<UiSubTask> = subTaskIds.map { UiSubTask(id = it) }
 ): UiMainTask = UiMainTask(
     id = id,
     description = description,

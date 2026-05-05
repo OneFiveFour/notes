@@ -8,7 +8,7 @@ internal data class KeyboardActionResolution(
 
 internal sealed interface KeyboardMutation {
     data object AddMainTask : KeyboardMutation
-    data class RemoveMainTask(val mainTaskId: Long) : KeyboardMutation
-    data class AddSubTask(val mainTaskId: Long) : KeyboardMutation
-    data class RemoveSubTask(val mainTaskId: Long, val subTaskId: Long) : KeyboardMutation
+    data class RemoveMainTask(val mainTaskId: String) : KeyboardMutation
+    data class AddSubTask(val mainTaskId: String) : KeyboardMutation
+    data class RemoveSubTask(val mainTaskId: String, val subTaskId: String) : KeyboardMutation
 }

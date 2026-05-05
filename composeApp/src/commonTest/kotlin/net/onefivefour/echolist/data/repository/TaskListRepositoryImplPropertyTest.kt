@@ -51,15 +51,17 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
     val arbProtoSubTask = arbitrary {
         tasks.v1.SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind()
+            is_done = Arb.boolean().bind()
         )
     }
 
     val arbProtoMainTask = arbitrary {
         tasks.v1.MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind(),
+            is_done = Arb.boolean().bind(),
             due_date = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             sub_tasks = Arb.list(arbProtoSubTask, 0..3).bind()
@@ -69,7 +71,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
             updated_at = Arb.long(0..Long.MAX_VALUE).bind(),
@@ -79,6 +81,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
     val arbDomainSubTask = arbitrary {
         SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind()
         )
@@ -86,6 +89,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
 
     val arbDomainMainTask = arbitrary {
         MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
@@ -135,7 +139,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
@@ -186,7 +190,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
@@ -204,7 +208,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
                 GetTaskListResponse(
                     task_list = tasks.v1.TaskList(
                         id = taskListId,
-                        file_path = "/some/path.tl",
+                        parent_dir = "some/path",
                         title = "t",
                         tasks = emptyList(),
                         updated_at = 0L
@@ -245,7 +249,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             taskLists.size shouldBe protoTaskLists.size
             taskLists.forEachIndexed { i, entry ->
                 entry.id shouldBe protoTaskLists[i].id
-                entry.filePath shouldBe protoTaskLists[i].file_path
+                entry.parentDir shouldBe protoTaskLists[i].parent_dir
                 entry.name shouldBe protoTaskLists[i].title
                 entry.updatedAt shouldBe protoTaskLists[i].updated_at
             }
@@ -292,7 +296,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
@@ -335,7 +339,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
                 GetTaskListResponse(
                     task_list = tasks.v1.TaskList(
                         id = taskListId,
-                        file_path = "home/projects/$taskListId.json",
+                        parent_dir = "home/projects",
                         title = "Delete me",
                         tasks = emptyList(),
                         updated_at = 1L,
@@ -365,7 +369,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
                 GetTaskListResponse(
                     task_list = tasks.v1.TaskList(
                         id = taskListId,
-                        file_path = "home/projects/$taskListId.json",
+                        parent_dir = "home/projects",
                         title = "Delete me",
                         tasks = emptyList(),
                         updated_at = 1L,

@@ -13,15 +13,15 @@ import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 
 internal data class EditTaskListScreenController(
     val blurFocusRequester: FocusRequester,
-    val focusedMainTaskId: Long?,
+    val focusedMainTaskId: String?,
     val resolvedFocusTarget: FocusTarget?,
     val onFocusHandled: () -> Unit,
-    val onMainTaskDescriptionFocusChanged: (Long, Boolean) -> Unit,
+    val onMainTaskDescriptionFocusChanged: (String, Boolean) -> Unit,
     val onAddMainTaskAndFocus: () -> Unit,
     val onTitleKeyboardAction: () -> Unit,
-    val onMainTaskKeyboardAction: (Long) -> Unit,
-    val onSubTaskKeyboardAction: (Long, Long) -> Unit,
-    val onAddFirstSubTaskAndFocus: (Long) -> Unit
+    val onMainTaskKeyboardAction: (String) -> Unit,
+    val onSubTaskKeyboardAction: (String, String) -> Unit,
+    val onAddFirstSubTaskAndFocus: (String) -> Unit
 )
 
 @Composable
@@ -37,7 +37,7 @@ internal fun rememberEditTaskListScreenController(
     val blurFocusRequester = remember { FocusRequester() }
     var clearFocusRequest by remember { mutableIntStateOf(0) }
     var pendingFocusTarget by remember { mutableStateOf<FocusTarget?>(null) }
-    var focusedMainTaskId by remember { mutableStateOf<Long?>(null) }
+    var focusedMainTaskId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(clearFocusRequest) {
         if (clearFocusRequest == 0) return@LaunchedEffect
@@ -159,18 +159,18 @@ private fun KeyboardMutation?.execute(
     }
 }
 
-private fun List<UiMainTask>.indexOfMainTask(id: Long): Int? =
+private fun List<UiMainTask>.indexOfMainTask(id: String): Int? =
     indexOfFirst { it.id == id }
         .takeIf { it != -1 }
 
 private fun List<UiMainTask>.findTaskCoordinates(
-    mainTaskId: Long,
-    subTaskId: Long
+    mainTaskId: String,
+    subTaskId: String
 ): TaskCoordinates? {
     val mainTaskIndex = indexOfMainTask(id = mainTaskId) ?: return null
     val subTaskIndex = get(mainTaskIndex)
         .subTasks
-        .indexOfFirst { it.subTaskId == subTaskId }
+        .indexOfFirst { it.id == subTaskId }
         .takeIf { it != -1 }
         ?: return null
 

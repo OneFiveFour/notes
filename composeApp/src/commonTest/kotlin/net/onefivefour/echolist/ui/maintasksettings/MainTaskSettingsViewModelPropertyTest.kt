@@ -10,9 +10,21 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.set
 import io.kotest.property.checkAll
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import net.onefivefour.echolist.data.dto.CreateTaskListParams
+import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.domain.model.TaskList
+import net.onefivefour.echolist.domain.model.TaskListEntry
+import net.onefivefour.echolist.domain.repository.TaskListRepository
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 
@@ -25,7 +37,58 @@ import net.onefivefour.echolist.ui.recurrence.RecurrenceState
  * Property 4: Selecting a recurrence clears due date
  * **Validates: Requirements 5.2**
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class MainTaskSettingsViewModelPropertyTest : FunSpec({
+
+    val testDispatcher = StandardTestDispatcher()
+
+    beforeSpec {
+        Dispatchers.setMain(testDispatcher)
+    }
+
+    afterSpec {
+        Dispatchers.resetMain()
+    }
+
+    class FakeTaskListRepository(private val mainTask: MainTask) : TaskListRepository {
+        override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> =
+            Result.failure(UnsupportedOperationException())
+
+        override suspend fun getTaskList(taskListId: String): Result<TaskList> =
+            Result.failure(UnsupportedOperationException())
+
+        override suspend fun getMainTask(mainTaskId: String): Result<MainTask> =
+            Result.success(mainTask)
+
+        override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
+            Result.success(emptyList())
+
+        override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
+            Result.failure(UnsupportedOperationException())
+
+        override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
+            Result.failure(UnsupportedOperationException())
+    }
+
+    fun createViewModel(
+        mainTaskId: String,
+        dueDate: String,
+        recurrence: String
+    ): MainTaskSettingsViewModel {
+        val task = MainTask(
+            id = mainTaskId,
+            description = "Test task",
+            isDone = false,
+            dueDate = dueDate,
+            recurrence = recurrence,
+            subTasks = emptyList()
+        )
+        return MainTaskSettingsViewModel(
+            mainTaskId = mainTaskId,
+            taskListRepository = FakeTaskListRepository(task),
+            resultFlow = MutableSharedFlow()
+        )
+    }
 
     // Generator for non-Off RecurrenceState instances
     val arbDayOfWeek = Arb.of(DayOfWeek.entries)
@@ -52,43 +115,38 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
     }
 
     test("Property 3: Selecting a date clears recurrence — onDateSelected sets recurrence to Off and due date to selected date") {
-        checkAll(
-            PropTestConfig(iterations = 100),
-            arbNonOffRecurrenceState,
-            arbDateMillisAndString
-        ) { recurrenceState, (dateMillis, expectedDateString) ->
-            // Create a ViewModel with a non-Off recurrence and no initial due date
-            val viewModel = MainTaskSettingsViewModel(
-                mainTaskId = 1L,
-                initialDueDate = "",
-                initialRecurrence = recurrenceState.toRrule(),
-                resultFlow = MutableSharedFlow()
-            )
+        runTest(testDispatcher) {
+            checkAll(
+                PropTestConfig(iterations = 100),
+                arbNonOffRecurrenceState,
+                arbDateMillisAndString
+            ) { recurrenceState, (dateMillis, expectedDateString) ->
+                val viewModel = createViewModel(
+                    mainTaskId = "task-1",
+                    dueDate = "",
+                    recurrence = recurrenceState.toRrule()
+                )
 
-            // Verify the initial recurrence state is not Off
-            viewModel.uiState.value.recurrenceState shouldBe recurrenceState
+                testScheduler.advanceUntilIdle()
 
-            // Select a date
-            viewModel.onDateSelected(dateMillis)
+                viewModel.uiState.value.recurrenceState shouldBe recurrenceState
 
-            // Assert recurrence is cleared to Off
-            viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
+                viewModel.onDateSelected(dateMillis)
 
-            // Assert due date is set to the selected date
-            viewModel.uiState.value.selectedDueDate shouldBe expectedDateString
+                viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
+                viewModel.uiState.value.selectedDueDate shouldBe expectedDateString
+            }
         }
     }
 
     // --- Property 4 generators ---
 
-    // Generator for random date strings (2000-01-01 to 2099-12-31) formatted as YYYY-MM-DD
     val arbDateString: Arb<String> = Arb.int(0..36523).map { dayOffset ->
         val baseDate = LocalDate(2000, 1, 1)
         val epochDay = baseDate.toEpochDays() + dayOffset
         LocalDate.fromEpochDays(epochDay).toString()
     }
 
-    // Generator for non-Off RecurrenceInterval
     val arbNonOffInterval: Arb<RecurrenceInterval> = Arb.of(
         RecurrenceInterval.Daily,
         RecurrenceInterval.Weekly,
@@ -98,40 +156,31 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
 
     /**
      * Property 4: Selecting a recurrence clears due date
-     *
-     * *For any* `MainTaskSettingsViewModel` whose due date is non-empty, and *for any*
-     * recurrence interval other than `Off`, calling `onRecurrenceIntervalSelected(interval)`
-     * shall result in the due date state being empty (`""`) and the recurrence state
-     * reflecting the selected interval.
-     *
      * **Validates: Requirements 5.2**
      */
     test("Property 4: Selecting a recurrence clears due date — onRecurrenceIntervalSelected clears due date and sets interval") {
-        checkAll(
-            PropTestConfig(iterations = 100),
-            arbDateString,
-            arbNonOffInterval
-        ) { dateString, interval ->
-            // Create a ViewModel with a non-empty initial due date and Off recurrence
-            val viewModel = MainTaskSettingsViewModel(
-                mainTaskId = 1L,
-                initialDueDate = dateString,
-                initialRecurrence = "",
-                resultFlow = MutableSharedFlow()
-            )
+        runTest(testDispatcher) {
+            checkAll(
+                PropTestConfig(iterations = 100),
+                arbDateString,
+                arbNonOffInterval
+            ) { dateString, interval ->
+                val viewModel = createViewModel(
+                    mainTaskId = "task-1",
+                    dueDate = dateString,
+                    recurrence = ""
+                )
 
-            // Verify the initial state has the due date set and recurrence Off
-            viewModel.uiState.value.selectedDueDate shouldBe dateString
-            viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
+                testScheduler.advanceUntilIdle()
 
-            // Select a non-Off recurrence interval
-            viewModel.onRecurrenceIntervalSelected(interval)
+                viewModel.uiState.value.selectedDueDate shouldBe dateString
+                viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
 
-            // Assert due date is cleared
-            viewModel.uiState.value.selectedDueDate shouldBe ""
+                viewModel.onRecurrenceIntervalSelected(interval)
 
-            // Assert recurrence state reflects the selected interval
-            viewModel.uiState.value.recurrenceState.interval shouldBe interval
+                viewModel.uiState.value.selectedDueDate shouldBe ""
+                viewModel.uiState.value.recurrenceState.interval shouldBe interval
+            }
         }
     }
 })

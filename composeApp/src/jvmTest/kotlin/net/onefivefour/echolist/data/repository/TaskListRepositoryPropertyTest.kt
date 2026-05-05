@@ -22,6 +22,8 @@ import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest
 import tasks.v1.DeleteTaskListResponse
+import tasks.v1.GetMainTaskRequest
+import tasks.v1.GetMainTaskResponse
 import tasks.v1.GetTaskListRequest
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsRequest
@@ -54,6 +56,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     val arbDomainSubTask = arbitrary {
         SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind()
         )
@@ -61,6 +64,7 @@ class TaskListRepositoryPropertyTest : FunSpec({
 
     val arbDomainMainTask = arbitrary {
         MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
@@ -97,6 +101,8 @@ class TaskListRepositoryPropertyTest : FunSpec({
         override suspend fun createTaskList(request: CreateTaskListRequest): CreateTaskListResponse =
             throw exception
         override suspend fun getTaskList(request: GetTaskListRequest): GetTaskListResponse =
+            throw exception
+        override suspend fun getMainTask(request: GetMainTaskRequest): GetMainTaskResponse =
             throw exception
         override suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse =
             throw exception

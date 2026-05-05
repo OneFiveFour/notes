@@ -37,12 +37,14 @@ internal class EditTaskListViewModel(
 
     private val titleState = TextFieldState()
     private val tasks = mutableStateListOf<UiMainTask>()
-    private var nextDraftId = 1L
-    private var nextSubTaskDraftId = 1L
+    private var nextDraftId = 1
+    private var nextDraftSubTaskId = 1
     private var persistedTaskListId: String? = (mode as? EditTaskListMode.Edit)?.taskListId
     private var lastSuccessfulSnapshot: SyncSnapshot? = null
     private var syncQueued = false
     private var syncJob: Job? = null
+
+    val taskListId: String? get() = persistedTaskListId
 
     private val dueDatePattern = Regex("""^\d{4}-\d{2}-\d{2}$""")
     private val titleRequiredMessage = "Title cannot be blank."
@@ -61,6 +63,9 @@ internal class EditTaskListViewModel(
     private val _navigateBack = MutableSharedFlow<Unit>()
     val navigateBack: SharedFlow<Unit> = _navigateBack.asSharedFlow()
 
+    private fun nextDraftMainTaskId() = "draft-${nextDraftId++}"
+    private fun nextDraftSubTaskId() = "draft-sub-${nextDraftSubTaskId++}"
+
     init {
         if (mode is EditTaskListMode.Edit) {
             loadTaskList(mode.taskListId)
@@ -78,7 +83,7 @@ internal class EditTaskListViewModel(
     }
 
     fun onAddMainTask() {
-        val draft = UiMainTask(id = nextDraftId++)
+        val draft = UiMainTask(id = nextDraftMainTaskId())
         tasks.add(draft)
         observeDueDateRecurrenceExclusion(draft)
         _uiState.update { it.copy(error = null) }
@@ -104,7 +109,7 @@ internal class EditTaskListViewModel(
 
     fun onAddSubTask(mainTaskIndex: Int) {
         val task = tasks.getOrNull(mainTaskIndex) ?: return
-        task.subTasks.add(UiSubTask(subTaskId = nextSubTaskDraftId++))
+        task.subTasks.add(UiSubTask(id = nextDraftSubTaskId()))
         _uiState.update { it.copy(error = null) }
     }
 
@@ -166,18 +171,12 @@ internal class EditTaskListViewModel(
 
                     tasks.clear()
 
-                    var maxSubTaskId = 0L
                     taskList.tasks.forEach { task ->
-                        val draft = UiMainTask.fromDomain(nextDraftId++, task)
+                        val draft = UiMainTask.fromDomain(task)
                         tasks.add(draft)
-                        maxSubTaskId = maxOf(
-                            maxSubTaskId,
-                            draft.subTasks.maxOfOrNull { it.subTaskId } ?: 0L
-                        )
                         observeDueDateRecurrenceExclusion(draft)
                     }
 
-                    nextSubTaskDraftId = maxOf(nextSubTaskDraftId, maxSubTaskId + 1L)
                     lastSuccessfulSnapshot = taskList.toSyncSnapshot()
 
                     _uiState.update {

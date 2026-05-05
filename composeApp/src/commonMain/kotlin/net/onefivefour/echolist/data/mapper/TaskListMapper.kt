@@ -8,6 +8,7 @@ import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
+import tasks.v1.GetMainTaskResponse
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsResponse
 import tasks.v1.UpdateTaskListRequest
@@ -22,13 +23,15 @@ internal object TaskListMapper {
     // Proto -> Domain
 
     fun toDomain(proto: tasks.v1.SubTask): SubTask = SubTask(
+        id = proto.id,
         description = proto.description,
-        isDone = proto.done
+        isDone = proto.is_done
     )
 
     fun toDomain(proto: tasks.v1.MainTask): MainTask = MainTask(
+        id = proto.id,
         description = proto.description,
-        isDone = proto.done,
+        isDone = proto.is_done,
         dueDate = proto.due_date,
         recurrence = proto.recurrence,
         subTasks = proto.sub_tasks.map { toDomain(it) }
@@ -36,7 +39,7 @@ internal object TaskListMapper {
 
     fun toDomain(proto: tasks.v1.TaskList): TaskList = TaskList(
         id = proto.id,
-        filePath = proto.file_path,
+        parentDir = proto.parent_dir,
         name = proto.title,
         tasks = proto.tasks.map { toDomain(it) },
         updatedAt = proto.updated_at,
@@ -53,12 +56,19 @@ internal object TaskListMapper {
         return toDomain(taskList)
     }
 
+    fun toDomain(proto: GetMainTaskResponse): MainTask {
+        val mainTask = requireNotNull(proto.main_task) {
+            "GetMainTaskResponse did not include a main task payload"
+        }
+        return toDomain(mainTask)
+    }
+
     fun toDomain(proto: ListTaskListsResponse): List<TaskListEntry> =
         proto.task_lists.map { toEntry(it) }
 
     fun toEntry(proto: tasks.v1.TaskList): TaskListEntry = TaskListEntry(
         id = proto.id,
-        filePath = proto.file_path,
+        parentDir = proto.parent_dir,
         name = proto.title,
         updatedAt = proto.updated_at
     )
@@ -85,16 +95,18 @@ internal object TaskListMapper {
     )
 
     fun toProto(domain: MainTask): tasks.v1.MainTask = tasks.v1.MainTask(
+        id = domain.id,
         description = domain.description,
-        done = domain.isDone,
+        is_done = domain.isDone,
         due_date = domain.dueDate,
         recurrence = domain.recurrence,
         sub_tasks = domain.subTasks.map { toProto(it) }
     )
 
     fun toProto(domain: SubTask): tasks.v1.SubTask = tasks.v1.SubTask(
+        id = domain.id,
         description = domain.description,
-        done = domain.isDone
+        is_done = domain.isDone
     )
 
     private fun requireTaskList(taskList: tasks.v1.TaskList?, responseType: String): tasks.v1.TaskList =

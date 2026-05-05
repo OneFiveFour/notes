@@ -31,15 +31,17 @@ class TaskListRepositoryImplTest : FunSpec({
 
     val arbProtoSubTask = arbitrary {
         tasks.v1.SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind()
+            is_done = Arb.boolean().bind()
         )
     }
 
     val arbProtoMainTask = arbitrary {
         tasks.v1.MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
-            done = Arb.boolean().bind(),
+            is_done = Arb.boolean().bind(),
             due_date = Arb.string(0..50).bind(),
             recurrence = Arb.string(0..50).bind(),
             sub_tasks = Arb.list(arbProtoSubTask, 0..3).bind()
@@ -49,7 +51,7 @@ class TaskListRepositoryImplTest : FunSpec({
     val arbProtoTaskList = arbitrary {
         tasks.v1.TaskList(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             tasks = Arb.list(arbProtoMainTask, 0..5).bind(),
             updated_at = Arb.long(0..Long.MAX_VALUE).bind(),
@@ -59,6 +61,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
     val arbDomainSubTask = arbitrary {
         SubTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind()
         )
@@ -66,6 +69,7 @@ class TaskListRepositoryImplTest : FunSpec({
 
     val arbDomainMainTask = arbitrary {
         MainTask(
+            id = Arb.string(0..50).bind(),
             description = Arb.string(0..100).bind(),
             isDone = Arb.boolean().bind(),
             dueDate = Arb.string(0..50).bind(),
@@ -128,7 +132,7 @@ class TaskListRepositoryImplTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
@@ -144,7 +148,7 @@ class TaskListRepositoryImplTest : FunSpec({
                 CreateTaskListResponse(
                     task_list = tasks.v1.TaskList(
                         id = "new-uuid",
-                        file_path = "/test.json",
+                        parent_dir = "test",
                         title = "t",
                         tasks = emptyList(),
                         updated_at = 0L
@@ -186,7 +190,7 @@ class TaskListRepositoryImplTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
@@ -200,7 +204,7 @@ class TaskListRepositoryImplTest : FunSpec({
             GetTaskListResponse(
                 task_list = tasks.v1.TaskList(
                     id = "uuid-x",
-                    file_path = "/x.json",
+                    parent_dir = "",
                     title = "t",
                     tasks = emptyList(),
                     updated_at = 0L
@@ -230,14 +234,14 @@ class TaskListRepositoryImplTest : FunSpec({
     test("listTaskLists returns mapped result on success") {
         val tl1 = tasks.v1.TaskList(
             id = "tl-uuid-1",
-            file_path = "/lists/list1.json",
+            parent_dir = "lists",
             title = "List 1",
             tasks = emptyList(),
             updated_at = 100L
         )
         val tl2 = tasks.v1.TaskList(
             id = "tl-uuid-2",
-            file_path = "/lists/list2.json",
+            parent_dir = "lists",
             title = "List 2",
             tasks = emptyList(),
             updated_at = 200L
@@ -252,10 +256,10 @@ class TaskListRepositoryImplTest : FunSpec({
         val taskLists = result.getOrThrow()
         taskLists.size shouldBe 2
         taskLists[0].id shouldBe "tl-uuid-1"
-        taskLists[0].filePath shouldBe "/lists/list1.json"
+        taskLists[0].parentDir shouldBe "lists"
         taskLists[0].name shouldBe "List 1"
         taskLists[1].id shouldBe "tl-uuid-2"
-        taskLists[1].filePath shouldBe "/lists/list2.json"
+        taskLists[1].parentDir shouldBe "lists"
         taskLists[1].name shouldBe "List 2"
     }
 
@@ -309,13 +313,13 @@ class TaskListRepositoryImplTest : FunSpec({
             result.isSuccess shouldBe true
             val taskList = result.getOrThrow()
             taskList.id shouldBe protoTaskList.id
-            taskList.filePath shouldBe protoTaskList.file_path
+            taskList.parentDir shouldBe protoTaskList.parent_dir
             taskList.name shouldBe protoTaskList.title
             taskList.tasks.size shouldBe protoTaskList.tasks.size
             taskList.updatedAt shouldBe protoTaskList.updated_at
             taskList.isAutoDelete shouldBe protoTaskList.is_auto_delete
             notifier.notifiedPaths shouldBe listOf(
-                normalizePath(protoTaskList.file_path.substringBeforeLast('/', ""))
+                normalizePath(protoTaskList.parent_dir)
             )
         }
     }
@@ -327,7 +331,7 @@ class TaskListRepositoryImplTest : FunSpec({
                 UpdateTaskListResponse(
                     task_list = tasks.v1.TaskList(
                         id = params.id,
-                        file_path = "/test.json",
+                        parent_dir = "test",
                         title = "t",
                         tasks = emptyList(),
                         updated_at = 0L
@@ -362,7 +366,7 @@ class TaskListRepositoryImplTest : FunSpec({
         val fake = FakeTaskListRemoteDataSource()
         val taskList = tasks.v1.TaskList(
             id = "tl-uuid-del",
-            file_path = "home/projects/tl-uuid-del.json",
+            parent_dir = "home/projects",
             title = "Delete me",
             tasks = emptyList(),
             updated_at = 1L,
@@ -386,7 +390,7 @@ class TaskListRepositoryImplTest : FunSpec({
             GetTaskListResponse(
                 task_list = tasks.v1.TaskList(
                     id = "target-uuid",
-                    file_path = "home/projects/target-uuid.json",
+                    parent_dir = "home/projects",
                     title = "Delete me",
                     tasks = emptyList(),
                     updated_at = 1L,
@@ -408,7 +412,7 @@ class TaskListRepositoryImplTest : FunSpec({
             GetTaskListResponse(
                 task_list = tasks.v1.TaskList(
                     id = "some-uuid",
-                    file_path = "home/projects/some-uuid.json",
+                    parent_dir = "home/projects",
                     title = "Delete me",
                     tasks = emptyList(),
                     updated_at = 1L,

@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.TaskListMapper
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
+import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
@@ -11,6 +12,7 @@ import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 import tasks.v1.DeleteTaskListRequest
+import tasks.v1.GetMainTaskRequest
 import tasks.v1.GetTaskListRequest
 import tasks.v1.ListTaskListsRequest
 
@@ -44,6 +46,17 @@ internal class TaskListRepositoryImpl(
             }
         }
 
+    override suspend fun getMainTask(mainTaskId: String): Result<MainTask> =
+        withContext(dispatcher) {
+            try {
+                val request = GetMainTaskRequest(id = mainTaskId)
+                val response = networkDataSource.getMainTask(request)
+                Result.success(TaskListMapper.toDomain(response))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
     override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
         withContext(dispatcher) {
             try {
@@ -62,7 +75,7 @@ internal class TaskListRepositoryImpl(
                 val response = networkDataSource.updateTaskList(request)
                 val taskList = TaskListMapper.toDomain(response)
                 directoryChangeNotifier.notifyChanged(
-                    normalizePath(taskList.filePath.substringBeforeLast('/', ""))
+                    normalizePath(taskList.parentDir)
                 )
                 Result.success(taskList)
             } catch (e: Exception) {
@@ -74,11 +87,11 @@ internal class TaskListRepositoryImpl(
         withContext(dispatcher) {
             try {
                 val taskListResponse = networkDataSource.getTaskList(GetTaskListRequest(id = taskListId))
-                val filePath = TaskListMapper.toDomain(taskListResponse).filePath
+                val parentDir = TaskListMapper.toDomain(taskListResponse).parentDir
                 val request = DeleteTaskListRequest(id = taskListId)
                 networkDataSource.deleteTaskList(request)
                 directoryChangeNotifier.notifyChanged(
-                    normalizePath(filePath.substringBeforeLast('/', ""))
+                    normalizePath(parentDir)
                 )
                 Result.success(Unit)
             } catch (e: Exception) {

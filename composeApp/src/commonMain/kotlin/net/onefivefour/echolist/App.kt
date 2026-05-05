@@ -211,16 +211,9 @@ private fun AuthenticatedApp() {
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
                     onNavigateToSettings = { mainTaskId ->
-                        val task = viewModel.uiState.value.mainTasks.firstOrNull { it.id == mainTaskId }
-                        if (task != null) {
-                            backStack.add(
-                                MainTaskSettingsRoute(
-                                    mainTaskId = mainTaskId,
-                                    currentDueDate = task.dueDateState.text.toString(),
-                                    currentRecurrence = task.recurrenceState.text.toString()
-                                )
-                            )
-                        }
+                        backStack.add(
+                            MainTaskSettingsRoute(mainTaskId = mainTaskId)
+                        )
                     },
                     onDeleteClick = viewModel::onDeleteClick
                 )
@@ -230,11 +223,7 @@ private fun AuthenticatedApp() {
                 val viewModel = koinViewModel<MainTaskSettingsViewModel>(
                     key = "mainTaskSettings-${route.mainTaskId}"
                 ) {
-                    parametersOf(
-                        route.mainTaskId,
-                        route.currentDueDate,
-                        route.currentRecurrence
-                    )
+                    parametersOf(route.mainTaskId)
                 }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
