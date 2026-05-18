@@ -66,7 +66,7 @@ class CreateFolderViewModelPropertyTest : FunSpec({
             return createFolderHandler(params)
         }
 
-        override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> =
+        override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> =
             Result.success(emptyList())
 
         override suspend fun updateFolder(params: UpdateFolderParams): Result<Folder> =
@@ -82,7 +82,7 @@ class CreateFolderViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbPath) { path ->
             runTest(testDispatcher) {
                 val repo = MockFileRepository()
-                val vm = CreateFolderViewModel(currentPath = path, fileRepository = repo)
+                val vm = CreateFolderViewModel(parentDir = path, fileRepository = repo)
 
                 vm.uiState.value.isVisible shouldBe false
 
@@ -101,13 +101,13 @@ class CreateFolderViewModelPropertyTest : FunSpec({
         }
     }
 
-    // -- Property 3: Confirm sends trimmed name with correct path --
+    // -- Property 3: Confirm sends trimmed name with correct parentDir --
 
     test("Feature: create-folder-dialog, Property 3: onConfirm sends trimmed name with correct path") {
         checkAll(PropTestConfig(iterations = 100), arbPaddedNonBlankName, arbPath) { name, path ->
             runTest(testDispatcher) {
                 val repo = MockFileRepository()
-                val vm = CreateFolderViewModel(currentPath = path, fileRepository = repo)
+                val vm = CreateFolderViewModel(parentDir = path, fileRepository = repo)
 
                 vm.showDialog()
                 vm.onNameChange(name)
@@ -130,7 +130,7 @@ class CreateFolderViewModelPropertyTest : FunSpec({
                 repo.createFolderHandler = { params ->
                     Result.success(Folder(path = "${params.parentDir}/${params.name}", name = params.name))
                 }
-                val vm = CreateFolderViewModel(currentPath = path, fileRepository = repo)
+                val vm = CreateFolderViewModel(parentDir = path, fileRepository = repo)
 
                 vm.showDialog()
                 vm.onNameChange(name)
@@ -154,7 +154,7 @@ class CreateFolderViewModelPropertyTest : FunSpec({
                 repo.createFolderHandler = {
                     Result.failure(RuntimeException(errorMsg))
                 }
-                val vm = CreateFolderViewModel(currentPath = "test", fileRepository = repo)
+                val vm = CreateFolderViewModel(parentDir = "test", fileRepository = repo)
 
                 vm.showDialog()
                 vm.onNameChange(name)

@@ -102,7 +102,7 @@ private fun AuthenticatedApp() {
         entryProvider = entryProvider {
             entry<HomeRoute> { route ->
                 val homeViewModel =
-                    koinViewModel<HomeViewModel>(key = route.path) { parametersOf(route.path) }
+                    koinViewModel<HomeViewModel>(key = route.parentDir) { parametersOf(route.parentDir) }
 
                 val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
 
@@ -112,27 +112,27 @@ private fun AuthenticatedApp() {
 
                 val createFolderViewModel =
                     koinViewModel<CreateFolderViewModel>(
-                        key = "createFolder-${route.path}"
-                    ) { parametersOf(route.path) }
+                        key = "createFolder-${route.parentDir}"
+                    ) { parametersOf(route.parentDir) }
 
                 val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
 
                 HomeScreen(
                     uiState = homeUiState,
                     createFolderUiState = createFolderUiState,
-                    onBreadcrumbClick = { path ->
-                        val index = backStack.indexOfLast { it is HomeRoute && it.path == path }
+                    onBreadcrumbClick = { parentDir ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
                         if (index >= 0) {
                             while (backStack.size > index + 1) backStack.removeLast()
                         } else {
-                            backStack.add(HomeRoute(path))
+                            backStack.add(HomeRoute(parentDir))
                         }
                     },
                     onRefresh = homeViewModel::refresh,
                     createItemCallbacks = CreateItemCallbacks(
                         onCreateFolder = createFolderViewModel::showDialog,
-                        onCreateNote = { backStack.add(EditNoteRoute(parentPath = route.path)) },
-                        onCreateTaskList = { backStack.add(EditTaskListRoute(parentPath = route.path)) }
+                        onCreateNote = { backStack.add(EditNoteRoute(parentDir = route.parentDir)) },
+                        onCreateTaskList = { backStack.add(EditTaskListRoute(parentDir = route.parentDir)) }
                     ),
                     onFolderClick = { folderPath ->
                         backStack.add(HomeRoute(folderPath))
@@ -140,7 +140,7 @@ private fun AuthenticatedApp() {
                     onNoteClick = { noteId ->
                         backStack.add(
                             EditNoteRoute(
-                                parentPath = route.path,
+                                parentDir = route.parentDir,
                                 noteId = noteId
                             )
                         )
@@ -148,7 +148,7 @@ private fun AuthenticatedApp() {
                     onTaskClick = { taskListId ->
                         backStack.add(
                             EditTaskListRoute(
-                                parentPath = route.path,
+                                parentDir = route.parentDir,
                                 taskListId = taskListId
                             )
                         )
@@ -163,9 +163,9 @@ private fun AuthenticatedApp() {
                 val noteId = route.noteId?.takeIf { it.isNotBlank() }
 
                 val mode = noteId?.let(EditNoteMode::Edit)
-                    ?: EditNoteMode.Create(normalizePath(route.parentPath))
+                    ?: EditNoteMode.Create(normalizePath(route.parentDir))
                 val viewModel = koinViewModel<EditNoteViewModel>(
-                    key = "editNote-${route.parentPath}-${noteId.orEmpty()}"
+                    key = "editNote-${route.parentDir}-${noteId.orEmpty()}"
                 ) { parametersOf(mode) }
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -188,10 +188,10 @@ private fun AuthenticatedApp() {
                 val taskListId = route.taskListId?.takeIf { it.isNotBlank() }
 
                 val mode = taskListId?.let(EditTaskListMode::Edit)
-                    ?: EditTaskListMode.Create(normalizePath(route.parentPath))
+                    ?: EditTaskListMode.Create(normalizePath(route.parentDir))
 
                 val viewModel = koinViewModel<EditTaskListViewModel>(
-                    key = "editTaskList-${route.parentPath}-${taskListId.orEmpty()}"
+                    key = "editTaskList-${route.parentDir}-${taskListId.orEmpty()}"
                 ) { parametersOf(mode) }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()

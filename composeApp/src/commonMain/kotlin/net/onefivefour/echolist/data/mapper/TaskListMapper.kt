@@ -82,7 +82,7 @@ internal object TaskListMapper {
 
     fun toProto(params: CreateTaskListParams): CreateTaskListRequest = CreateTaskListRequest(
         title = params.name,
-        parent_dir = params.path,
+        parent_dir = params.parentDir,
         tasks = params.tasks.map { toProto(it) },
         is_auto_delete = params.isAutoDelete
     )

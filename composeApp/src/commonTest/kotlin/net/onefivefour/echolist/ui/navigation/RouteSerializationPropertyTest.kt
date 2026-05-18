@@ -18,8 +18,8 @@ class RouteSerializationPropertyTest : FunSpec({
     }
 
     test("Property 1: HomeRoute serialization round-trip") {
-        checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { path ->
-            val route = HomeRoute(path)
+        checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { parentDir ->
+            val route = HomeRoute(parentDir)
             val encoded = json.encodeToString(kotlinx.serialization.serializer<HomeRoute>(), route)
             val decoded = json.decodeFromString(kotlinx.serialization.serializer<HomeRoute>(), encoded)
             decoded shouldBe route
@@ -27,8 +27,8 @@ class RouteSerializationPropertyTest : FunSpec({
     }
 
     test("Property 1: Polymorphic NavKey serialization round-trip for HomeRoute") {
-        checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { path ->
-            val route: NavKey = HomeRoute(path)
+        checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { parentDir ->
+            val route: NavKey = HomeRoute(parentDir)
             val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
             val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
             decoded shouldBe route
@@ -41,9 +41,9 @@ class RouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withNoteId ->
-            val parentPath = if (index == 0) "" else "folder-$index"
+            val parentDir = if (index == 0) "" else "folder-$index"
             val route = EditNoteRoute(
-                parentPath = parentPath,
+                parentDir = parentDir,
                 noteId = if (withNoteId) "note-id-$index" else null
             )
             val encoded = json.encodeToString(kotlinx.serialization.serializer<EditNoteRoute>(), route)
@@ -58,9 +58,9 @@ class RouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withNoteId ->
-            val parentPath = if (index == 0) "" else "folder-$index"
+            val parentDir = if (index == 0) "" else "folder-$index"
             val route: NavKey = EditNoteRoute(
-                parentPath = parentPath,
+                parentDir = parentDir,
                 noteId = if (withNoteId) "note-id-$index" else null
             )
             val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
@@ -71,7 +71,7 @@ class RouteSerializationPropertyTest : FunSpec({
 
     test("Property 1: EditTaskListRoute serialization round-trip") {
         val route = EditTaskListRoute(
-            parentPath = "folder-1",
+            parentDir = "folder-1",
             taskListId = "task-list-1"
         )
         val encoded = json.encodeToString(kotlinx.serialization.serializer<EditTaskListRoute>(), route)
@@ -81,7 +81,7 @@ class RouteSerializationPropertyTest : FunSpec({
 
     test("Property 1: Polymorphic NavKey serialization round-trip for EditTaskListRoute") {
         val route: NavKey = EditTaskListRoute(
-            parentPath = "folder-1",
+            parentDir = "folder-1",
             taskListId = "task-list-1"
         )
         val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)

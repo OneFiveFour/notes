@@ -8,7 +8,7 @@ import net.onefivefour.echolist.data.dto.UpdateFolderParams
 
 interface FileRepository {
     suspend fun createFolder(params: CreateFolderParams): Result<Folder>
-    suspend fun listFiles(parentPath: String): Result<List<FileEntry>>
+    suspend fun listFiles(parentDir: String): Result<List<FileEntry>>
     suspend fun updateFolder(params: UpdateFolderParams): Result<Folder>
     suspend fun deleteFolder(params: DeleteFolderParams): Result<Unit>
 }

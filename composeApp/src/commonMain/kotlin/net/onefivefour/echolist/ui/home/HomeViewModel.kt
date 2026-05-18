@@ -14,7 +14,7 @@ import net.onefivefour.echolist.domain.repository.FileRepository
 import org.jetbrains.compose.resources.getString
 
 class HomeViewModel(
-    private val path: String,
+    private val parentDir: String,
     private val fileRepository: FileRepository,
     private val directoryChangeNotifier: DirectoryChangeNotifier
 ) : ViewModel() {
@@ -33,7 +33,7 @@ class HomeViewModel(
         }
         viewModelScope.launch {
             directoryChangeNotifier.directoryChanged.collect { changedPath ->
-                if (changedPath == path) {
+                if (changedPath == parentDir) {
                     loadData()
                 }
             }
@@ -70,7 +70,7 @@ class HomeViewModel(
                 breadcrumbs = breadcrumbs
             )
         }
-        val result = fileRepository.listFiles(path)
+        val result = fileRepository.listFiles(parentDir)
         _uiState.update { current ->
             result.fold(
                 onSuccess = { entries ->
@@ -95,20 +95,20 @@ class HomeViewModel(
 
     private suspend fun resolveBreadcrumbs(): List<BreadcrumbItem> =
         buildBreadcrumbs(
-            path = path,
+            parentDir = parentDir,
             homeTitle = getString(Res.string.home_title)
         )
 }
 
-internal fun buildBreadcrumbs(path: String, homeTitle: String): List<BreadcrumbItem> {
-    val breadcrumbs = mutableListOf(BreadcrumbItem(label = homeTitle, path = ""))
-    if (path.isEmpty()) return breadcrumbs
+internal fun buildBreadcrumbs(parentDir: String, homeTitle: String): List<BreadcrumbItem> {
+    val breadcrumbs = mutableListOf(BreadcrumbItem(label = homeTitle, parentDir = ""))
+    if (parentDir.isEmpty()) return breadcrumbs
 
-    val segments = path.trimStart('/').trimEnd('/').split('/')
+    val segments = parentDir.trimStart('/').trimEnd('/').split('/')
     var accumulated = ""
     for (segment in segments) {
         accumulated = if (accumulated.isEmpty()) segment else "$accumulated/$segment"
-        breadcrumbs.add(BreadcrumbItem(label = segment, path = accumulated))
+        breadcrumbs.add(BreadcrumbItem(label = segment, parentDir = accumulated))
     }
     return breadcrumbs
 }

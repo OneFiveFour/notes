@@ -28,7 +28,7 @@ internal class TaskListRepositoryImpl(
                 val request = TaskListMapper.toProto(params)
                 val response = networkDataSource.createTaskList(request)
                 val taskList = TaskListMapper.toDomain(response)
-                directoryChangeNotifier.notifyChanged(normalizePath(params.path))
+                directoryChangeNotifier.notifyChanged(normalizePath(params.parentDir))
                 Result.success(taskList)
             } catch (e: Exception) {
                 Result.failure(e)

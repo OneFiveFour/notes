@@ -10,17 +10,17 @@ import kotlinx.serialization.modules.polymorphic
 data object LoginRoute : NavKey
 
 @Serializable
-data class HomeRoute(val path: String = "") : NavKey
+data class HomeRoute(val parentDir: String = "") : NavKey
 
 @Serializable
 data class EditNoteRoute(
-    val parentPath: String,
+    val parentDir: String,
     val noteId: String? = null
 ) : NavKey
 
 @Serializable
 data class EditTaskListRoute(
-    val parentPath: String,
+    val parentDir: String,
     val taskListId: String? = null
 ) : NavKey
 

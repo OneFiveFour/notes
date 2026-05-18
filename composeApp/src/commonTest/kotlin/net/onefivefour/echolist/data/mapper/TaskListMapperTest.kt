@@ -260,7 +260,7 @@ class TaskListMapperTest : FunSpec({
     test("toProto transforms CreateTaskListParams to CreateTaskListRequest") {
         val params = CreateTaskListParams(
             name = "My Tasks",
-            path = "/home/user/lists",
+            parentDir = "/home/user/lists",
             isAutoDelete = true,
             tasks = listOf(
                 MainTask(

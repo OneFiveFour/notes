@@ -19,7 +19,7 @@ private fun arbHomeRoute(): Arb<HomeRoute> =
 private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         EditNoteRoute(
-            parentPath = "folder-$index",
+            parentDir = "folder-$index",
             noteId = if (index % 2 == 0) null else "note-id-$index"
         )
     }
@@ -28,13 +28,13 @@ private fun arbEditTaskListRoute(): Arb<EditTaskListRoute> =
     Arb.choice(
         Arb.int(0..50).map { index ->
             EditTaskListRoute(
-                parentPath = if (index == 0) "" else "folder-$index",
+                parentDir = if (index == 0) "" else "folder-$index",
                 taskListId = null
             )
         },
         Arb.int(0..50).map { index ->
             EditTaskListRoute(
-                parentPath = if (index == 0) "" else "folder-$index",
+                parentDir = if (index == 0) "" else "folder-$index",
                 taskListId = "task-list-$index"
             )
         }
@@ -65,10 +65,10 @@ class NavigationPropertyTest : FunSpec({
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            backStack.add(EditNoteRoute(parentPath = currentHome.path))
+            backStack.add(EditNoteRoute(parentDir = currentHome.parentDir))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditNoteRoute(parentPath = currentHome.path)
+            backStack.last() shouldBe EditNoteRoute(parentDir = currentHome.parentDir)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }
@@ -83,10 +83,10 @@ class NavigationPropertyTest : FunSpec({
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            backStack.add(EditTaskListRoute(parentPath = currentHome.path))
+            backStack.add(EditTaskListRoute(parentDir = currentHome.parentDir))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditTaskListRoute(parentPath = currentHome.path)
+            backStack.last() shouldBe EditTaskListRoute(parentDir = currentHome.parentDir)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }
@@ -105,14 +105,14 @@ class NavigationPropertyTest : FunSpec({
 
             backStack.add(
                 EditTaskListRoute(
-                    parentPath = currentHome.path,
+                    parentDir = currentHome.parentDir,
                     taskListId = taskListId
                 )
             )
 
             backStack.size shouldBe sizeBefore + 1
             backStack.last() shouldBe EditTaskListRoute(
-                parentPath = currentHome.path,
+                parentDir = currentHome.parentDir,
                 taskListId = taskListId
             )
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
@@ -131,10 +131,10 @@ class NavigationPropertyTest : FunSpec({
             val entriesBefore = backStack.toList()
             val noteId = "note-id-$fileIndex"
 
-            backStack.add(EditNoteRoute(parentPath = currentHome.path, noteId = noteId))
+            backStack.add(EditNoteRoute(parentDir = currentHome.parentDir, noteId = noteId))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditNoteRoute(parentPath = currentHome.path, noteId = noteId)
+            backStack.last() shouldBe EditNoteRoute(parentDir = currentHome.parentDir, noteId = noteId)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }

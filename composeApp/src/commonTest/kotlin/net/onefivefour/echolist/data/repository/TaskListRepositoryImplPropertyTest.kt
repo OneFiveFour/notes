@@ -101,7 +101,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
     val arbCreateTaskListParams = arbitrary {
         CreateTaskListParams(
             name = Arb.string(1..100).bind(),
-            path = Arb.string(1..100).bind(),
+            parentDir = Arb.string(1..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..3).bind(),
             isAutoDelete = Arb.boolean().bind()
         )
@@ -162,7 +162,7 @@ class TaskListRepositoryImplPropertyTest : FunSpec({
             repo.createTaskList(params)
 
             fake.lastCreateRequest?.title shouldBe params.name
-            fake.lastCreateRequest?.parent_dir shouldBe params.path
+            fake.lastCreateRequest?.parent_dir shouldBe params.parentDir
             fake.lastCreateRequest?.tasks?.size shouldBe params.tasks.size
             fake.lastCreateRequest?.is_auto_delete shouldBe params.isAutoDelete
         }

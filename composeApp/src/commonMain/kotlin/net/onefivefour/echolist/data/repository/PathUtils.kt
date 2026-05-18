@@ -9,8 +9,8 @@ internal fun normalizePath(path: String): String {
         .let { if (it == ".") "" else it }
 }
 
-internal fun joinPath(parentPath: String, childName: String): String {
-    val parent = normalizePath(parentPath)
+internal fun joinPath(parentDir: String, childName: String): String {
+    val parent = normalizePath(parentDir)
     val child = normalizePath(childName)
     return when {
         parent.isEmpty() -> child

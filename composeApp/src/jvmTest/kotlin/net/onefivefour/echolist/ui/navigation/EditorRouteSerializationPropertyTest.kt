@@ -23,9 +23,9 @@ class EditorRouteSerializationPropertyTest : FunSpec({
             Arb.int(0..50),
             Arb.boolean()
         ) { index, withNoteId ->
-            val parentPath = if (index == 0) "" else "folder-$index"
+            val parentDir = if (index == 0) "" else "folder-$index"
             val route = EditNoteRoute(
-                parentPath = parentPath,
+                parentDir = parentDir,
                 noteId = if (withNoteId) "note-id-$index" else null
             )
             val json = Json.encodeToString(route)
@@ -36,7 +36,7 @@ class EditorRouteSerializationPropertyTest : FunSpec({
 
     test("Feature: note-tasklist-editors, Property 5: EditTaskListRoute serialization round-trip produces equal object") {
         val route = EditTaskListRoute(
-            parentPath = "folder-1",
+            parentDir = "folder-1",
             taskListId = "task-list-1"
         )
         val json = Json.encodeToString(route)

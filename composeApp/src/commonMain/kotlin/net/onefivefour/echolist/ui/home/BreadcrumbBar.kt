@@ -93,7 +93,7 @@ internal fun BreadcrumbBar(
                     .dropLast(1)
                     .forEach { bc ->
                         Text(
-                            modifier = Modifier.clickable { onBreadcrumbClick(bc.path) },
+                            modifier = Modifier.clickable { onBreadcrumbClick(bc.parentDir) },
                             text = bc.label,
                             style = EchoListTheme.typography.labelMedium
                         )
@@ -123,15 +123,15 @@ private fun BreadcrumbBarPreview() {
             breadcrumbs = listOf(
                 BreadcrumbItem(
                     label = "Home",
-                    path = ""
+                    parentDir = ""
                 ),
                 BreadcrumbItem(
                     label = "Folder 1",
-                    path = "folder1"
+                    parentDir = "folder1"
                 ),
                 BreadcrumbItem(
                     label = "Folder 2",
-                    path = "folder1/folder2"
+                    parentDir = "folder1/folder2"
                 )
             ),
             onBreadcrumbClick = { }

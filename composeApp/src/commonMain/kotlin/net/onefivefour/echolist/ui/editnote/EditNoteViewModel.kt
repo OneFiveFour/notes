@@ -98,7 +98,7 @@ class EditNoteViewModel(
                     CreateNoteParams(
                         title = trimmedTitle,
                         content = content,
-                        parentDir = currentMode.parentPath
+                        parentDir = currentMode.parentDir
                     )
                 )
                 is EditNoteMode.Edit -> notesRepository.updateNote(

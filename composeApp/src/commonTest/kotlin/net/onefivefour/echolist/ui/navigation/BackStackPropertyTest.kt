@@ -19,10 +19,10 @@ private fun arbHomeRoute(): Arb<HomeRoute> =
 private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
     Arb.int(0..50).map { index ->
         if (index % 2 == 0) {
-            EditNoteRoute(parentPath = "folder-$index")
+            EditNoteRoute(parentDir = "folder-$index")
         } else {
             EditNoteRoute(
-                parentPath = "folder-$index",
+                parentDir = "folder-$index",
                 noteId = "note-id-$index"
             )
         }
@@ -58,10 +58,10 @@ class BackStackPropertyTest : FunSpec({
         ) { paths ->
             val stack = paths.map { HomeRoute(it) }.toMutableList()
             val targetIndex = (0 until stack.size).random()
-            val targetPath = stack[targetIndex].path
+            val targetPath = stack[targetIndex].parentDir
             val entriesBefore = stack.toList()
 
-            val index = stack.indexOfLast { it.path == targetPath }
+            val index = stack.indexOfLast { it.parentDir == targetPath }
             if (index >= 0) {
                 while (stack.size > index + 1) stack.removeLast()
             } else {

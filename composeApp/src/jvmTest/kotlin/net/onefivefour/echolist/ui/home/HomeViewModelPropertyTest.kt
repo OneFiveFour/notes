@@ -51,7 +51,7 @@ class HomeViewModelPropertyTest : FunSpec({
     class MockFileRepository : FileRepository {
         val listFilesCallCount = AtomicInteger(0)
 
-        override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
+        override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> {
             listFilesCallCount.incrementAndGet()
             return Result.success(emptyList())
         }
@@ -73,7 +73,7 @@ class HomeViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 val repo = MockFileRepository()
                 val notifier = FakeDirectoryChangeNotifier()
-                val vm = HomeViewModel(path = vmPath, fileRepository = repo, directoryChangeNotifier = notifier)
+                val vm = HomeViewModel(parentDir = vmPath, fileRepository = repo, directoryChangeNotifier = notifier)
 
                 // Let init's loadData() complete
                 advanceUntilIdle()

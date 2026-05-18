@@ -42,7 +42,7 @@ class HomeViewModelClearErrorTest : FunSpec({
         runTest(testDispatcher) {
             var shouldFail = true
             val repo = object : FileRepository {
-                override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
+                override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> {
                     return if (shouldFail) {
                         Result.failure(Exception("code Unauthenticated token expired"))
                     } else {
@@ -58,7 +58,7 @@ class HomeViewModelClearErrorTest : FunSpec({
             }
 
             val vm = HomeViewModel(
-                path = "",
+                parentDir = "",
                 fileRepository = repo,
                 directoryChangeNotifier = FakeDirectoryChangeNotifier()
             )
@@ -84,7 +84,7 @@ class HomeViewModelClearErrorTest : FunSpec({
         runTest(testDispatcher) {
             var callCount = 0
             val repo = object : FileRepository {
-                override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
+                override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> {
                     callCount++
                     return Result.failure(Exception("token expired"))
                 }
@@ -97,7 +97,7 @@ class HomeViewModelClearErrorTest : FunSpec({
             }
 
             val vm = HomeViewModel(
-                path = "",
+                parentDir = "",
                 fileRepository = repo,
                 directoryChangeNotifier = FakeDirectoryChangeNotifier()
             )

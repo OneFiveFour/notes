@@ -11,7 +11,7 @@ import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.domain.repository.FileRepository
 
 class CreateFolderViewModel(
-    private val currentPath: String,
+    private val parentDir: String,
     private val fileRepository: FileRepository
 ) : ViewModel() {
 
@@ -42,7 +42,7 @@ class CreateFolderViewModel(
 
         viewModelScope.launch {
             val result = fileRepository.createFolder(
-                CreateFolderParams(parentDir = currentPath, name = trimmedName)
+                CreateFolderParams(parentDir = parentDir, name = trimmedName)
             )
             result.fold(
                 onSuccess = {

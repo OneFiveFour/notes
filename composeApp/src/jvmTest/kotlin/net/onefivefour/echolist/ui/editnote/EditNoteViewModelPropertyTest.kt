@@ -93,9 +93,9 @@ class EditNoteViewModelPropertyTest : FunSpec({
         ) { generatedTitle, generatedContent ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeNotesRepository()
-                val parentPath = "test/path"
+                val parentDir = "test/path"
                 val vm = EditNoteViewModel(
-                    mode = EditNoteMode.Create(parentPath),
+                    mode = EditNoteMode.Create(parentDir),
                     notesRepository = fakeRepo
                 )
 
@@ -119,7 +119,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
                     fakeRepo.createNoteCalls.size shouldBe 1
                     fakeRepo.createNoteCalls[0].title shouldBe trimmed
                     fakeRepo.createNoteCalls[0].content shouldBe generatedContent
-                    fakeRepo.createNoteCalls[0].parentDir shouldBe parentPath
+                    fakeRepo.createNoteCalls[0].parentDir shouldBe parentDir
                 }
             }
         }
@@ -132,9 +132,9 @@ class EditNoteViewModelPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), Arb.string(0..50).filter { it.isNotBlank() }) { generatedTitle ->
             runTest(testDispatcher) {
                 val fakeRepo = FakeNotesRepository()
-                val parentPath = "test/path"
+                val parentDir = "test/path"
                 val vm = EditNoteViewModel(
-                    mode = EditNoteMode.Create(parentPath),
+                    mode = EditNoteMode.Create(parentDir),
                     notesRepository = fakeRepo
                 )
 
@@ -186,9 +186,9 @@ class EditNoteViewModelPropertyTest : FunSpec({
                         Result.failure(UnsupportedOperationException())
                 }
 
-                val parentPath = "test/path"
+                val parentDir = "test/path"
                 val vm = EditNoteViewModel(
-                    mode = EditNoteMode.Create(parentPath),
+                    mode = EditNoteMode.Create(parentDir),
                     notesRepository = failingRepo
                 )
 

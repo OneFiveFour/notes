@@ -52,7 +52,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             createTaskListCalls.add(params)
             val created = TaskList(
                 id = "created-${nextCreatedId++}",
-                parentDir = params.path,
+                parentDir = params.parentDir,
                 name = params.name,
                 tasks = params.tasks,
                 updatedAt = 0L,

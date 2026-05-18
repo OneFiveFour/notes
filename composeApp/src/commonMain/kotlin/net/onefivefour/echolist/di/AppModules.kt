@@ -166,14 +166,14 @@ val navigationModule: Module = module {
     single { MutableSharedFlow<MainTaskSettingsResult>() }
     viewModel { params ->
         HomeViewModel(
-            path = params.get(),
+            parentDir = params.get(),
             fileRepository = get(),
             directoryChangeNotifier = get()
         )
     }
     viewModel { params ->
         CreateFolderViewModel(
-            currentPath = params.get(),
+            parentDir = params.get(),
             fileRepository = get()
         )
     }

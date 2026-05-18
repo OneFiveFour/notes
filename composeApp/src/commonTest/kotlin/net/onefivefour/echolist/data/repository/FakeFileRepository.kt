@@ -31,8 +31,8 @@ open class FakeFileRepository : FileRepository {
         return createFolderResult
     }
 
-    override suspend fun listFiles(parentPath: String): Result<List<FileEntry>> {
-        callLog.add("listFiles($parentPath)")
+    override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> {
+        callLog.add("listFiles($parentDir)")
         return listFilesResult
     }
 

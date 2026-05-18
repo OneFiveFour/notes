@@ -41,11 +41,11 @@ internal class CacheDataSourceImpl(
         return noteQueries.selectById(id).executeAsOneOrNull()?.toDomain()
     }
 
-    override suspend fun listNotes(path: String): List<Note> {
-        return if (path.isEmpty()) {
+    override suspend fun listNotes(parentDir: String): List<Note> {
+        return if (parentDir.isEmpty()) {
             noteQueries.selectAll().executeAsList().map { it.toDomain() }
         } else {
-            noteQueries.selectByParentDir(path).executeAsList().map { it.toDomain() }
+            noteQueries.selectByParentDir(parentDir).executeAsList().map { it.toDomain() }
         }
     }
 

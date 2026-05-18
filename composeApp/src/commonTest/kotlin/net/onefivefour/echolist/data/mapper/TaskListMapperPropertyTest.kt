@@ -82,7 +82,7 @@ class TaskListMapperPropertyTest : FunSpec({
     val arbCreateTaskListParams = arbitrary {
         CreateTaskListParams(
             name = Arb.string(1..100).bind(),
-            path = Arb.string(0..100).bind(),
+            parentDir = Arb.string(0..100).bind(),
             tasks = Arb.list(arbDomainMainTask, 0..5).bind(),
             isAutoDelete = Arb.boolean().bind()
         )
