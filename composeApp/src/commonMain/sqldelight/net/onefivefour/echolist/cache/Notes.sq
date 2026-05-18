@@ -1,23 +1,23 @@
 CREATE TABLE Note (
     id TEXT NOT NULL PRIMARY KEY,
-    filePath TEXT NOT NULL,
+    parentDir TEXT NOT NULL,
     title TEXT NOT NULL,
     content TEXT NOT NULL,
     updatedAt INTEGER NOT NULL,
     cachedAt INTEGER NOT NULL
 );
 
-CREATE INDEX note_file_path_index ON Note(filePath);
+CREATE INDEX note_parent_dir_index ON Note(parentDir);
 
 insertOrReplace:
-INSERT OR REPLACE INTO Note(id, filePath, title, content, updatedAt, cachedAt)
+INSERT OR REPLACE INTO Note(id, parentDir, title, content, updatedAt, cachedAt)
 VALUES (?, ?, ?, ?, ?, ?);
 
 selectById:
 SELECT * FROM Note WHERE id = ?;
 
-selectByPathPrefix:
-SELECT * FROM Note WHERE filePath LIKE ? || '%' ORDER BY updatedAt DESC;
+selectByParentDir:
+SELECT * FROM Note WHERE parentDir = ? ORDER BY updatedAt DESC;
 
 selectAll:
 SELECT * FROM Note ORDER BY updatedAt DESC;

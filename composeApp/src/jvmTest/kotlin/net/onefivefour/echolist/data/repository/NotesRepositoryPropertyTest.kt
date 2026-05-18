@@ -57,7 +57,7 @@ class NotesRepositoryPropertyTest : FunSpec({
     val arbNote = arbitrary {
         Note(
             id = Arb.string(1..50).bind(),
-            filePath = Arb.string(1..50).bind(),
+            parentDir = Arb.string(0..50).bind(),
             title = Arb.string(1..50).bind(),
             content = Arb.string(0..200).bind(),
             updatedAt = Arb.long(1L..Long.MAX_VALUE / 2).bind()
@@ -91,7 +91,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             CreateNoteResponse(
                 note = notes.v1.Note(
                     id = "generated-${req.title}",
-                    file_path = "${req.parent_dir}/${req.title}.md",
+                    parent_dir = req.parent_dir,
                     title = req.title,
                     content = req.content,
                     updated_at = System.currentTimeMillis()
@@ -108,7 +108,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             UpdateNoteResponse(
                 note = notes.v1.Note(
                     id = req.id,
-                    file_path = "path/${req.id}.md",
+                    parent_dir = "path",
                     title = req.title,
                     content = req.content,
                     updated_at = System.currentTimeMillis()
@@ -152,14 +152,13 @@ class NotesRepositoryPropertyTest : FunSpec({
             val mockNetwork = MockNoteRemoteDataSource()
 
             val createdId = "generated-${params.title}"
-            val createdFilePath = "${params.parentDir}/${params.title}.md"
             val createdTimestamp = System.currentTimeMillis()
 
             mockNetwork.createNoteHandler = { req ->
                 CreateNoteResponse(
                     note = notes.v1.Note(
                         id = createdId,
-                        file_path = createdFilePath,
+                        parent_dir = req.parent_dir,
                         title = req.title,
                         content = req.content,
                         updated_at = createdTimestamp
@@ -170,7 +169,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 GetNoteResponse(
                     note = notes.v1.Note(
                         id = req.id,
-                        file_path = createdFilePath,
+                        parent_dir = params.parentDir,
                         title = params.title,
                         content = params.content,
                         updated_at = createdTimestamp
@@ -193,7 +192,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             val fetched = getResult.getOrThrow()
             fetched.title shouldBe params.title
             fetched.content shouldBe params.content
-            fetched.filePath shouldBe created.filePath
+            fetched.parentDir shouldBe created.parentDir
         }
     }
 
@@ -211,7 +210,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 UpdateNoteResponse(
                     note = notes.v1.Note(
                         id = req.id,
-                        file_path = originalNote.filePath,
+                        parent_dir = originalNote.parentDir,
                         title = originalNote.title,
                         content = req.content,
                         updated_at = updatedTimestamp
@@ -222,7 +221,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 GetNoteResponse(
                     note = notes.v1.Note(
                         id = req.id,
-                        file_path = originalNote.filePath,
+                        parent_dir = originalNote.parentDir,
                         title = originalNote.title,
                         content = newContent,
                         updated_at = updatedTimestamp
@@ -315,7 +314,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             result.isSuccess shouldBe true
 
             val fetched = result.getOrThrow()
-            fetched.filePath shouldBe note.filePath
+            fetched.parentDir shouldBe note.parentDir
             fetched.title shouldBe note.title
             fetched.content shouldBe note.content
             fetched.updatedAt shouldBe note.updatedAt
@@ -340,7 +339,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             result.isSuccess shouldBe true
 
             val listResult = result.getOrThrow()
-            listResult.any { it.filePath == note.filePath } shouldBe true
+            listResult.any { it.parentDir == note.parentDir } shouldBe true
         }
     }
 
@@ -376,7 +375,7 @@ class NotesRepositoryPropertyTest : FunSpec({
                 CreateNoteResponse(
                     note = notes.v1.Note(
                         id = "synced-${req.title}",
-                        file_path = "${req.parent_dir}/${req.title}.md",
+                        parent_dir = req.parent_dir,
                         title = req.title,
                         content = req.content,
                         updated_at = System.currentTimeMillis()

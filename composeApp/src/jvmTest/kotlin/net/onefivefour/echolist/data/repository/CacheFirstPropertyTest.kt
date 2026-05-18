@@ -43,7 +43,7 @@ class CacheFirstPropertyTest : FunSpec({
     val arbNote = arbitrary {
         Note(
             id = Arb.string(1..50).bind(),
-            filePath = Arb.string(1..50).bind(),
+            parentDir = Arb.string(0..50).bind(),
             title = Arb.string(1..50).bind(),
             content = Arb.string(0..200).bind(),
             updatedAt = Arb.long(1L..Long.MAX_VALUE / 2).bind()
@@ -78,7 +78,7 @@ class CacheFirstPropertyTest : FunSpec({
             return GetNoteResponse(
                 note = notes.v1.Note(
                     id = request.id,
-                    file_path = "network/path.md",
+                    parent_dir = "network/path",
                     title = "network-title",
                     content = "network-content",
                     updated_at = System.currentTimeMillis()
@@ -112,7 +112,7 @@ class CacheFirstPropertyTest : FunSpec({
             result.isSuccess shouldBe true
 
             val fetched = result.getOrThrow()
-            fetched.filePath shouldBe note.filePath
+            fetched.parentDir shouldBe note.parentDir
             fetched.title shouldBe note.title
             fetched.content shouldBe note.content
             fetched.updatedAt shouldBe note.updatedAt

@@ -14,7 +14,7 @@ internal class CacheDataSourceImpl(
     override suspend fun saveNote(note: Note) {
         noteQueries.insertOrReplace(
             id = note.id,
-            filePath = note.filePath,
+            parentDir = note.parentDir,
             title = note.title,
             content = note.content,
             updatedAt = note.updatedAt,
@@ -27,7 +27,7 @@ internal class CacheDataSourceImpl(
             notes.forEach { note ->
                 noteQueries.insertOrReplace(
                     id = note.id,
-                    filePath = note.filePath,
+                    parentDir = note.parentDir,
                     title = note.title,
                     content = note.content,
                     updatedAt = note.updatedAt,
@@ -45,7 +45,7 @@ internal class CacheDataSourceImpl(
         return if (path.isEmpty()) {
             noteQueries.selectAll().executeAsList().map { it.toDomain() }
         } else {
-            noteQueries.selectByPathPrefix(path).executeAsList().map { it.toDomain() }
+            noteQueries.selectByParentDir(path).executeAsList().map { it.toDomain() }
         }
     }
 
@@ -53,13 +53,13 @@ internal class CacheDataSourceImpl(
         noteQueries.deleteById(id)
     }
 
-    override suspend fun saveEntries(parentPath: String, entries: List<String>) {
+    override suspend fun saveEntries(parentDir: String, entries: List<String>) {
         database.transaction {
-            entryQueries.deleteByParentPath(parentPath)
+            entryQueries.deleteByParentPath(parentDir)
             val now = currentTimeMillis()
             entries.forEach { entryPath ->
                 entryQueries.insertOrReplace(
-                    parentPath = parentPath,
+                    parentPath = parentDir,
                     entryPath = entryPath,
                     cachedAt = now
                 )
@@ -67,8 +67,8 @@ internal class CacheDataSourceImpl(
         }
     }
 
-    override suspend fun listEntries(parentPath: String): List<String> {
-        return entryQueries.selectByParentPath(parentPath).executeAsList()
+    override suspend fun listEntries(parentDir: String): List<String> {
+        return entryQueries.selectByParentPath(parentDir).executeAsList()
     }
 
     override suspend fun clear() {
@@ -82,7 +82,7 @@ internal class CacheDataSourceImpl(
 private fun net.onefivefour.echolist.cache.Note.toDomain(): Note {
     return Note(
         id = id,
-        filePath = filePath,
+        parentDir = parentDir,
         title = title,
         content = content,
         updatedAt = updatedAt

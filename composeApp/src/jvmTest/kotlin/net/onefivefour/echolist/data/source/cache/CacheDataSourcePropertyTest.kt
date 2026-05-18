@@ -25,7 +25,7 @@ class CacheDataSourcePropertyTest : FunSpec({
     val arbNote = arbitrary {
         Note(
             id = Arb.string(1..100).bind(),
-            filePath = Arb.string(1..100).bind(),
+            parentDir = Arb.string(0..100).bind(),
             title = Arb.string(0..200).bind(),
             content = Arb.string(0..500).bind(),
             updatedAt = Arb.long(0L..Long.MAX_VALUE / 2).bind()
@@ -52,7 +52,7 @@ class CacheDataSourcePropertyTest : FunSpec({
 
             retrieved shouldNotBe null
             retrieved!!.id shouldBe note.id
-            retrieved.filePath shouldBe note.filePath
+            retrieved.parentDir shouldBe note.parentDir
             retrieved.title shouldBe note.title
             retrieved.content shouldBe note.content
             retrieved.updatedAt shouldBe note.updatedAt
@@ -83,7 +83,7 @@ class CacheDataSourcePropertyTest : FunSpec({
 
             retrieved shouldNotBe null
             retrieved!!.id shouldBe note.id
-            retrieved.filePath shouldBe note.filePath
+            retrieved.parentDir shouldBe note.parentDir
             retrieved.title shouldBe note.title
             retrieved.content shouldBe note.content
             retrieved.updatedAt shouldBe note.updatedAt

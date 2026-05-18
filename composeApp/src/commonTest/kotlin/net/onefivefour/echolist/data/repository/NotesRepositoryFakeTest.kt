@@ -12,7 +12,7 @@ class NotesRepositoryFakeTest {
 
     private val sampleNote = Note(
         id = "hello-note",
-        filePath = "docs/hello.md",
+        parentDir = "docs",
         title = "hello",
         content = "world",
         updatedAt = 100L
@@ -34,7 +34,7 @@ class NotesRepositoryFakeTest {
         val repo = NotesRepositoryFake()
         val note2 = Note(
             id = "second-note",
-            filePath = "docs/second.md",
+            parentDir = "docs",
             title = "second",
             content = "content",
             updatedAt = 200L
@@ -50,23 +50,24 @@ class NotesRepositoryFakeTest {
     @Test
     fun createNoteReturnsCreatedNote() = runTest {
         val repo = NotesRepositoryFake()
-        val params = CreateNoteParams("title", "body", "/docs")
+        val params = CreateNoteParams("title", "body", "docs")
 
         val result = repo.createNote(params)
 
         assertTrue(result.isSuccess)
         assertEquals("title", result.getOrNull()?.title)
         assertEquals("body", result.getOrNull()?.content)
+        assertEquals("docs", result.getOrNull()?.parentDir)
     }
 
     @Test
-    fun createNoteAtRootUsesSingleLeadingSlash() = runTest {
+    fun createNoteAtRootUsesEmptyParentDir() = runTest {
         val repo = NotesRepositoryFake()
 
-        val result = repo.createNote(CreateNoteParams("title", "body", "/"))
+        val result = repo.createNote(CreateNoteParams("title", "body", ""))
 
         assertTrue(result.isSuccess)
-        assertEquals("title", result.getOrNull()?.filePath)
+        assertEquals("", result.getOrNull()?.parentDir)
     }
 
     @Test

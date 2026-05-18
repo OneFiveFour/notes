@@ -38,7 +38,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
     val arbProtoNote = arbitrary {
         notes.v1.Note(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
             updated_at = Arb.long(0..Long.MAX_VALUE).bind()
@@ -82,7 +82,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
             note.id shouldBe protoNote.id
-            note.filePath shouldBe protoNote.file_path
+            note.parentDir shouldBe protoNote.parent_dir
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
             note.updatedAt shouldBe protoNote.updated_at
@@ -133,7 +133,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             notesList.size shouldBe protoNotes.size
             notesList.forEachIndexed { i, note ->
                 note.id shouldBe protoNotes[i].id
-                note.filePath shouldBe protoNotes[i].file_path
+                note.parentDir shouldBe protoNotes[i].parent_dir
                 note.title shouldBe protoNotes[i].title
                 note.content shouldBe protoNotes[i].content
                 note.updatedAt shouldBe protoNotes[i].updated_at
@@ -178,7 +178,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
             note.id shouldBe protoNote.id
-            note.filePath shouldBe protoNote.file_path
+            note.parentDir shouldBe protoNote.parent_dir
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
             note.updatedAt shouldBe protoNote.updated_at
@@ -195,7 +195,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
                 GetNoteResponse(
                     note = notes.v1.Note(
                         id = noteId,
-                        file_path = "/some/path.md",
+                        parent_dir = "some/path",
                         title = "t",
                         content = "c",
                         updated_at = 0L
@@ -232,7 +232,7 @@ class NotesRepositoryImplPropertyTest : FunSpec({
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
             note.id shouldBe protoNote.id
-            note.filePath shouldBe protoNote.file_path
+            note.parentDir shouldBe protoNote.parent_dir
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
             note.updatedAt shouldBe protoNote.updated_at

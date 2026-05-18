@@ -25,7 +25,7 @@ class DesktopDatabaseDriverTest : FunSpec({
         val databasePath = Files.createTempDirectory("desktop-db").resolve("echolist.db")
         val note = Note(
             id = "note-1",
-            filePath = "/projects/demo.md",
+            parentDir = "projects",
             title = "Desktop note",
             content = "Persistence matters",
             updatedAt = 1234L

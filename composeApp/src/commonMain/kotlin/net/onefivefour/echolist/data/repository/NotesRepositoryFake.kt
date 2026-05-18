@@ -37,7 +37,7 @@ class NotesRepositoryFake : NotesRepository {
 
         val note = Note(
             id = "generated-${params.title}",
-            filePath = joinPath(params.parentDir, params.title),
+            parentDir = params.parentDir,
             title = params.title,
             content = params.content,
             updatedAt = 0L
@@ -53,7 +53,7 @@ class NotesRepositoryFake : NotesRepository {
         val filteredNotes = if (parentDir.isEmpty()) {
             notes.values.toList()
         } else {
-            notes.values.filter { it.filePath.startsWith(parentDir) }
+            notes.values.filter { it.parentDir == parentDir }
         }
         return Result.success(filteredNotes)
     }

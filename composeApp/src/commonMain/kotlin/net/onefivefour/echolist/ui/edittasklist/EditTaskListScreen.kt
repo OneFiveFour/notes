@@ -178,7 +178,7 @@ private fun EditTaskListScreenPreview() {
                     titleState = TextFieldState(initialText = "Launch plan"),
                     mainTasks = tasks,
                     isAutoDelete = false,
-                    mode = EditTaskListMode.Create(parentPath = "")
+                    mode = EditTaskListMode.Create(parentDir = "")
                 ),
                 onAddMainTask = {},
                 onRemoveMainTask = {},

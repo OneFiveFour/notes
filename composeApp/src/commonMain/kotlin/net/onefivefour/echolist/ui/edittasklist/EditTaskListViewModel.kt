@@ -228,7 +228,7 @@ internal class EditTaskListViewModel(
             } ?: taskListRepository.createTaskList(
                 CreateTaskListParams(
                     name = snapshot.title,
-                    path = (mode as EditTaskListMode.Create).parentPath,
+                    path = (mode as EditTaskListMode.Create).parentDir,
                     tasks = snapshot.tasks,
                     isAutoDelete = snapshot.isAutoDelete
                 )

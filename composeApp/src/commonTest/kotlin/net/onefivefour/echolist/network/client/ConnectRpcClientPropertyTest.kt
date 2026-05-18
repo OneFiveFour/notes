@@ -89,11 +89,11 @@ class ConnectRpcClientPropertyTest : FunSpec({
             Arb.string(0..200),
             Arb.string(0..500),
             Arb.long(0L..Long.MAX_VALUE)
-        ) { filePath, title, content, updatedAt ->
+        ) { parentDir, title, content, updatedAt ->
             val original = notes.v1.CreateNoteResponse(
                 note = notes.v1.Note(
                     id = "test-id",
-                    file_path = filePath,
+                    parent_dir = parentDir,
                     title = title,
                     content = content,
                     updated_at = updatedAt

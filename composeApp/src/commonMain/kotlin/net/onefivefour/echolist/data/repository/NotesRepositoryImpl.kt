@@ -118,8 +118,7 @@ internal class NotesRepositoryImpl(
             val response = noteRemoteDataSource.updateNote(request)
             val note = NoteMapper.toDomain(response)
             cacheDataSource.saveNote(note)
-            val parentDir = note.filePath.substringBeforeLast('/', "")
-            directoryChangeNotifier.notifyChanged(parentDir)
+            directoryChangeNotifier.notifyChanged(note.parentDir)
             Result.success(note)
         } catch (e: NetworkException) {
             // Queue for offline sync
@@ -137,8 +136,7 @@ internal class NotesRepositoryImpl(
             noteRemoteDataSource.deleteNote(request)
             cacheDataSource.deleteNote(noteId)
             cached?.let {
-                val parentDir = it.filePath.substringBeforeLast('/', "")
-                directoryChangeNotifier.notifyChanged(parentDir)
+                directoryChangeNotifier.notifyChanged(it.parentDir)
             }
             Result.success(Unit)
         } catch (e: NetworkException) {

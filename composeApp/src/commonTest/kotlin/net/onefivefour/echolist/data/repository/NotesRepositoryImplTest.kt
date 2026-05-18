@@ -28,7 +28,7 @@ class NotesRepositoryImplTest : FunSpec({
     val arbProtoNote = arbitrary {
         notes.v1.Note(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
             updated_at = Arb.long(0..Long.MAX_VALUE).bind()
@@ -65,7 +65,7 @@ class NotesRepositoryImplTest : FunSpec({
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
             note.id shouldBe protoNote.id
-            note.filePath shouldBe protoNote.file_path
+            note.parentDir shouldBe protoNote.parent_dir
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
             note.updatedAt shouldBe protoNote.updated_at
@@ -79,7 +79,7 @@ class NotesRepositoryImplTest : FunSpec({
                 CreateNoteResponse(
                     note = notes.v1.Note(
                         id = "new-uuid",
-                        file_path = "/test.md",
+                        parent_dir = "test",
                         title = "t",
                         content = "c",
                         updated_at = 0L
@@ -112,8 +112,8 @@ class NotesRepositoryImplTest : FunSpec({
     // -- ListNotes --
 
     test("listNotes returns mapped notes on success (no cache)") {
-        val note1 = notes.v1.Note(id = "id-1", file_path = "/n1.md", title = "N1", content = "C1", updated_at = 100L)
-        val note2 = notes.v1.Note(id = "id-2", file_path = "/n2.md", title = "N2", content = "C2", updated_at = 200L)
+        val note1 = notes.v1.Note(id = "id-1", parent_dir = "parent", title = "N1", content = "C1", updated_at = 100L)
+        val note2 = notes.v1.Note(id = "id-2", parent_dir = "parent", title = "N2", content = "C2", updated_at = 200L)
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.listNotesResult = Result.success(
             ListNotesResponse(
@@ -129,9 +129,9 @@ class NotesRepositoryImplTest : FunSpec({
         val notesList = result.getOrThrow()
         notesList.size shouldBe 2
         notesList[0].id shouldBe "id-1"
-        notesList[0].filePath shouldBe "/n1.md"
+        notesList[0].parentDir shouldBe "parent"
         notesList[1].id shouldBe "id-2"
-        notesList[1].filePath shouldBe "/n2.md"
+        notesList[1].parentDir shouldBe "parent"
     }
 
     test("listNotes forwards correct parent_dir to data source") {
@@ -174,7 +174,7 @@ class NotesRepositoryImplTest : FunSpec({
     test("getNote returns mapped note on success (no cache)") {
         val protoNote = notes.v1.Note(
             id = "note-uuid-1",
-            file_path = "/note.md",
+            parent_dir = "notes",
             title = "Title",
             content = "Content",
             updated_at = 999L
@@ -189,7 +189,7 @@ class NotesRepositoryImplTest : FunSpec({
         result.isSuccess shouldBe true
         val note = result.getOrThrow()
         note.id shouldBe "note-uuid-1"
-        note.filePath shouldBe "/note.md"
+        note.parentDir shouldBe "notes"
         note.title shouldBe "Title"
         note.content shouldBe "Content"
         note.updatedAt shouldBe 999L
@@ -199,7 +199,7 @@ class NotesRepositoryImplTest : FunSpec({
         val fakeNetwork = FakeNoteRemoteDataSource()
         fakeNetwork.getNoteResult = Result.success(
             GetNoteResponse(
-                note = notes.v1.Note(id = "uuid-x", file_path = "/x.md", title = "t", content = "c", updated_at = 0L)
+                note = notes.v1.Note(id = "uuid-x", parent_dir = "", title = "t", content = "c", updated_at = 0L)
             )
         )
         val fakeCache = FakeCacheDataSource()
@@ -236,7 +236,7 @@ class NotesRepositoryImplTest : FunSpec({
             result.isSuccess shouldBe true
             val note = result.getOrThrow()
             note.id shouldBe protoNote.id
-            note.filePath shouldBe protoNote.file_path
+            note.parentDir shouldBe protoNote.parent_dir
             note.title shouldBe protoNote.title
             note.content shouldBe protoNote.content
             note.updatedAt shouldBe protoNote.updated_at
@@ -250,7 +250,7 @@ class NotesRepositoryImplTest : FunSpec({
                 UpdateNoteResponse(
                     note = notes.v1.Note(
                         id = params.id,
-                        file_path = "/test.md",
+                        parent_dir = "test",
                         title = "t",
                         content = "c",
                         updated_at = 0L

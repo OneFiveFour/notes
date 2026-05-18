@@ -17,19 +17,23 @@ internal class FakeCacheDataSource : CacheDataSource {
 
     override suspend fun getNote(id: String): Note? = notes[id]
 
-    override suspend fun listNotes(path: String): List<Note> =
-        notes.values.filter { it.filePath.startsWith(path) }
+    override suspend fun listNotes(parentDir: String): List<Note> =
+        if (parentDir.isEmpty()) {
+            notes.values.toList()
+        } else {
+            notes.values.filter { it.parentDir == parentDir }
+        }
 
     override suspend fun deleteNote(id: String) {
         notes.remove(id)
     }
 
-    override suspend fun saveEntries(parentPath: String, entries: List<String>) {
-        this.entries[parentPath] = entries
+    override suspend fun saveEntries(parentDir: String, entries: List<String>) {
+        this.entries[parentDir] = entries
     }
 
-    override suspend fun listEntries(parentPath: String): List<String> =
-        entries[parentPath] ?: emptyList()
+    override suspend fun listEntries(parentDir: String): List<String> =
+        entries[parentDir] ?: emptyList()
 
     override suspend fun clear() {
         notes.clear()

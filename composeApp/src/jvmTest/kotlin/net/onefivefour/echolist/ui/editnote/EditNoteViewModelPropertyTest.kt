@@ -51,7 +51,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             createNoteCalls.add(params)
             val note = Note(
                 id = "generated-${params.title}",
-                filePath = "${params.parentDir}/${params.title}",
+                parentDir = params.parentDir,
                 title = params.title,
                 content = params.content,
                 updatedAt = 0L
@@ -212,7 +212,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             val fakeRepo = FakeNotesRepository()
             val note = Note(
                 id = "note-empty-id",
-                filePath = "note-empty.md",
+                parentDir = "",
                 title = "note-empty",
                 content = "",
                 updatedAt = 1L
@@ -239,7 +239,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
             val fakeRepo = FakeNotesRepository()
             val note = Note(
                 id = "note-id",
-                filePath = "note.md",
+                parentDir = "",
                 title = "note",
                 content = "before",
                 updatedAt = 1L

@@ -26,7 +26,7 @@ class NoteMapperPropertyTest : FunSpec({
     val arbProtoNote = arbitrary {
         notes.v1.Note(
             id = Arb.string(1..50).bind(),
-            file_path = Arb.string(1..100).bind(),
+            parent_dir = Arb.string(0..100).bind(),
             title = Arb.string(1..100).bind(),
             content = Arb.string(0..500).bind(),
             updated_at = Arb.long(0..Long.MAX_VALUE).bind()
@@ -67,8 +67,8 @@ class NoteMapperPropertyTest : FunSpec({
             // Verify id mapping
             domain.id shouldBe proto.id
 
-            // Verify file_path -> filePath mapping
-            domain.filePath shouldBe proto.file_path
+            // Verify parent_dir -> parentDir mapping
+            domain.parentDir shouldBe proto.parent_dir
 
             // Verify all other fields correctly mapped
             domain.title shouldBe proto.title
@@ -85,7 +85,7 @@ class NoteMapperPropertyTest : FunSpec({
             val protoNote = response.note!!
 
             domain.id shouldBe protoNote.id
-            domain.filePath shouldBe protoNote.file_path
+            domain.parentDir shouldBe protoNote.parent_dir
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
             domain.updatedAt shouldBe protoNote.updated_at
@@ -98,7 +98,7 @@ class NoteMapperPropertyTest : FunSpec({
             val protoNote = response.note!!
 
             domain.id shouldBe protoNote.id
-            domain.filePath shouldBe protoNote.file_path
+            domain.parentDir shouldBe protoNote.parent_dir
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
             domain.updatedAt shouldBe protoNote.updated_at
@@ -111,7 +111,7 @@ class NoteMapperPropertyTest : FunSpec({
             val protoNote = response.note!!
 
             domain.id shouldBe protoNote.id
-            domain.filePath shouldBe protoNote.file_path
+            domain.parentDir shouldBe protoNote.parent_dir
             domain.title shouldBe protoNote.title
             domain.content shouldBe protoNote.content
             domain.updatedAt shouldBe protoNote.updated_at
@@ -133,7 +133,7 @@ class NoteMapperPropertyTest : FunSpec({
             result.forEachIndexed { index, note ->
                 val protoNote = response.notes[index]
                 note.id shouldBe protoNote.id
-                note.filePath shouldBe protoNote.file_path
+                note.parentDir shouldBe protoNote.parent_dir
                 note.title shouldBe protoNote.title
                 note.content shouldBe protoNote.content
                 note.updatedAt shouldBe protoNote.updated_at
