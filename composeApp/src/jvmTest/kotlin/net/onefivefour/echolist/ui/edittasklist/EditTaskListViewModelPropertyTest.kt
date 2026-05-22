@@ -561,6 +561,155 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
+    test("empty main tasks are stripped from the UI on screen left") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-strip-empty",
+                tasks = listOf(
+                    MainTask(id = "t1", description = "Real task", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultFlow = MutableSharedFlow()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            // Simulate pressing Enter which adds an empty main task
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks shouldHaveSize 2
+            vm.uiState.value.mainTasks[1].descriptionState.text.toString() shouldBe ""
+
+            // Simulate navigating away (screen left triggers cleanup)
+            vm.onScreenLeft()
+            testScheduler.advanceUntilIdle()
+
+            // The empty task should be removed from the UI
+            vm.uiState.value.mainTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].descriptionState.text.toString() shouldBe "Real task"
+
+            // No update sent since effective content hasn't changed
+            repo.updateTaskListCalls shouldHaveSize 0
+        }
+    }
+
+    test("empty sub tasks are stripped from the UI on screen left") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-strip-empty-sub",
+                tasks = listOf(
+                    MainTask(
+                        id = "t1",
+                        description = "Parent task",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = listOf(
+                            SubTask(id = "s1", description = "Real sub", isDone = false)
+                        )
+                    )
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultFlow = MutableSharedFlow()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            // Simulate adding an empty sub task
+            vm.onAddSubTask(0)
+            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 2
+            vm.uiState.value.mainTasks[0].subTasks[1].descriptionState.text.toString() shouldBe ""
+
+            // Simulate navigating away
+            vm.onScreenLeft()
+            testScheduler.advanceUntilIdle()
+
+            // The empty sub task should be removed from the UI
+            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
+            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.text.toString() shouldBe "Real sub"
+
+            // No update sent since the effective content hasn't changed
+            repo.updateTaskListCalls shouldHaveSize 0
+        }
+    }
+
+    test("empty main tasks in create mode are not persisted on screen left") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo,
+                settingsResultFlow = MutableSharedFlow()
+            )
+
+            vm.uiState.value.titleState.edit { replace(0, length, "New list") }
+
+            // Add a real task and an empty task
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks[0].descriptionState.edit {
+                replace(0, length, "Do something")
+            }
+            vm.onAddMainTask() // empty task added by pressing Enter
+
+            vm.uiState.value.mainTasks shouldHaveSize 2
+
+            // Trigger screen left (e.g. navigating away)
+            vm.onScreenLeft()
+            testScheduler.advanceUntilIdle()
+
+            // Empty task should be stripped from UI
+            vm.uiState.value.mainTasks shouldHaveSize 1
+
+            // Only the real task should be persisted
+            repo.createTaskListCalls shouldHaveSize 1
+            repo.createTaskListCalls[0].tasks shouldHaveSize 1
+            repo.createTaskListCalls[0].tasks[0].description shouldBe "Do something"
+        }
+    }
+
+    test("adding an empty main task does not get stripped by regular sync") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-keep-empty",
+                tasks = listOf(
+                    MainTask(id = "t1", description = "Real task", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultFlow = MutableSharedFlow()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            // Simulate pressing Enter which adds an empty main task
+            vm.onAddMainTask()
+            vm.uiState.value.mainTasks shouldHaveSize 2
+
+            // Regular focus lost should NOT strip the empty task (user is still editing)
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            // Empty task should still be in the UI
+            vm.uiState.value.mainTasks shouldHaveSize 2
+        }
+    }
+
     test("delete emits navigate-back for a persisted task list") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()

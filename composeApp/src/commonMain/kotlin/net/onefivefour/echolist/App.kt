@@ -5,6 +5,7 @@ import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -198,6 +199,10 @@ private fun AuthenticatedApp() {
 
                 LaunchedEffect(viewModel) {
                     viewModel.navigateBack.collect { backStack.removeLastOrNull() }
+                }
+
+                DisposableEffect(viewModel) {
+                    onDispose { viewModel.onScreenLeft() }
                 }
 
                 EditTaskListScreen(

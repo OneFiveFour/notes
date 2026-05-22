@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlin.uuid.ExperimentalUuidApi
+import kotlin.uuid.Uuid
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
@@ -37,8 +39,6 @@ internal class EditTaskListViewModel(
 
     private val titleState = TextFieldState()
     private val tasks = mutableStateListOf<UiMainTask>()
-    private var nextDraftId = 1
-    private var nextDraftSubTaskId = 1
     private var persistedTaskListId: String? = (mode as? EditTaskListMode.Edit)?.taskListId
     private var lastSuccessfulSnapshot: SyncSnapshot? = null
     private var syncQueued = false
@@ -63,8 +63,10 @@ internal class EditTaskListViewModel(
     private val _navigateBack = MutableSharedFlow<Unit>()
     val navigateBack: SharedFlow<Unit> = _navigateBack.asSharedFlow()
 
-    private fun nextDraftMainTaskId() = "draft-${nextDraftId++}"
-    private fun nextDraftSubTaskId() = "draft-sub-${nextDraftSubTaskId++}"
+    @OptIn(ExperimentalUuidApi::class)
+    private fun nextDraftMainTaskId() = Uuid.random().toString()
+    @OptIn(ExperimentalUuidApi::class)
+    private fun nextDraftSubTaskId() = Uuid.random().toString()
 
     init {
         if (mode is EditTaskListMode.Edit) {
@@ -140,6 +142,11 @@ internal class EditTaskListViewModel(
     }
 
     fun onFieldFocusLost() {
+        requestSync()
+    }
+
+    fun onScreenLeft() {
+        stripEmptyTasks()
         requestSync()
     }
 
@@ -289,6 +296,13 @@ internal class EditTaskListViewModel(
             tasks = normalizedTasks,
             isAutoDelete = _uiState.value.isAutoDelete
         )
+    }
+
+    private fun stripEmptyTasks() {
+        tasks.forEach { mainTask ->
+            mainTask.subTasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
+        }
+        tasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
     }
 
     private fun observeDueDateRecurrenceExclusion(draft: UiMainTask) {
