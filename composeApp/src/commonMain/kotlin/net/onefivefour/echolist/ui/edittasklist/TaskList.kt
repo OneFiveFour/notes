@@ -12,7 +12,6 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun TaskList(
     mainTasks: List<UiMainTask>,
-    isEditMode: Boolean,
     focusedMainTaskId: String?,
     isAutoDelete: Boolean,
     onRemoveMainTask: (Int) -> Unit,
@@ -54,8 +53,7 @@ internal fun TaskList(
                 onMainTaskKeyboardAction = onMainTaskKeyboardAction,
                 shouldFocusMainTask = mainTaskToFocus?.mainTaskId == mainTask.id,
                 onMainTaskFocusHandled = onFocusHandled,
-                showAddFirstSubTask = isEditMode &&
-                    mainTask.subTasks.isEmpty() &&
+                showAddFirstSubTask = mainTask.subTasks.isEmpty() &&
                     focusedMainTaskId == mainTask.id,
                 onAddFirstSubTask = { onAddSubTask(mainTask.id) },
                 focusedSubTaskId = subTaskToFocus?.id?.takeIf { subTaskToFocus.mainTaskId == mainTask.id },

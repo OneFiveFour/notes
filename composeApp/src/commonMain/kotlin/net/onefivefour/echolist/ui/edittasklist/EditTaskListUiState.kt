@@ -15,7 +15,4 @@ internal data class EditTaskListUiState(
 ) {
     val isCreateMode: Boolean
         get() = mode is EditTaskListMode.Create
-
-    val isEditMode: Boolean
-        get() = mode is EditTaskListMode.Edit
 }

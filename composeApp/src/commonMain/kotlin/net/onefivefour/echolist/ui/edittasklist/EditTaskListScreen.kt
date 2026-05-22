@@ -131,7 +131,6 @@ private fun TaskListContentCard(
                     focusedMainTaskId = controller.focusedMainTaskId,
                     focusTarget = controller.resolvedFocusTarget,
                     isAutoDelete = uiState.isAutoDelete,
-                    isEditMode = uiState.isEditMode,
                     mainTasks = uiState.mainTasks,
                     onAddMainTask = controller.onAddMainTaskAndFocus,
                     onAddSubTask = controller.onAddFirstSubTaskAndFocus,
