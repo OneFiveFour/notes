@@ -1,11 +1,8 @@
 package net.onefivefour.echolist.ui.recurrence
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,27 +21,19 @@ internal fun DailyDetailContent(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier
-            .padding(horizontal = EchoListTheme.dimensions.l),
-        horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.xs),
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(
+            space = EchoListTheme.dimensions.xs,
+            alignment = Alignment.CenterHorizontally
+        ),
         verticalAlignment = Alignment.CenterVertically
     ) {
         DayOfWeek.entries.forEachIndexed { index, day ->
-            val isChecked = day in selectedDays
-
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Checkbox(
-                    checked = isChecked,
-                    onCheckedChange = { checked -> onDayToggled(day, checked) }
-                )
-                Text(
-                    text = dayAbbreviations[index],
-                    style = EchoListTheme.typography.labelSmall,
-                    color = EchoListTheme.materialColors.onSurface
-                )
-            }
+            DayToggle(
+                label = dayAbbreviations[index],
+                isSelected = day in selectedDays,
+                onClick = { onDayToggled(day, day !in selectedDays) }
+            )
         }
     }
 }

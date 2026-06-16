@@ -1,17 +1,12 @@
 package net.onefivefour.echolist.ui.recurrence
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -28,57 +23,45 @@ internal fun MonthlyDetailContent(
     onDayOfMonthChanged: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val textStyle = EchoListTheme.typography.bodyMedium
-    val textColor = EchoListTheme.materialColors.onSurface
-
-    Row(
-        modifier = modifier
-            .padding(horizontal = EchoListTheme.dimensions.l),
-        verticalAlignment = Alignment.CenterVertically
+    Column(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.m)
     ) {
-        Text(
-            text = "Every ",
-            style = textStyle,
-            color = textColor
-        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            LabelText(text = "Repeat every")
 
-        BasicTextField(
-            value = everyNMonths.toString(),
-            onValueChange = { newValue ->
-                if (isValidPositiveInt(newValue)) {
-                    newValue.toIntOrNull()?.let { onMonthIntervalChanged(it) }
+            NumberInputField(
+                value = everyNMonths.toString(),
+                onValueChange = { newValue ->
+                    if (isValidPositiveInt(newValue)) {
+                        newValue.toIntOrNull()?.let { onMonthIntervalChanged(it) }
+                    }
                 }
-            },
-            textStyle = textStyle.copy(color = textColor),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.width(40.dp)
-        )
+            )
 
-        Text(
-            text = " month(s) on the ",
-            style = textStyle,
-            color = textColor
-        )
+            LabelText(text = if (everyNMonths == 1) "month" else "months")
+        }
 
-        BasicTextField(
-            value = dayOfMonth.toString(),
-            onValueChange = { newValue ->
-                if (isValidDayOfMonth(newValue)) {
-                    newValue.toIntOrNull()?.let { onDayOfMonthChanged(it) }
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            LabelText(text = "On day")
+
+            NumberInputField(
+                value = dayOfMonth.toString(),
+                onValueChange = { newValue ->
+                    if (isValidDayOfMonth(newValue)) {
+                        newValue.toIntOrNull()?.let { onDayOfMonthChanged(it) }
+                    }
                 }
-            },
-            textStyle = textStyle.copy(color = textColor),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            singleLine = true,
-            modifier = Modifier.width(40.dp)
-        )
+            )
 
-        Text(
-            text = "th day",
-            style = textStyle,
-            color = textColor
-        )
+            LabelText(text = "of the month")
+        }
     }
 }
 

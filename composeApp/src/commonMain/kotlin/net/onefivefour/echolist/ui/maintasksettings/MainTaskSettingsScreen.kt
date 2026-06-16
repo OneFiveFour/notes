@@ -1,10 +1,10 @@
 package net.onefivefour.echolist.ui.maintasksettings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -12,10 +12,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
@@ -23,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filterNotNull
 import net.onefivefour.echolist.ui.recurrence.DailyDetailContent
@@ -59,7 +62,13 @@ internal fun MainTaskSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {},
+                title = {
+                    Text(
+                        text = "Task Settings",
+                        style = EchoListTheme.typography.labelLarge,
+                        color = EchoListTheme.materialColors.onSurface
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(
@@ -90,23 +99,52 @@ internal fun MainTaskSettingsScreen(
                 .fillMaxSize()
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
+                .padding(EchoListTheme.dimensions.l),
+            verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.l)
         ) {
-            DatePicker(
-                state = datePickerState,
-                modifier = Modifier.fillMaxWidth()
-            )
+            SettingsSection(title = "Due date") {
+                DatePicker(
+                    state = datePickerState,
+                    modifier = Modifier.fillMaxWidth(),
+                    title = null,
+                    showModeToggle = false,
+                    colors = DatePickerDefaults.colors(
+                        containerColor = Color.Transparent
+                    )
+                )
+            }
 
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+            SettingsSection(title = "Repeat") {
+                RecurrenceIntervalPicker(
+                    selectedInterval = uiState.recurrenceState.interval,
+                    onIntervalSelected = onRecurrenceIntervalSelected
+                )
 
-            RecurrenceIntervalPicker(
-                selectedInterval = uiState.recurrenceState.interval,
-                onIntervalSelected = onRecurrenceIntervalSelected
-            )
+                RecurrenceDetail(
+                    recurrenceState = uiState.recurrenceState,
+                    onRecurrenceDetailChanged = onRecurrenceDetailChanged
+                )
+            }
+        }
+    }
+}
 
-            Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+@Composable
+private fun RecurrenceDetail(
+    recurrenceState: RecurrenceState,
+    onRecurrenceDetailChanged: (RecurrenceState) -> Unit
+) {
+    val hasDetail = recurrenceState is RecurrenceState.Daily ||
+        recurrenceState is RecurrenceState.Weekly ||
+        recurrenceState is RecurrenceState.Monthly
 
-            when (val state = uiState.recurrenceState) {
-                is RecurrenceState.Off -> { /* no detail content */ }
+    AnimatedVisibility(visible = hasDetail) {
+        Column(
+            modifier = Modifier.padding(top = EchoListTheme.dimensions.l)
+        ) {
+            when (val state = recurrenceState) {
+                is RecurrenceState.Off -> Unit
+                is RecurrenceState.Yearly -> Unit
                 is RecurrenceState.Daily -> {
                     DailyDetailContent(
                         selectedDays = state.selectedDays,
@@ -140,7 +178,6 @@ internal fun MainTaskSettingsScreen(
                         }
                     )
                 }
-                is RecurrenceState.Yearly -> { /* no detail content */ }
             }
         }
     }

@@ -1,14 +1,13 @@
 package net.onefivefour.echolist.ui.recurrence
 
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import net.onefivefour.echolist.ui.common.GradientBackground
@@ -22,11 +21,10 @@ internal fun RecurrenceIntervalPicker(
 ) {
     val intervals = remember { RecurrenceInterval.entries }
 
-    Row(
-        modifier = modifier
-            .padding(horizontal = EchoListTheme.dimensions.l),
-        horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.xs),
-        verticalAlignment = Alignment.CenterVertically
+    FlowRow(
+        modifier = modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s),
+        verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
     ) {
         intervals.forEach { interval ->
             val isSelected = interval == selectedInterval
@@ -38,11 +36,10 @@ internal fun RecurrenceIntervalPicker(
                     EchoListTheme.materialColors.primary
                 } else {
                     EchoListTheme.materialColors.surfaceVariant
-                },
-                modifier = Modifier.animateContentSize()
+                }
             ) {
                 Text(
-                    text = if (isSelected) interval.fullLabel else interval.shortLabel,
+                    text = interval.fullLabel,
                     style = EchoListTheme.typography.labelMedium,
                     color = if (isSelected) {
                         EchoListTheme.materialColors.onPrimary
@@ -66,7 +63,8 @@ private fun RecurrenceIntervalPickerPreview() {
         GradientBackground {
             RecurrenceIntervalPicker(
                 selectedInterval = RecurrenceInterval.Off,
-                onIntervalSelected = {}
+                onIntervalSelected = {},
+                modifier = Modifier.padding(EchoListTheme.dimensions.l)
             )
         }
     }
@@ -79,7 +77,8 @@ private fun RecurrenceIntervalPickerWeeklyPreview() {
         GradientBackground {
             RecurrenceIntervalPicker(
                 selectedInterval = RecurrenceInterval.Weekly,
-                onIntervalSelected = {}
+                onIntervalSelected = {},
+                modifier = Modifier.padding(EchoListTheme.dimensions.l)
             )
         }
     }
