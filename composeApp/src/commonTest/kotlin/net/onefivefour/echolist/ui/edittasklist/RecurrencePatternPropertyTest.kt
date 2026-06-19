@@ -8,7 +8,6 @@ import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.set
-import io.kotest.property.arbitrary.string
 import io.kotest.property.arbitrary.flatMap
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
@@ -16,6 +15,8 @@ import io.kotest.property.exhaustive.collection
 import kotlinx.datetime.DayOfWeek
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
+import net.onefivefour.echolist.ui.recurrence.hasValidDetails
+import net.onefivefour.echolist.ui.recurrence.isEditableNumberInput
 import net.onefivefour.echolist.ui.recurrence.isValidDayOfMonth
 import net.onefivefour.echolist.ui.recurrence.isValidPositiveInt
 import net.onefivefour.echolist.ui.recurrence.monthlyFormatString
@@ -105,25 +106,39 @@ class RecurrencePatternPropertyTest : FunSpec({
     test("Property 7: Positive integer validation — accepts iff string parses to integer >= 1") {
         // 1. Random positive integers (as strings) → should return true
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..Int.MAX_VALUE)) { n ->
-            isValidPositiveInt(n.toString()) shouldBe true
+            isValidPositiveInt(n) shouldBe true
         }
 
         // 2. Random non-positive integers (0, negatives as strings) → should return false
         checkAll(PropTestConfig(iterations = 100), Arb.int(Int.MIN_VALUE..0)) { n ->
-            isValidPositiveInt(n.toString()) shouldBe false
+            isValidPositiveInt(n) shouldBe false
         }
 
         // 3. Random non-numeric strings → should return false
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..20)) { s ->
-            if (s.toIntOrNull() == null || s.toIntOrNull()!! < 1) {
-                isValidPositiveInt(s) shouldBe false
-            } else {
-                isValidPositiveInt(s) shouldBe true
-            }
+        // 4. Empty string → should return false
+        isValidPositiveInt(null) shouldBe false
+    }
+
+    test("Numeric recurrence input editing allows digits or empty input only") {
+        checkAll(PropTestConfig(iterations = 100), Arb.int(0..Int.MAX_VALUE)) { n ->
+            isEditableNumberInput(n.toString()) shouldBe true
         }
 
-        // 4. Empty string → should return false
-        isValidPositiveInt("") shouldBe false
+        isEditableNumberInput("") shouldBe true
+        isEditableNumberInput("12a") shouldBe false
+        isEditableNumberInput("1 2") shouldBe false
+        isEditableNumberInput("-1") shouldBe false
+    }
+
+    test("Recurrence details validation accepts only saveable numeric detail values") {
+        RecurrenceState.Weekly(everyNWeeks = null).hasValidDetails() shouldBe false
+        RecurrenceState.Weekly(everyNWeeks = 0).hasValidDetails() shouldBe false
+        RecurrenceState.Weekly(everyNWeeks = 1).hasValidDetails() shouldBe true
+
+        RecurrenceState.Monthly(everyNMonths = null, dayOfMonth = 1).hasValidDetails() shouldBe false
+        RecurrenceState.Monthly(everyNMonths = 1, dayOfMonth = null).hasValidDetails() shouldBe false
+        RecurrenceState.Monthly(everyNMonths = 1, dayOfMonth = 32).hasValidDetails() shouldBe false
+        RecurrenceState.Monthly(everyNMonths = 1, dayOfMonth = 31).hasValidDetails() shouldBe true
     }
 
     /**
@@ -137,28 +152,20 @@ class RecurrencePatternPropertyTest : FunSpec({
     test("Property 8: Day-of-month range validation — accepts iff value is in [1, 31]") {
         // 1. Integers in [1, 31] (as strings) → should return true
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..31)) { n ->
-            isValidDayOfMonth(n.toString()) shouldBe true
+            isValidDayOfMonth(n) shouldBe true
         }
 
         // 2. Integers outside [1, 31] (negatives, 0, 32+) → should return false
         checkAll(PropTestConfig(iterations = 100), Arb.int(Int.MIN_VALUE..0)) { n ->
-            isValidDayOfMonth(n.toString()) shouldBe false
+            isValidDayOfMonth(n) shouldBe false
         }
         checkAll(PropTestConfig(iterations = 100), Arb.int(32..Int.MAX_VALUE)) { n ->
-            isValidDayOfMonth(n.toString()) shouldBe false
+            isValidDayOfMonth(n) shouldBe false
         }
 
         // 3. Non-numeric strings → should return false
-        checkAll(PropTestConfig(iterations = 100), Arb.string(1..20)) { s ->
-            if (s.toIntOrNull() == null || s.toIntOrNull()!! !in 1..31) {
-                isValidDayOfMonth(s) shouldBe false
-            } else {
-                isValidDayOfMonth(s) shouldBe true
-            }
-        }
-
         // 4. Empty string → should return false
-        isValidDayOfMonth("") shouldBe false
+        isValidDayOfMonth(null) shouldBe false
     }
 
     /**

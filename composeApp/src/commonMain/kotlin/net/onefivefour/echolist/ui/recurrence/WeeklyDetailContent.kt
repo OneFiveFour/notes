@@ -16,8 +16,9 @@ internal fun weeklyFormatString(n: Int): String = "Every $n week(s)"
 
 @Composable
 internal fun WeeklyDetailContent(
-    everyNWeeks: Int,
-    onWeekCountChanged: (Int) -> Unit,
+    everyNWeeks: Int?,
+    onWeekCountChanged: (Int?) -> Unit,
+    isError: Boolean,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -28,12 +29,9 @@ internal fun WeeklyDetailContent(
         LabelText(text = "Repeat every")
 
         NumberInputField(
-            value = everyNWeeks.toString(),
-            onValueChange = { newValue ->
-                if (isValidPositiveInt(newValue)) {
-                    newValue.toIntOrNull()?.let { onWeekCountChanged(it) }
-                }
-            }
+            value = everyNWeeks,
+            onValueChange = onWeekCountChanged,
+            isError = isError
         )
 
         LabelText(text = if (everyNWeeks == 1) "week" else "weeks")
@@ -47,7 +45,8 @@ private fun WeeklyDetailContentPreview() {
         GradientBackground {
             WeeklyDetailContent(
                 everyNWeeks = 1,
-                onWeekCountChanged = {}
+                onWeekCountChanged = {},
+                isError = false
             )
         }
     }
@@ -60,7 +59,8 @@ private fun WeeklyDetailContentMultiWeekPreview() {
         GradientBackground {
             WeeklyDetailContent(
                 everyNWeeks = 3,
-                onWeekCountChanged = {}
+                onWeekCountChanged = {},
+                isError = false
             )
         }
     }

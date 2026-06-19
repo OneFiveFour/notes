@@ -182,4 +182,22 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
             }
         }
     }
+
+    test("Confirming invalid recurrence details keeps the screen in an error state") {
+        runTest(testDispatcher) {
+            val viewModel = createViewModel(
+                mainTaskId = "task-1",
+                dueDate = "",
+                recurrence = ""
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            viewModel.onRecurrenceIntervalSelected(RecurrenceInterval.Weekly)
+            viewModel.onRecurrenceDetailChanged(RecurrenceState.Weekly(everyNWeeks = null))
+
+            viewModel.onConfirm() shouldBe false
+            viewModel.uiState.value.showRecurrenceValidationErrors shouldBe true
+        }
+    }
 })

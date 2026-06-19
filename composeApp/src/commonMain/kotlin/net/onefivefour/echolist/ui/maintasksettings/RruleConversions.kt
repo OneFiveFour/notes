@@ -29,9 +29,16 @@ internal fun RecurrenceState.toRrule(): String = when (this) {
         }
     }
 
-    is RecurrenceState.Weekly -> "FREQ=WEEKLY;INTERVAL=$everyNWeeks"
+    is RecurrenceState.Weekly -> {
+        require(everyNWeeks != null && everyNWeeks >= 1)
+        "FREQ=WEEKLY;INTERVAL=$everyNWeeks"
+    }
 
-    is RecurrenceState.Monthly -> "FREQ=MONTHLY;INTERVAL=$everyNMonths;BYMONTHDAY=$dayOfMonth"
+    is RecurrenceState.Monthly -> {
+        require(everyNMonths != null && everyNMonths >= 1)
+        require(dayOfMonth != null && dayOfMonth in 1..31)
+        "FREQ=MONTHLY;INTERVAL=$everyNMonths;BYMONTHDAY=$dayOfMonth"
+    }
 
     is RecurrenceState.Yearly -> "FREQ=YEARLY"
 }

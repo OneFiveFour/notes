@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
+import net.onefivefour.echolist.ui.recurrence.hasValidDetails
 
 internal class MainTaskSettingsViewModel(
     private val mainTaskId: String,
@@ -48,7 +49,8 @@ internal class MainTaskSettingsViewModel(
         _uiState.update { state ->
             state.copy(
                 selectedDueDate = dueDate,
-                recurrenceState = RecurrenceState.Off
+                recurrenceState = RecurrenceState.Off,
+                showRecurrenceValidationErrors = false
             )
         }
     }
@@ -65,7 +67,8 @@ internal class MainTaskSettingsViewModel(
         _uiState.update { state ->
             state.copy(
                 selectedDueDate = if (interval != RecurrenceInterval.Off) "" else state.selectedDueDate,
-                recurrenceState = newRecurrenceState
+                recurrenceState = newRecurrenceState,
+                showRecurrenceValidationErrors = false
             )
         }
     }
@@ -74,9 +77,14 @@ internal class MainTaskSettingsViewModel(
         _uiState.update { it.copy(recurrenceState = state) }
     }
 
-    fun onConfirm() {
+    fun onConfirm(): Boolean {
+        val currentState = _uiState.value
+        if (!currentState.recurrenceState.hasValidDetails()) {
+            _uiState.update { it.copy(showRecurrenceValidationErrors = true) }
+            return false
+        }
+
         viewModelScope.launch {
-            val currentState = _uiState.value
             resultBus.emit(
                 MainTaskSettingsResult(
                     mainTaskId = mainTaskId,
@@ -85,5 +93,6 @@ internal class MainTaskSettingsViewModel(
                 )
             )
         }
+        return true
     }
 }

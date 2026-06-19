@@ -239,8 +239,9 @@ private fun AuthenticatedApp() {
                     onRecurrenceIntervalSelected = viewModel::onRecurrenceIntervalSelected,
                     onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
                     onConfirm = {
-                        viewModel.onConfirm()
-                        backStack.removeLastOrNull()
+                        if (viewModel.onConfirm()) {
+                            backStack.removeLastOrNull()
+                        }
                     },
                     onBack = {
                         backStack.removeLastOrNull()

@@ -34,6 +34,8 @@ import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceIntervalPicker
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 import net.onefivefour.echolist.ui.recurrence.WeeklyDetailContent
+import net.onefivefour.echolist.ui.recurrence.isValidDayOfMonth
+import net.onefivefour.echolist.ui.recurrence.isValidPositiveInt
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -122,6 +124,7 @@ internal fun MainTaskSettingsScreen(
 
                 RecurrenceDetail(
                     recurrenceState = uiState.recurrenceState,
+                    showValidationErrors = uiState.showRecurrenceValidationErrors,
                     onRecurrenceDetailChanged = onRecurrenceDetailChanged
                 )
             }
@@ -132,6 +135,7 @@ internal fun MainTaskSettingsScreen(
 @Composable
 private fun RecurrenceDetail(
     recurrenceState: RecurrenceState,
+    showValidationErrors: Boolean,
     onRecurrenceDetailChanged: (RecurrenceState) -> Unit
 ) {
     val hasDetail = recurrenceState is RecurrenceState.Daily ||
@@ -163,7 +167,8 @@ private fun RecurrenceDetail(
                         everyNWeeks = state.everyNWeeks,
                         onWeekCountChanged = { newCount ->
                             onRecurrenceDetailChanged(state.copy(everyNWeeks = newCount))
-                        }
+                        },
+                        isError = showValidationErrors && !isValidPositiveInt(state.everyNWeeks)
                     )
                 }
                 is RecurrenceState.Monthly -> {
@@ -175,7 +180,9 @@ private fun RecurrenceDetail(
                         },
                         onDayOfMonthChanged = { newDay ->
                             onRecurrenceDetailChanged(state.copy(dayOfMonth = newDay))
-                        }
+                        },
+                        isMonthIntervalError = showValidationErrors && !isValidPositiveInt(state.everyNMonths),
+                        isDayOfMonthError = showValidationErrors && !isValidDayOfMonth(state.dayOfMonth)
                     )
                 }
             }

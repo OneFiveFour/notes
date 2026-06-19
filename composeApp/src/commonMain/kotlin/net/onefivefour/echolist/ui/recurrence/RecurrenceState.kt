@@ -16,14 +16,14 @@ sealed interface RecurrenceState {
     }
 
     data class Weekly(
-        val everyNWeeks: Int = 1
+        val everyNWeeks: Int? = 1
     ) : RecurrenceState {
         override val interval = RecurrenceInterval.Weekly
     }
 
     data class Monthly(
-        val everyNMonths: Int = 1,
-        val dayOfMonth: Int = 1
+        val everyNMonths: Int? = 1,
+        val dayOfMonth: Int? = 1
     ) : RecurrenceState {
         override val interval = RecurrenceInterval.Monthly
     }

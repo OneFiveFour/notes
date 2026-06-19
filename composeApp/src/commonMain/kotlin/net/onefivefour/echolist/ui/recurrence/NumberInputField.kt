@@ -1,5 +1,6 @@
 package net.onefivefour.echolist.ui.recurrence
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -24,9 +25,10 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
  */
 @Composable
 internal fun NumberInputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    modifier: Modifier = Modifier
+    value: Int?,
+    onValueChange: (Int?) -> Unit,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false
 ) {
     val textStyle = EchoListTheme.typography.bodyMedium.copy(
         color = EchoListTheme.materialColors.onSurface,
@@ -37,11 +39,24 @@ internal fun NumberInputField(
         modifier = modifier,
         shape = EchoListTheme.shapes.small,
         color = EchoListTheme.materialColors.surfaceVariant,
-        contentColor = EchoListTheme.materialColors.onSurface
+        contentColor = EchoListTheme.materialColors.onSurface,
+        border = BorderStroke(
+            width = EchoListTheme.dimensions.borderWidth,
+            color = if (isError) {
+                EchoListTheme.materialColors.error
+            } else {
+                EchoListTheme.materialColors.surfaceVariant
+            }
+        )
     ) {
         BasicTextField(
-            value = value,
-            onValueChange = onValueChange,
+            value = value?.toString().orEmpty(),
+            onValueChange = { newValue ->
+                when {
+                    newValue.isEmpty() -> onValueChange(null)
+                    isEditableNumberInput(newValue) -> newValue.toIntOrNull()?.let(onValueChange)
+                }
+            },
             textStyle = textStyle,
             cursorBrush = SolidColor(EchoListTheme.materialColors.primary),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -73,8 +88,9 @@ private fun NumberInputFieldPreview() {
                 contentAlignment = Alignment.Center
             ) {
                 NumberInputField(
-                    value = "3",
-                    onValueChange = {}
+                    value = 3,
+                    onValueChange = {},
+                    isError = false
                 )
             }
         }

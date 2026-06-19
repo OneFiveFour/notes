@@ -17,10 +17,12 @@ internal fun monthlyFormatString(n: Int, m: Int): String = "Every $n month(s) on
 
 @Composable
 internal fun MonthlyDetailContent(
-    everyNMonths: Int,
-    dayOfMonth: Int,
-    onMonthIntervalChanged: (Int) -> Unit,
-    onDayOfMonthChanged: (Int) -> Unit,
+    everyNMonths: Int?,
+    dayOfMonth: Int?,
+    onMonthIntervalChanged: (Int?) -> Unit,
+    onDayOfMonthChanged: (Int?) -> Unit,
+    isMonthIntervalError: Boolean,
+    isDayOfMonthError: Boolean,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -34,12 +36,9 @@ internal fun MonthlyDetailContent(
             LabelText(text = "Repeat every")
 
             NumberInputField(
-                value = everyNMonths.toString(),
-                onValueChange = { newValue ->
-                    if (isValidPositiveInt(newValue)) {
-                        newValue.toIntOrNull()?.let { onMonthIntervalChanged(it) }
-                    }
-                }
+                value = everyNMonths,
+                onValueChange = onMonthIntervalChanged,
+                isError = isMonthIntervalError
             )
 
             LabelText(text = if (everyNMonths == 1) "month" else "months")
@@ -52,12 +51,9 @@ internal fun MonthlyDetailContent(
             LabelText(text = "On day")
 
             NumberInputField(
-                value = dayOfMonth.toString(),
-                onValueChange = { newValue ->
-                    if (isValidDayOfMonth(newValue)) {
-                        newValue.toIntOrNull()?.let { onDayOfMonthChanged(it) }
-                    }
-                }
+                value = dayOfMonth,
+                onValueChange = onDayOfMonthChanged,
+                isError = isDayOfMonthError
             )
 
             LabelText(text = "of the month")
@@ -74,7 +70,9 @@ private fun MonthlyDetailContentPreview() {
                 everyNMonths = 1,
                 dayOfMonth = 15,
                 onMonthIntervalChanged = {},
-                onDayOfMonthChanged = {}
+                onDayOfMonthChanged = {},
+                isMonthIntervalError = false,
+                isDayOfMonthError = false
             )
         }
     }
@@ -89,7 +87,9 @@ private fun MonthlyDetailContentMultiMonthPreview() {
                 everyNMonths = 3,
                 dayOfMonth = 1,
                 onMonthIntervalChanged = {},
-                onDayOfMonthChanged = {}
+                onDayOfMonthChanged = {},
+                isMonthIntervalError = false,
+                isDayOfMonthError = false
             )
         }
     }
