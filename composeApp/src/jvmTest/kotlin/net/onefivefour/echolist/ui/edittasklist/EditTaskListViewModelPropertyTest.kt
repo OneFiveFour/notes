@@ -7,7 +7,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
@@ -21,6 +20,7 @@ import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class EditTaskListViewModelPropertyTest : FunSpec({
@@ -137,7 +137,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
@@ -167,7 +167,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
@@ -200,7 +200,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -223,7 +223,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -251,7 +251,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -280,7 +280,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -319,7 +319,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -342,7 +342,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -361,7 +361,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
@@ -385,11 +385,11 @@ class EditTaskListViewModelPropertyTest : FunSpec({
     test("selecting a due date in create mode immediately creates the task list") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()
-            val settingsFlow = MutableSharedFlow<MainTaskSettingsResult>()
+            val settingsFlow = MainTaskSettingsResultBus()
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultFlow = settingsFlow
+                settingsResultBus = settingsFlow
             )
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
@@ -414,11 +414,11 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(id = "task-list-due-date")
             repo.addTaskList(existing)
 
-            val settingsFlow = MutableSharedFlow<MainTaskSettingsResult>()
+            val settingsFlow = MainTaskSettingsResultBus()
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = settingsFlow
+                settingsResultBus = settingsFlow
             )
 
             testScheduler.advanceUntilIdle()
@@ -450,11 +450,11 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             )
             repo.addTaskList(existing)
 
-            val settingsFlow = MutableSharedFlow<MainTaskSettingsResult>()
+            val settingsFlow = MainTaskSettingsResultBus()
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = settingsFlow
+                settingsResultBus = settingsFlow
             )
 
             testScheduler.advanceUntilIdle()
@@ -487,11 +487,11 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             )
             repo.addTaskList(existing)
 
-            val settingsFlow = MutableSharedFlow<MainTaskSettingsResult>()
+            val settingsFlow = MainTaskSettingsResultBus()
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = settingsFlow
+                settingsResultBus = settingsFlow
             )
 
             testScheduler.advanceUntilIdle()
@@ -513,7 +513,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -538,7 +538,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -575,7 +575,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -621,7 +621,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -650,7 +650,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             vm.uiState.value.titleState.edit { replace(0, length, "New list") }
@@ -692,7 +692,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()
@@ -719,7 +719,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultFlow = MutableSharedFlow()
+                settingsResultBus = MainTaskSettingsResultBus()
             )
 
             testScheduler.advanceUntilIdle()

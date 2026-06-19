@@ -23,12 +23,12 @@ import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.repository.TaskListRepository
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 internal class EditTaskListViewModel(
     private val mode: EditTaskListMode,
     private val taskListRepository: TaskListRepository,
-    private val settingsResultFlow: MutableSharedFlow<MainTaskSettingsResult>
+    private val settingsResultBus: MainTaskSettingsResultBus
 ) : ViewModel() {
 
     private data class SyncSnapshot(
@@ -74,7 +74,7 @@ internal class EditTaskListViewModel(
         }
 
         viewModelScope.launch {
-            settingsResultFlow.collect { result ->
+            settingsResultBus.results.collect { result ->
                 val task = tasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)

@@ -2,7 +2,6 @@ package net.onefivefour.echolist.network.auth
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.shouldNotBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.arbitrary
@@ -15,9 +14,11 @@ import io.ktor.client.engine.mock.respond
 import io.ktor.client.request.get
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.async
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import net.onefivefour.echolist.data.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthEventBus
 import net.onefivefour.echolist.data.network.auth.AuthInterceptor
 import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.source.FakeSecureStorage
@@ -84,13 +85,13 @@ class AuthInterceptorPropertyTest : FunSpec({
                 respond(content = "ok", status = HttpStatusCode.OK)
             }
 
-            val authEventFlow = MutableSharedFlow<AuthEvent>()
+            val authEventBus = AuthEventBus()
             val repo = fakeAuthRepository(storage)
 
             val client = HttpClient(mockEngine) {
                 install(AuthInterceptor) {
                     this.authRepository = repo
-                    this.authEventFlow = authEventFlow
+                    this.authEventBus = authEventBus
                 }
             }
 
@@ -135,7 +136,7 @@ class AuthInterceptorPropertyTest : FunSpec({
                 }
             }
 
-            val authEventFlow = MutableSharedFlow<AuthEvent>()
+            val authEventBus = AuthEventBus()
             val repo = fakeAuthRepository(storage) {
                 // Simulate successful refresh
                 storage.put(StorageKeys.ACCESS_TOKEN, newToken)
@@ -145,7 +146,7 @@ class AuthInterceptorPropertyTest : FunSpec({
             val client = HttpClient(mockEngine) {
                 install(AuthInterceptor) {
                     this.authRepository = repo
-                    this.authEventFlow = authEventFlow
+                    this.authEventBus = authEventBus
                 }
             }
 
@@ -179,7 +180,7 @@ class AuthInterceptorPropertyTest : FunSpec({
                     respond(content = "unauthorized", status = HttpStatusCode.Unauthorized)
                 }
 
-                val authEventFlow = MutableSharedFlow<AuthEvent>(replay = 1, extraBufferCapacity = 1)
+                val authEventBus = AuthEventBus()
                 val repo = fakeAuthRepository(storage) {
                     Result.failure(Exception("refresh failed"))
                 }
@@ -187,19 +188,19 @@ class AuthInterceptorPropertyTest : FunSpec({
                 val client = HttpClient(mockEngine) {
                     install(AuthInterceptor) {
                         this.authRepository = repo
-                        this.authEventFlow = authEventFlow
+                        this.authEventBus = authEventBus
                     }
                 }
 
                 try {
+                    val emittedEvent = async { authEventBus.events.first() }
                     client.get("http://localhost:$port$path")
 
                     // Verify: tokens cleared
                     storage.get(StorageKeys.ACCESS_TOKEN) shouldBe null
                     storage.get(StorageKeys.REFRESH_TOKEN) shouldBe null
                     // Verify: ReAuthRequired emitted
-                    authEventFlow.replayCache.singleOrNull() shouldNotBe null
-                    authEventFlow.replayCache.single() shouldBe AuthEvent.ReAuthRequired
+                    emittedEvent.await() shouldBe AuthEvent.ReAuthRequired
                 } finally {
                     client.close()
                 }

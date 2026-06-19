@@ -12,7 +12,6 @@ import io.kotest.property.arbitrary.set
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -86,7 +85,7 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
         return MainTaskSettingsViewModel(
             mainTaskId = mainTaskId,
             taskListRepository = FakeTaskListRepository(task),
-            resultFlow = MutableSharedFlow()
+            resultBus = MainTaskSettingsResultBus()
         )
     }
 

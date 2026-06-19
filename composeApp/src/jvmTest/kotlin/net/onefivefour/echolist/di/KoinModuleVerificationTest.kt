@@ -17,7 +17,7 @@ class KoinModuleVerificationTest : FunSpec({
                 // These are provided by authModule at runtime
                 net.onefivefour.echolist.data.source.SecureStorage::class,
                 AuthRepository::class,
-                kotlinx.coroutines.flow.MutableSharedFlow::class
+                net.onefivefour.echolist.data.network.auth.AuthEventBus::class
             )
         )
     }

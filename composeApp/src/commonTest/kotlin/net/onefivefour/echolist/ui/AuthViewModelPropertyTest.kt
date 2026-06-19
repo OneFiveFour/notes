@@ -9,14 +9,14 @@ import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import net.onefivefour.echolist.data.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthEventBus
 import net.onefivefour.echolist.data.source.FakeSecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.data.network.auth.AuthEvent
 
 /**
  * Property 11: AuthState reflects storage
@@ -45,9 +45,9 @@ class AuthViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
-                val authEvents = MutableSharedFlow<AuthEvent>()
+                val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEvents)
+                val vm = AuthViewModel(storage, authEventBus)
 
                 vm.authState.value shouldBe AuthState.Authenticated
             }
@@ -59,9 +59,9 @@ class AuthViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 // No access token stored
-                val authEvents = MutableSharedFlow<AuthEvent>()
+                val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEvents)
+                val vm = AuthViewModel(storage, authEventBus)
 
                 vm.authState.value shouldBe AuthState.Unauthenticated
             }
@@ -73,14 +73,14 @@ class AuthViewModelPropertyTest : FunSpec({
             runTest(testDispatcher) {
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
-                val authEvents = MutableSharedFlow<AuthEvent>()
+                val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEvents)
+                val vm = AuthViewModel(storage, authEventBus)
                 // Let the viewModelScope coroutine start collecting
                 testScheduler.advanceUntilIdle()
                 vm.authState.value shouldBe AuthState.Authenticated
 
-                authEvents.emit(AuthEvent.ReAuthRequired)
+                authEventBus.emit(AuthEvent.ReAuthRequired)
                 testScheduler.advanceUntilIdle()
 
                 vm.authState.value shouldBe AuthState.Unauthenticated

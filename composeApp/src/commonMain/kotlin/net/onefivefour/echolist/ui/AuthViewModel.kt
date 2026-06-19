@@ -2,18 +2,18 @@ package net.onefivefour.echolist.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import net.onefivefour.echolist.data.network.auth.AuthEvent
+import net.onefivefour.echolist.data.network.auth.AuthEventBus
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.data.network.auth.AuthEvent
 
 class AuthViewModel(
     private val secureStorage: SecureStorage,
-    private val authEvents: MutableSharedFlow<AuthEvent>
+    private val authEventBus: AuthEventBus
 ) : ViewModel() {
 
     private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
@@ -30,7 +30,7 @@ class AuthViewModel(
 
         // Collect auth events from the interceptor
         viewModelScope.launch {
-            authEvents.collect { event ->
+            authEventBus.events.collect { event ->
                 when (event) {
                     AuthEvent.ReAuthRequired -> {
                         _authState.value = AuthState.Unauthenticated

@@ -6,7 +6,6 @@ import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.header
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import net.onefivefour.echolist.domain.repository.AuthRepository
@@ -19,7 +18,7 @@ import net.onefivefour.echolist.domain.repository.AuthRepository
  */
 val AuthInterceptor = createClientPlugin("AuthInterceptor", ::AuthInterceptorConfig) {
     val authRepository = pluginConfig.authRepository
-    val authEventFlow = pluginConfig.authEventFlow
+    val authEventBus = pluginConfig.authEventBus
     val refreshMutex = Mutex()
 
     onRequest { request, _ ->
@@ -51,7 +50,7 @@ val AuthInterceptor = createClientPlugin("AuthInterceptor", ::AuthInterceptorCon
                 proceed(retryRequest)
             } else {
                 authRepository.clearAuth()
-                authEventFlow.emit(AuthEvent.ReAuthRequired)
+                authEventBus.emit(AuthEvent.ReAuthRequired)
                 originalCall
             }
         } else {
@@ -65,7 +64,7 @@ val AuthInterceptor = createClientPlugin("AuthInterceptor", ::AuthInterceptorCon
  */
 class AuthInterceptorConfig {
     lateinit var authRepository: AuthRepository
-    lateinit var authEventFlow: MutableSharedFlow<AuthEvent>
+    lateinit var authEventBus: AuthEventBus
 }
 
 private val PUBLIC_AUTH_ENDPOINTS = setOf(

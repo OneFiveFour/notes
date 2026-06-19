@@ -2,7 +2,6 @@ package net.onefivefour.echolist.ui.maintasksettings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,7 +14,7 @@ import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 internal class MainTaskSettingsViewModel(
     private val mainTaskId: String,
     taskListRepository: TaskListRepository,
-    private val resultFlow: MutableSharedFlow<MainTaskSettingsResult>
+    private val resultBus: MainTaskSettingsResultBus
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
@@ -78,7 +77,7 @@ internal class MainTaskSettingsViewModel(
     fun onConfirm() {
         viewModelScope.launch {
             val currentState = _uiState.value
-            resultFlow.emit(
+            resultBus.emit(
                 MainTaskSettingsResult(
                     mainTaskId = mainTaskId,
                     dueDate = currentState.selectedDueDate,

@@ -4,13 +4,12 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.MutableSharedFlow
 import net.onefivefour.echolist.data.DirectoryChangeNotifierImpl
+import net.onefivefour.echolist.data.network.auth.AuthEventBus
 import net.onefivefour.echolist.data.network.logging.LogLevel
 import net.onefivefour.echolist.data.network.logging.NetworkLoggingPlugin
 import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.repository.AuthRepositoryImpl
-import net.onefivefour.echolist.data.network.auth.AuthEvent
 import net.onefivefour.echolist.data.network.auth.AuthInterceptor
 import net.onefivefour.echolist.domain.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
@@ -41,7 +40,7 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.onClose
@@ -50,7 +49,7 @@ import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 
 val authModule: Module = module {
-    single { MutableSharedFlow<AuthEvent>() }
+    single { AuthEventBus() }
     single<AuthRepository> {
         AuthRepositoryImpl(
             secureStorage = get(),
@@ -58,7 +57,7 @@ val authModule: Module = module {
             networkConfigProvider = get()
         )
     }
-    viewModel { AuthViewModel(secureStorage = get(), authEvents = get()) }
+    viewModel { AuthViewModel(secureStorage = get(), authEventBus = get()) }
     viewModel {
         LoginViewModel(
             authRepository = get(),
@@ -74,7 +73,7 @@ val networkModule: Module = module {
     single {
         val configProvider: NetworkConfigProvider = get()
         val authRepository: AuthRepository = get()
-        val authEventFlow: MutableSharedFlow<AuthEvent> = get()
+        val authEventBus: AuthEventBus = get()
         HttpClient {
             install(NetworkLoggingPlugin) {
                 minLogLevel = LogLevel.DEBUG
@@ -85,7 +84,7 @@ val networkModule: Module = module {
             }
             install(AuthInterceptor) {
                 this.authRepository = authRepository
-                this.authEventFlow = authEventFlow
+                this.authEventBus = authEventBus
             }
         }
     }
@@ -163,7 +162,7 @@ val uiModule: Module = module {
 }
 
 val navigationModule: Module = module {
-    single { MutableSharedFlow<MainTaskSettingsResult>() }
+    single { MainTaskSettingsResultBus() }
     viewModel { params ->
         HomeViewModel(
             parentDir = params.get(),
@@ -187,14 +186,14 @@ val navigationModule: Module = module {
         EditTaskListViewModel(
             mode = params.get<EditTaskListMode>(),
             taskListRepository = get(),
-            settingsResultFlow = get()
+            settingsResultBus = get()
         )
     }
     viewModel { params ->
         MainTaskSettingsViewModel(
             mainTaskId = params.get(),
             taskListRepository = get(),
-            resultFlow = get()
+            resultBus = get()
         )
     }
 }
