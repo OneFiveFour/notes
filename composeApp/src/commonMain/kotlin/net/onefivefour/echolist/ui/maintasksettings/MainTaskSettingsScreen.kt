@@ -5,21 +5,13 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -44,9 +36,7 @@ internal fun MainTaskSettingsScreen(
     uiState: MainTaskSettingsUiState,
     onDateSelected: (Long) -> Unit,
     onRecurrenceIntervalSelected: (RecurrenceInterval) -> Unit,
-    onRecurrenceDetailChanged: (RecurrenceState) -> Unit,
-    onConfirm: () -> Unit,
-    onBack: () -> Unit
+    onRecurrenceDetailChanged: (RecurrenceState) -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.initialDateMillis
@@ -61,73 +51,38 @@ internal fun MainTaskSettingsScreen(
             }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Task Settings",
-                        style = EchoListTheme.typography.labelLarge,
-                        color = EchoListTheme.materialColors.onSurface
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back",
-                            tint = EchoListTheme.materialColors.onSurface
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = onConfirm) {
-                        Icon(
-                            imageVector = Icons.Default.Check,
-                            contentDescription = "Confirm",
-                            tint = EchoListTheme.materialColors.onSurface
-                        )
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = EchoListTheme.materialColors.surface
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .imePadding()
+            .verticalScroll(rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.l)
+    ) {
+        SettingsSection(title = "Due date") {
+            DatePicker(
+                state = datePickerState,
+                modifier = Modifier.fillMaxWidth(),
+                title = null,
+                headline = null,
+                showModeToggle = false,
+                colors = DatePickerDefaults.colors(
+                    containerColor = Color.Transparent
                 )
             )
-        },
-        containerColor = EchoListTheme.materialColors.background
-    ) { innerPadding ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(EchoListTheme.dimensions.l),
-            verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.l)
-        ) {
-            SettingsSection(title = "Due date") {
-                DatePicker(
-                    state = datePickerState,
-                    modifier = Modifier.fillMaxWidth(),
-                    title = null,
-                    showModeToggle = false,
-                    colors = DatePickerDefaults.colors(
-                        containerColor = Color.Transparent
-                    )
-                )
-            }
+        }
 
-            SettingsSection(title = "Repeat") {
-                RecurrenceIntervalPicker(
-                    selectedInterval = uiState.recurrenceState.interval,
-                    onIntervalSelected = onRecurrenceIntervalSelected
-                )
+        SettingsSection(title = "Repeat") {
+            RecurrenceIntervalPicker(
+                selectedInterval = uiState.recurrenceState.interval,
+                onIntervalSelected = onRecurrenceIntervalSelected
+            )
 
-                RecurrenceDetail(
-                    recurrenceState = uiState.recurrenceState,
-                    showValidationErrors = uiState.showRecurrenceValidationErrors,
-                    onRecurrenceDetailChanged = onRecurrenceDetailChanged
-                )
-            }
+            RecurrenceDetail(
+                recurrenceState = uiState.recurrenceState,
+                showValidationErrors = uiState.showRecurrenceValidationErrors,
+                onRecurrenceDetailChanged = onRecurrenceDetailChanged
+            )
         }
     }
 }
@@ -146,43 +101,45 @@ private fun RecurrenceDetail(
         Column(
             modifier = Modifier.padding(top = EchoListTheme.dimensions.l)
         ) {
-            when (val state = recurrenceState) {
+            when (recurrenceState) {
                 is RecurrenceState.Off -> Unit
                 is RecurrenceState.Yearly -> Unit
                 is RecurrenceState.Daily -> {
                     DailyDetailContent(
-                        selectedDays = state.selectedDays,
+                        selectedDays = recurrenceState.selectedDays,
                         onDayToggled = { day, checked ->
                             val updatedDays = if (checked) {
-                                state.selectedDays + day
+                                recurrenceState.selectedDays + day
                             } else {
-                                state.selectedDays - day
+                                recurrenceState.selectedDays - day
                             }
-                            onRecurrenceDetailChanged(state.copy(selectedDays = updatedDays))
+                            onRecurrenceDetailChanged(recurrenceState.copy(selectedDays = updatedDays))
                         }
                     )
                 }
+
                 is RecurrenceState.Weekly -> {
                     WeeklyDetailContent(
-                        everyNWeeks = state.everyNWeeks,
+                        everyNWeeks = recurrenceState.everyNWeeks,
                         onWeekCountChanged = { newCount ->
-                            onRecurrenceDetailChanged(state.copy(everyNWeeks = newCount))
+                            onRecurrenceDetailChanged(recurrenceState.copy(everyNWeeks = newCount))
                         },
-                        isError = showValidationErrors && !isValidPositiveInt(state.everyNWeeks)
+                        isError = showValidationErrors && !isValidPositiveInt(recurrenceState.everyNWeeks)
                     )
                 }
+
                 is RecurrenceState.Monthly -> {
                     MonthlyDetailContent(
-                        everyNMonths = state.everyNMonths,
-                        dayOfMonth = state.dayOfMonth,
+                        everyNMonths = recurrenceState.everyNMonths,
+                        dayOfMonth = recurrenceState.dayOfMonth,
                         onMonthIntervalChanged = { newInterval ->
-                            onRecurrenceDetailChanged(state.copy(everyNMonths = newInterval))
+                            onRecurrenceDetailChanged(recurrenceState.copy(everyNMonths = newInterval))
                         },
                         onDayOfMonthChanged = { newDay ->
-                            onRecurrenceDetailChanged(state.copy(dayOfMonth = newDay))
+                            onRecurrenceDetailChanged(recurrenceState.copy(dayOfMonth = newDay))
                         },
-                        isMonthIntervalError = showValidationErrors && !isValidPositiveInt(state.everyNMonths),
-                        isDayOfMonthError = showValidationErrors && !isValidDayOfMonth(state.dayOfMonth)
+                        isMonthIntervalError = showValidationErrors && !isValidPositiveInt(recurrenceState.everyNMonths),
+                        isDayOfMonthError = showValidationErrors && !isValidDayOfMonth(recurrenceState.dayOfMonth)
                     )
                 }
             }

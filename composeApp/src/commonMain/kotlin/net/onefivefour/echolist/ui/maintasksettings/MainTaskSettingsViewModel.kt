@@ -53,6 +53,7 @@ internal class MainTaskSettingsViewModel(
                 showRecurrenceValidationErrors = false
             )
         }
+        onConfirm()
     }
 
     fun onRecurrenceIntervalSelected(interval: RecurrenceInterval) {
@@ -71,13 +72,15 @@ internal class MainTaskSettingsViewModel(
                 showRecurrenceValidationErrors = false
             )
         }
+        onConfirm()
     }
 
     fun onRecurrenceDetailChanged(state: RecurrenceState) {
         _uiState.update { it.copy(recurrenceState = state) }
+        onConfirm()
     }
 
-    fun onConfirm(): Boolean {
+    private fun onConfirm(): Boolean {
         val currentState = _uiState.value
         if (!currentState.recurrenceState.hasValidDetails()) {
             _uiState.update { it.copy(showRecurrenceValidationErrors = true) }

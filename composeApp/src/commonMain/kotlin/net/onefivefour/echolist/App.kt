@@ -237,15 +237,7 @@ private fun AuthenticatedApp() {
                     uiState = uiState,
                     onDateSelected = viewModel::onDateSelected,
                     onRecurrenceIntervalSelected = viewModel::onRecurrenceIntervalSelected,
-                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
-                    onConfirm = {
-                        if (viewModel.onConfirm()) {
-                            backStack.removeLastOrNull()
-                        }
-                    },
-                    onBack = {
-                        backStack.removeLastOrNull()
-                    }
+                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged
                 )
             }
         }
