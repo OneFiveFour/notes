@@ -30,10 +30,28 @@ import net.onefivefour.echolist.ui.recurrence.isValidDayOfMonth
 import net.onefivefour.echolist.ui.recurrence.isValidPositiveInt
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MainTaskSettingsScreen(
     uiState: MainTaskSettingsUiState,
+    onDateSelected: (Long) -> Unit,
+    onRecurrenceIntervalSelected: (RecurrenceInterval) -> Unit,
+    onRecurrenceDetailChanged: (RecurrenceState) -> Unit
+) {
+    when (uiState) {
+        is MainTaskSettingsUiState.Loading -> Unit
+        is MainTaskSettingsUiState.Ready -> MainTaskSettingsContent(
+            uiState = uiState,
+            onDateSelected = onDateSelected,
+            onRecurrenceIntervalSelected = onRecurrenceIntervalSelected,
+            onRecurrenceDetailChanged = onRecurrenceDetailChanged
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun MainTaskSettingsContent(
+    uiState: MainTaskSettingsUiState.Ready,
     onDateSelected: (Long) -> Unit,
     onRecurrenceIntervalSelected: (RecurrenceInterval) -> Unit,
     onRecurrenceDetailChanged: (RecurrenceState) -> Unit
@@ -50,7 +68,6 @@ internal fun MainTaskSettingsScreen(
                 onDateSelected(selectedMillis)
             }
     }
-
 
     Column(
         modifier = Modifier

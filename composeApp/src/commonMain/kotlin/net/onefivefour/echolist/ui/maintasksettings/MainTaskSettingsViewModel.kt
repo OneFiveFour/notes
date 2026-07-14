@@ -18,35 +18,27 @@ internal class MainTaskSettingsViewModel(
     private val resultBus: MainTaskSettingsResultBus
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
-        MainTaskSettingsUiState(
-            selectedDueDate = "",
-            recurrenceState = RecurrenceState.Off,
-            initialDateMillis = null
-        )
-    )
+    private val _uiState = MutableStateFlow<MainTaskSettingsUiState>(MainTaskSettingsUiState.Loading)
     val uiState: StateFlow<MainTaskSettingsUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
             taskListRepository.getMainTask(mainTaskId).fold(
                 onSuccess = { task ->
-                    _uiState.update {
-                        MainTaskSettingsUiState(
-                            selectedDueDate = task.dueDate,
-                            recurrenceState = rruleToRecurrenceState(task.recurrence),
-                            initialDateMillis = dueDateToUtcMillis(task.dueDate)
-                        )
-                    }
+                    _uiState.value = MainTaskSettingsUiState.Ready(
+                        selectedDueDate = task.dueDate,
+                        recurrenceState = rruleToRecurrenceState(task.recurrence),
+                        initialDateMillis = dueDateToUtcMillis(task.dueDate)
+                    )
                 },
-                onFailure = { /* leave defaults */ }
+                onFailure = { /* leave Loading */ }
             )
         }
     }
 
     fun onDateSelected(dateMillis: Long) {
         val dueDate = utcMillisToDueDate(dateMillis)
-        _uiState.update { state ->
+        updateReady { state ->
             state.copy(
                 selectedDueDate = dueDate,
                 recurrenceState = RecurrenceState.Off,
@@ -65,7 +57,7 @@ internal class MainTaskSettingsViewModel(
             RecurrenceInterval.Yearly -> RecurrenceState.Yearly
         }
 
-        _uiState.update { state ->
+        updateReady { state ->
             state.copy(
                 selectedDueDate = if (interval != RecurrenceInterval.Off) "" else state.selectedDueDate,
                 recurrenceState = newRecurrenceState,
@@ -76,14 +68,23 @@ internal class MainTaskSettingsViewModel(
     }
 
     fun onRecurrenceDetailChanged(state: RecurrenceState) {
-        _uiState.update { it.copy(recurrenceState = state) }
+        updateReady { it.copy(recurrenceState = state) }
         onConfirm()
     }
 
+    private fun updateReady(transform: (MainTaskSettingsUiState.Ready) -> MainTaskSettingsUiState.Ready) {
+        _uiState.update { current ->
+            when (current) {
+                is MainTaskSettingsUiState.Ready -> transform(current)
+                is MainTaskSettingsUiState.Loading -> current
+            }
+        }
+    }
+
     private fun onConfirm(): Boolean {
-        val currentState = _uiState.value
+        val currentState = _uiState.value as? MainTaskSettingsUiState.Ready ?: return false
         if (!currentState.recurrenceState.hasValidDetails()) {
-            _uiState.update { it.copy(showRecurrenceValidationErrors = true) }
+            updateReady { it.copy(showRecurrenceValidationErrors = true) }
             return false
         }
 
