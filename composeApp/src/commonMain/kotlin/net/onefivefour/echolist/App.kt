@@ -92,8 +92,8 @@ private fun AuthenticatedApp() {
     NavDisplay(
         modifier = Modifier
             .padding(
-                horizontal = EchoListTheme.dimensions.xl,
-                vertical = EchoListTheme.dimensions.l
+                horizontal = EchoListTheme.dimensions.l,
+                vertical = EchoListTheme.dimensions.m
             ),
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },

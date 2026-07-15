@@ -41,11 +41,11 @@ internal class MainTaskSettingsViewModel(
         updateReady { state ->
             state.copy(
                 selectedDueDate = dueDate,
-                recurrenceState = RecurrenceState.Off,
-                showRecurrenceValidationErrors = false
+                showRecurrenceValidationErrors = false,
+                showDueDateRequiredError = false
             )
         }
-        onConfirm()
+        confirm()
     }
 
     fun onRecurrenceIntervalSelected(interval: RecurrenceInterval) {
@@ -59,17 +59,16 @@ internal class MainTaskSettingsViewModel(
 
         updateReady { state ->
             state.copy(
-                selectedDueDate = if (interval != RecurrenceInterval.Off) "" else state.selectedDueDate,
                 recurrenceState = newRecurrenceState,
                 showRecurrenceValidationErrors = false
             )
         }
-        onConfirm()
+        confirm()
     }
 
     fun onRecurrenceDetailChanged(state: RecurrenceState) {
         updateReady { it.copy(recurrenceState = state) }
-        onConfirm()
+        confirm()
     }
 
     private fun updateReady(transform: (MainTaskSettingsUiState.Ready) -> MainTaskSettingsUiState.Ready) {
@@ -81,8 +80,14 @@ internal class MainTaskSettingsViewModel(
         }
     }
 
-    private fun onConfirm(): Boolean {
+    private fun confirm(): Boolean {
         val currentState = _uiState.value as? MainTaskSettingsUiState.Ready ?: return false
+
+        if (currentState.recurrenceState != RecurrenceState.Off && currentState.selectedDueDate.isBlank()) {
+            updateReady { it.copy(showDueDateRequiredError = true) }
+            return false
+        }
+
         if (!currentState.recurrenceState.hasValidDetails()) {
             updateReady { it.copy(showRecurrenceValidationErrors = true) }
             return false

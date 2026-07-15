@@ -8,6 +8,7 @@ internal sealed interface MainTaskSettingsUiState {
         val selectedDueDate: String,
         val recurrenceState: RecurrenceState,
         val initialDateMillis: Long?,
-        val showRecurrenceValidationErrors: Boolean = false
+        val showRecurrenceValidationErrors: Boolean = false,
+        val showDueDateRequiredError: Boolean = false
     ) : MainTaskSettingsUiState
 }

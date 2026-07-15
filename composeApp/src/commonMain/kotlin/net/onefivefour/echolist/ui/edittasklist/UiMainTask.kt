@@ -34,7 +34,7 @@ internal class UiMainTask(
             id = id,
             description = trimmedDescription,
             isDone = isDone,
-            dueDate = if (normalizedRecurrence.isNotBlank()) "" else normalizedDueDate,
+            dueDate = normalizedDueDate,
             recurrence = normalizedRecurrence,
             subTasks = subTasks.mapNotNull { it.toDomain() }
         )
@@ -45,7 +45,7 @@ internal class UiMainTask(
             id = domain.id,
             description = domain.description,
             isDone = domain.isDone,
-            dueDate = if (domain.recurrence.isNotBlank()) "" else domain.dueDate,
+            dueDate = domain.dueDate,
             recurrence = domain.recurrence.singleLine(),
             subTasks = domain.subTasks.map { UiSubTask.fromDomain(it) }
         )

@@ -7,9 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
@@ -110,6 +112,7 @@ internal fun MainTaskCard(
                     if (mainTask.dueDateState.text.isNotEmpty()) {
                         DueDateTag(
                             dueDate = mainTask.dueDateState.text.toString(),
+                            isRecurring = mainTask.recurrenceState.text.isNotEmpty(),
                             onClick = onNavigateToSettings
                         )
                     }
@@ -179,6 +182,7 @@ internal fun MainTaskCard(
 @Composable
 private fun DueDateTag(
     dueDate: String,
+    isRecurring: Boolean,
     onClick: () -> Unit
 ) {
     Surface(
@@ -187,15 +191,29 @@ private fun DueDateTag(
         onClick = onClick,
         modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
     ) {
-        Text(
-            text = dueDate,
-            style = EchoListTheme.typography.labelMedium,
-            color = EchoListTheme.materialColors.onSurfaceVariant,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(
                 horizontal = EchoListTheme.dimensions.m,
                 vertical = EchoListTheme.dimensions.xs
             )
-        )
+        ) {
+            if (isRecurring) {
+                Icon(
+                    imageVector = Icons.Default.Refresh,
+                    contentDescription = "Recurring",
+                    modifier = Modifier
+                        .padding(end = EchoListTheme.dimensions.xs)
+                        .size(EchoListTheme.dimensions.l),
+                    tint = EchoListTheme.materialColors.onSurfaceVariant
+                )
+            }
+            Text(
+                text = dueDate,
+                style = EchoListTheme.typography.labelMedium,
+                color = EchoListTheme.materialColors.onSurfaceVariant
+            )
+        }
     }
 }
 

@@ -12,6 +12,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -76,7 +77,6 @@ private fun MainTaskSettingsContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.l)
     ) {
-        SettingsSection(title = "Due date") {
             DatePicker(
                 state = datePickerState,
                 modifier = Modifier.fillMaxWidth(),
@@ -87,7 +87,6 @@ private fun MainTaskSettingsContent(
                     containerColor = Color.Transparent
                 )
             )
-        }
 
         SettingsSection(title = "Repeat") {
             RecurrenceIntervalPicker(
@@ -99,6 +98,15 @@ private fun MainTaskSettingsContent(
                 recurrenceState = uiState.recurrenceState,
                 showValidationErrors = uiState.showRecurrenceValidationErrors,
                 onRecurrenceDetailChanged = onRecurrenceDetailChanged
+            )
+        }
+
+        AnimatedVisibility(visible = uiState.showDueDateRequiredError) {
+            Text(
+                text = "A due date is required when recurrence is active.",
+                style = EchoListTheme.typography.bodySmall,
+                color = EchoListTheme.materialColors.error,
+                modifier = Modifier.padding(horizontal = EchoListTheme.dimensions.l)
             )
         }
     }

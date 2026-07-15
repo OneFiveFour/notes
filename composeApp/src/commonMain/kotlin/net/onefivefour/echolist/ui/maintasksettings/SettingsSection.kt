@@ -47,7 +47,7 @@ internal fun SettingsSection(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(EchoListTheme.dimensions.l),
+                    .padding(EchoListTheme.dimensions.m),
                 content = content
             )
         }

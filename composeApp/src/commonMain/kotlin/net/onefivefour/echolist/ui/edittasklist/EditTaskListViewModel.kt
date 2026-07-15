@@ -43,6 +43,7 @@ internal class EditTaskListViewModel(
     private var lastSuccessfulSnapshot: SyncSnapshot? = null
     private var syncQueued = false
     private var syncJob: Job? = null
+    private val pendingCompletionTaskIds = mutableSetOf<String>()
 
     val taskListId: String? get() = persistedTaskListId
 
@@ -87,7 +88,7 @@ internal class EditTaskListViewModel(
     fun onAddMainTask() {
         val draft = UiMainTask(id = nextDraftMainTaskId())
         tasks.add(draft)
-        observeDueDateRecurrenceExclusion(draft)
+        observeRecurrenceSanitization(draft)
         _uiState.update { it.copy(error = null) }
     }
 
@@ -100,10 +101,18 @@ internal class EditTaskListViewModel(
     fun onMainTaskCheckedChange(index: Int, isChecked: Boolean) {
         val task = tasks.getOrNull(index) ?: return
 
+        // Block re-taps on recurring tasks until the sync response arrives
+        if (task.id in pendingCompletionTaskIds) return
+
+        val isRecurring = task.recurrenceState.text.isNotEmpty()
+
         if (_uiState.value.isAutoDelete && isChecked) {
             tasks.removeAt(index)
         } else {
             task.isDone = isChecked
+            if (isRecurring && isChecked) {
+                pendingCompletionTaskIds.add(task.id)
+            }
         }
 
         requestSync()
@@ -181,7 +190,7 @@ internal class EditTaskListViewModel(
                     taskList.tasks.forEach { task ->
                         val draft = UiMainTask.fromDomain(task)
                         tasks.add(draft)
-                        observeDueDateRecurrenceExclusion(draft)
+                        observeRecurrenceSanitization(draft)
                     }
 
                     lastSuccessfulSnapshot = taskList.toSyncSnapshot()
@@ -245,6 +254,18 @@ internal class EditTaskListViewModel(
                 onSuccess = { taskList ->
                     persistedTaskListId = taskList.id
                     lastSuccessfulSnapshot = taskList.toSyncSnapshot()
+
+                    // Apply backend-computed changes for recurring tasks that were just completed
+                    if (pendingCompletionTaskIds.isNotEmpty()) {
+                        for (serverTask in taskList.tasks) {
+                            if (serverTask.id !in pendingCompletionTaskIds) continue
+                            val uiTask = tasks.firstOrNull { it.id == serverTask.id } ?: continue
+                            uiTask.isDone = serverTask.isDone
+                            uiTask.dueDateState.setTextAndPlaceCursorAtEnd(serverTask.dueDate)
+                        }
+                        pendingCompletionTaskIds.clear()
+                    }
+
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -256,6 +277,7 @@ internal class EditTaskListViewModel(
                     }
                 },
                 onFailure = { e ->
+                    pendingCompletionTaskIds.clear()
                     _uiState.update {
                         it.copy(
                             isLoading = false,
@@ -305,17 +327,7 @@ internal class EditTaskListViewModel(
         tasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
     }
 
-    private fun observeDueDateRecurrenceExclusion(draft: UiMainTask) {
-        viewModelScope.launch {
-            snapshotFlow { draft.dueDateState.text.toString() }
-                .drop(1)
-                .collect { value ->
-                    if (value.trim().isNotBlank()) {
-                        draft.recurrenceState.setTextAndPlaceCursorAtEnd("")
-                    }
-                }
-        }
-
+    private fun observeRecurrenceSanitization(draft: UiMainTask) {
         viewModelScope.launch {
             snapshotFlow { draft.recurrenceState.text.toString() }
                 .drop(1)
@@ -323,9 +335,6 @@ internal class EditTaskListViewModel(
                     val sanitized = value.singleLine()
                     if (sanitized != value) {
                         draft.recurrenceState.setTextAndPlaceCursorAtEnd(sanitized)
-                    }
-                    if (sanitized.isNotBlank()) {
-                        draft.dueDateState.setTextAndPlaceCursorAtEnd("")
                     }
                 }
         }
@@ -342,8 +351,12 @@ internal class EditTaskListViewModel(
                 return "Recurrence must be a single-line RRULE."
             }
 
-            if (recurrence.isBlank() && dueDate.isNotBlank() && !dueDatePattern.matches(dueDate)) {
+            if (dueDate.isNotBlank() && !dueDatePattern.matches(dueDate)) {
                 return "Due date must use YYYY-MM-DD."
+            }
+
+            if (recurrence.isNotBlank() && dueDate.isBlank()) {
+                return "A due date is required when recurrence is active."
             }
         }
 

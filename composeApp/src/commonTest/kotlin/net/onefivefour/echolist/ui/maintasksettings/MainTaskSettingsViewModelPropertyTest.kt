@@ -113,7 +113,7 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
         millis to date.toString()
     }
 
-    test("Property 3: Selecting a date clears recurrence — onDateSelected sets recurrence to Off and due date to selected date") {
+    test("Property 3: Selecting a date preserves recurrence and sets due date to selected date") {
         runTest(testDispatcher) {
             checkAll(
                 PropTestConfig(iterations = 100),
@@ -128,12 +128,14 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
 
                 testScheduler.advanceUntilIdle()
 
-                viewModel.uiState.value.recurrenceState shouldBe recurrenceState
+                val readyState = viewModel.uiState.value as MainTaskSettingsUiState.Ready
+                readyState.recurrenceState shouldBe recurrenceState
 
                 viewModel.onDateSelected(dateMillis)
 
-                viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
-                viewModel.uiState.value.selectedDueDate shouldBe expectedDateString
+                val updatedState = viewModel.uiState.value as MainTaskSettingsUiState.Ready
+                updatedState.recurrenceState shouldBe recurrenceState
+                updatedState.selectedDueDate shouldBe expectedDateString
             }
         }
     }
@@ -154,10 +156,10 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
     )
 
     /**
-     * Property 4: Selecting a recurrence clears due date
+     * Property 4: Selecting a recurrence preserves due date but sets interval
      * **Validates: Requirements 5.2**
      */
-    test("Property 4: Selecting a recurrence clears due date — onRecurrenceIntervalSelected clears due date and sets interval") {
+    test("Property 4: Selecting a recurrence preserves due date and sets interval") {
         runTest(testDispatcher) {
             checkAll(
                 PropTestConfig(iterations = 100),
@@ -172,13 +174,15 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
 
                 testScheduler.advanceUntilIdle()
 
-                viewModel.uiState.value.selectedDueDate shouldBe dateString
-                viewModel.uiState.value.recurrenceState shouldBe RecurrenceState.Off
+                val readyState = viewModel.uiState.value as MainTaskSettingsUiState.Ready
+                readyState.selectedDueDate shouldBe dateString
+                readyState.recurrenceState shouldBe RecurrenceState.Off
 
                 viewModel.onRecurrenceIntervalSelected(interval)
 
-                viewModel.uiState.value.selectedDueDate shouldBe ""
-                viewModel.uiState.value.recurrenceState.interval shouldBe interval
+                val updatedState = viewModel.uiState.value as MainTaskSettingsUiState.Ready
+                updatedState.selectedDueDate shouldBe dateString
+                updatedState.recurrenceState.interval shouldBe interval
             }
         }
     }
@@ -187,7 +191,7 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
         runTest(testDispatcher) {
             val viewModel = createViewModel(
                 mainTaskId = "task-1",
-                dueDate = "",
+                dueDate = "2026-04-01",
                 recurrence = ""
             )
 
@@ -196,8 +200,8 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
             viewModel.onRecurrenceIntervalSelected(RecurrenceInterval.Weekly)
             viewModel.onRecurrenceDetailChanged(RecurrenceState.Weekly(everyNWeeks = null))
 
-            viewModel.onConfirm() shouldBe false
-            viewModel.uiState.value.showRecurrenceValidationErrors shouldBe true
+            val readyState = viewModel.uiState.value as MainTaskSettingsUiState.Ready
+            readyState.showRecurrenceValidationErrors shouldBe true
         }
     }
 })
