@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
@@ -100,7 +101,13 @@ internal fun MainTaskCard(
 
                     ElTextField(
                         state = mainTask.descriptionState,
-                        style = EchoListTheme.typography.bodyLarge,
+                        style = EchoListTheme.typography.bodyLarge.copy(
+                            textDecoration = if (mainTask.isDone) {
+                                TextDecoration.LineThrough
+                            } else {
+                                TextDecoration.None
+                            }
+                        ),
                         singleLine = true,
                         imeAction = ImeAction.Next,
                         onKeyboardAction = { onMainTaskKeyboardAction(mainTask.id) },
