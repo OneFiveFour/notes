@@ -41,6 +41,7 @@ internal class MainTaskSettingsViewModel(
         updateReady { state ->
             state.copy(
                 selectedDueDate = dueDate,
+                initialDateMillis = dateMillis,
                 showRecurrenceValidationErrors = false,
                 showDueDateRequiredError = false
             )
