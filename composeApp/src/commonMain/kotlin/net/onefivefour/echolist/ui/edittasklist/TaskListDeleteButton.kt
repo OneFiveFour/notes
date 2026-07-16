@@ -21,7 +21,7 @@ internal fun TaskListDeleteButton(
         Icon(
             painter = painterResource(Res.drawable.ic_delete),
             contentDescription = "Delete task list",
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .clip(RoundedCornerShape(50))
                 .clickable(enabled = !uiState.isLoading && !uiState.isSaving) { onDeleteTaskList() }
                 .padding(

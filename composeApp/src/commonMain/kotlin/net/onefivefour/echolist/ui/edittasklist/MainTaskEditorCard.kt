@@ -71,7 +71,7 @@ internal fun MainTaskCard(
     Surface(
         shape = EchoListTheme.shapes.medium,
         color = EchoListTheme.materialColors.surface,
-        modifier = Modifier.Companion
+        modifier = Modifier
             .fillMaxWidth()
             .border(
                 width = EchoListTheme.dimensions.borderWidth,
@@ -80,10 +80,10 @@ internal fun MainTaskCard(
             )
     ) {
         Column(
-            modifier = Modifier.Companion.padding(EchoListTheme.dimensions.s)
+            modifier = Modifier.padding(EchoListTheme.dimensions.s)
         ) {
             Row(
-                verticalAlignment = Alignment.Companion.CenterVertically,
+                verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
             ) {
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
@@ -94,7 +94,7 @@ internal fun MainTaskCard(
                 }
 
                 Column(
-                    modifier = Modifier.Companion.weight(1f),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center
                 ) {
 
@@ -125,7 +125,7 @@ internal fun MainTaskCard(
                     Icon(
                         imageVector = Icons.Default.DateRange,
                         contentDescription = "Set due date",
-                        modifier = Modifier.Companion
+                        modifier = Modifier
                             .clip(RoundedCornerShape(50))
                             .clickable { onNavigateToSettings() }
                             .padding(
@@ -134,12 +134,11 @@ internal fun MainTaskCard(
                             )
                     )
 
-                    // Property 6: Delete icon visibility is inverse of isAutoDelete (tasklist-auto-delete)
                     if (!isAutoDelete) {
                         Icon(
                             painter = painterResource(Res.drawable.ic_delete),
                             contentDescription = "Delete main task",
-                            modifier = Modifier.Companion
+                            modifier = Modifier
                                 .clip(RoundedCornerShape(50))
                                 .clickable { onRemoveMainTask() }
                                 .padding(

@@ -11,8 +11,8 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun TaskListLoading() {
     Box(
-        modifier = Modifier.Companion.fillMaxSize(),
-        contentAlignment = Alignment.Companion.Center
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = "Loading task list...",

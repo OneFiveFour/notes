@@ -65,7 +65,7 @@ internal fun EditNoteToolbar(
                 true -> "Edit"
                 false -> "Preview"
             },
-            modifier = Modifier.Companion
+            modifier = Modifier
                 .clip(RoundedCornerShape(50))
                 .clickable { onPreviewToggle() }
                 .padding(

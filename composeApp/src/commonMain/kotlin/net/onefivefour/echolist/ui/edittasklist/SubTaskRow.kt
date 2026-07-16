@@ -38,10 +38,10 @@ internal fun SubTaskRow(
     }
 
     Row(
-        modifier = Modifier.Companion
+        modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = EchoListTheme.dimensions.m),
-        verticalAlignment = Alignment.Companion.CenterVertically
+        verticalAlignment = Alignment.CenterVertically
     ) {
         CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
             Checkbox(
@@ -52,7 +52,7 @@ internal fun SubTaskRow(
 
         ElTextField(
             state = subTask.descriptionState,
-            modifier = Modifier.Companion.weight(1f),
+            modifier = Modifier.weight(1f),
             style = EchoListTheme.typography.bodyMedium.copy(
                 textDecoration = if (subTask.isDone) {
                     TextDecoration.LineThrough

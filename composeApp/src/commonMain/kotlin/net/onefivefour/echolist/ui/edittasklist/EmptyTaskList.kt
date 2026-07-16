@@ -14,11 +14,11 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun EmptyTaskList(onAddMainTask: () -> Unit) {
     Box(
-        modifier = Modifier.Companion.fillMaxSize(),
-        contentAlignment = Alignment.Companion.Center
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
     ) {
         Column(
-            horizontalAlignment = Alignment.Companion.CenterHorizontally,
+            horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
         ) {
             Text(
