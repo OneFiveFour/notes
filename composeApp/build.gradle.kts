@@ -49,6 +49,9 @@ kotlin {
                 languageSettings.optIn("io.kotest.common.ExperimentalKotest")
             }
         }
+        commonMain {
+            kotlin.srcDir(layout.buildDirectory.dir("generated/wire"))
+        }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
