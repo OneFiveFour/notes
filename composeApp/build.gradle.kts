@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -139,6 +140,22 @@ android {
     namespace = "net.onefivefour.echolist"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
+    val releaseKeystorePropertiesFile = rootProject.file("keystore.properties")
+    val releaseKeystoreProperties = Properties().apply {
+        if (releaseKeystorePropertiesFile.exists()) {
+            releaseKeystorePropertiesFile.inputStream().use(::load)
+        }
+    }
+    fun releaseSigningProperty(name: String): String? =
+        releaseKeystoreProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+
+    val hasReleaseSigningConfig = listOf(
+        "storeFile",
+        "storePassword",
+        "keyAlias",
+        "keyPassword",
+    ).all { releaseSigningProperty(it) != null }
+
     defaultConfig {
         applicationId = "net.onefivefour.echolist"
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -151,9 +168,22 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    signingConfigs {
+        if (hasReleaseSigningConfig) {
+            create("release") {
+                storeFile = rootProject.file(releaseSigningProperty("storeFile")!!)
+                storePassword = releaseSigningProperty("storePassword")
+                keyAlias = releaseSigningProperty("keyAlias")
+                keyPassword = releaseSigningProperty("keyPassword")
+            }
+        }
+    }
     buildTypes {
         getByName("release") {
             isMinifyEnabled = false
+            if (hasReleaseSigningConfig) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
     compileOptions {
