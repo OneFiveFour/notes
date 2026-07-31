@@ -432,6 +432,73 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
+    test("main tasks are ordered by ascending due date with undated tasks last") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-sort-due-date",
+                tasks = listOf(
+                    MainTask(
+                        id = "late",
+                        description = "Late",
+                        isDone = false,
+                        dueDate = "2026-05-10",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "none",
+                        description = "No date",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "early",
+                        description = "Early",
+                        isDone = false,
+                        dueDate = "2026-04-01",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultBus = MainTaskSettingsResultBus()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.mainTasks.map { it.id } shouldBe listOf("early", "late", "none")
+
+            vm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 0
+
+            val settingsFlow = MainTaskSettingsResultBus()
+            val sortingVm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultBus = settingsFlow
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "none", dueDate = "2026-03-01", recurrence = ""))
+            testScheduler.advanceUntilIdle()
+
+            sortingVm.uiState.value.mainTasks.map { it.id } shouldBe listOf("none", "early", "late")
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls.single().tasks.map { it.id } shouldBe listOf("none", "early", "late")
+        }
+    }
+
     test("selecting a due date clears recurrence before syncing") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()
