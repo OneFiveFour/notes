@@ -80,3 +80,8 @@ build/
 
 # Local configuration file
 local.properties
+
+# Release signing secrets
+keystore.properties
+*.keystore
+*.jks
