@@ -43,6 +43,7 @@ internal class EditTaskListViewModel(
     private var lastSuccessfulSnapshot: SyncSnapshot? = null
     private var syncQueued = false
     private var syncJob: Job? = null
+    private var skipNextScreenLeftCleanup = false
     private val pendingCompletionTaskIds = mutableSetOf<String>()
 
     val taskListId: String? get() = persistedTaskListId
@@ -156,7 +157,16 @@ internal class EditTaskListViewModel(
         requestSync()
     }
 
+    fun onSettingsNavigationStarted() {
+        skipNextScreenLeftCleanup = true
+    }
+
     fun onScreenLeft() {
+        if (skipNextScreenLeftCleanup) {
+            skipNextScreenLeftCleanup = false
+            return
+        }
+
         stripEmptyTasks()
         requestSync()
     }

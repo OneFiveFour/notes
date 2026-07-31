@@ -88,4 +88,15 @@ class RouteSerializationPropertyTest : FunSpec({
         val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
         decoded shouldBe route
     }
+
+    test("MainTaskSettingsRoute serialization preserves draft settings") {
+        val route: NavKey = MainTaskSettingsRoute(
+            mainTaskId = "draft-task-1",
+            currentDueDate = "2026-08-15",
+            currentRecurrence = "FREQ=WEEKLY;INTERVAL=2"
+        )
+        val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
+        val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
+        decoded shouldBe route
+    }
 })

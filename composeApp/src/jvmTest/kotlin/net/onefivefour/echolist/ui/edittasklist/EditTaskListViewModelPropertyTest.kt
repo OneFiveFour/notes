@@ -665,6 +665,34 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
+    test("empty main task is preserved while navigating to settings and stripped on actual exit") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo,
+                settingsResultBus = MainTaskSettingsResultBus()
+            )
+
+            vm.uiState.value.titleState.edit { replace(0, length, "New list") }
+            vm.onAddMainTask()
+            val draftId = vm.uiState.value.mainTasks.single().id
+
+            vm.onSettingsNavigationStarted()
+            vm.onScreenLeft()
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.mainTasks.single().id shouldBe draftId
+            repo.createTaskListCalls shouldHaveSize 0
+
+            vm.onScreenLeft()
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.mainTasks shouldHaveSize 0
+            repo.createTaskListCalls shouldHaveSize 0
+        }
+    }
+
     test("empty sub tasks are stripped from the UI on screen left") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()

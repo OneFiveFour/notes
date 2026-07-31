@@ -192,7 +192,8 @@ val navigationModule: Module = module {
     viewModel { params ->
         MainTaskSettingsViewModel(
             mainTaskId = params.get(),
-            taskListRepository = get(),
+            currentDueDate = params.get(),
+            currentRecurrence = params.get(),
             resultBus = get()
         )
     }

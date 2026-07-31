@@ -26,7 +26,9 @@ data class EditTaskListRoute(
 
 @Serializable
 data class MainTaskSettingsRoute(
-    val mainTaskId: String
+    val mainTaskId: String,
+    val currentDueDate: String = "",
+    val currentRecurrence: String = ""
 ) : NavKey
 
 val navKeySerializersModule = SerializersModule {

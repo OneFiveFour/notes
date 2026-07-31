@@ -37,7 +37,7 @@ internal fun EditTaskListScreen(
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
-    onNavigateToSettings: (String) -> Unit,
+    onNavigateToSettings: (String, String, String) -> Unit,
     onDeleteClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -98,7 +98,7 @@ private fun TaskListContentCard(
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
     onRemoveMainTask: (Int) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
-    onNavigateToSettings: (String) -> Unit,
+    onNavigateToSettings: (String, String, String) -> Unit,
     onDeleteClick: () -> Unit
 ) {
     Surface(
@@ -187,7 +187,7 @@ private fun EditTaskListScreenPreview() {
                 onSubTaskCheckedChange = { _, _, _ -> },
                 onToggleAutoDelete = {},
                 onFieldFocusLost = {},
-                onNavigateToSettings = {},
+                onNavigateToSettings = { _, _, _ -> },
                 onDeleteClick = {}
             )
         }
