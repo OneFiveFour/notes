@@ -111,6 +111,18 @@ private fun AuthenticatedApp() {
                     homeViewModel.clearErrorAndReload()
                 }
 
+                LaunchedEffect(homeViewModel) {
+                    homeViewModel.navigateToFolder.collect { parentDir ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
+                        if (index >= 0) {
+                            while (backStack.size > index + 1) backStack.removeLast()
+                        } else {
+                            backStack.removeLastOrNull()
+                            backStack.add(HomeRoute(parentDir))
+                        }
+                    }
+                }
+
                 val createFolderViewModel =
                     koinViewModel<CreateFolderViewModel>(
                         key = "createFolder-${route.parentDir}"
@@ -154,6 +166,7 @@ private fun AuthenticatedApp() {
                             )
                         )
                     },
+                    onDeleteCurrentFolderClick = homeViewModel::onDeleteCurrentFolderClick,
                     onFolderNameChange = createFolderViewModel::onNameChange,
                     onConfirmCreateFolder = createFolderViewModel::onConfirm,
                     onDismissCreateFolder = createFolderViewModel::dismissDialog

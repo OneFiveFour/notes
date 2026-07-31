@@ -4,11 +4,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.home_title
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import org.jetbrains.compose.resources.getString
@@ -26,6 +30,9 @@ class HomeViewModel(
         )
     )
     val uiState: StateFlow<HomeScreenUiState> = _uiState.asStateFlow()
+
+    private val _navigateToFolder = MutableSharedFlow<String>()
+    val navigateToFolder: SharedFlow<String> = _navigateToFolder.asSharedFlow()
 
     init {
         viewModelScope.launch {
@@ -63,6 +70,29 @@ class HomeViewModel(
         }
     }
 
+    fun onDeleteCurrentFolderClick() {
+        if (!_uiState.value.canDeleteCurrentFolder || _uiState.value.isDeletingFolder) return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isDeletingFolder = true, error = null) }
+            val result = fileRepository.deleteFolder(DeleteFolderParams(folderPath = parentDir))
+            result.fold(
+                onSuccess = {
+                    _uiState.update { it.copy(isDeletingFolder = false) }
+                    _navigateToFolder.emit(parentPath(parentDir))
+                },
+                onFailure = { exception ->
+                    _uiState.update {
+                        it.copy(
+                            isDeletingFolder = false,
+                            error = exception.message
+                        )
+                    }
+                }
+            )
+        }
+    }
+
     private suspend fun loadData() {
         val breadcrumbs = resolveBreadcrumbs()
         _uiState.update { current ->
@@ -78,6 +108,7 @@ class HomeViewModel(
                         breadcrumbs = breadcrumbs,
                         fileEntries = entries,
                         isLoading = false,
+                        canDeleteCurrentFolder = parentDir.isNotBlank() && entries.isEmpty(),
                         error = null
                     )
                 },
@@ -86,6 +117,7 @@ class HomeViewModel(
                         breadcrumbs = breadcrumbs,
                         fileEntries = emptyList(),
                         isLoading = false,
+                        canDeleteCurrentFolder = false,
                         error = exception.message
                     )
                 }
@@ -98,6 +130,9 @@ class HomeViewModel(
             parentDir = parentDir,
             homeTitle = getString(Res.string.home_title)
         )
+
+    private fun parentPath(path: String): String =
+        path.trimEnd('/').substringBeforeLast('/', "")
 }
 
 internal fun buildBreadcrumbs(parentDir: String, homeTitle: String): List<BreadcrumbItem> {

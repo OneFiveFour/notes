@@ -7,6 +7,8 @@ data class HomeScreenUiState(
     val fileEntries: List<FileEntry> = emptyList(),
     val isLoading: Boolean = false,
     val isRefreshing: Boolean = false,
+    val isDeletingFolder: Boolean = false,
+    val canDeleteCurrentFolder: Boolean = false,
     val error: String? = null
 )
 
