@@ -18,12 +18,6 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
-import net.onefivefour.echolist.data.dto.CreateTaskListParams
-import net.onefivefour.echolist.data.models.UpdateTaskListParams
-import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.TaskList
-import net.onefivefour.echolist.domain.model.TaskListEntry
-import net.onefivefour.echolist.domain.repository.TaskListRepository
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 
@@ -49,42 +43,15 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
         Dispatchers.resetMain()
     }
 
-    class FakeTaskListRepository(private val mainTask: MainTask) : TaskListRepository {
-        override suspend fun createTaskList(params: CreateTaskListParams): Result<TaskList> =
-            Result.failure(UnsupportedOperationException())
-
-        override suspend fun getTaskList(taskListId: String): Result<TaskList> =
-            Result.failure(UnsupportedOperationException())
-
-        override suspend fun getMainTask(mainTaskId: String): Result<MainTask> =
-            Result.success(mainTask)
-
-        override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
-            Result.success(emptyList())
-
-        override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> =
-            Result.failure(UnsupportedOperationException())
-
-        override suspend fun deleteTaskList(taskListId: String): Result<Unit> =
-            Result.failure(UnsupportedOperationException())
-    }
-
     fun createViewModel(
         mainTaskId: String,
         dueDate: String,
         recurrence: String
     ): MainTaskSettingsViewModel {
-        val task = MainTask(
-            id = mainTaskId,
-            description = "Test task",
-            isDone = false,
-            dueDate = dueDate,
-            recurrence = recurrence,
-            subTasks = emptyList()
-        )
         return MainTaskSettingsViewModel(
             mainTaskId = mainTaskId,
-            taskListRepository = FakeTaskListRepository(task),
+            currentDueDate = dueDate,
+            currentRecurrence = recurrence,
             resultBus = MainTaskSettingsResultBus()
         )
     }

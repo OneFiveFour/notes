@@ -22,8 +22,8 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 /**
  * Regression test for the due-date round-trip bug:
  * When a due date is set via MainTaskSettings, persisted through EditTaskList sync,
- * and then MainTaskSettings is opened again for the same task, the calendar should
- * show the previously selected date (initialDateMillis should be non-null).
+ * and then MainTaskSettings is opened again with the current editor values, the calendar
+ * should show the previously selected date (initialDateMillis should be non-null).
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainTaskSettingsDueDateRoundTripTest : FunSpec({
@@ -99,6 +99,51 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
         }
     }
 
+    test("empty draft opens settings locally and persists its date after receiving a description") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val resultBus = MainTaskSettingsResultBus()
+            val editVm = EditTaskListViewModel(
+                mode = EditTaskListMode.Create("home"),
+                taskListRepository = repo,
+                settingsResultBus = resultBus
+            )
+
+            editVm.uiState.value.titleState.edit { replace(0, length, "Draft list") }
+            editVm.onAddMainTask()
+            val draft = editVm.uiState.value.mainTasks.single()
+
+            editVm.onSettingsNavigationStarted()
+            editVm.onScreenLeft()
+
+            val settingsVm = MainTaskSettingsViewModel(
+                mainTaskId = draft.id,
+                currentDueDate = draft.dueDateState.text.toString(),
+                currentRecurrence = draft.recurrenceState.text.toString(),
+                resultBus = resultBus
+            )
+            val readyState = settingsVm.uiState.value
+            readyState.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
+            readyState.selectedDueDate shouldBe ""
+
+            settingsVm.onDateSelected(dueDateToUtcMillis("2026-09-01")!!)
+            testScheduler.advanceUntilIdle()
+
+            editVm.uiState.value.mainTasks.single().dueDateState.text.toString() shouldBe "2026-09-01"
+            repo.taskLists shouldBe emptyMap()
+
+            editVm.uiState.value.mainTasks.single().descriptionState.edit {
+                replace(0, length, "Name the draft")
+            }
+            editVm.onFieldFocusLost()
+            testScheduler.advanceUntilIdle()
+
+            val persistedTask = repo.taskLists.values.single().tasks.single()
+            persistedTask.description shouldBe "Name the draft"
+            persistedTask.dueDate shouldBe "2026-09-01"
+        }
+    }
+
     test("Round trip: selecting a due date persists it so re-opening settings shows it in the calendar") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()
@@ -134,7 +179,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             // --- Step 2: First navigation to MainTaskSettings ---
             val settingsVm1 = MainTaskSettingsViewModel(
                 mainTaskId = "task-1",
-                taskListRepository = repo,
+                currentDueDate = "",
+                currentRecurrence = "",
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -159,7 +205,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             // (This simulates creating a new ViewModel instance for the same task)
             val settingsVm2 = MainTaskSettingsViewModel(
                 mainTaskId = "task-1",
-                taskListRepository = repo,
+                currentDueDate = updatedTask.dueDate,
+                currentRecurrence = updatedTask.recurrence,
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -208,7 +255,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             // First navigation — ViewModel is created
             val settingsVm = MainTaskSettingsViewModel(
                 mainTaskId = "task-1",
-                taskListRepository = repo,
+                currentDueDate = "",
+                currentRecurrence = "",
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -267,7 +315,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             // First navigation to settings
             val settingsVm1 = MainTaskSettingsViewModel(
                 mainTaskId = "task-2",
-                taskListRepository = repo,
+                currentDueDate = "",
+                currentRecurrence = "",
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -294,7 +343,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             // Second navigation — new ViewModel
             val settingsVm2 = MainTaskSettingsViewModel(
                 mainTaskId = "task-2",
-                taskListRepository = repo,
+                currentDueDate = updatedTask.dueDate,
+                currentRecurrence = updatedTask.recurrence,
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()

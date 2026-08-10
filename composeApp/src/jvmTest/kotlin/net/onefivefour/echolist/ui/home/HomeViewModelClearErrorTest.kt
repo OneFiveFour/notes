@@ -4,8 +4,10 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.async
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
@@ -16,6 +18,8 @@ import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.data.models.FileEntry
+import net.onefivefour.echolist.data.models.FileMetadata
+import net.onefivefour.echolist.data.models.ItemType
 import net.onefivefour.echolist.domain.model.Folder
 import net.onefivefour.echolist.domain.repository.FileRepository
 
@@ -112,6 +116,89 @@ class HomeViewModelClearErrorTest : FunSpec({
             advanceUntilIdle()
 
             callCount shouldBe callsAfterInit + 1
+        }
+    }
+
+    test("empty non-root folder can be deleted and navigates to parent") {
+        runTest(testDispatcher) {
+            var deletedPath: String? = null
+            val repo = object : FileRepository {
+                override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> =
+                    Result.success(emptyList())
+                override suspend fun createFolder(params: CreateFolderParams): Result<Folder> =
+                    Result.failure(UnsupportedOperationException())
+                override suspend fun updateFolder(params: UpdateFolderParams): Result<Folder> =
+                    Result.failure(UnsupportedOperationException())
+                override suspend fun deleteFolder(params: DeleteFolderParams): Result<Unit> {
+                    deletedPath = params.folderPath
+                    return Result.success(Unit)
+                }
+            }
+
+            val vm = HomeViewModel(
+                parentDir = "parent/child",
+                fileRepository = repo,
+                directoryChangeNotifier = FakeDirectoryChangeNotifier()
+            )
+            advanceUntilIdle()
+
+            vm.uiState.value.canDeleteCurrentFolder shouldBe true
+            val navigation = async { vm.navigateToFolder.first() }
+
+            vm.onDeleteCurrentFolderClick()
+            advanceUntilIdle()
+
+            deletedPath shouldBe "parent/child"
+            navigation.await() shouldBe "parent"
+            vm.uiState.value.isDeletingFolder shouldBe false
+        }
+    }
+
+    test("root and non-empty folders are not deletable") {
+        runTest(testDispatcher) {
+            var deleteCallCount = 0
+            fun repoWithEntries(entries: List<FileEntry>) = object : FileRepository {
+                override suspend fun listFiles(parentDir: String): Result<List<FileEntry>> =
+                    Result.success(entries)
+                override suspend fun createFolder(params: CreateFolderParams): Result<Folder> =
+                    Result.failure(UnsupportedOperationException())
+                override suspend fun updateFolder(params: UpdateFolderParams): Result<Folder> =
+                    Result.failure(UnsupportedOperationException())
+                override suspend fun deleteFolder(params: DeleteFolderParams): Result<Unit> {
+                    deleteCallCount++
+                    return Result.success(Unit)
+                }
+            }
+            val childEntry = FileEntry(
+                path = "child",
+                title = "child",
+                itemType = ItemType.FOLDER,
+                metadata = FileMetadata.Folder(childCount = 0)
+            )
+
+            val nonEmptyVm = HomeViewModel(
+                parentDir = "parent",
+                fileRepository = repoWithEntries(listOf(childEntry)),
+                directoryChangeNotifier = FakeDirectoryChangeNotifier()
+            )
+            advanceUntilIdle()
+
+            nonEmptyVm.uiState.value.canDeleteCurrentFolder shouldBe false
+            nonEmptyVm.onDeleteCurrentFolderClick()
+            advanceUntilIdle()
+
+            val rootVm = HomeViewModel(
+                parentDir = "",
+                fileRepository = repoWithEntries(emptyList()),
+                directoryChangeNotifier = FakeDirectoryChangeNotifier()
+            )
+            advanceUntilIdle()
+
+            rootVm.uiState.value.canDeleteCurrentFolder shouldBe false
+            rootVm.onDeleteCurrentFolderClick()
+            advanceUntilIdle()
+
+            deleteCallCount shouldBe 0
         }
     }
 })

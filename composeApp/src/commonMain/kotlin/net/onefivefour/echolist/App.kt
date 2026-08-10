@@ -10,8 +10,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
+import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
@@ -97,6 +99,10 @@ private fun AuthenticatedApp() {
             ),
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
+        entryDecorators = listOf(
+            rememberSaveableStateHolderNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator()
+        ),
         transitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
@@ -109,6 +115,18 @@ private fun AuthenticatedApp() {
 
                 LaunchedEffect(Unit) {
                     homeViewModel.clearErrorAndReload()
+                }
+
+                LaunchedEffect(homeViewModel) {
+                    homeViewModel.navigateToFolder.collect { parentDir ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
+                        if (index >= 0) {
+                            while (backStack.size > index + 1) backStack.removeLast()
+                        } else {
+                            backStack.removeLastOrNull()
+                            backStack.add(HomeRoute(parentDir))
+                        }
+                    }
                 }
 
                 val createFolderViewModel =
@@ -154,6 +172,7 @@ private fun AuthenticatedApp() {
                             )
                         )
                     },
+                    onDeleteCurrentFolderClick = homeViewModel::onDeleteCurrentFolderClick,
                     onFolderNameChange = createFolderViewModel::onNameChange,
                     onConfirmCreateFolder = createFolderViewModel::onConfirm,
                     onDismissCreateFolder = createFolderViewModel::dismissDialog
@@ -215,9 +234,14 @@ private fun AuthenticatedApp() {
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
-                    onNavigateToSettings = { mainTaskId ->
+                    onNavigateToSettings = { mainTaskId, currentDueDate, currentRecurrence ->
+                        viewModel.onSettingsNavigationStarted()
                         backStack.add(
-                            MainTaskSettingsRoute(mainTaskId = mainTaskId)
+                            MainTaskSettingsRoute(
+                                mainTaskId = mainTaskId,
+                                currentDueDate = currentDueDate,
+                                currentRecurrence = currentRecurrence
+                            )
                         )
                     },
                     onDeleteClick = viewModel::onDeleteClick
@@ -228,7 +252,11 @@ private fun AuthenticatedApp() {
                 val viewModel = koinViewModel<MainTaskSettingsViewModel>(
                     key = "mainTaskSettings-${route.mainTaskId}"
                 ) {
-                    parametersOf(route.mainTaskId)
+                    parametersOf(
+                        route.mainTaskId,
+                        route.currentDueDate,
+                        route.currentRecurrence
+                    )
                 }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()

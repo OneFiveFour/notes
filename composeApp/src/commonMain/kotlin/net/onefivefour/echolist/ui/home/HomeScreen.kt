@@ -1,11 +1,14 @@
 package net.onefivefour.echolist.ui.home
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
@@ -13,12 +16,13 @@ import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.recent
+import echolist.composeapp.generated.resources.ic_delete
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
-import org.jetbrains.compose.resources.stringResource
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,6 +33,7 @@ fun HomeScreen(
     onFolderClick: (path: String) -> Unit = {},
     onNoteClick: (noteId: String) -> Unit = {},
     onTaskClick: (taskListId: String) -> Unit = {},
+    onDeleteCurrentFolderClick: () -> Unit = {},
     createItemCallbacks: CreateItemCallbacks = CreateItemCallbacks(),
     createFolderUiState: CreateFolderUiState = CreateFolderUiState(),
     onFolderNameChange: (String) -> Unit = {},
@@ -44,11 +49,31 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.xxl))
 
-        Text(
-            text = uiState.breadcrumbs.lastOrNull()?.label ?: "",
-            color = EchoListTheme.materialColors.primary,
-            style = EchoListTheme.typography.titleLarge
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.weight(1f),
+                text = uiState.breadcrumbs.lastOrNull()?.label ?: "",
+                color = EchoListTheme.materialColors.primary,
+                style = EchoListTheme.typography.titleLarge
+            )
+
+            if (uiState.canDeleteCurrentFolder) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_delete),
+                    contentDescription = "Delete folder",
+                    tint = EchoListTheme.materialColors.primary,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable(enabled = !uiState.isDeletingFolder) { onDeleteCurrentFolderClick() }
+                        .padding(
+                            horizontal = EchoListTheme.dimensions.m,
+                            vertical = EchoListTheme.dimensions.m
+                        )
+                )
+            }
+        }
 
         Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
 

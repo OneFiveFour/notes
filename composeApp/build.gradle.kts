@@ -50,6 +50,9 @@ kotlin {
                 languageSettings.optIn("io.kotest.common.ExperimentalKotest")
             }
         }
+        commonMain {
+            kotlin.srcDir(layout.buildDirectory.dir("generated/wire"))
+        }
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.androidx.activity.compose)
@@ -144,6 +147,22 @@ val signingProps = Properties().apply {
 android {
     namespace = "net.onefivefour.echolist"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    val releaseKeystorePropertiesFile = rootProject.file("keystore.properties")
+    val releaseKeystoreProperties = Properties().apply {
+        if (releaseKeystorePropertiesFile.exists()) {
+            releaseKeystorePropertiesFile.inputStream().use(::load)
+        }
+    }
+    fun releaseSigningProperty(name: String): String? =
+        releaseKeystoreProperties.getProperty(name)?.takeIf { it.isNotBlank() }
+
+    val hasReleaseSigningConfig = listOf(
+        "storeFile",
+        "storePassword",
+        "keyAlias",
+        "keyPassword",
+    ).all { releaseSigningProperty(it) != null }
 
     defaultConfig {
         applicationId = "net.onefivefour.echolist"
