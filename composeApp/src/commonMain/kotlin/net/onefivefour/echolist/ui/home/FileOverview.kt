@@ -28,7 +28,7 @@ internal fun FileOverview(
         when {
             isLoading -> item(key = "loading") { LoadingIndicator() }
             error != null -> item(key = "error") { ErrorContainer(message = error) }
-            else -> items(fileEntries, key = { it.path }) { entry ->
+            else -> items(fileEntries) { entry ->
                 when (entry.itemType) {
                     ItemType.FOLDER -> FolderItem(
                         title = entry.title,

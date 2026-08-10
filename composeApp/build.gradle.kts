@@ -1,6 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.ExperimentalWasmDsl
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import java.util.Properties
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -132,6 +133,14 @@ kotlin {
     }
 }
 
+// Load signing properties from local file (not in VCS)
+val signingPropsFile = rootProject.file("signing.properties")
+val signingProps = Properties().apply {
+    if (signingPropsFile.exists()) {
+        signingPropsFile.inputStream().use { load(it) }
+    }
+}
+
 android {
     namespace = "net.onefivefour.echolist"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
@@ -148,9 +157,32 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+    signingConfigs {
+        create("release") {
+            val storeFilePath = signingProps.getProperty("RELEASE_STORE_FILE")
+            if (storeFilePath != null) {
+                storeFile = rootProject.file(storeFilePath)
+                storePassword = signingProps.getProperty("RELEASE_STORE_PASSWORD")
+                keyAlias = signingProps.getProperty("RELEASE_KEY_ALIAS")
+                keyPassword = signingProps.getProperty("RELEASE_KEY_PASSWORD")
+            }
+        }
+    }
+
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+            signingConfig = if (signingPropsFile.exists()) {
+                signingConfigs.getByName("release")
+            } else {
+                signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
