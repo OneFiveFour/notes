@@ -83,8 +83,8 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - **Property 10: Past date skips scheduling**
     - **Validates: Requirements 4.1, 4.3, 4.4, 5.1, 5.2, 5.3, 5.4, 5.5, 8.1, 8.2**
 
-- [ ] 5. Implement platform-specific NotificationScheduler implementations
-  - [~] 5.1 Implement AndroidNotificationScheduler
+- [x] 5. Implement platform-specific NotificationScheduler implementations
+  - [x] 5.1 Implement AndroidNotificationScheduler
     - Use `AlarmManager.setExactAndAllowWhileIdle()` with `RTC_WAKEUP` for scheduling
     - Create `TaskReminderReceiver` BroadcastReceiver to post notifications via `NotificationManager`
     - Use `PendingIntent.FLAG_UPDATE_CURRENT | FLAG_IMMUTABLE` for idempotent replacement
@@ -95,7 +95,7 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Cancel: remove PendingIntent and dismiss displayed notification
     - _Requirements: 4.2, 5.4, 6.1, 6.2, 7.1, 7.3, 8.1, 9.1, 9.2_
 
-  - [~] 5.2 Implement IosNotificationScheduler
+  - [x] 5.2 Implement IosNotificationScheduler
     - Use `UNUserNotificationCenter` with `UNCalendarNotificationTrigger` at midnight local time
     - Set `hiddenPreviewsBodyPlaceholder` on notification category for lock screen privacy
     - Use task ID as notification request identifier for idempotent replacement
@@ -104,7 +104,7 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Skip scheduling if due date is before today
     - _Requirements: 5.4, 6.3, 7.1, 7.3, 8.1, 9.3_
 
-  - [~] 5.3 Implement JvmNotificationScheduler
+  - [x] 5.3 Implement JvmNotificationScheduler
     - Check `SystemTray.isSupported` — use system tray notification if available
     - Fall back to coroutine-delayed in-process alert if SystemTray is not supported
     - Schedule notification at midnight local time using `kotlinx-datetime` conversion
@@ -112,7 +112,7 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Skip scheduling if due date is before today
     - _Requirements: 5.4, 6.4, 7.1, 8.1_
 
-  - [~] 5.4 Implement WebNotificationScheduler (JS and WasmJS)
+  - [x] 5.4 Implement WebNotificationScheduler (JS and WasmJS)
     - Use browser `Notification` API for both JS and WasmJS targets
     - Use `setTimeout` or `window.setTimeout` for delayed firing at midnight local time
     - Handle permission denied as no-op with warning log
