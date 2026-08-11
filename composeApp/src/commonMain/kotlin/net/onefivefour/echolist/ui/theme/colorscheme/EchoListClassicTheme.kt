@@ -19,7 +19,8 @@ val EchoListClassicTheme = ColorTheme(
         onBackground = Color(0xFFFF8C00),
         onSurface = Color(0xFF383838),
         onSurfaceVariant = Color(0xFF383838),
-        error = Color(0xFFB81A1C)
+        error = Color(0xFFB81A1C),
+        onError = Color(0xFFE1E0D5)
     ),
     materialColorSchemeDark = darkColorScheme(
         background = Color(0xFFFF8C00),
@@ -30,7 +31,8 @@ val EchoListClassicTheme = ColorTheme(
         onSecondary = Color(0xFFEFEFEF),
         onBackground = Color(0xFFFF8C00),
         onSurface = Color(0xFFFF8C00),
-        error = Color(0xFFFF0000)
+        error = Color(0xFFFF0000),
+        onError = Color(0xFFEFEFEF)
     ),
     echoListColorSchemeLight = EchoListColorScheme(
         background = Color(0xFFE1E0D5),
@@ -39,7 +41,9 @@ val EchoListClassicTheme = ColorTheme(
         backgroundGradient3 = Color(0x2725C0F4),
         taskColor = Color(0xFF88A7E5),
         noteColor = Color(0xFFE8B767),
-        folderColor = Color(0xFF69D09B)
+        folderColor = Color(0xFF69D09B),
+        warning = Color(0xFFE8B767),
+        onWarning = Color(0xFFE1E0D5)
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),
@@ -48,7 +52,9 @@ val EchoListClassicTheme = ColorTheme(
         backgroundGradient3 = Color(0x2725C0F4),
         taskColor = Color(0xFFDBEAFE),
         noteColor = Color(0xFFFFEDD5),
-        folderColor = Color(0xFFD1FAE5)
+        folderColor = Color(0xFFD1FAE5),
+        warning = Color(0xFFE8B767),
+        onWarning = Color(0xFFE1E0D5)
     )
 //    echoListColorSchemeLight = EchoListColorScheme(
 //        background = Color(0xFF1A0B18),

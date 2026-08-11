@@ -20,7 +20,9 @@ class ThemeManagerTest : FunSpec({
         backgroundGradient3 = Color.White,
         taskColor = Color.White,
         noteColor = Color.White,
-        folderColor = Color.White
+        folderColor = Color.White,
+        warning = Color.White,
+        onWarning = Color.White
     )
 
     val themeA = ColorTheme(

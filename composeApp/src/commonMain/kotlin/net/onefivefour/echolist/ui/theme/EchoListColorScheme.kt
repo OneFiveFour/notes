@@ -10,7 +10,9 @@ data class EchoListColorScheme(
     val backgroundGradient3: Color,
     val taskColor: Color,
     val noteColor: Color,
-    val folderColor: Color
+    val folderColor: Color,
+    val warning: Color,
+    val onWarning: Color
 )
 
 val LocalEchoListColors = staticCompositionLocalOf {
@@ -21,6 +23,8 @@ val LocalEchoListColors = staticCompositionLocalOf {
         backgroundGradient3 = Color.Unspecified,
         taskColor = Color.Unspecified,
         noteColor = Color.Unspecified,
-        folderColor = Color.Unspecified
+        folderColor = Color.Unspecified,
+        warning = Color.Unspecified,
+        onWarning = Color.Unspecified
     )
 }

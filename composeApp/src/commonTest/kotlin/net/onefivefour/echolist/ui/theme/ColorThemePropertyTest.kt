@@ -70,7 +70,9 @@ class ColorThemePropertyTest : FunSpec({
                 backgroundGradient3 = arbColor().bind(),
                 taskColor = arbColor().bind(),
                 noteColor = arbColor().bind(),
-                folderColor = arbColor().bind()
+                folderColor = arbColor().bind(),
+                warning = arbColor().bind(),
+                onWarning = arbColor().bind()
             ),
             echoListColorSchemeDark = EchoListColorScheme(
                 background = arbColor().bind(),
@@ -79,7 +81,9 @@ class ColorThemePropertyTest : FunSpec({
                 backgroundGradient3 = arbColor().bind(),
                 taskColor = arbColor().bind(),
                 noteColor = arbColor().bind(),
-                folderColor = arbColor().bind()
+                folderColor = arbColor().bind(),
+                warning = arbColor().bind(),
+                onWarning = arbColor().bind()
             )
         )
     }

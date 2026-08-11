@@ -35,7 +35,9 @@ val EchoListTheme2 = ColorTheme(
         backgroundGradient3 = Color(0x33F48C25),
         taskColor = Color(0xFFDBEAFE),
         noteColor = Color(0xFFFFEDD5),
-        folderColor = Color(0xFFD1FAE5)
+        folderColor = Color(0xFFD1FAE5),
+        warning = Color(0xFFFFA726),
+        onWarning = Color(0xFF000000)
     ),
     echoListColorSchemeDark = EchoListColorScheme(
         background = Color(0xFF1A0B18),
@@ -44,6 +46,8 @@ val EchoListTheme2 = ColorTheme(
         backgroundGradient3 = Color(0x33F48C25),
         taskColor = Color(0xFFDBEAFE),
         noteColor = Color(0xFFFFEDD5),
-        folderColor = Color(0xFFD1FAE5)
+        folderColor = Color(0xFFD1FAE5),
+        warning = Color(0xFFFFA726),
+        onWarning = Color(0xFF000000)
     )
 )
