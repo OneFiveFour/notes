@@ -7,6 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.onefivefour.echolist.domain.NotificationPermissionChecker
+import net.onefivefour.echolist.domain.NotificationPermissionRequester
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 import net.onefivefour.echolist.ui.recurrence.hasValidDetails
@@ -15,6 +17,9 @@ internal class MainTaskSettingsViewModel(
     private val mainTaskId: String,
     currentDueDate: String,
     currentRecurrence: String,
+    currentIsNotificationEnabled: Boolean,
+    private val permissionChecker: NotificationPermissionChecker,
+    private val permissionRequester: NotificationPermissionRequester,
     private val resultBus: MainTaskSettingsResultBus
 ) : ViewModel() {
 
@@ -22,7 +27,9 @@ internal class MainTaskSettingsViewModel(
         MainTaskSettingsUiState.Ready(
             selectedDueDate = currentDueDate,
             recurrenceState = rruleToRecurrenceState(currentRecurrence),
-            initialDateMillis = dueDateToUtcMillis(currentDueDate)
+            initialDateMillis = dueDateToUtcMillis(currentDueDate),
+            isNotificationEnabled = currentIsNotificationEnabled,
+            isNotificationToggleEnabled = rruleToRecurrenceState(currentRecurrence) != RecurrenceState.Off
         )
     )
     val uiState: StateFlow<MainTaskSettingsUiState> = _uiState.asStateFlow()
@@ -40,6 +47,11 @@ internal class MainTaskSettingsViewModel(
         confirm()
     }
 
+    fun onNotificationToggleChanged(enabled: Boolean) {
+        updateReady { it.copy(isNotificationEnabled = enabled) }
+        confirm()
+    }
+
     fun onRecurrenceIntervalSelected(interval: RecurrenceInterval) {
         val newRecurrenceState = when (interval) {
             RecurrenceInterval.Off -> RecurrenceState.Off
@@ -50,10 +62,20 @@ internal class MainTaskSettingsViewModel(
         }
 
         updateReady { state ->
-            state.copy(
-                recurrenceState = newRecurrenceState,
-                showRecurrenceValidationErrors = false
-            )
+            if (interval == RecurrenceInterval.Off) {
+                state.copy(
+                    recurrenceState = newRecurrenceState,
+                    isNotificationEnabled = false,
+                    isNotificationToggleEnabled = false,
+                    showRecurrenceValidationErrors = false
+                )
+            } else {
+                state.copy(
+                    recurrenceState = newRecurrenceState,
+                    isNotificationToggleEnabled = true,
+                    showRecurrenceValidationErrors = false
+                )
+            }
         }
         confirm()
     }
@@ -90,10 +112,38 @@ internal class MainTaskSettingsViewModel(
                 MainTaskSettingsResult(
                     mainTaskId = mainTaskId,
                     dueDate = currentState.selectedDueDate,
-                    recurrence = currentState.recurrenceState.toRrule()
+                    recurrence = currentState.recurrenceState.toRrule(),
+                    isNotificationEnabled = currentState.isNotificationEnabled
                 )
             )
         }
         return true
+    }
+
+    fun onScreenLeaving() {
+        viewModelScope.launch {
+            val state = _uiState.value as? MainTaskSettingsUiState.Ready ?: return@launch
+
+            if (!state.isNotificationEnabled || state.recurrenceState == RecurrenceState.Off) {
+                return@launch
+            }
+
+            val isGranted = runCatching { permissionChecker.isGranted() }.getOrDefault(false)
+            if (isGranted) return@launch
+
+            val wasGranted = runCatching { permissionRequester.request() }.getOrDefault(false)
+            if (wasGranted) return@launch
+
+            updateReady { it.copy(isNotificationEnabled = false) }
+
+            resultBus.emit(
+                MainTaskSettingsResult(
+                    mainTaskId = mainTaskId,
+                    dueDate = state.selectedDueDate,
+                    recurrence = state.recurrenceState.toRrule(),
+                    isNotificationEnabled = false
+                )
+            )
+        }
     }
 }

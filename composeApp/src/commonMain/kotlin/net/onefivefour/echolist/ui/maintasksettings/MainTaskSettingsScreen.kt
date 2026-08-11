@@ -3,6 +3,7 @@ package net.onefivefour.echolist.ui.maintasksettings
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.imePadding
@@ -12,11 +13,13 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.flow.drop
@@ -36,7 +39,8 @@ internal fun MainTaskSettingsScreen(
     uiState: MainTaskSettingsUiState,
     onDateSelected: (Long) -> Unit,
     onRecurrenceIntervalSelected: (RecurrenceInterval) -> Unit,
-    onRecurrenceDetailChanged: (RecurrenceState) -> Unit
+    onRecurrenceDetailChanged: (RecurrenceState) -> Unit,
+    onNotificationToggleChanged: (Boolean) -> Unit
 ) {
     when (uiState) {
         is MainTaskSettingsUiState.Loading -> Unit
@@ -44,7 +48,8 @@ internal fun MainTaskSettingsScreen(
             uiState = uiState,
             onDateSelected = onDateSelected,
             onRecurrenceIntervalSelected = onRecurrenceIntervalSelected,
-            onRecurrenceDetailChanged = onRecurrenceDetailChanged
+            onRecurrenceDetailChanged = onRecurrenceDetailChanged,
+            onNotificationToggleChanged = onNotificationToggleChanged
         )
     }
 }
@@ -55,7 +60,8 @@ private fun MainTaskSettingsContent(
     uiState: MainTaskSettingsUiState.Ready,
     onDateSelected: (Long) -> Unit,
     onRecurrenceIntervalSelected: (RecurrenceInterval) -> Unit,
-    onRecurrenceDetailChanged: (RecurrenceState) -> Unit
+    onRecurrenceDetailChanged: (RecurrenceState) -> Unit,
+    onNotificationToggleChanged: (Boolean) -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = uiState.initialDateMillis
@@ -99,6 +105,32 @@ private fun MainTaskSettingsContent(
                 showValidationErrors = uiState.showRecurrenceValidationErrors,
                 onRecurrenceDetailChanged = onRecurrenceDetailChanged
             )
+        }
+
+        SettingsSection(title = "Notifications") {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Erinnern",
+                    style = EchoListTheme.typography.bodyMedium
+                )
+                Switch(
+                    checked = uiState.isNotificationEnabled,
+                    onCheckedChange = onNotificationToggleChanged,
+                    enabled = uiState.isNotificationToggleEnabled
+                )
+            }
+
+            AnimatedVisibility(visible = !uiState.isNotificationToggleEnabled) {
+                Text(
+                    text = "Notifications sind nur bei aktiver Wiederholung verfügbar.",
+                    style = EchoListTheme.typography.bodySmall,
+                    color = EchoListTheme.materialColors.onSurfaceVariant
+                )
+            }
         }
 
         AnimatedVisibility(visible = uiState.showDueDateRequiredError) {

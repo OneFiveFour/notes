@@ -255,7 +255,8 @@ private fun AuthenticatedApp() {
                     parametersOf(
                         route.mainTaskId,
                         route.currentDueDate,
-                        route.currentRecurrence
+                        route.currentRecurrence,
+                        route.currentIsNotificationEnabled
                     )
                 }
 
@@ -265,7 +266,8 @@ private fun AuthenticatedApp() {
                     uiState = uiState,
                     onDateSelected = viewModel::onDateSelected,
                     onRecurrenceIntervalSelected = viewModel::onRecurrenceIntervalSelected,
-                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged
+                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
+                    onNotificationToggleChanged = viewModel::onNotificationToggleChanged
                 )
             }
         }

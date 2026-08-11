@@ -195,6 +195,9 @@ val navigationModule: Module = module {
             mainTaskId = params.get(),
             currentDueDate = params.get(),
             currentRecurrence = params.get(),
+            currentIsNotificationEnabled = params.get(),
+            permissionChecker = get(),
+            permissionRequester = get(),
             resultBus = get()
         )
     }

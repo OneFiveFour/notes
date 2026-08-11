@@ -176,6 +176,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494015
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455771692
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455774309
       }
     ],
     "4.1 Add new constructor parameters to `MainTaskSettingsViewModel`": [
@@ -183,6 +193,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494057
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455779111
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455842292
       }
     ],
     "4.2 Extend `MainTaskSettingsUiState.Ready` with notification fields": [
@@ -190,6 +210,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494086
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455779957
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455843091
       }
     ],
     "4.3 Implement `onNotificationToggleChanged(enabled: Boolean)`": [
@@ -197,6 +227,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494112
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455847370
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455962018
       }
     ],
     "4.4 Modify `onRecurrenceIntervalSelected` for auto-disable": [
@@ -204,6 +244,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494139
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455848082
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455962844
       }
     ],
     "4.5 Modify `confirm()` to include `isNotificationEnabled` in emitted result": [
@@ -211,6 +261,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494166
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455848866
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455963711
       }
     ],
     "4.6 Implement `onScreenLeaving()` with permission check/request logic": [
@@ -218,6 +278,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494192
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455849772
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455964567
       }
     ],
     "4.7 Write property tests for ViewModel (Properties 1–4)": [
@@ -225,6 +295,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494239
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455969113
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456699249
       }
     ],
     "5.1 Add `onNotificationToggleChanged` callback parameter to `MainTaskSettingsScreen`": [
@@ -232,6 +312,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494288
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455970012
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456700349
       }
     ],
     "5.2 Add \"Notifications\" `SettingsSection` with Material 3 Switch": [
@@ -239,6 +329,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494327
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455970891
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456701437
       }
     ],
     "5.3 Add helper text when toggle is disabled": [
@@ -246,6 +346,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494368
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455971632
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456702423
       }
     ],
     "5.4 Wire the new callback in `MainTaskSettingsContent`": [
@@ -253,6 +363,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494407
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455972528
+      },
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456703608
       }
     ],
     "6.1 Update `EditTaskListViewModel` settingsResultBus collector": [
@@ -351,6 +471,20 @@
         "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
         "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
         "timestamp": 1786455137575
+      }
+    ],
+    "4. UI Layer — MainTaskSettingsViewModel Permission Logic": [
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456699302
+      }
+    ],
+    "5. UI Layer — MainTaskSettingsScreen Toggle": [
+      {
+        "executionId": "68124a04-c823-424e-954f-912e6df77718",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786456703661
       }
     ]
   }

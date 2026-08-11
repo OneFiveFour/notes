@@ -16,6 +16,8 @@ import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.domain.repository.TaskListRepository
+import net.onefivefour.echolist.testutil.NoOpNotificationPermissionChecker
+import net.onefivefour.echolist.testutil.NoOpNotificationPermissionRequester
 import net.onefivefour.echolist.testutil.NoOpNotificationScheduler
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
@@ -122,6 +124,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = draft.id,
                 currentDueDate = draft.dueDateState.text.toString(),
                 currentRecurrence = draft.recurrenceState.text.toString(),
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             val readyState = settingsVm.uiState.value
@@ -184,6 +189,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = "task-1",
                 currentDueDate = "",
                 currentRecurrence = "",
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -210,6 +218,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = "task-1",
                 currentDueDate = updatedTask.dueDate,
                 currentRecurrence = updatedTask.recurrence,
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -261,6 +272,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = "task-1",
                 currentDueDate = "",
                 currentRecurrence = "",
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -322,6 +336,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = "task-2",
                 currentDueDate = "",
                 currentRecurrence = "",
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()
@@ -350,6 +367,9 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
                 mainTaskId = "task-2",
                 currentDueDate = updatedTask.dueDate,
                 currentRecurrence = updatedTask.recurrence,
+                currentIsNotificationEnabled = true,
+                permissionChecker = NoOpNotificationPermissionChecker(),
+                permissionRequester = NoOpNotificationPermissionRequester(),
                 resultBus = resultBus
             )
             testScheduler.advanceUntilIdle()

@@ -69,36 +69,36 @@ Implementation proceeds bottom-up: domain model changes → data layer extension
     - Tag: `Feature: notification-permission-toggle, Property 6: Route-Parameter Round-Trip`
     - **Validates: Requirements 2.4**
 
-- [~] 3. Checkpoint — Domain & Data Layer
+- [x] 3. Checkpoint — Domain & Data Layer
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. UI Layer — MainTaskSettingsViewModel Permission Logic
-  - [~] 4.1 Add new constructor parameters to `MainTaskSettingsViewModel`
+- [x] 4. UI Layer — MainTaskSettingsViewModel Permission Logic
+  - [x] 4.1 Add new constructor parameters to `MainTaskSettingsViewModel`
     - Add `currentIsNotificationEnabled: Boolean`, `permissionChecker: NotificationPermissionChecker`, `permissionRequester: NotificationPermissionRequester`
     - Initialize UI state with `isNotificationEnabled = currentIsNotificationEnabled` and compute `isNotificationToggleEnabled` from recurrence state
     - _Requirements: 2.4, 3.1_
 
-  - [~] 4.2 Extend `MainTaskSettingsUiState.Ready` with notification fields
+  - [x] 4.2 Extend `MainTaskSettingsUiState.Ready` with notification fields
     - Add `val isNotificationEnabled: Boolean = true`
     - Add `val isNotificationToggleEnabled: Boolean = true`
     - _Requirements: 1.1, 1.4, 7.1_
 
-  - [~] 4.3 Implement `onNotificationToggleChanged(enabled: Boolean)`
+  - [x] 4.3 Implement `onNotificationToggleChanged(enabled: Boolean)`
     - Update `isNotificationEnabled` in the Ready state via `updateReady`
     - Call `confirm()` to emit result immediately (no permission logic here)
     - _Requirements: 1.3_
 
-  - [~] 4.4 Modify `onRecurrenceIntervalSelected` for auto-disable
+  - [x] 4.4 Modify `onRecurrenceIntervalSelected` for auto-disable
     - When interval is `RecurrenceInterval.Off`: set `isNotificationEnabled = false` and `isNotificationToggleEnabled = false`
     - When interval is not Off: set `isNotificationToggleEnabled = true`, preserve current `isNotificationEnabled`
     - _Requirements: 1.4, 1.5_
 
-  - [~] 4.5 Modify `confirm()` to include `isNotificationEnabled` in emitted result
+  - [x] 4.5 Modify `confirm()` to include `isNotificationEnabled` in emitted result
     - Add `isNotificationEnabled = currentState.isNotificationEnabled` to the `MainTaskSettingsResult` constructor call inside `confirm()`
     - `confirm()` remains synchronous and contains NO permission checking logic — it emits immediately on every change
     - _Requirements: 2.3_
 
-  - [~] 4.6 Implement `onScreenLeaving()` with permission check/request logic
+  - [x] 4.6 Implement `onScreenLeaving()` with permission check/request logic
     - Add new public method `fun onScreenLeaving()` that launches a coroutine in `viewModelScope`
     - Logic:
       1. Read current state; if not Ready, return
@@ -109,7 +109,7 @@ Implementation proceeds bottom-up: domain model changes → data layer extension
     - This is the ONLY place where permission checking occurs
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3_
 
-  - [~] 4.7 Write property tests for ViewModel (Properties 1–4)
+  - [x] 4.7 Write property tests for ViewModel (Properties 1–4)
     - **Property 1: Toggle-Konsistenz** — For all Boolean `enabled` values, `onNotificationToggleChanged(enabled)` results in emitted `MainTaskSettingsResult.isNotificationEnabled` matching the enabled value (immediate emission via confirm(), no permission involved)
     - **Property 2: Recurrence.Off erzwingt Deaktivierung** — For all active RecurrenceState values, switching to Off sets `isNotificationEnabled=false` and `isNotificationToggleEnabled=false`
     - **Property 3: Berechtigungsprüfungs-Guard (onScreenLeaving)** — For all `(isNotificationEnabled, recurrenceState)` combinations, when `onScreenLeaving()` is called: permissionChecker is only called when `isNotificationEnabled == true` AND `recurrenceState != Off`
@@ -119,25 +119,25 @@ Implementation proceeds bottom-up: domain model changes → data layer extension
     - Tags: `Feature: notification-permission-toggle, Property {N}: {Title}`
     - **Validates: Requirements 1.3, 1.4, 1.5, 2.3, 3.1, 3.4, 4.2, 4.3**
 
-- [ ] 5. UI Layer — MainTaskSettingsScreen Toggle
-  - [~] 5.1 Add `onNotificationToggleChanged` callback parameter to `MainTaskSettingsScreen`
+- [x] 5. UI Layer — MainTaskSettingsScreen Toggle
+  - [x] 5.1 Add `onNotificationToggleChanged` callback parameter to `MainTaskSettingsScreen`
     - Add `onNotificationToggleChanged: (Boolean) -> Unit` to both the outer `MainTaskSettingsScreen` and inner `MainTaskSettingsContent` composables
     - _Requirements: 1.3, 7.1_
 
-  - [~] 5.2 Add "Notifications" `SettingsSection` with Material 3 Switch
+  - [x] 5.2 Add "Notifications" `SettingsSection` with Material 3 Switch
     - Place below the "Repeat" section
     - Use `Switch` composable bound to `uiState.isNotificationEnabled` with `enabled = uiState.isNotificationToggleEnabled`
     - Label text "Erinnern" with `EchoListTheme.typography.bodyMedium`
     - Use `EchoListTheme.materialColors`, `EchoListTheme.dimensions` for all styling
     - _Requirements: 7.1, 7.2, 7.4_
 
-  - [~] 5.3 Add helper text when toggle is disabled
+  - [x] 5.3 Add helper text when toggle is disabled
     - Use `AnimatedVisibility(visible = !uiState.isNotificationToggleEnabled)`
     - Display explanatory text: "Notifications sind nur bei aktiver Wiederholung verfügbar."
     - Use `EchoListTheme.typography.bodySmall` and `EchoListTheme.materialColors.onSurfaceVariant`
     - _Requirements: 7.3_
 
-  - [~] 5.4 Wire the new callback in `MainTaskSettingsContent`
+  - [x] 5.4 Wire the new callback in `MainTaskSettingsContent`
     - Pass `onNotificationToggleChanged` through to the Switch `onCheckedChange`
     - _Requirements: 1.3_
 
