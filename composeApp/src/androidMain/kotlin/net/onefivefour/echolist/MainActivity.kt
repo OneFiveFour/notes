@@ -85,33 +85,35 @@ class MainActivity : ComponentActivity() {
 
             App()
 
-            // Rationale dialog — explains why notifications are needed
-            if (showRationaleDialog) {
-                NotificationRationaleDialog(
-                    onConfirm = {
-                        showRationaleDialog = false
-                        launchPermissionRequest()
-                    },
-                    onDismiss = {
-                        showRationaleDialog = false
-                        permissionBridge.deliverResult(false)
-                    }
-                )
-            }
+            EchoListTheme {
+                // Rationale dialog — explains why notifications are needed
+                if (showRationaleDialog) {
+                    NotificationRationaleDialog(
+                        onConfirm = {
+                            showRationaleDialog = false
+                            launchPermissionRequest()
+                        },
+                        onDismiss = {
+                            showRationaleDialog = false
+                            permissionBridge.deliverResult(false)
+                        }
+                    )
+                }
 
-            // Settings redirect dialog — user permanently denied permission
-            if (showSettingsDialog) {
-                NotificationSettingsDialog(
-                    onOpenSettings = {
-                        showSettingsDialog = false
-                        awaitingSettingsReturn = true
-                        openAppNotificationSettings()
-                    },
-                    onDismiss = {
-                        showSettingsDialog = false
-                        permissionBridge.deliverResult(false)
-                    }
-                )
+                // Settings redirect dialog — user permanently denied permission
+                if (showSettingsDialog) {
+                    NotificationSettingsDialog(
+                        onOpenSettings = {
+                            showSettingsDialog = false
+                            awaitingSettingsReturn = true
+                            openAppNotificationSettings()
+                        },
+                        onDismiss = {
+                            showSettingsDialog = false
+                            permissionBridge.deliverResult(false)
+                        }
+                    )
+                }
             }
         }
     }
