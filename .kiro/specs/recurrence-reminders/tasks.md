@@ -50,17 +50,17 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - For each `DueDateUrgency` value, verify the returned color pair matches the specification
     - **Validates: Requirements 2.1, 2.2, 2.3**
 
-- [~] 3. Checkpoint - Urgency coloring complete
+- [x] 3. Checkpoint - Urgency coloring complete
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 4. Implement NotificationScheduler interface and scheduling logic
-  - [~] 4.1 Create NotificationScheduler interface in domain layer
+- [x] 4. Implement NotificationScheduler interface and scheduling logic
+  - [x] 4.1 Create NotificationScheduler interface in domain layer
     - Define `NotificationScheduler` interface in `commonMain/domain/` with `schedule()` and `cancel()` suspend functions
     - `schedule(taskId: String, title: String, body: String, dueDateIso: String)`
     - `cancel(taskId: String)`
     - _Requirements: 4.1, 4.2, 4.5_
 
-  - [~] 4.2 Create TaskNotificationData model and scheduleTaskNotification helper
+  - [x] 4.2 Create TaskNotificationData model and scheduleTaskNotification helper
     - Define `TaskNotificationData` data class with `taskId`, `taskDescription`, `taskListName`, `dueDateIso`
     - Implement `scheduleTaskNotification(scheduler, task, taskListName)` suspend function
     - If task has blank dueDate or blank recurrence → call `cancel(task.id)`
@@ -68,7 +68,7 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Skip scheduling if dueDate is strictly before today
     - _Requirements: 4.1, 4.3, 5.1, 5.2, 5.3, 5.5, 8.1, 8.2_
 
-  - [~] 4.3 Write unit tests for notification scheduling logic
+  - [x] 4.3 Write unit tests for notification scheduling logic
     - Use a fake `NotificationScheduler` implementation to capture calls
     - Verify `schedule` is called when task has valid dueDate + recurrence
     - Verify `cancel` is called when recurrence is empty
