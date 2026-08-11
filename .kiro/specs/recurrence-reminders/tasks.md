@@ -119,20 +119,20 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Skip scheduling if due date is before today
     - _Requirements: 5.4, 6.5, 7.1, 8.1_
 
-- [ ] 6. Wire DI bindings and ViewModel integration
-  - [~] 6.1 Add NotificationScheduler Koin bindings per platform
+- [x] 6. Wire DI bindings and ViewModel integration
+  - [x] 6.1 Add NotificationScheduler Koin bindings per platform
     - Bind `NotificationScheduler` interface in each platform's Koin module (`androidMain`, `iosMain`, `jvmMain`, `jsMain`, `wasmJsMain`)
     - Use `single<NotificationScheduler> { PlatformNotificationScheduler(...) }` pattern
     - _Requirements: 6.6_
 
-  - [~] 6.2 Integrate notification scheduling in EditTaskListViewModel
+  - [x] 6.2 Integrate notification scheduling in EditTaskListViewModel
     - Inject `NotificationScheduler` via Koin into `EditTaskListViewModel`
     - Call `scheduleTaskNotification()` when a task with recurrence is saved/updated
     - Call `scheduler.cancel(taskId)` when a task is deleted
     - Launch scheduling on `viewModelScope` with `Dispatchers.Default`
     - _Requirements: 4.1, 4.3, 4.4_
 
-  - [~] 6.3 Write unit tests for ViewModel notification integration
+  - [x] 6.3 Write unit tests for ViewModel notification integration
     - Use fake `NotificationScheduler` to verify scheduling/cancellation calls
     - Verify saving task with recurrence triggers `schedule`
     - Verify deleting task triggers `cancel`
@@ -140,10 +140,10 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - **Property 6: Notification idempotency**
     - **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
 
-- [ ] 7. Checkpoint - Full feature integration complete
+- [x] 7. Checkpoint - Full feature integration complete
   - Ensure all tests pass, ask the user if questions arise.
 
-  - [~] 7.1 Write property tests for notification idempotency and permission handling
+  - [x] 7.1 Write property tests for notification idempotency and permission handling
     - **Property 6: Notification idempotency** — scheduling twice results in exactly one pending notification
     - **Property 9: Permission denied is a no-op** — verify no exception, no scheduling when permission denied
     - Use fake scheduler with state tracking to verify single-notification invariant

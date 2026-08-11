@@ -18,17 +18,21 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
+import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.data.dto.CreateTaskListParams
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.domain.NotificationScheduler
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.repository.TaskListRepository
+import net.onefivefour.echolist.domain.scheduleTaskNotification
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 internal class EditTaskListViewModel(
     private val mode: EditTaskListMode,
     private val taskListRepository: TaskListRepository,
-    private val settingsResultBus: MainTaskSettingsResultBus
+    private val settingsResultBus: MainTaskSettingsResultBus,
+    private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
     private data class SyncSnapshot(
@@ -97,7 +101,11 @@ internal class EditTaskListViewModel(
 
     fun onRemoveMainTask(index: Int) {
         if (index !in tasks.indices) return
+        val removedTaskId = tasks[index].id
         tasks.removeAt(index)
+        viewModelScope.launch(Dispatchers.Default) {
+            notificationScheduler.cancel(removedTaskId)
+        }
         requestSync()
     }
 
@@ -179,6 +187,12 @@ internal class EditTaskListViewModel(
         viewModelScope.launch {
             taskListRepository.deleteTaskList(taskListId).fold(
                 onSuccess = {
+                    // Cancel notifications for all tasks before navigating back
+                    launch(Dispatchers.Default) {
+                        for (task in tasks) {
+                            notificationScheduler.cancel(task.id)
+                        }
+                    }
                     _uiState.update { it.copy(isSaving = false) }
                     _navigateBack.emit(Unit)
                 },
@@ -288,6 +302,9 @@ internal class EditTaskListViewModel(
                             error = null
                         )
                     }
+
+                    // Schedule/cancel notifications for all tasks after successful sync
+                    scheduleNotifications(taskList.name, taskList.tasks)
                 },
                 onFailure = { e ->
                     pendingCompletionTaskIds.clear()
@@ -387,6 +404,14 @@ internal class EditTaskListViewModel(
         }
 
         return null
+    }
+
+    private fun scheduleNotifications(taskListName: String, domainTasks: List<MainTask>) {
+        viewModelScope.launch(Dispatchers.Default) {
+            for (task in domainTasks) {
+                scheduleTaskNotification(notificationScheduler, task, taskListName)
+            }
+        }
     }
 
     private fun TaskList.toSyncSnapshot(): SyncSnapshot = SyncSnapshot(

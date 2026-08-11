@@ -186,7 +186,8 @@ val navigationModule: Module = module {
         EditTaskListViewModel(
             mode = params.get<EditTaskListMode>(),
             taskListRepository = get(),
-            settingsResultBus = get()
+            settingsResultBus = get(),
+            notificationScheduler = get()
         )
     }
     viewModel { params ->

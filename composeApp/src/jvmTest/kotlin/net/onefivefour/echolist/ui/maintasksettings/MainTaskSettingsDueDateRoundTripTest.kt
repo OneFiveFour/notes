@@ -16,6 +16,7 @@ import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.domain.repository.TaskListRepository
+import net.onefivefour.echolist.testutil.NoOpNotificationScheduler
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 
@@ -106,7 +107,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus
+                settingsResultBus = resultBus,
+                notificationScheduler = NoOpNotificationScheduler()
             )
 
             editVm.uiState.value.titleState.edit { replace(0, length, "Draft list") }
@@ -172,7 +174,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-1"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus
+                settingsResultBus = resultBus,
+                notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()
 
@@ -248,7 +251,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-1"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus
+                settingsResultBus = resultBus,
+                notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()
 
@@ -308,7 +312,8 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-2"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus
+                settingsResultBus = resultBus,
+                notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()
 
