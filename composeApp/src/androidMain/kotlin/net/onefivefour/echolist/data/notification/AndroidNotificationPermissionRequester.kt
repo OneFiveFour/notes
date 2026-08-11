@@ -8,26 +8,33 @@ import androidx.core.content.ContextCompat
 import net.onefivefour.echolist.domain.NotificationPermissionRequester
 
 /**
- * Android implementation of [NotificationPermissionRequester].
+ * Android implementation of [NotificationPermissionRequester] that delegates
+ * the actual permission request to the Activity via [PermissionResultBridge].
  *
- * On API 33+ (Tiramisu), runtime notification permission is required.
- * Since requesting a permission dialog requires an Activity context with an
- * ActivityResultLauncher, and this class operates at the ViewModel/DI layer,
- * it checks the current permission status. If permission is not yet granted,
- * it returns false so the toggle gets deactivated gracefully.
- *
- * The actual system permission dialog should be triggered via the Activity's
- * registered ActivityResultLauncher when a more interactive flow is implemented.
- * For now, this serves as a safe fallback that prevents scheduling notifications
- * without proper permission.
+ * The bridge emits a generic request; the Activity handles the full permission flow
+ * including rationale display, system dialog, and settings redirect if needed.
+ * Once the flow completes, the Activity delivers the result back through the bridge.
  */
 class AndroidNotificationPermissionRequester(
-    private val context: Context
+    private val context: Context,
+    private val bridge: PermissionResultBridge
 ) : NotificationPermissionRequester {
+
     override suspend fun request(): Boolean {
+        // Below API 33, no runtime permission needed
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
             return true
         }
+
+        // Already granted — no need to ask
+        if (isGranted()) return true
+
+        // Delegate to the Activity via the bridge.
+        // The Activity will determine the right UI to show (rationale, system dialog, or settings).
+        return bridge.awaitPermission()
+    }
+
+    private fun isGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
             Manifest.permission.POST_NOTIFICATIONS
