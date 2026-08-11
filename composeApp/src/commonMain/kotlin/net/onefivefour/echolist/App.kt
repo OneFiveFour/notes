@@ -234,13 +234,14 @@ private fun AuthenticatedApp() {
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
-                    onNavigateToSettings = { mainTaskId, currentDueDate, currentRecurrence ->
+                    onNavigateToSettings = { mainTaskId, currentDueDate, currentRecurrence, currentIsNotificationEnabled ->
                         viewModel.onSettingsNavigationStarted()
                         backStack.add(
                             MainTaskSettingsRoute(
                                 mainTaskId = mainTaskId,
                                 currentDueDate = currentDueDate,
-                                currentRecurrence = currentRecurrence
+                                currentRecurrence = currentRecurrence,
+                                currentIsNotificationEnabled = currentIsNotificationEnabled
                             )
                         )
                     },
@@ -261,6 +262,10 @@ private fun AuthenticatedApp() {
                 }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+                DisposableEffect(viewModel) {
+                    onDispose { viewModel.onScreenLeaving() }
+                }
 
                 MainTaskSettingsScreen(
                     uiState = uiState,

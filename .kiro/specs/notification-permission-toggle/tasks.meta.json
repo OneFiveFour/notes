@@ -380,6 +380,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494452
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457081288
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457234789
       }
     ],
     "6.2 Update `onNavigateToSettings` callback to pass `isNotificationEnabled`": [
@@ -387,6 +397,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494509
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457082317
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457235685
       }
     ],
     "6.3 Update Koin binding for `MainTaskSettingsViewModel` in `AppModules.kt`": [
@@ -394,6 +414,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494564
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457083370
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457236633
       }
     ],
     "6.4 Update `entry<MainTaskSettingsRoute>` in `App.kt` with DisposableEffect and new params": [
@@ -401,6 +431,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454494594
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457084650
+      },
+      {
+        "executionId": "d8605297-aa06-4f92-abb6-dd270598f17e",
+        "chatSessionId": "sess_9f2e3116-295c-4578-91f4-f9a84eaad44b",
+        "timestamp": 1786457237884
       }
     ],
     "6.5 Write integration tests for toggle deactivation → sync → cancel flow": [

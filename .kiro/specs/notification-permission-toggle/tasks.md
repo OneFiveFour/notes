@@ -141,23 +141,23 @@ Implementation proceeds bottom-up: domain model changes → data layer extension
     - Pass `onNotificationToggleChanged` through to the Switch `onCheckedChange`
     - _Requirements: 1.3_
 
-- [ ] 6. Integration — EditTaskListViewModel & Navigation Wiring
-  - [~] 6.1 Update `EditTaskListViewModel` settingsResultBus collector
+- [~] 6. Integration — EditTaskListViewModel & Navigation Wiring
+  - [x] 6.1 Update `EditTaskListViewModel` settingsResultBus collector
     - In the `collect` block, also update `task.isNotificationEnabled = result.isNotificationEnabled`
     - This ensures the new flag is synced when the settings screen emits results
     - _Requirements: 5.3_
 
-  - [~] 6.2 Update `onNavigateToSettings` callback to pass `isNotificationEnabled`
+  - [x] 6.2 Update `onNavigateToSettings` callback to pass `isNotificationEnabled`
     - In `App.kt` inside `entry<EditTaskListRoute>`, change `onNavigateToSettings` lambda signature to accept a 4th parameter: `currentIsNotificationEnabled: Boolean`
     - Pass `currentIsNotificationEnabled` to `MainTaskSettingsRoute` constructor
     - In `EditTaskListScreen`, pass `mainTask.isNotificationEnabled` as the 4th argument when invoking `onNavigateToSettings`
     - _Requirements: 2.4_
 
-  - [~] 6.3 Update Koin binding for `MainTaskSettingsViewModel` in `AppModules.kt`
+  - [x] 6.3 Update Koin binding for `MainTaskSettingsViewModel` in `AppModules.kt`
     - Add `currentIsNotificationEnabled = params.get()` and inject `permissionChecker = get()` and `permissionRequester = get()`
     - _Requirements: 6.3_
 
-  - [~] 6.4 Update `entry<MainTaskSettingsRoute>` in `App.kt` with DisposableEffect and new params
+  - [x] 6.4 Update `entry<MainTaskSettingsRoute>` in `App.kt` with DisposableEffect and new params
     - Pass `route.currentIsNotificationEnabled` as 4th param to ViewModel via `parametersOf`
     - Add `DisposableEffect(viewModel) { onDispose { viewModel.onScreenLeaving() } }` to trigger permission check on back-navigation
     - Pass `onNotificationToggleChanged = viewModel::onNotificationToggleChanged` to `MainTaskSettingsScreen`

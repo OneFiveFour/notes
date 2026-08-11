@@ -21,7 +21,7 @@ internal fun TaskList(
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
     onMainTaskDescriptionFocusChanged: (String, Boolean) -> Unit,
-    onNavigateToSettings: (String, String, String) -> Unit,
+    onNavigateToSettings: (String, String, String, Boolean) -> Unit,
     focusTarget: FocusTarget?,
     onFocusHandled: () -> Unit,
     onMainTaskKeyboardAction: (String) -> Unit,
@@ -53,7 +53,8 @@ internal fun TaskList(
                     onNavigateToSettings(
                         mainTask.id,
                         mainTask.dueDateState.text.toString(),
-                        mainTask.recurrenceState.text.toString()
+                        mainTask.recurrenceState.text.toString(),
+                        mainTask.isNotificationEnabled
                     )
                 },
                 onMainTaskKeyboardAction = onMainTaskKeyboardAction,

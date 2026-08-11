@@ -84,6 +84,7 @@ internal class EditTaskListViewModel(
                 val task = uiMainTasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)
+                task.isNotificationEnabled = result.isNotificationEnabled
                 sortTasksByDueDate()
                 _uiState.update { it.copy(error = null) }
                 requestSync()
