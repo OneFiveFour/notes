@@ -23,29 +23,29 @@ This plan implements two capabilities for the EchoList task list editor: (1) vis
     - Verify monotonicity: for dueDate1 < dueDate2, urgency(dueDate1) ≥ urgency(dueDate2) in severity
     - **Validates: Requirements 1.1, 1.2, 1.3, 1.4, 1.5, 3.1, 3.2**
 
-- [ ] 2. Implement urgency color resolution and update DueDateTag composable
-  - [~] 2.1 Create resolveUrgencyColors composable helper
+- [x] 2. Implement urgency color resolution and update DueDateTag composable
+  - [x] 2.1 Create resolveUrgencyColors composable helper
     - Create `resolveUrgencyColors(urgency: DueDateUrgency): Pair<Color, Color>` in `commonMain/ui/` near DueDateTag
     - Map `Normal` → `(EchoListTheme.materialColors.surfaceVariant, EchoListTheme.materialColors.onSurfaceVariant)`
     - Map `Warning` → `(EchoListTheme.echoListColorScheme.warning, EchoListTheme.echoListColorScheme.onWarning)`
     - Map `Overdue` → `(EchoListTheme.materialColors.error, EchoListTheme.materialColors.onError)`
     - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-  - [~] 2.2 Update DueDateTag composable to accept and render urgency
+  - [x] 2.2 Update DueDateTag composable to accept and render urgency
     - Add `urgency: DueDateUrgency` parameter to `DueDateTag`
     - Call `resolveUrgencyColors(urgency)` to obtain background and text colors
     - Apply background color to the pill `Surface` and text color to `Text` and recurrence `Icon` tint
     - Ensure DueDateTag remains stateless — urgency is computed externally
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 2.5, 2.6_
 
-  - [~] 2.3 Update MainTaskEditorCard to compute urgency and pass to DueDateTag
+  - [x] 2.3 Update MainTaskEditorCard to compute urgency and pass to DueDateTag
     - Import `Clock.System.todayIn(TimeZone.currentSystemDefault())` for current date
     - Use `remember` keyed on dueDate text and today to compute urgency
     - Handle unparseable/empty dates by defaulting to `DueDateUrgency.Normal`
     - Pass computed urgency to the `DueDateTag` composable call
     - _Requirements: 1.1, 1.2, 1.3, 3.1, 3.2_
 
-  - [~] 2.4 Write property test for color resolution correctness
+  - [x] 2.4 Write property test for color resolution correctness
     - **Property 3: Color resolution correctness**
     - For each `DueDateUrgency` value, verify the returned color pair matches the specification
     - **Validates: Requirements 2.1, 2.2, 2.3**
