@@ -6,5 +6,6 @@ data class MainTask(
     val isDone: Boolean,
     val dueDate: String,
     val recurrence: String,
+    val isNotificationEnabled: Boolean = true,
     val subTasks: List<SubTask>
 )

@@ -10,6 +10,7 @@ import net.onefivefour.echolist.domain.model.MainTask
  * Determines whether a task needs a notification and either schedules or cancels it.
  *
  * Scheduling rules:
+ * - If the task has isNotificationEnabled set to false, any existing notification is canceled immediately.
  * - If the task has a blank dueDate or blank recurrence, any existing notification is canceled.
  * - If the dueDate cannot be parsed as a valid ISO-8601 date, the notification is canceled.
  * - If the dueDate is strictly before today, scheduling is skipped (no schedule, no cancel).
@@ -24,6 +25,12 @@ suspend fun scheduleTaskNotification(
     task: MainTask,
     taskListName: String
 ) {
+    // Guard: per-task notifications disabled → cancel and return immediately
+    if (!task.isNotificationEnabled) {
+        scheduler.cancel(task.id)
+        return
+    }
+
     if (task.dueDate.isBlank() || task.recurrence.isBlank()) {
         scheduler.cancel(task.id)
         return

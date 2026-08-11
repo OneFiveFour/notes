@@ -1,0 +1,300 @@
+{
+  "pbtResults": {},
+  "executionHistory": {
+    "1.1 Add `isNotificationEnabled` field to `MainTask` data class": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493538
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454521985
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454629262
+      }
+    ],
+    "1.2 Add early-return guard in `scheduleTaskNotification`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493567
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454640212
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454699663
+      }
+    ],
+    "1.3 Create `NotificationPermissionChecker` interface": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493735
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454522889
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454630046
+      }
+    ],
+    "1.4 Create `NotificationPermissionRequester` interface": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493771
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454523709
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454630888
+      }
+    ],
+    "1.5 Write property tests for `scheduleTaskNotification` with `isNotificationEnabled=false`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493817
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454714498
+      },
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454823670
+      }
+    ],
+    "2.1 Add `isNotificationEnabled` field to `UiMainTask`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493845
+      }
+    ],
+    "2.2 Add `isNotificationEnabled` to `MainTaskSettingsResult`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493873
+      }
+    ],
+    "2.3 Add `currentIsNotificationEnabled` to `MainTaskSettingsRoute`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493900
+      }
+    ],
+    "2.4 Ensure `isNotificationEnabled` is preserved locally during sync": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493926
+      }
+    ],
+    "2.5 Write property test for route serialization round-trip": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454493962
+      }
+    ],
+    "3. Checkpoint — Domain & Data Layer": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494015
+      }
+    ],
+    "4.1 Add new constructor parameters to `MainTaskSettingsViewModel`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494057
+      }
+    ],
+    "4.2 Extend `MainTaskSettingsUiState.Ready` with notification fields": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494086
+      }
+    ],
+    "4.3 Implement `onNotificationToggleChanged(enabled: Boolean)`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494112
+      }
+    ],
+    "4.4 Modify `onRecurrenceIntervalSelected` for auto-disable": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494139
+      }
+    ],
+    "4.5 Modify `confirm()` to include `isNotificationEnabled` in emitted result": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494166
+      }
+    ],
+    "4.6 Implement `onScreenLeaving()` with permission check/request logic": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494192
+      }
+    ],
+    "4.7 Write property tests for ViewModel (Properties 1–4)": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494239
+      }
+    ],
+    "5.1 Add `onNotificationToggleChanged` callback parameter to `MainTaskSettingsScreen`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494288
+      }
+    ],
+    "5.2 Add \"Notifications\" `SettingsSection` with Material 3 Switch": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494327
+      }
+    ],
+    "5.3 Add helper text when toggle is disabled": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494368
+      }
+    ],
+    "5.4 Wire the new callback in `MainTaskSettingsContent`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494407
+      }
+    ],
+    "6.1 Update `EditTaskListViewModel` settingsResultBus collector": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494452
+      }
+    ],
+    "6.2 Update `onNavigateToSettings` callback to pass `isNotificationEnabled`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494509
+      }
+    ],
+    "6.3 Update Koin binding for `MainTaskSettingsViewModel` in `AppModules.kt`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494564
+      }
+    ],
+    "6.4 Update `entry<MainTaskSettingsRoute>` in `App.kt` with DisposableEffect and new params": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494594
+      }
+    ],
+    "6.5 Write integration tests for toggle deactivation → sync → cancel flow": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494620
+      }
+    ],
+    "7.1 Android: Implement `AndroidNotificationPermissionChecker` and `AndroidNotificationPermissionRequester`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494647
+      }
+    ],
+    "7.2 iOS: Implement `IosNotificationPermissionChecker` and `IosNotificationPermissionRequester`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494679
+      }
+    ],
+    "7.3 JVM: Implement `JvmNotificationPermissionChecker` and `JvmNotificationPermissionRequester`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494712
+      }
+    ],
+    "7.4 JS: Implement `JsNotificationPermissionChecker` and `JsNotificationPermissionRequester`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494745
+      }
+    ],
+    "7.5 WasmJS: Implement `WasmJsNotificationPermissionChecker` and `WasmJsNotificationPermissionRequester`": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494781
+      }
+    ],
+    "7.6 Add Koin bindings for all platforms": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494818
+      }
+    ],
+    "8. Final Checkpoint": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454494885
+      }
+    ],
+    "1. Domain Layer — Model & Scheduling Modifications": [
+      {
+        "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
+        "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
+        "timestamp": 1786454823712
+      }
+    ]
+  }
+}

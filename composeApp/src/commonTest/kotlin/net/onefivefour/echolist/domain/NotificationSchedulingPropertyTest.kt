@@ -6,9 +6,12 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
+import io.kotest.property.arbitrary.choice
+import io.kotest.property.arbitrary.constant
 import io.kotest.property.arbitrary.filter
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.map
+import io.kotest.property.arbitrary.of
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import kotlin.time.Clock
@@ -404,6 +407,62 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
             scheduler.scheduleCalls.shouldBeEmpty()
             scheduler.cancelCalls.shouldBeEmpty()
+        }
+    }
+
+    // -- Feature: notification-permission-toggle, Property 5 --
+
+    /**
+     * Feature: notification-permission-toggle
+     * Property 5: isNotificationEnabled=false → immer cancel
+     *
+     * For all MainTask instances with isNotificationEnabled = false, regardless of
+     * dueDate and recurrence values, scheduleTaskNotification MUST call
+     * scheduler.cancel(task.id) and MUST NOT call scheduler.schedule(...).
+     *
+     * Validates: Requirements 5.1
+     */
+    test("Feature: notification-permission-toggle, Property 5: isNotificationEnabled=false → immer cancel") {
+        // Generator for dueDate: mix of future dates, past dates, blank strings, and invalid strings
+        val arbAnyDueDate = Arb.choice(
+            arbFutureDateString,
+            arbPastDateString,
+            Arb.constant(""),
+            Arb.constant("   "),
+            Arb.of("not-a-date", "2099-13-45", "abc", "12/31/2095")
+        )
+
+        // Generator for recurrence: mix of valid recurrence strings and blank strings
+        val arbAnyRecurrence = Arb.choice(
+            arbRecurrence,
+            Arb.constant(""),
+            Arb.constant("   ")
+        )
+
+        checkAll(
+            PropTestConfig(iterations = 100),
+            arbTaskId,
+            arbDescription,
+            arbAnyDueDate,
+            arbAnyRecurrence,
+            arbTaskListName
+        ) { taskId, description, dueDate, recurrence, taskListName ->
+            val scheduler = FakeNotificationScheduler()
+            val task = MainTask(
+                id = taskId,
+                description = description,
+                isDone = false,
+                dueDate = dueDate,
+                recurrence = recurrence,
+                isNotificationEnabled = false,
+                subTasks = emptyList()
+            )
+
+            scheduleTaskNotification(scheduler, task, taskListName)
+
+            scheduler.cancelCalls shouldHaveSize 1
+            scheduler.cancelCalls[0].taskId shouldBe taskId
+            scheduler.scheduleCalls.shouldBeEmpty()
         }
     }
 })
