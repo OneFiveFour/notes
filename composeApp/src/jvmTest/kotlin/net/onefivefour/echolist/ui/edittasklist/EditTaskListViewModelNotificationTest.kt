@@ -87,13 +87,13 @@ class EditTaskListViewModelNotificationTest : FunSpec({
 
             vm.uiState.value.titleState.edit { replace(0, length, "Weekly shopping") }
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Buy groceries")
             }
-            vm.uiState.value.mainTasks[0].dueDateState.edit {
+            vm.uiState.value.uiMainTasks[0].dueDateState.edit {
                 replace(0, length, "2027-06-01")
             }
-            vm.uiState.value.mainTasks[0].recurrenceState.edit {
+            vm.uiState.value.uiMainTasks[0].recurrenceState.edit {
                 replace(0, length, "FREQ=WEEKLY")
             }
 

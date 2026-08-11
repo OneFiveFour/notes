@@ -39,29 +39,29 @@ Implementation proceeds bottom-up: domain model changes → data layer extension
     - Tag: `Feature: notification-permission-toggle, Property 5: isNotificationEnabled=false → immer cancel`
     - **Validates: Requirements 5.1**
 
-- [ ] 2. Data Layer — Model Extensions
-  - [~] 2.1 Add `isNotificationEnabled` field to `UiMainTask`
+- [x] 2. Data Layer — Model Extensions
+  - [x] 2.1 Add `isNotificationEnabled` field to `UiMainTask`
     - Add `isNotificationEnabled: Boolean = true` constructor parameter
     - Add `var isNotificationEnabled by mutableStateOf(isNotificationEnabled)` property
     - Update `toDomain()` to include `isNotificationEnabled` in the returned `MainTask`
     - Update `fromDomain()` to read `domain.isNotificationEnabled`
     - _Requirements: 2.1, 2.3_
 
-  - [~] 2.2 Add `isNotificationEnabled` to `MainTaskSettingsResult`
+  - [x] 2.2 Add `isNotificationEnabled` to `MainTaskSettingsResult`
     - Add `val isNotificationEnabled: Boolean` field to the data class
     - _Requirements: 2.3_
 
-  - [~] 2.3 Add `currentIsNotificationEnabled` to `MainTaskSettingsRoute`
+  - [x] 2.3 Add `currentIsNotificationEnabled` to `MainTaskSettingsRoute`
     - Add `val currentIsNotificationEnabled: Boolean = true` parameter to the `@Serializable` data class
     - _Requirements: 2.4_
 
-  - [~] 2.4 Ensure `isNotificationEnabled` is preserved locally during sync
+  - [x] 2.4 Ensure `isNotificationEnabled` is preserved locally during sync
     - The `isNotificationEnabled` field is purely on-device — it is NOT sent to the backend
     - In `TaskListMapper.toDomain(tasks.v1.MainTask)`: the proto has no `notifications_enabled` field, so the domain default (`true`) applies for tasks loaded from the server
     - Ensure `UiMainTask.isNotificationEnabled` survives a sync round-trip: when the server returns a task, `fromDomain()` uses the default `true`, so existing local toggle state must be preserved in the ViewModel rather than overwritten by server response
     - _Requirements: 2.1_
 
-  - [~] 2.5 Write property test for route serialization round-trip
+  - [x] 2.5 Write property test for route serialization round-trip
     - **Property 6: Route-Parameter Round-Trip**
     - Generate random Boolean values for `currentIsNotificationEnabled`
     - Serialize and deserialize `MainTaskSettingsRoute`, assert `currentIsNotificationEnabled` is preserved

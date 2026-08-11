@@ -113,7 +113,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
 
             editVm.uiState.value.titleState.edit { replace(0, length, "Draft list") }
             editVm.onAddMainTask()
-            val draft = editVm.uiState.value.mainTasks.single()
+            val draft = editVm.uiState.value.uiMainTasks.single()
 
             editVm.onSettingsNavigationStarted()
             editVm.onScreenLeft()
@@ -131,10 +131,10 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             settingsVm.onDateSelected(dueDateToUtcMillis("2026-09-01")!!)
             testScheduler.advanceUntilIdle()
 
-            editVm.uiState.value.mainTasks.single().dueDateState.text.toString() shouldBe "2026-09-01"
+            editVm.uiState.value.uiMainTasks.single().dueDateState.text.toString() shouldBe "2026-09-01"
             repo.taskLists shouldBe emptyMap()
 
-            editVm.uiState.value.mainTasks.single().descriptionState.edit {
+            editVm.uiState.value.uiMainTasks.single().descriptionState.edit {
                 replace(0, length, "Name the draft")
             }
             editVm.onFieldFocusLost()

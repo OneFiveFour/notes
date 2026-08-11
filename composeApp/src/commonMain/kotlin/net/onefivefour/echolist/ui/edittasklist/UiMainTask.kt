@@ -13,12 +13,14 @@ internal class UiMainTask(
     isDone: Boolean = false,
     dueDate: String = "",
     recurrence: String = "",
+    isNotificationEnabled: Boolean = true,
     subTasks: List<UiSubTask> = emptyList()
 ) {
     val descriptionState = TextFieldState(initialText = description)
     var isDone by mutableStateOf(isDone)
     val dueDateState = TextFieldState(initialText = dueDate)
     val recurrenceState = TextFieldState(initialText = recurrence)
+    var isNotificationEnabled by mutableStateOf(isNotificationEnabled)
     val subTasks = mutableStateListOf<UiSubTask>().apply {
         addAll(subTasks)
     }
@@ -36,6 +38,7 @@ internal class UiMainTask(
             isDone = isDone,
             dueDate = normalizedDueDate,
             recurrence = normalizedRecurrence,
+            isNotificationEnabled = isNotificationEnabled,
             subTasks = subTasks.mapNotNull { it.toDomain() }
         )
     }
@@ -47,6 +50,7 @@ internal class UiMainTask(
             isDone = domain.isDone,
             dueDate = domain.dueDate,
             recurrence = domain.recurrence.singleLine(),
+            isNotificationEnabled = domain.isNotificationEnabled,
             subTasks = domain.subTasks.map { UiSubTask.fromDomain(it) }
         )
     }

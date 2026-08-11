@@ -42,7 +42,7 @@ internal fun EditTaskListScreen(
     modifier: Modifier = Modifier
 ) {
     val controller = rememberEditTaskListScreenController(
-        mainTasks = uiState.mainTasks,
+        mainTasks = uiState.uiMainTasks,
         onAddMainTask = onAddMainTask,
         onRemoveMainTask = onRemoveMainTask,
         onAddSubTask = onAddSubTask,
@@ -126,12 +126,12 @@ private fun TaskListContentCard(
 
             when {
                 uiState.isLoading -> TaskListLoading()
-                uiState.mainTasks.isEmpty() -> EmptyTaskList(controller.onAddMainTaskAndFocus)
+                uiState.uiMainTasks.isEmpty() -> EmptyTaskList(controller.onAddMainTaskAndFocus)
                 else -> TaskList(
                     focusedMainTaskId = controller.focusedMainTaskId,
                     focusTarget = controller.resolvedFocusTarget,
                     isAutoDelete = uiState.isAutoDelete,
-                    mainTasks = uiState.mainTasks,
+                    mainTasks = uiState.uiMainTasks,
                     onAddMainTask = controller.onAddMainTaskAndFocus,
                     onAddSubTask = controller.onAddFirstSubTaskAndFocus,
                     onFieldFocusLost = onFieldFocusLost,
@@ -175,7 +175,7 @@ private fun EditTaskListScreenPreview() {
             EditTaskListScreen(
                 uiState = EditTaskListUiState(
                     titleState = TextFieldState(initialText = "Launch plan"),
-                    mainTasks = tasks,
+                    uiMainTasks = tasks,
                     isAutoDelete = false,
                     mode = EditTaskListMode.Create(parentDir = "")
                 ),

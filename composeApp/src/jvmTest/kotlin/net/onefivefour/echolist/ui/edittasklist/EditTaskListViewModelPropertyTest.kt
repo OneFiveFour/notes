@@ -149,7 +149,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             repo.createTaskListCalls shouldHaveSize 0
 
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Plan release")
             }
             vm.onFieldFocusLost()
@@ -175,13 +175,13 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Plan release")
             }
             vm.onFieldFocusLost()
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Plan release v2")
             }
             vm.onFieldFocusLost()
@@ -295,7 +295,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             vm.onMainTaskCheckedChange(0, true)
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Task 2")
+            vm.uiState.value.uiMainTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Task 2")
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls[0].tasks.map { it.description } shouldBe listOf("Task 2")
         }
@@ -335,7 +335,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             vm.onSubTaskCheckedChange(0, 0, true)
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks[0].subTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Sub 2")
+            vm.uiState.value.uiMainTasks[0].subTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Sub 2")
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls[0].tasks[0].subTasks.map { it.description } shouldBe listOf("Sub 2")
         }
@@ -376,10 +376,10 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Plan release")
             }
-            vm.uiState.value.mainTasks[0].dueDateState.edit {
+            vm.uiState.value.uiMainTasks[0].dueDateState.edit {
                 replace(0, length, "2026/04/01")
             }
 
@@ -405,8 +405,8 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.titleState.edit { replace(0, length, "Sprint plan") }
             vm.onAddMainTask()
-            val taskId = vm.uiState.value.mainTasks[0].id
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            val taskId = vm.uiState.value.uiMainTasks[0].id
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Plan release")
             }
 
@@ -435,7 +435,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             testScheduler.advanceUntilIdle()
 
-            val taskId = vm.uiState.value.mainTasks[0].id
+            val taskId = vm.uiState.value.uiMainTasks[0].id
             settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
@@ -487,7 +487,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks.map { it.id } shouldBe listOf("early", "late", "none")
+            vm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("early", "late", "none")
 
             vm.onFieldFocusLost()
             testScheduler.advanceUntilIdle()
@@ -507,7 +507,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "none", dueDate = "2026-03-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
-            sortingVm.uiState.value.mainTasks.map { it.id } shouldBe listOf("none", "early", "late")
+            sortingVm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("none", "early", "late")
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls.single().tasks.map { it.id } shouldBe listOf("none", "early", "late")
         }
@@ -541,7 +541,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             testScheduler.advanceUntilIdle()
 
-            val taskId = vm.uiState.value.mainTasks[0].id
+            val taskId = vm.uiState.value.uiMainTasks[0].id
             settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-05-10", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
@@ -579,7 +579,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             testScheduler.advanceUntilIdle()
 
-            val taskId = vm.uiState.value.mainTasks[0].id
+            val taskId = vm.uiState.value.uiMainTasks[0].id
             settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
@@ -668,16 +668,16 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             // Simulate pressing Enter which adds an empty main task
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks shouldHaveSize 2
-            vm.uiState.value.mainTasks[1].descriptionState.text.toString() shouldBe ""
+            vm.uiState.value.uiMainTasks shouldHaveSize 2
+            vm.uiState.value.uiMainTasks[1].descriptionState.text.toString() shouldBe ""
 
             // Simulate navigating away (screen left triggers cleanup)
             vm.onScreenLeft()
             testScheduler.advanceUntilIdle()
 
             // The empty task should be removed from the UI
-            vm.uiState.value.mainTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].descriptionState.text.toString() shouldBe "Real task"
+            vm.uiState.value.uiMainTasks shouldHaveSize 1
+            vm.uiState.value.uiMainTasks[0].descriptionState.text.toString() shouldBe "Real task"
 
             // No update sent since effective content hasn't changed
             repo.updateTaskListCalls shouldHaveSize 0
@@ -696,19 +696,19 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             vm.uiState.value.titleState.edit { replace(0, length, "New list") }
             vm.onAddMainTask()
-            val draftId = vm.uiState.value.mainTasks.single().id
+            val draftId = vm.uiState.value.uiMainTasks.single().id
 
             vm.onSettingsNavigationStarted()
             vm.onScreenLeft()
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks.single().id shouldBe draftId
+            vm.uiState.value.uiMainTasks.single().id shouldBe draftId
             repo.createTaskListCalls shouldHaveSize 0
 
             vm.onScreenLeft()
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.mainTasks shouldHaveSize 0
+            vm.uiState.value.uiMainTasks shouldHaveSize 0
             repo.createTaskListCalls shouldHaveSize 0
         }
     }
@@ -744,16 +744,16 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             // Simulate adding an empty sub task
             vm.onAddSubTask(0)
-            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 2
-            vm.uiState.value.mainTasks[0].subTasks[1].descriptionState.text.toString() shouldBe ""
+            vm.uiState.value.uiMainTasks[0].subTasks shouldHaveSize 2
+            vm.uiState.value.uiMainTasks[0].subTasks[1].descriptionState.text.toString() shouldBe ""
 
             // Simulate navigating away
             vm.onScreenLeft()
             testScheduler.advanceUntilIdle()
 
             // The empty sub task should be removed from the UI
-            vm.uiState.value.mainTasks[0].subTasks shouldHaveSize 1
-            vm.uiState.value.mainTasks[0].subTasks[0].descriptionState.text.toString() shouldBe "Real sub"
+            vm.uiState.value.uiMainTasks[0].subTasks shouldHaveSize 1
+            vm.uiState.value.uiMainTasks[0].subTasks[0].descriptionState.text.toString() shouldBe "Real sub"
 
             // No update sent since the effective content hasn't changed
             repo.updateTaskListCalls shouldHaveSize 0
@@ -774,19 +774,19 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             // Add a real task and an empty task
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks[0].descriptionState.edit {
+            vm.uiState.value.uiMainTasks[0].descriptionState.edit {
                 replace(0, length, "Do something")
             }
             vm.onAddMainTask() // empty task added by pressing Enter
 
-            vm.uiState.value.mainTasks shouldHaveSize 2
+            vm.uiState.value.uiMainTasks shouldHaveSize 2
 
             // Trigger screen left (e.g. navigating away)
             vm.onScreenLeft()
             testScheduler.advanceUntilIdle()
 
             // Empty task should be stripped from UI
-            vm.uiState.value.mainTasks shouldHaveSize 1
+            vm.uiState.value.uiMainTasks shouldHaveSize 1
 
             // Only the real task should be persisted
             repo.createTaskListCalls shouldHaveSize 1
@@ -817,14 +817,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
 
             // Simulate pressing Enter which adds an empty main task
             vm.onAddMainTask()
-            vm.uiState.value.mainTasks shouldHaveSize 2
+            vm.uiState.value.uiMainTasks shouldHaveSize 2
 
             // Regular focus lost should NOT strip the empty task (user is still editing)
             vm.onFieldFocusLost()
             testScheduler.advanceUntilIdle()
 
             // Empty task should still be in the UI
-            vm.uiState.value.mainTasks shouldHaveSize 2
+            vm.uiState.value.uiMainTasks shouldHaveSize 2
         }
     }
 

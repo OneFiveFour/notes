@@ -50,7 +50,7 @@ class SaveEnabledPropertyTest : FunSpec({
         ) { isPersisted, isLoading, isSaving ->
             val uiState = EditTaskListUiState(
                 titleState = TextFieldState(),
-                mainTasks = androidx.compose.runtime.mutableStateListOf(),
+                uiMainTasks = androidx.compose.runtime.mutableStateListOf(),
                 mode = EditTaskListMode.Create(""),
                 isPersisted = isPersisted,
                 isLoading = isLoading,

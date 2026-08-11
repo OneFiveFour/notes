@@ -91,6 +91,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454493845
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454896323
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454969287
       }
     ],
     "2.2 Add `isNotificationEnabled` to `MainTaskSettingsResult`": [
@@ -98,6 +108,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454493873
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454897115
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454970171
       }
     ],
     "2.3 Add `currentIsNotificationEnabled` to `MainTaskSettingsRoute`": [
@@ -105,6 +125,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454493900
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454897963
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454970976
       }
     ],
     "2.4 Ensure `isNotificationEnabled` is preserved locally during sync": [
@@ -112,6 +142,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454493926
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454975113
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455137528
       }
     ],
     "2.5 Write property test for route serialization round-trip": [
@@ -119,6 +159,16 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454493962
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786454975916
+      },
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455136737
       }
     ],
     "3. Checkpoint — Domain & Data Layer": [
@@ -294,6 +344,13 @@
         "executionId": "a6950f1f-82c1-46e1-a58c-0034c890ee8e",
         "chatSessionId": "sess_e2ce71f1-9b87-413c-930a-11f33d8cdc24",
         "timestamp": 1786454823712
+      }
+    ],
+    "2. Data Layer — Model Extensions": [
+      {
+        "executionId": "0f793aaf-cece-4364-8caf-07120438af8c",
+        "chatSessionId": "sess_aa472713-5de4-4e9b-99ff-1fc0a1a07adb",
+        "timestamp": 1786455137575
       }
     ]
   }

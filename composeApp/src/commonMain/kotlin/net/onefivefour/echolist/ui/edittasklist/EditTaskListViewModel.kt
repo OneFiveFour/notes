@@ -37,12 +37,12 @@ internal class EditTaskListViewModel(
 
     private data class SyncSnapshot(
         val title: String,
-        val tasks: List<MainTask>,
+        val mainTasks: List<MainTask>,
         val isAutoDelete: Boolean
     )
 
     private val titleState = TextFieldState()
-    private val tasks = mutableStateListOf<UiMainTask>()
+    private val uiMainTasks = mutableStateListOf<UiMainTask>()
     private var persistedTaskListId: String? = (mode as? EditTaskListMode.Edit)?.taskListId
     private var lastSuccessfulSnapshot: SyncSnapshot? = null
     private var syncQueued = false
@@ -58,7 +58,7 @@ internal class EditTaskListViewModel(
     private val _uiState = MutableStateFlow(
         EditTaskListUiState(
             titleState = titleState,
-            mainTasks = tasks,
+            uiMainTasks = uiMainTasks,
             mode = mode,
             isPersisted = mode is EditTaskListMode.Edit,
             isLoading = mode is EditTaskListMode.Edit
@@ -81,7 +81,7 @@ internal class EditTaskListViewModel(
 
         viewModelScope.launch {
             settingsResultBus.results.collect { result ->
-                val task = tasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
+                val task = uiMainTasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)
                 sortTasksByDueDate()
@@ -93,16 +93,16 @@ internal class EditTaskListViewModel(
 
     fun onAddMainTask() {
         val draft = UiMainTask(id = nextDraftMainTaskId())
-        tasks.add(draft)
+        uiMainTasks.add(draft)
         sortTasksByDueDate()
         observeRecurrenceSanitization(draft)
         _uiState.update { it.copy(error = null) }
     }
 
     fun onRemoveMainTask(index: Int) {
-        if (index !in tasks.indices) return
-        val removedTaskId = tasks[index].id
-        tasks.removeAt(index)
+        if (index !in uiMainTasks.indices) return
+        val removedTaskId = uiMainTasks[index].id
+        uiMainTasks.removeAt(index)
         viewModelScope.launch(Dispatchers.Default) {
             notificationScheduler.cancel(removedTaskId)
         }
@@ -110,7 +110,7 @@ internal class EditTaskListViewModel(
     }
 
     fun onMainTaskCheckedChange(index: Int, isChecked: Boolean) {
-        val task = tasks.getOrNull(index) ?: return
+        val task = uiMainTasks.getOrNull(index) ?: return
 
         // Block re-taps on recurring tasks until the sync response arrives
         if (task.id in pendingCompletionTaskIds) return
@@ -118,7 +118,7 @@ internal class EditTaskListViewModel(
         val isRecurring = task.recurrenceState.text.isNotEmpty()
 
         if (_uiState.value.isAutoDelete && isChecked) {
-            tasks.removeAt(index)
+            uiMainTasks.removeAt(index)
         } else {
             task.isDone = isChecked
             if (isRecurring && isChecked) {
@@ -130,13 +130,13 @@ internal class EditTaskListViewModel(
     }
 
     fun onAddSubTask(mainTaskIndex: Int) {
-        val task = tasks.getOrNull(mainTaskIndex) ?: return
+        val task = uiMainTasks.getOrNull(mainTaskIndex) ?: return
         task.subTasks.add(UiSubTask(id = nextDraftSubTaskId()))
         _uiState.update { it.copy(error = null) }
     }
 
     fun onRemoveSubTask(mainTaskIndex: Int, subTaskIndex: Int) {
-        val task = tasks.getOrNull(mainTaskIndex) ?: return
+        val task = uiMainTasks.getOrNull(mainTaskIndex) ?: return
         if (subTaskIndex !in task.subTasks.indices) return
 
         task.subTasks.removeAt(subTaskIndex)
@@ -144,7 +144,7 @@ internal class EditTaskListViewModel(
     }
 
     fun onSubTaskCheckedChange(mainTaskIndex: Int, subTaskIndex: Int, isChecked: Boolean) {
-        val task = tasks.getOrNull(mainTaskIndex) ?: return
+        val task = uiMainTasks.getOrNull(mainTaskIndex) ?: return
         if (subTaskIndex !in task.subTasks.indices) return
 
         if (_uiState.value.isAutoDelete && isChecked) {
@@ -189,7 +189,7 @@ internal class EditTaskListViewModel(
                 onSuccess = {
                     // Cancel notifications for all tasks before navigating back
                     launch(Dispatchers.Default) {
-                        for (task in tasks) {
+                        for (task in uiMainTasks) {
                             notificationScheduler.cancel(task.id)
                         }
                     }
@@ -211,11 +211,11 @@ internal class EditTaskListViewModel(
                         replace(0, length, taskList.name)
                     }
 
-                    tasks.clear()
+                    uiMainTasks.clear()
 
                     taskList.tasks.sortedByDueDate().forEach { task ->
                         val draft = UiMainTask.fromDomain(task)
-                        tasks.add(draft)
+                        uiMainTasks.add(draft)
                         observeRecurrenceSanitization(draft)
                     }
 
@@ -263,7 +263,7 @@ internal class EditTaskListViewModel(
                     UpdateTaskListParams(
                         id = taskListId,
                         title = snapshot.title,
-                        tasks = snapshot.tasks,
+                        tasks = snapshot.mainTasks,
                         isAutoDelete = snapshot.isAutoDelete
                     )
                 )
@@ -271,7 +271,7 @@ internal class EditTaskListViewModel(
                 CreateTaskListParams(
                     name = snapshot.title,
                     parentDir = (mode as EditTaskListMode.Create).parentDir,
-                    tasks = snapshot.tasks,
+                    tasks = snapshot.mainTasks,
                     isAutoDelete = snapshot.isAutoDelete
                 )
             )
@@ -285,7 +285,7 @@ internal class EditTaskListViewModel(
                     if (pendingCompletionTaskIds.isNotEmpty()) {
                         for (serverTask in taskList.tasks) {
                             if (serverTask.id !in pendingCompletionTaskIds) continue
-                            val uiTask = tasks.firstOrNull { it.id == serverTask.id } ?: continue
+                            val uiTask = uiMainTasks.firstOrNull { it.id == serverTask.id } ?: continue
                             uiTask.isDone = serverTask.isDone
                             uiTask.dueDateState.setTextAndPlaceCursorAtEnd(serverTask.dueDate)
                         }
@@ -303,8 +303,22 @@ internal class EditTaskListViewModel(
                         )
                     }
 
-                    // Schedule/cancel notifications for all tasks after successful sync
-                    scheduleNotifications(taskList.name, taskList.tasks)
+                    // Schedule/cancel notifications for all tasks after successful sync.
+                    // Merge local isNotificationEnabled state into server-returned tasks because
+                    // the backend does not persist this field (it defaults to true in the mapper).
+                    val tasksWithLocalNotificationState = taskList.tasks.map { serverTask ->
+                        val localTask = uiMainTasks.firstOrNull { it.id == serverTask.id }
+                        if (localTask != null) {
+                            serverTask.copy(isNotificationEnabled = localTask.isNotificationEnabled)
+                        } else {
+                            serverTask
+                        }
+                    }
+
+                    scheduleNotifications(
+                        taskListName = taskList.name,
+                        domainTasks = tasksWithLocalNotificationState
+                    )
                 },
                 onFailure = { e ->
                     pendingCompletionTaskIds.clear()
@@ -327,7 +341,7 @@ internal class EditTaskListViewModel(
         }
 
         val trimmedTitle = titleState.text.toString().trim()
-        val normalizedTasks = tasks.mapNotNull { it.toDomain() }.sortedByDueDate()
+        val normalizedTasks = uiMainTasks.mapNotNull { it.toDomain() }.sortedByDueDate()
 
         if (trimmedTitle.isBlank()) {
             if (persistedTaskListId != null) {
@@ -345,29 +359,29 @@ internal class EditTaskListViewModel(
 
         return SyncSnapshot(
             title = trimmedTitle,
-            tasks = normalizedTasks,
+            mainTasks = normalizedTasks,
             isAutoDelete = _uiState.value.isAutoDelete
         )
     }
 
     private fun stripEmptyTasks() {
-        tasks.forEach { mainTask ->
+        uiMainTasks.forEach { mainTask ->
             mainTask.subTasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
         }
-        tasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
+        uiMainTasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
         sortTasksByDueDate()
     }
 
     private fun sortTasksByDueDate() {
-        if (tasks.size < 2) return
+        if (uiMainTasks.size < 2) return
 
         // Keep existing UiMainTask instances so TextFieldState, focus, and cursor state survive autosyncs.
-        val sortedTasks = tasks.sortedByDueDate { it.dueDateState.text.toString() }
+        val sortedTasks = uiMainTasks.sortedByDueDate { it.dueDateState.text.toString() }
 
-        if (tasks.toList() == sortedTasks) return
+        if (uiMainTasks.toList() == sortedTasks) return
 
-        tasks.clear()
-        tasks.addAll(sortedTasks)
+        uiMainTasks.clear()
+        uiMainTasks.addAll(sortedTasks)
     }
 
     private fun observeRecurrenceSanitization(draft: UiMainTask) {
@@ -384,7 +398,7 @@ internal class EditTaskListViewModel(
     }
 
     private fun validateDrafts(): String? {
-        tasks.forEach { task ->
+        uiMainTasks.forEach { task ->
             if (task.descriptionState.text.toString().trim().isBlank()) return@forEach
 
             val recurrence = task.recurrenceState.text.toString()
@@ -416,7 +430,16 @@ internal class EditTaskListViewModel(
 
     private fun TaskList.toSyncSnapshot(): SyncSnapshot = SyncSnapshot(
         title = name,
-        tasks = tasks.sortedByDueDate(),
+        mainTasks = tasks.map { serverTask ->
+            // Merge local isNotificationEnabled into the snapshot so that diff-checks
+            // against buildSyncSnapshot() don't trigger re-syncs for this on-device-only field.
+            val localTask = this@EditTaskListViewModel.uiMainTasks.firstOrNull { it.id == serverTask.id }
+            if (localTask != null) {
+                serverTask.copy(isNotificationEnabled = localTask.isNotificationEnabled)
+            } else {
+                serverTask
+            }
+        }.sortedByDueDate(),
         isAutoDelete = isAutoDelete
     )
 

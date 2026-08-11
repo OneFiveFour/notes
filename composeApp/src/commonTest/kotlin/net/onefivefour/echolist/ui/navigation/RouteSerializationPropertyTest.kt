@@ -99,4 +99,40 @@ class RouteSerializationPropertyTest : FunSpec({
         val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
         decoded shouldBe route
     }
+
+    test("Feature: notification-permission-toggle, Property 6: Route-Parameter Round-Trip") {
+        /**
+         * Validates: Requirements 2.4
+         *
+         * For all Boolean values v, when a MainTaskSettingsRoute is created with
+         * currentIsNotificationEnabled = v and serialized/deserialized, the resulting
+         * currentIsNotificationEnabled value must equal v.
+         */
+        checkAll(
+            PropTestConfig(iterations = 100),
+            Arb.string(1..50),
+            Arb.string(0..20),
+            Arb.string(0..50),
+            Arb.boolean()
+        ) { mainTaskId, dueDate, recurrence, isNotificationEnabled ->
+            val route = MainTaskSettingsRoute(
+                mainTaskId = mainTaskId,
+                currentDueDate = dueDate,
+                currentRecurrence = recurrence,
+                currentIsNotificationEnabled = isNotificationEnabled
+            )
+
+            // Direct serialization round-trip
+            val encoded = json.encodeToString(kotlinx.serialization.serializer<MainTaskSettingsRoute>(), route)
+            val decoded = json.decodeFromString(kotlinx.serialization.serializer<MainTaskSettingsRoute>(), encoded)
+            decoded shouldBe route
+            decoded.currentIsNotificationEnabled shouldBe isNotificationEnabled
+
+            // Polymorphic NavKey serialization round-trip
+            val polyEncoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
+            val polyDecoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), polyEncoded)
+            polyDecoded shouldBe route
+            (polyDecoded as MainTaskSettingsRoute).currentIsNotificationEnabled shouldBe isNotificationEnabled
+        }
+    }
 })
