@@ -25,7 +25,6 @@ suspend fun scheduleTaskNotification(
     task: MainTask,
     taskListName: String
 ) {
-    // Guard: per-task notifications disabled → cancel and return immediately
     if (!task.isNotificationEnabled) {
         scheduler.cancel(task.id)
         return
@@ -44,7 +43,6 @@ suspend fun scheduleTaskNotification(
 
     val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
     if (dueDate < today) {
-        // Past due date — skip scheduling silently (no cancel either)
         return
     }
 

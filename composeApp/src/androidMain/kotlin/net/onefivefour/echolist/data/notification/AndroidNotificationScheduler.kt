@@ -8,7 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import android.util.Log
 import androidx.core.content.ContextCompat
 import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
@@ -19,7 +18,7 @@ import net.onefivefour.echolist.domain.NotificationScheduler
 
 /**
  * Android implementation of [NotificationScheduler] that uses [AlarmManager]
- * to schedule exact alarms and a [TaskReminderReceiver] to post notifications.
+ * to schedule inexact alarms and a [TaskReminderReceiver] to post notifications.
  */
 class AndroidNotificationScheduler(
     private val context: Context
@@ -31,22 +30,12 @@ class AndroidNotificationScheduler(
         body: String,
         dueDateIso: String
     ) {
-        val dueDate = runCatching { LocalDate.parse(dueDateIso) }.getOrNull()
-        if (dueDate == null) {
-            Log.w(TAG, "Cannot schedule notification for task $taskId: invalid date '$dueDateIso'")
-            return
-        }
+        val dueDate = runCatching { LocalDate.parse(dueDateIso) }.getOrNull() ?: return
 
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-        if (dueDate < today) {
-            Log.w(TAG, "Skipping notification for task $taskId: due date $dueDateIso is in the past")
-            return
-        }
+        if (dueDate < today) return
 
-        if (!hasNotificationPermission()) {
-            Log.w(TAG, "Skipping notification for task $taskId: POST_NOTIFICATIONS permission denied")
-            return
-        }
+        if (!hasNotificationPermission()) return
 
         val triggerAtMillis = dueDate
             .atStartOfDayIn(TimeZone.currentSystemDefault())
@@ -66,7 +55,7 @@ class AndroidNotificationScheduler(
         )
 
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        alarmManager.setExactAndAllowWhileIdle(
+        alarmManager.setAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             triggerAtMillis,
             pendingIntent
@@ -99,9 +88,5 @@ class AndroidNotificationScheduler(
             ) == PackageManager.PERMISSION_GRANTED
         }
         return true
-    }
-
-    companion object {
-        private const val TAG = "AndroidNotifScheduler"
     }
 }
