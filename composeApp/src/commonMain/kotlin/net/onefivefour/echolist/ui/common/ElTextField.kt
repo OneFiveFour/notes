@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -29,7 +28,6 @@ fun ElTextField(
     modifier: Modifier = Modifier,
     style: TextStyle = EchoListTheme.typography.bodyMedium,
     color: Color = EchoListTheme.materialColors.onSurface,
-    singleLine: Boolean = false,
     imeAction: ImeAction = ImeAction.Default,
     onKeyboardAction: (() -> Unit)? = null,
     onFocusChanged: ((Boolean) -> Unit)? = null,
@@ -63,7 +61,6 @@ fun ElTextField(
             ),
         textStyle = style.copy(color = color),
         cursorBrush = SolidColor(EchoListTheme.materialColors.primary),
-        lineLimits = if (singleLine) TextFieldLineLimits.SingleLine else TextFieldLineLimits.MultiLine(),
         keyboardOptions = KeyboardOptions(imeAction = imeAction),
         onKeyboardAction = onKeyboardAction?.let { keyboardAction ->
             { keyboardAction() }

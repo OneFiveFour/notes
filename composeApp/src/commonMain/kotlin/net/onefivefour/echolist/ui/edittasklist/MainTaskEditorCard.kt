@@ -26,14 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
-import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -45,6 +44,7 @@ import net.onefivefour.echolist.ui.common.ElTextField
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
+import kotlin.time.Clock
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -91,7 +91,7 @@ internal fun MainTaskCard(
             modifier = Modifier.padding(EchoListTheme.dimensions.s)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
+                verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
             ) {
                 CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
@@ -115,7 +115,6 @@ internal fun MainTaskCard(
                                 TextDecoration.None
                             }
                         ),
-                        singleLine = true,
                         imeAction = ImeAction.Next,
                         onKeyboardAction = { onMainTaskKeyboardAction(mainTask.id) },
                         onFocusChanged = onMainTaskDescriptionFocusChanged,
@@ -235,8 +234,7 @@ private fun DueDateTag(
     Surface(
         shape = RoundedCornerShape(50),
         color = backgroundColor,
-        onClick = onClick,
-        modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
+        onClick = onClick
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -272,7 +270,7 @@ private fun MainTaskCardPreview() {
         UiMainTask.fromDomain(
             domain = MainTask(
                 id = "preview-1",
-                description = "Plan launch",
+                description = "Plan launch with a longer title sentence",
                 isDone = false,
                 dueDate = "2026-04-01",
                 recurrence = "",
