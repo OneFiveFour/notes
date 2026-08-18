@@ -28,6 +28,7 @@ import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.CreateItemCallbacks
 import net.onefivefour.echolist.ui.home.HomeScreen
 import net.onefivefour.echolist.ui.home.HomeViewModel
+import net.onefivefour.echolist.ui.home.RenameFolderViewModel
 import net.onefivefour.echolist.ui.login.LoginScreen
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import net.onefivefour.echolist.ui.editnote.EditNoteScreen
@@ -136,6 +137,25 @@ private fun AuthenticatedApp() {
 
                 val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
 
+                val renameFolderViewModel =
+                    koinViewModel<RenameFolderViewModel>(
+                        key = "renameFolder-${route.parentDir}"
+                    ) { parametersOf(route.parentDir) }
+
+                val renameFolderUiState by renameFolderViewModel.uiState.collectAsStateWithLifecycle()
+
+                LaunchedEffect(renameFolderViewModel) {
+                    renameFolderViewModel.navigateToFolder.collect { newPath ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == newPath }
+                        if (index >= 0) {
+                            while (backStack.size > index + 1) backStack.removeLast()
+                        } else {
+                            backStack.removeLastOrNull()
+                            backStack.add(HomeRoute(newPath))
+                        }
+                    }
+                }
+
                 HomeScreen(
                     uiState = homeUiState,
                     createFolderUiState = createFolderUiState,
@@ -173,9 +193,14 @@ private fun AuthenticatedApp() {
                         )
                     },
                     onDeleteCurrentFolderClick = homeViewModel::onDeleteCurrentFolderClick,
+                    onRenameCurrentFolderClick = renameFolderViewModel::showDialog,
                     onFolderNameChange = createFolderViewModel::onNameChange,
                     onConfirmCreateFolder = createFolderViewModel::onConfirm,
-                    onDismissCreateFolder = createFolderViewModel::dismissDialog
+                    onDismissCreateFolder = createFolderViewModel::dismissDialog,
+                    renameFolderUiState = renameFolderUiState,
+                    onRenameFolderNameChange = renameFolderViewModel::onNameChange,
+                    onConfirmRenameFolder = renameFolderViewModel::onConfirm,
+                    onDismissRenameFolder = renameFolderViewModel::dismissDialog
                 )
             }
 

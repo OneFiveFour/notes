@@ -109,6 +109,7 @@ class HomeViewModel(
                         fileEntries = entries,
                         isLoading = false,
                         canDeleteCurrentFolder = parentDir.isNotBlank() && entries.isEmpty(),
+                        canRenameCurrentFolder = parentDir.isNotBlank(),
                         error = null
                     )
                 },
@@ -118,6 +119,7 @@ class HomeViewModel(
                         fileEntries = emptyList(),
                         isLoading = false,
                         canDeleteCurrentFolder = false,
+                        canRenameCurrentFolder = parentDir.isNotBlank(),
                         error = exception.message
                     )
                 }

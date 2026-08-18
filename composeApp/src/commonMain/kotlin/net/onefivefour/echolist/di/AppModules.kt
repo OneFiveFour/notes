@@ -39,6 +39,7 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
+import net.onefivefour.echolist.ui.home.RenameFolderViewModel
 import net.onefivefour.echolist.ui.login.LoginViewModel
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
@@ -172,6 +173,12 @@ val navigationModule: Module = module {
     }
     viewModel { params ->
         CreateFolderViewModel(
+            parentDir = params.get(),
+            fileRepository = get()
+        )
+    }
+    viewModel { params ->
+        RenameFolderViewModel(
             parentDir = params.get(),
             fileRepository = get()
         )

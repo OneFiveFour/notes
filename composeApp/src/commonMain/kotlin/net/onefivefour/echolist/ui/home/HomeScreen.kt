@@ -20,6 +20,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
+import echolist.composeapp.generated.resources.ic_edit
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
@@ -34,11 +35,16 @@ fun HomeScreen(
     onNoteClick: (noteId: String) -> Unit = {},
     onTaskClick: (taskListId: String) -> Unit = {},
     onDeleteCurrentFolderClick: () -> Unit = {},
+    onRenameCurrentFolderClick: () -> Unit = {},
     createItemCallbacks: CreateItemCallbacks = CreateItemCallbacks(),
     createFolderUiState: CreateFolderUiState = CreateFolderUiState(),
     onFolderNameChange: (String) -> Unit = {},
     onConfirmCreateFolder: () -> Unit = {},
-    onDismissCreateFolder: () -> Unit = {}
+    onDismissCreateFolder: () -> Unit = {},
+    renameFolderUiState: RenameFolderUiState = RenameFolderUiState(),
+    onRenameFolderNameChange: (String) -> Unit = {},
+    onConfirmRenameFolder: () -> Unit = {},
+    onDismissRenameFolder: () -> Unit = {}
 ) {
 
     Column {
@@ -58,6 +64,21 @@ fun HomeScreen(
                 color = EchoListTheme.materialColors.primary,
                 style = EchoListTheme.typography.titleLarge
             )
+
+            if (uiState.canRenameCurrentFolder) {
+                Icon(
+                    painter = painterResource(Res.drawable.ic_edit),
+                    contentDescription = "Rename folder",
+                    tint = EchoListTheme.materialColors.primary,
+                    modifier = Modifier
+                        .clip(RoundedCornerShape(50))
+                        .clickable { onRenameCurrentFolderClick() }
+                        .padding(
+                            horizontal = EchoListTheme.dimensions.m,
+                            vertical = EchoListTheme.dimensions.m
+                        )
+                )
+            }
 
             if (uiState.canDeleteCurrentFolder) {
                 Icon(
@@ -115,6 +136,13 @@ fun HomeScreen(
             onNameChange = onFolderNameChange,
             onConfirm = onConfirmCreateFolder,
             onDismiss = onDismissCreateFolder
+        )
+
+        RenameFolderDialog(
+            uiState = renameFolderUiState,
+            onNameChange = onRenameFolderNameChange,
+            onConfirm = onConfirmRenameFolder,
+            onDismiss = onDismissRenameFolder
         )
     }
 }

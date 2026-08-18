@@ -9,6 +9,7 @@ data class HomeScreenUiState(
     val isRefreshing: Boolean = false,
     val isDeletingFolder: Boolean = false,
     val canDeleteCurrentFolder: Boolean = false,
+    val canRenameCurrentFolder: Boolean = false,
     val error: String? = null
 )
 
