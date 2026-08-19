@@ -4,8 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+
 import androidx.compose.runtime.Composable
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -16,7 +15,6 @@ internal fun TaskList(
     isAutoDelete: Boolean,
     onRemoveMainTask: (Int) -> Unit,
     onMainTaskCheckedChange: (Int, Boolean) -> Unit,
-    onAddMainTask: () -> Unit,
     onAddSubTask: (String) -> Unit,
     onSubTaskCheckedChange: (Int, Int, Boolean) -> Unit,
     onFieldFocusLost: () -> Unit,
@@ -69,16 +67,6 @@ internal fun TaskList(
                     onSubTaskKeyboardAction(mainTask.id, subTaskId)
                 }
             )
-        }
-
-        item {
-            TextButton(onClick = onAddMainTask) {
-                Text(
-                    text = "Add another main task",
-                    style = EchoListTheme.typography.labelMedium,
-                    color = EchoListTheme.materialColors.primary
-                )
-            }
         }
     }
 }

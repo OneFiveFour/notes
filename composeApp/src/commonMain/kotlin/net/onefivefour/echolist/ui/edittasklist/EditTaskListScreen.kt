@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.ui.common.EditTitle
+import net.onefivefour.echolist.ui.common.ElButton
 import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 
@@ -69,6 +71,18 @@ internal fun EditTaskListScreen(
             onNavigateToSettings = onNavigateToSettings,
             onDeleteClick = onDeleteClick
         )
+
+        Spacer(modifier = Modifier.height(EchoListTheme.dimensions.m))
+
+        ElButton(
+            onClick = controller.onAddMainTaskAndFocus,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Add another main task",
+                style = EchoListTheme.typography.labelMedium
+            )
+        }
 
         uiState.error?.let { errorMessage ->
             Spacer(modifier = Modifier.height(EchoListTheme.dimensions.s))
@@ -132,7 +146,6 @@ private fun TaskListContentCard(
                     focusTarget = controller.resolvedFocusTarget,
                     isAutoDelete = uiState.isAutoDelete,
                     mainTasks = uiState.uiMainTasks,
-                    onAddMainTask = controller.onAddMainTaskAndFocus,
                     onAddSubTask = controller.onAddFirstSubTaskAndFocus,
                     onFieldFocusLost = onFieldFocusLost,
                     onFocusHandled = controller.onFocusHandled,
