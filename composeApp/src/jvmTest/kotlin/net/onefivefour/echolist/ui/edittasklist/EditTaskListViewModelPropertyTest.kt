@@ -444,6 +444,62 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         }
     }
 
+    test("completed main tasks and subtasks are sorted after incomplete tasks") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-sort-completed",
+                tasks = listOf(
+                    MainTask(
+                        id = "completed",
+                        description = "Completed",
+                        isDone = true,
+                        dueDate = "2026-04-01",
+                        recurrence = "",
+                        subTasks = listOf(
+                            SubTask(id = "done-sub", description = "Done subtask", isDone = true),
+                            SubTask(id = "open-sub", description = "Open subtask", isDone = false),
+                            SubTask(id = "other-open-sub", description = "Other open subtask", isDone = false)
+                        )
+                    ),
+                    MainTask(
+                        id = "active",
+                        description = "Active",
+                        isDone = false,
+                        dueDate = "2026-05-01",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
+                )
+            )
+            repo.addTaskList(existing)
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultBus = MainTaskSettingsResultBus(),
+                notificationScheduler = NoOpNotificationScheduler()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("active", "completed")
+            vm.uiState.value.uiMainTasks[1].subTasks.map { it.id } shouldBe listOf("open-sub", "other-open-sub", "done-sub")
+
+            vm.onMainTaskCheckedChange(0, true)
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("completed", "active")
+            repo.updateTaskListCalls.last().tasks.map { it.id } shouldBe listOf("completed", "active")
+
+            vm.onSubTaskCheckedChange(0, 0, true)
+            testScheduler.advanceUntilIdle()
+
+            vm.uiState.value.uiMainTasks[0].subTasks.map { it.id } shouldBe listOf("other-open-sub", "open-sub", "done-sub")
+            repo.updateTaskListCalls.last().tasks[0].subTasks.map { it.id } shouldBe listOf("other-open-sub", "open-sub", "done-sub")
+        }
+    }
+
     test("main tasks are ordered by ascending due date with undated tasks last") {
         runTest(testDispatcher) {
             val repo = FakeTaskListRepository()

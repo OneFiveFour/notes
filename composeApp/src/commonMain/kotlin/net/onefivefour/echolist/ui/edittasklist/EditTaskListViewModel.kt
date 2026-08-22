@@ -85,7 +85,7 @@ internal class EditTaskListViewModel(
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)
                 task.isNotificationEnabled = result.isNotificationEnabled
-                sortTasksByDueDate()
+                sortTasks()
                 _uiState.update { it.copy(error = null) }
                 requestSync()
             }
@@ -95,7 +95,7 @@ internal class EditTaskListViewModel(
     fun onAddMainTask() {
         val draft = UiMainTask(id = nextDraftMainTaskId())
         uiMainTasks.add(draft)
-        sortTasksByDueDate()
+        sortTasks()
         observeRecurrenceSanitization(draft)
         _uiState.update { it.copy(error = null) }
     }
@@ -125,6 +125,7 @@ internal class EditTaskListViewModel(
             if (isRecurring && isChecked) {
                 pendingCompletionTaskIds.add(task.id)
             }
+            sortTasks()
         }
 
         requestSync()
@@ -133,6 +134,7 @@ internal class EditTaskListViewModel(
     fun onAddSubTask(mainTaskIndex: Int) {
         val task = uiMainTasks.getOrNull(mainTaskIndex) ?: return
         task.subTasks.add(UiSubTask(id = nextDraftSubTaskId()))
+        sortTasks()
         _uiState.update { it.copy(error = null) }
     }
 
@@ -152,6 +154,7 @@ internal class EditTaskListViewModel(
             task.subTasks.removeAt(subTaskIndex)
         } else {
             task.subTasks[subTaskIndex].isDone = isChecked
+            sortTasks()
         }
 
         requestSync()
@@ -214,7 +217,7 @@ internal class EditTaskListViewModel(
 
                     uiMainTasks.clear()
 
-                    taskList.tasks.sortedByDueDate().forEach { task ->
+                    taskList.tasks.sortedTasks().forEach { task ->
                         val draft = UiMainTask.fromDomain(task)
                         uiMainTasks.add(draft)
                         observeRecurrenceSanitization(draft)
@@ -291,7 +294,7 @@ internal class EditTaskListViewModel(
                             uiTask.dueDateState.setTextAndPlaceCursorAtEnd(serverTask.dueDate)
                         }
                         pendingCompletionTaskIds.clear()
-                        sortTasksByDueDate()
+                        sortTasks()
                     }
 
                     _uiState.update {
@@ -342,7 +345,7 @@ internal class EditTaskListViewModel(
         }
 
         val trimmedTitle = titleState.text.toString().trim()
-        val normalizedTasks = uiMainTasks.mapNotNull { it.toDomain() }.sortedByDueDate()
+        val normalizedTasks = uiMainTasks.mapNotNull { it.toDomain() }.sortedTasks()
 
         if (trimmedTitle.isBlank()) {
             if (persistedTaskListId != null) {
@@ -370,19 +373,28 @@ internal class EditTaskListViewModel(
             mainTask.subTasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
         }
         uiMainTasks.removeAll { it.descriptionState.text.toString().trim().isBlank() }
-        sortTasksByDueDate()
+        sortTasks()
     }
 
-    private fun sortTasksByDueDate() {
-        if (uiMainTasks.size < 2) return
-
+    private fun sortTasks() {
         // Keep existing UiMainTask instances so TextFieldState, focus, and cursor state survive autosyncs.
-        val sortedTasks = uiMainTasks.sortedByDueDate { it.dueDateState.text.toString() }
+        val sortedTasks = uiMainTasks.sortedTasks(
+            isDone = { it.isDone },
+            dueDate = { it.dueDateState.text.toString() }
+        )
 
-        if (uiMainTasks.toList() == sortedTasks) return
+        if (uiMainTasks.toList() != sortedTasks) {
+            uiMainTasks.clear()
+            uiMainTasks.addAll(sortedTasks)
+        }
 
-        uiMainTasks.clear()
-        uiMainTasks.addAll(sortedTasks)
+        uiMainTasks.forEach { mainTask ->
+            val sortedSubTasks = mainTask.subTasks.sortedTasks { it.isDone }
+            if (mainTask.subTasks.toList() != sortedSubTasks) {
+                mainTask.subTasks.clear()
+                mainTask.subTasks.addAll(sortedSubTasks)
+            }
+        }
     }
 
     private fun observeRecurrenceSanitization(draft: UiMainTask) {
@@ -440,21 +452,31 @@ internal class EditTaskListViewModel(
             } else {
                 serverTask
             }
-        }.sortedByDueDate(),
+        }.sortedTasks(),
         isAutoDelete = isAutoDelete
     )
 
-    private fun List<MainTask>.sortedByDueDate(): List<MainTask> =
-        sortedByDueDate { it.dueDate }
+    private fun List<MainTask>.sortedTasks(): List<MainTask> =
+        sortedTasks(isDone = { it.isDone }, dueDate = { it.dueDate })
+            .map { task -> task.copy(subTasks = task.subTasks.sortedTasks { it.isDone }) }
 
-    // Shared by domain payloads/snapshots and the mutable UI list; only due-date access differs.
-    private fun <T> Iterable<T>.sortedByDueDate(dueDate: (T) -> String): List<T> =
+    // Shared by domain payloads/snapshots and the mutable UI list; only field access differs.
+    private fun <T> Iterable<T>.sortedTasks(
+        isDone: (T) -> Boolean,
+        dueDate: (T) -> String
+    ): List<T> =
         withIndex()
             .sortedWith(
-                compareBy<IndexedValue<T>> { dueDate(it.value).dueDateSortKey() == null }
+                compareBy<IndexedValue<T>> { isDone(it.value) }
+                    .thenBy { dueDate(it.value).dueDateSortKey() == null }
                     .thenBy { dueDate(it.value).dueDateSortKey() }
                     .thenBy { it.index }
             )
+            .map { it.value }
+
+    private fun <T> Iterable<T>.sortedTasks(isDone: (T) -> Boolean): List<T> =
+        withIndex()
+            .sortedWith(compareBy<IndexedValue<T>> { isDone(it.value) }.thenBy { it.index })
             .map { it.value }
 
     private fun String.dueDateSortKey(): String? =
