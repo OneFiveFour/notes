@@ -92,12 +92,13 @@ internal class EditTaskListViewModel(
         }
     }
 
-    fun onAddMainTask() {
+    fun onAddMainTask(): String {
         val draft = UiMainTask(id = nextDraftMainTaskId())
         uiMainTasks.add(draft)
         sortTasks()
         observeRecurrenceSanitization(draft)
         _uiState.update { it.copy(error = null) }
+        return draft.id
     }
 
     fun onRemoveMainTask(index: Int) {

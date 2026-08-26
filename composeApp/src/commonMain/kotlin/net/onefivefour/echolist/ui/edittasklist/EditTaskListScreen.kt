@@ -31,7 +31,7 @@ import net.onefivefour.echolist.ui.theme.EchoListTheme
 @Composable
 internal fun EditTaskListScreen(
     uiState: EditTaskListUiState,
-    onAddMainTask: () -> Unit,
+    onAddMainTask: () -> String,
     onRemoveMainTask: (Int) -> Unit,
     onAddSubTask: (Int) -> Unit,
     onRemoveSubTask: (Int, Int) -> Unit,
@@ -192,7 +192,7 @@ private fun EditTaskListScreenPreview() {
                     isAutoDelete = false,
                     mode = EditTaskListMode.Create(parentDir = "")
                 ),
-                onAddMainTask = {},
+                onAddMainTask = { "preview-main-task" },
                 onRemoveMainTask = {},
                 onAddSubTask = {},
                 onRemoveSubTask = { _, _ -> },

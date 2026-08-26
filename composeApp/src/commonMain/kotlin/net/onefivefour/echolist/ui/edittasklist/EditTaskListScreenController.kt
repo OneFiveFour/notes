@@ -27,7 +27,7 @@ internal data class EditTaskListScreenController(
 @Composable
 internal fun rememberEditTaskListScreenController(
     mainTasks: List<UiMainTask>,
-    onAddMainTask: () -> Unit,
+    onAddMainTask: () -> String,
     onRemoveMainTask: (Int) -> Unit,
     onAddSubTask: (Int) -> Unit,
     onRemoveSubTask: (Int, Int) -> Unit
@@ -64,14 +64,13 @@ internal fun rememberEditTaskListScreenController(
                 clearFocusRequest += 1
             }
 
-            pendingFocusTarget = action.focusTarget
-            action.mutation.execute(
+            pendingFocusTarget = action.mutation.execute(
                 mainTasks = mainTasks,
                 onAddMainTask = onAddMainTask,
                 onRemoveMainTask = onRemoveMainTask,
                 onAddSubTask = onAddSubTask,
                 onRemoveSubTask = onRemoveSubTask
-            )
+            ) ?: action.focusTarget
         }
     }
 
@@ -90,12 +89,7 @@ internal fun rememberEditTaskListScreenController(
             }
         },
         onAddMainTaskAndFocus = {
-            applyKeyboardAction(
-                KeyboardActionResolution(
-                    focusTarget = FocusTarget.LastMainTask,
-                    mutation = KeyboardMutation.AddMainTask
-                )
-            )
+            pendingFocusTarget = FocusTarget.MainTask(onAddMainTask())
         },
         onTitleKeyboardAction = {
             applyKeyboardAction(resolveTitleKeyboardAction(mainTasks))
@@ -130,32 +124,33 @@ internal fun rememberEditTaskListScreenController(
 
 private fun KeyboardMutation?.execute(
     mainTasks: List<UiMainTask>,
-    onAddMainTask: () -> Unit,
+    onAddMainTask: () -> String,
     onRemoveMainTask: (Int) -> Unit,
     onAddSubTask: (Int) -> Unit,
     onRemoveSubTask: (Int, Int) -> Unit
-) {
-    when (this) {
-        null -> Unit
-        KeyboardMutation.AddMainTask -> onAddMainTask()
-        is KeyboardMutation.RemoveMainTask -> {
-            mainTasks.indexOfMainTask(id = mainTaskId)
-                ?.let(onRemoveMainTask)
-        }
+): FocusTarget? = when (this) {
+    null -> null
+    KeyboardMutation.AddMainTask -> FocusTarget.MainTask(onAddMainTask())
+    is KeyboardMutation.RemoveMainTask -> {
+        mainTasks.indexOfMainTask(id = mainTaskId)
+            ?.let(onRemoveMainTask)
+        null
+    }
 
-        is KeyboardMutation.AddSubTask -> {
-            mainTasks.indexOfMainTask(id = mainTaskId)
-                ?.let(onAddSubTask)
-        }
+    is KeyboardMutation.AddSubTask -> {
+        mainTasks.indexOfMainTask(id = mainTaskId)
+            ?.let(onAddSubTask)
+        null
+    }
 
-        is KeyboardMutation.RemoveSubTask -> {
-            mainTasks.findTaskCoordinates(
-                mainTaskId = mainTaskId,
-                subTaskId = subTaskId
-            )?.let { coordinates ->
-                onRemoveSubTask(coordinates.mainTaskIndex, coordinates.subTaskIndex)
-            }
+    is KeyboardMutation.RemoveSubTask -> {
+        mainTasks.findTaskCoordinates(
+            mainTaskId = mainTaskId,
+            subTaskId = subTaskId
+        )?.let { coordinates ->
+            onRemoveSubTask(coordinates.mainTaskIndex, coordinates.subTaskIndex)
         }
+        null
     }
 }
 
