@@ -3,14 +3,19 @@ package net.onefivefour.echolist
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavBackStack
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
@@ -18,10 +23,14 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
+import echolist.composeapp.generated.resources.Res
+import echolist.composeapp.generated.resources.ic_arrow_back
+import echolist.composeapp.generated.resources.navigate_back
 import net.onefivefour.echolist.data.repository.normalizePath
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.common.GradientBackground
+import net.onefivefour.echolist.ui.common.RoundIconButton
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
@@ -45,6 +54,7 @@ import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun App() {
@@ -85,18 +95,55 @@ private fun UnauthenticatedApp(authViewModel: AuthViewModel) {
 @Composable
 private fun AuthenticatedApp() {
     val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
+    val canNavigateBack = backStack.size > 1
 
     NavigationBackHandler(
         state = rememberNavigationEventState(NavigationEventInfo.None),
-        isBackEnabled = backStack.size > 1,
+        isBackEnabled = canNavigateBack,
         onBackCompleted = { backStack.removeLastOrNull() }
     )
 
+    Box(modifier = Modifier.fillMaxSize()) {
+        AuthenticatedNavDisplay(
+            backStack = backStack,
+            canNavigateBack = canNavigateBack
+        )
+
+        if (canNavigateBack) {
+            RoundIconButton(
+                iconRes = Res.drawable.ic_arrow_back,
+                onClick = { backStack.removeLastOrNull() },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(
+                        end = EchoListTheme.dimensions.l,
+                        bottom = EchoListTheme.dimensions.m
+                    ),
+                containerColor = EchoListTheme.materialColors.primary,
+                contentColor = EchoListTheme.materialColors.onPrimary,
+                contentDescription = stringResource(Res.string.navigate_back)
+            )
+        }
+    }
+}
+
+@Composable
+private fun AuthenticatedNavDisplay(
+    backStack: NavBackStack<NavKey>,
+    canNavigateBack: Boolean
+) {
     NavDisplay(
         modifier = Modifier
+            .fillMaxSize()
             .padding(
-                horizontal = EchoListTheme.dimensions.l,
-                vertical = EchoListTheme.dimensions.m
+                start = EchoListTheme.dimensions.l,
+                top = EchoListTheme.dimensions.m,
+                end = EchoListTheme.dimensions.l,
+                bottom = if (canNavigateBack) {
+                    EchoListTheme.dimensions.xxxl + EchoListTheme.dimensions.xl
+                } else {
+                    EchoListTheme.dimensions.m
+                }
             ),
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
@@ -259,7 +306,11 @@ private fun AuthenticatedApp() {
                     onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
                     onToggleAutoDelete = viewModel::onToggleAutoDelete,
                     onFieldFocusLost = viewModel::onFieldFocusLost,
-                    onNavigateToSettings = { mainTaskId, currentDueDate, currentRecurrence, currentIsNotificationEnabled ->
+                    onNavigateToSettings = {
+                            mainTaskId,
+                            currentDueDate,
+                            currentRecurrence,
+                            currentIsNotificationEnabled ->
                         viewModel.onSettingsNavigationStarted()
                         backStack.add(
                             MainTaskSettingsRoute(
