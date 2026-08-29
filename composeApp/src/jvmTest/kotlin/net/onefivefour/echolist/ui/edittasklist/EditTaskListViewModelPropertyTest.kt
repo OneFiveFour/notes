@@ -44,6 +44,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
         val taskLists = mutableMapOf<String, TaskList>()
         var nextCreatedId = 1
         var blockNextUpdate: CompletableDeferred<Unit>? = null
+        var updateTaskListTransform: (TaskList) -> TaskList = { it }
 
         fun addTaskList(taskList: TaskList) {
             taskLists[taskList.id] = taskList
@@ -92,11 +93,13 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskLists[params.id]
                 ?: return Result.failure(NoSuchElementException("TaskList not found: ${params.id}"))
 
-            val updated = existing.copy(
-                name = params.title,
-                tasks = params.tasks,
-                updatedAt = existing.updatedAt + 1,
-                isAutoDelete = params.isAutoDelete
+            val updated = updateTaskListTransform(
+                existing.copy(
+                    name = params.title,
+                    tasks = params.tasks,
+                    updatedAt = existing.updatedAt + 1,
+                    isAutoDelete = params.isAutoDelete
+                )
             )
             taskLists[updated.id] = updated
             return Result.success(updated)
@@ -298,6 +301,52 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             vm.uiState.value.uiMainTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Task 2")
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls[0].tasks.map { it.description } shouldBe listOf("Task 2")
+        }
+    }
+
+    test("auto-delete keeps recurring main tasks and applies the renewed due date") {
+        runTest(testDispatcher) {
+            val repo = FakeTaskListRepository()
+            val existing = taskList(
+                id = "task-list-auto-recurring",
+                tasks = listOf(
+                    MainTask(
+                        id = "recurring",
+                        description = "Recurring task",
+                        isDone = false,
+                        dueDate = "2026-04-01",
+                        recurrence = "FREQ=WEEKLY",
+                        subTasks = emptyList()
+                    )
+                ),
+                isAutoDelete = true
+            )
+            repo.addTaskList(existing)
+            repo.updateTaskListTransform = { updated ->
+                updated.copy(
+                    tasks = updated.tasks.map { task ->
+                        task.copy(isDone = false, dueDate = "2026-04-08")
+                    }
+                )
+            }
+
+            val vm = EditTaskListViewModel(
+                mode = EditTaskListMode.Edit(existing.id),
+                taskListRepository = repo,
+                settingsResultBus = MainTaskSettingsResultBus(),
+                notificationScheduler = NoOpNotificationScheduler()
+            )
+
+            testScheduler.advanceUntilIdle()
+
+            vm.onMainTaskCheckedChange(0, true)
+            testScheduler.advanceUntilIdle()
+
+            repo.updateTaskListCalls shouldHaveSize 1
+            repo.updateTaskListCalls.single().tasks.single().isDone shouldBe true
+            vm.uiState.value.uiMainTasks shouldHaveSize 1
+            vm.uiState.value.uiMainTasks.single().isDone shouldBe false
+            vm.uiState.value.uiMainTasks.single().dueDateState.text.toString() shouldBe "2026-04-08"
         }
     }
 

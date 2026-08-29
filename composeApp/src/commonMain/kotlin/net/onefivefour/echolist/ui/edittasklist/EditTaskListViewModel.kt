@@ -119,7 +119,7 @@ internal class EditTaskListViewModel(
 
         val isRecurring = task.recurrenceState.text.isNotEmpty()
 
-        if (_uiState.value.isAutoDelete && isChecked) {
+        if (_uiState.value.isAutoDelete && isChecked && !isRecurring) {
             uiMainTasks.removeAt(index)
         } else {
             task.isDone = isChecked

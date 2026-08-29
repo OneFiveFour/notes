@@ -94,7 +94,7 @@ internal fun MainTaskCard(
                 verticalAlignment = Alignment.Top,
                 horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.s)
             ) {
-                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xxl) {
+                CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides EchoListTheme.dimensions.xl) {
                     Checkbox(
                         checked = mainTask.isDone,
                         onCheckedChange = onMainTaskCheckedChange
