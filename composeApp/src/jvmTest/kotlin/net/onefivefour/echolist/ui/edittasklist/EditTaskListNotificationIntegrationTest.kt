@@ -285,7 +285,13 @@ private class IntegrationRecordingScheduler : NotificationScheduler {
     val scheduleCalls = mutableListOf<IntegrationScheduleCall>()
     val cancelCalls = mutableListOf<IntegrationCancelCall>()
 
-    override suspend fun schedule(taskId: String, title: String, body: String, dueDateIso: String) {
+    override suspend fun schedule(
+        taskId: String,
+        taskListId: String,
+        title: String,
+        body: String,
+        dueDateIso: String
+    ) {
         scheduleCalls.add(IntegrationScheduleCall(taskId, title, body, dueDateIso))
     }
 

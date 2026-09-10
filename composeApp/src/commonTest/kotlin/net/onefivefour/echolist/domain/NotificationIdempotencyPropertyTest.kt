@@ -62,8 +62,8 @@ class NotificationIdempotencyPropertyTest : FunSpec({
             )
 
             // Schedule the same task twice
-            scheduleTaskNotification(scheduler, task, taskListName)
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             // Exactly one pending notification should exist for this taskId
             scheduler.pendingNotifications.size shouldBe 1
@@ -93,8 +93,8 @@ class NotificationIdempotencyPropertyTest : FunSpec({
             val task2 = task1.copy(dueDate = dueDate2)
 
             // Schedule with first due date, then with a different due date
-            scheduleTaskNotification(scheduler, task1, taskListName)
-            scheduleTaskNotification(scheduler, task2, taskListName)
+            scheduleTaskNotification(scheduler, task1, taskListName, "list-1")
+            scheduleTaskNotification(scheduler, task2, taskListName, "list-1")
 
             // Still exactly one pending notification for this taskId (the latest one)
             scheduler.pendingNotifications.size shouldBe 1
@@ -125,7 +125,7 @@ class NotificationIdempotencyPropertyTest : FunSpec({
             )
 
             // Should complete without throwing
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             // No state changes in the scheduler
             scheduler.scheduleCalled shouldBe 0
@@ -149,7 +149,13 @@ private class StatefulFakeScheduler : NotificationScheduler {
 
     val pendingNotifications = mutableMapOf<String, ScheduledNotification>()
 
-    override suspend fun schedule(taskId: String, title: String, body: String, dueDateIso: String) {
+    override suspend fun schedule(
+        taskId: String,
+        taskListId: String,
+        title: String,
+        body: String,
+        dueDateIso: String
+    ) {
         pendingNotifications[taskId] = ScheduledNotification(taskId, title, body, dueDateIso)
     }
 
@@ -168,7 +174,13 @@ private class PermissionDeniedScheduler : NotificationScheduler {
     var cancelCalled = 0
         private set
 
-    override suspend fun schedule(taskId: String, title: String, body: String, dueDateIso: String) {
+    override suspend fun schedule(
+        taskId: String,
+        taskListId: String,
+        title: String,
+        body: String,
+        dueDateIso: String
+    ) {
         // Permission denied — no-op, no exception
     }
 

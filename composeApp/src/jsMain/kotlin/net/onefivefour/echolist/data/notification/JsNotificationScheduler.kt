@@ -28,8 +28,10 @@ class JsNotificationScheduler : NotificationScheduler {
 
     private val scheduledTimeouts = mutableMapOf<String, Int>()
 
+    // taskListId is unused: the browser Notification API used here has no action buttons.
     override suspend fun schedule(
         taskId: String,
+        taskListId: String,
         title: String,
         body: String,
         dueDateIso: String

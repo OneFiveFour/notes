@@ -25,6 +25,14 @@
         <receiver
             android:name=".data.notification.TaskReminderReceiver"
             android:exported="false" />
+
+        <receiver
+            android:name=".data.notification.TaskDoneReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="net.onefivefour.echolist.action.MARK_TASK_DONE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>
