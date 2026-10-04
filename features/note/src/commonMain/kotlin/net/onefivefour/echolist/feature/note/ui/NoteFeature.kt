@@ -15,7 +15,7 @@ fun NoteFeature(parentDir: String, noteId: String?, onNavigateBack: () -> Unit) 
     val mode = resolvedNoteId?.let(EditNoteMode::Edit)
         ?: EditNoteMode.Create(normalizePath(parentDir))
     val viewModel = koinViewModel<EditNoteViewModel>(
-        key = "editNote-${parentDir}-${resolvedNoteId.orEmpty()}"
+        key = "editNote-$parentDir-${resolvedNoteId.orEmpty()}"
     ) { parametersOf(mode) }
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -31,5 +31,4 @@ fun NoteFeature(parentDir: String, noteId: String?, onNavigateBack: () -> Unit) 
         onSaveClick = viewModel::onSaveClick,
         onDeleteClick = viewModel::onDeleteClick
     )
-
 }

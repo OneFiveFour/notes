@@ -44,7 +44,9 @@ class JsNotificationScheduler : NotificationScheduler {
 
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         if (dueDate < today) {
-            println("[JsNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping")
+            println(
+                "[JsNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping"
+            )
             return
         }
 
@@ -55,7 +57,10 @@ class JsNotificationScheduler : NotificationScheduler {
                 return
             }
             "default" -> {
-                println("[JsNotificationScheduler] WARNING: Notification permission not yet granted for task $taskId, skipping")
+                println(
+                    "[JsNotificationScheduler] WARNING: Notification permission " +
+                        "not yet granted for task $taskId, skipping"
+                )
                 return
             }
         }

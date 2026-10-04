@@ -83,16 +83,16 @@ private fun MainTaskSettingsContent(
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.l)
     ) {
-            DatePicker(
-                state = datePickerState,
-                modifier = Modifier.fillMaxWidth(),
-                title = null,
-                headline = null,
-                showModeToggle = false,
-                colors = DatePickerDefaults.colors(
-                    containerColor = Color.Transparent
-                )
+        DatePicker(
+            state = datePickerState,
+            modifier = Modifier.fillMaxWidth(),
+            title = null,
+            headline = null,
+            showModeToggle = false,
+            colors = DatePickerDefaults.colors(
+                containerColor = Color.Transparent
             )
+        )
 
         SettingsSection(title = "Repeat") {
             RecurrenceIntervalPicker(
@@ -195,7 +195,8 @@ private fun RecurrenceDetail(
                         onDayOfMonthChanged = { newDay ->
                             onRecurrenceDetailChanged(recurrenceState.copy(dayOfMonth = newDay))
                         },
-                        isMonthIntervalError = showValidationErrors && !isValidPositiveInt(recurrenceState.everyNMonths),
+                        isMonthIntervalError =
+                        showValidationErrors && !isValidPositiveInt(recurrenceState.everyNMonths),
                         isDayOfMonthError = showValidationErrors && !isValidDayOfMonth(recurrenceState.dayOfMonth)
                     )
                 }

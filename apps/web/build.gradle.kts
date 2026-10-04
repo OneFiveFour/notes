@@ -4,8 +4,14 @@ plugins {
     alias(libs.plugins.composeCompiler)
 }
 kotlin {
-    js { browser(); binaries.executable() }
-    wasmJs { browser(); binaries.executable() }
+    js {
+        browser()
+        binaries.executable()
+    }
+    wasmJs {
+        browser()
+        binaries.executable()
+    }
     sourceSets.commonMain.dependencies {
         implementation(project(":app"))
         implementation(libs.compose.ui)

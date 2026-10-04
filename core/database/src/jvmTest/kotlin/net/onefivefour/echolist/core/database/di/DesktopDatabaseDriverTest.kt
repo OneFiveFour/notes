@@ -25,7 +25,12 @@ class DesktopDatabaseDriverTest : FunSpec({
         runTest {
             createDesktopSqlDriver(databasePath).use { driver ->
                 EchoListDatabase(driver).notesQueries.insertOrReplace(
-                    "note-1", "projects", "Desktop note", "Persistence matters", 1234L, 1234L
+                    "note-1",
+                    "projects",
+                    "Desktop note",
+                    "Persistence matters",
+                    1234L,
+                    1234L
                 )
             }
             createDesktopSqlDriver(databasePath).use { driver ->

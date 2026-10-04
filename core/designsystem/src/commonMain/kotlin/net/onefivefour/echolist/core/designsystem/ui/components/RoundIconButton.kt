@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.core.designsystem.ui.components
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -27,7 +26,6 @@ fun RoundIconButton(
     contentColor: Color = EchoListTheme.materialColors.onSurface,
     contentDescription: String? = null
 ) {
-
     Surface(
         modifier = modifier
             .size(EchoListTheme.dimensions.xxxl),

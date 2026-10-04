@@ -16,7 +16,6 @@ import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.headersOf
-import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClientImpl
 import net.onefivefour.echolist.core.networking.data.config.NetworkConfig
 import net.onefivefour.echolist.core.networking.data.error.NetworkException
 

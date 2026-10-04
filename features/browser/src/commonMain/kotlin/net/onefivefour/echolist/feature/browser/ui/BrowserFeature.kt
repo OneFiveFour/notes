@@ -33,14 +33,14 @@ fun BrowserFeature(
 
     val createFolderViewModel =
         koinViewModel<CreateFolderViewModel>(
-            key = "createFolder-${parentDir}"
+            key = "createFolder-$parentDir"
         ) { parametersOf(parentDir) }
 
     val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
 
     val renameFolderViewModel =
         koinViewModel<RenameFolderViewModel>(
-            key = "renameFolder-${parentDir}"
+            key = "renameFolder-$parentDir"
         ) { parametersOf(parentDir) }
 
     val renameFolderUiState by renameFolderViewModel.uiState.collectAsStateWithLifecycle()
@@ -74,5 +74,4 @@ fun BrowserFeature(
         onConfirmRenameFolder = renameFolderViewModel::onConfirm,
         onDismissRenameFolder = renameFolderViewModel::dismissDialog
     )
-
 }

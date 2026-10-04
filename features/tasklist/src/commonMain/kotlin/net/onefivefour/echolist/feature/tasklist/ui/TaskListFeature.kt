@@ -25,7 +25,7 @@ fun TaskListFeature(
         ?: EditTaskListMode.Create(normalizePath(parentDir))
 
     val viewModel = koinViewModel<EditTaskListViewModel>(
-        key = "editTaskList-${parentDir}-${resolvedTaskListId.orEmpty()}"
+        key = "editTaskList-$parentDir-${resolvedTaskListId.orEmpty()}"
     ) { parametersOf(mode, settingsResults) }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -54,9 +54,10 @@ fun TaskListFeature(
                 currentRecurrence,
                 currentIsNotificationEnabled ->
             viewModel.onSettingsNavigationStarted()
-            onOpenSettings(TaskSettingsChanges(mainTaskId, currentDueDate, currentRecurrence, currentIsNotificationEnabled))
+            onOpenSettings(
+                TaskSettingsChanges(mainTaskId, currentDueDate, currentRecurrence, currentIsNotificationEnabled)
+            )
         },
         onDeleteClick = viewModel::onDeleteClick
     )
-
 }

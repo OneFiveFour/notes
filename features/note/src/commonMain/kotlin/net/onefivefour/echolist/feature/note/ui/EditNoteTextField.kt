@@ -19,7 +19,6 @@ internal fun EditNoteTextField(
     requestFocus: Boolean = true,
     focusRequester: FocusRequester = remember { FocusRequester() }
 ) {
-
     if (requestFocus) {
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()

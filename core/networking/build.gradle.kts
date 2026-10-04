@@ -11,5 +11,8 @@ kotlin.sourceSets {
     getByName("jvmMain").dependencies { implementation(libs.ktor.client.okhttp) }
     getByName("jsMain").dependencies { implementation(libs.ktor.client.js) }
     getByName("wasmJsMain").dependencies { implementation(libs.ktor.client.js) }
-    getByName("commonTest").dependencies { implementation(libs.ktor.client.mock); implementation(project(":core:protocol")) }
+    getByName("commonTest").dependencies {
+        implementation(libs.ktor.client.mock)
+        implementation(project(":core:protocol"))
+    }
 }

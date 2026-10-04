@@ -23,7 +23,7 @@ import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 @Composable
 internal fun MarkdownPreview(
     document: String,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val blocks = remember(document) { MarkdownSubsetParser.parse(document) }
     val linkColor = EchoListTheme.materialColors.primary
@@ -54,7 +54,7 @@ internal fun MarkdownPreview(
                     block.items.forEach { item ->
                         MarkdownListRow(
                             prefix = "-",
-                            content = item.toAnnotatedString(linkColor),
+                            content = item.toAnnotatedString(linkColor)
                         )
                     }
                 }
@@ -65,7 +65,7 @@ internal fun MarkdownPreview(
                     block.items.forEach { item ->
                         MarkdownListRow(
                             prefix = if (item.isChecked) "[x]" else "[ ]",
-                            content = item.content.toAnnotatedString(linkColor),
+                            content = item.content.toAnnotatedString(linkColor)
                         )
                     }
                 }
@@ -77,7 +77,7 @@ internal fun MarkdownPreview(
 @Composable
 private fun MarkdownListRow(
     prefix: String,
-    content: AnnotatedString,
+    content: AnnotatedString
 ) {
     Row(
         modifier = Modifier.fillMaxWidth(),

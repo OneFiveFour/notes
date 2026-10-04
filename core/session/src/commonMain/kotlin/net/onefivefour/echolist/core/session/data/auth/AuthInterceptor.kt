@@ -4,8 +4,6 @@ import net.onefivefour.echolist.core.session.domain.AuthEventBus
 
 import net.onefivefour.echolist.core.session.domain.AuthEvent
 
-import net.onefivefour.echolist.core.session.domain.SecureStorage
-
 import io.ktor.client.plugins.api.Send
 import io.ktor.client.plugins.api.createClientPlugin
 import io.ktor.client.request.HttpRequestBuilder

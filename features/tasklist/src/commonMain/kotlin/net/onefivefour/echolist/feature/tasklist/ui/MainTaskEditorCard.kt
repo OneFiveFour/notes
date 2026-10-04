@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.echolist.feature.tasklist.resources.Res
 import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
@@ -72,7 +71,6 @@ internal fun MainTaskCard(
     onSubTaskFocusHandled: () -> Unit,
     onSubTaskKeyboardAction: (String) -> Unit
 ) {
-
     val mainTaskFocusRequester = remember(mainTask.id) { FocusRequester() }
 
     LaunchedEffect(shouldFocusMainTask) {
@@ -111,7 +109,6 @@ internal fun MainTaskCard(
                     modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.Center
                 ) {
-
                     ElTextField(
                         state = mainTask.descriptionState,
                         style = EchoListTheme.typography.bodyLarge.copy(
@@ -266,7 +263,6 @@ private fun DueDateTag(
         }
     }
 }
-
 
 @Preview
 @Composable

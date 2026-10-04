@@ -12,7 +12,6 @@ import io.kotest.property.arbitrary.element
 import io.kotest.property.arbitrary.int
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.core.networking.data.client.withRetry
 import net.onefivefour.echolist.core.networking.data.error.NetworkException
 
 /**

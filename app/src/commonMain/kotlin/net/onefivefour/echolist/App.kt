@@ -178,13 +178,15 @@ private fun AuthenticatedNavDisplay(
                     taskListId = route.taskListId,
                     settingsResults = settingsChannels.resultsFor(route.editorId),
                     onOpenSettings = { initial ->
-                        backStack.add(MainTaskSettingsRoute(
-                            mainTaskId = initial.mainTaskId,
-                            currentDueDate = initial.dueDate,
-                            currentRecurrence = initial.recurrence,
-                            currentIsNotificationEnabled = initial.isNotificationEnabled,
-                            editorId = route.editorId
-                        ))
+                        backStack.add(
+                            MainTaskSettingsRoute(
+                                mainTaskId = initial.mainTaskId,
+                                currentDueDate = initial.dueDate,
+                                currentRecurrence = initial.recurrence,
+                                currentIsNotificationEnabled = initial.isNotificationEnabled,
+                                editorId = route.editorId
+                            )
+                        )
                     },
                     onNavigateBack = { backStack.removeLastOrNull() }
                 )
@@ -192,10 +194,17 @@ private fun AuthenticatedNavDisplay(
 
             entry<MainTaskSettingsRoute> { route ->
                 TaskSettingsFeature(
-                    initial = TaskSettingsChanges(route.mainTaskId, route.currentDueDate, route.currentRecurrence, route.currentIsNotificationEnabled),
-                    onResult = settingsChannels.sinkFor(route.editorId.ifBlank {
-                        backStack.filterIsInstance<EditTaskListRoute>().lastOrNull()?.editorId.orEmpty()
-                    })
+                    initial = TaskSettingsChanges(
+                        route.mainTaskId,
+                        route.currentDueDate,
+                        route.currentRecurrence,
+                        route.currentIsNotificationEnabled
+                    ),
+                    onResult = settingsChannels.sinkFor(
+                        route.editorId.ifBlank {
+                            backStack.filterIsInstance<EditTaskListRoute>().lastOrNull()?.editorId.orEmpty()
+                        }
+                    )
                 )
             }
         }

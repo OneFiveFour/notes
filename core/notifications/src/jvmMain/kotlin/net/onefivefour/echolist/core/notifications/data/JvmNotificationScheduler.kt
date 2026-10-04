@@ -47,7 +47,9 @@ class JvmNotificationScheduler(
 
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         if (dueDate < today) {
-            println("[JvmNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping")
+            println(
+                "[JvmNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping"
+            )
             return
         }
 

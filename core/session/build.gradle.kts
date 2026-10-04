@@ -11,7 +11,10 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
 }
 
 kotlin.sourceSets {
-    getByName("androidMain").dependencies { implementation(libs.androidx.security.crypto); implementation(libs.androidx.core) }
+    getByName("androidMain").dependencies {
+        implementation(libs.androidx.security.crypto)
+        implementation(libs.androidx.core)
+    }
     getByName("jvmMain").dependencies { implementation(project(":core:files")) }
     getByName("jsMain").dependencies { implementation(libs.kotlinx.browser) }
     getByName("wasmJsMain").dependencies { implementation(libs.kotlinx.browser) }

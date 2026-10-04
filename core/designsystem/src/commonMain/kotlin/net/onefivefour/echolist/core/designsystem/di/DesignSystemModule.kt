@@ -17,4 +17,3 @@ val designSystemModule: Module = module {
         )
     }
 }
-

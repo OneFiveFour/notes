@@ -20,6 +20,4 @@ actual val databaseModule = module {
     single {
         EchoListDatabase(driver = get())
     }
-
-
 }

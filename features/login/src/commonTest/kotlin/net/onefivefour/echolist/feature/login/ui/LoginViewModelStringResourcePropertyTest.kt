@@ -17,7 +17,6 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
 import org.jetbrains.compose.resources.getString
 
 /**

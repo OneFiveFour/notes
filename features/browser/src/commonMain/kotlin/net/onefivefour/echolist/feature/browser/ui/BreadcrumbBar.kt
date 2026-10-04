@@ -68,8 +68,7 @@ internal fun BreadcrumbBar(
             Icon(
                 modifier = Modifier
                     .offset(x = EchoListTheme.dimensions.xs)
-                    .clickable { onBreadcrumbClick("") }
-                ,
+                    .clickable { onBreadcrumbClick("") },
                 painter = painterResource(Res.drawable.ic_home),
                 contentDescription = stringResource(Res.string.home_title),
                 tint = when (breadcrumbs.size) {

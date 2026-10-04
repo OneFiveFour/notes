@@ -18,7 +18,12 @@ val noteModule = module {
     single<NoteRemoteDataSource> { NoteRemoteDataSourceImpl(client = get()) }
     single<CacheDataSource> { CacheDataSourceImpl(databaseProvider = get()) }
     single<NotesRepository> {
-        NotesRepositoryImpl(noteRemoteDataSource = get(), cacheDataSource = get(), directoryChangeNotifier = get(), dispatcher = Dispatchers.Default)
+        NotesRepositoryImpl(
+            noteRemoteDataSource = get(),
+            cacheDataSource = get(),
+            directoryChangeNotifier = get(),
+            dispatcher = Dispatchers.Default
+        )
     } withOptions { onClose { (it as? AutoCloseable)?.close() } }
     viewModel { params -> EditNoteViewModel(mode = params.get<EditNoteMode>(), notesRepository = get()) }
 }

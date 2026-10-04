@@ -31,5 +31,7 @@ internal class TaskSettingsChannels : ViewModel() {
 
     private fun entry(editorId: String): Entry = entries.getOrPut(editorId) { Entry() }
 
-    override fun onCleared() { clearEditors() }
+    override fun onCleared() {
+        clearEditors()
+    }
 }

@@ -13,7 +13,6 @@ internal class AuthRepositoryImpl(
     private val networkConfigProvider: NetworkConfigProvider
 ) : AuthRepository {
 
-
     override suspend fun login(
         baseUrl: String,
         username: String,

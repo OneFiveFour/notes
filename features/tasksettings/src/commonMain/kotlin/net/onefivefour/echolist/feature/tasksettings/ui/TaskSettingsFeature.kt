@@ -36,5 +36,4 @@ fun TaskSettingsFeature(initial: TaskSettingsChanges, onResult: TaskSettingsResu
         onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
         onNotificationToggleChanged = viewModel::onNotificationToggleChanged
     )
-
 }

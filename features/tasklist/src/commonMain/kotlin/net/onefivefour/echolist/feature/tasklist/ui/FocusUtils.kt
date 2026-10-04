@@ -19,13 +19,14 @@ internal fun resolveFocusTarget(
         FocusTarget.MainTask(task.id)
     }
 
-    is FocusTarget.LastSubTask -> tasks
-        .firstOrNull { it.id == focusTarget.mainTaskId }
-        ?.subTasks
-        ?.lastOrNull()
-        ?.let { subTask ->
-            FocusTarget.SubTask(focusTarget.mainTaskId, subTask.id)
-        }
+    is FocusTarget.LastSubTask ->
+        tasks
+            .firstOrNull { it.id == focusTarget.mainTaskId }
+            ?.subTasks
+            ?.lastOrNull()
+            ?.let { subTask ->
+                FocusTarget.SubTask(focusTarget.mainTaskId, subTask.id)
+            }
 }
 
 internal fun resolveTitleKeyboardAction(mainTasks: List<UiMainTask>): KeyboardActionResolution =

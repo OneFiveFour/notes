@@ -1,7 +1,6 @@
 package net.onefivefour.echolist.feature.note.di
 
 import io.kotest.core.spec.style.FunSpec
-import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
 import net.onefivefour.echolist.feature.note.ui.EditNoteMode

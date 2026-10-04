@@ -19,7 +19,6 @@ import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
-import net.onefivefour.echolist.feature.tasklist.ui.MainTaskSettingsResultBus
 
 /**
  * Integration tests verifying the toggle deactivation → sync → cancel flow.

@@ -22,10 +22,12 @@ class KoinModuleVerificationTest : FunSpec({
         EchoListDatabase.Schema.synchronous().create(driver)
         val application = koinApplication {
             modules(appModules)
-            modules(module {
-                single<SecureStorage> { FakeSecureStorage() }
-                single { EchoListDatabase(driver) }
-            })
+            modules(
+                module {
+                    single<SecureStorage> { FakeSecureStorage() }
+                    single { EchoListDatabase(driver) }
+                }
+            )
         }
         try {
             val koin = application.koin

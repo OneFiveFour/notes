@@ -21,7 +21,6 @@ import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.testutil.NoOpNotificationScheduler
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
-import net.onefivefour.echolist.feature.tasklist.ui.MainTaskSettingsResultBus
 
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class EditTaskListViewModelPropertyTest : FunSpec({
@@ -250,8 +249,22 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-delete-row",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList()),
-                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Task 1",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "t2",
+                        description = "Task 2",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
                 )
             )
             repo.addTaskList(existing)
@@ -279,8 +292,22 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-auto-main",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList()),
-                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Task 1",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "t2",
+                        description = "Task 2",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
                 ),
                 isAutoDelete = true
             )
@@ -384,7 +411,8 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             vm.onSubTaskCheckedChange(0, 0, true)
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.uiMainTasks[0].subTasks.map { it.descriptionState.text.toString() } shouldBe listOf("Sub 2")
+            vm.uiState.value.uiMainTasks[0].subTasks.map { it.descriptionState.text.toString() } shouldBe
+                listOf("Sub 2")
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls[0].tasks[0].subTasks.map { it.description } shouldBe listOf("Sub 2")
         }
@@ -533,7 +561,8 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             testScheduler.advanceUntilIdle()
 
             vm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("active", "completed")
-            vm.uiState.value.uiMainTasks[1].subTasks.map { it.id } shouldBe listOf("open-sub", "other-open-sub", "done-sub")
+            vm.uiState.value.uiMainTasks[1].subTasks.map { it.id } shouldBe
+                listOf("open-sub", "other-open-sub", "done-sub")
 
             vm.onMainTaskCheckedChange(0, true)
             testScheduler.advanceUntilIdle()
@@ -544,8 +573,11 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             vm.onSubTaskCheckedChange(0, 0, true)
             testScheduler.advanceUntilIdle()
 
-            vm.uiState.value.uiMainTasks[0].subTasks.map { it.id } shouldBe listOf("other-open-sub", "open-sub", "done-sub")
-            repo.updateTaskListCalls.last().tasks[0].subTasks.map { it.id } shouldBe listOf("other-open-sub", "open-sub", "done-sub")
+            vm.uiState.value.uiMainTasks[0].subTasks.map { it.id } shouldBe
+                listOf("other-open-sub", "open-sub", "done-sub")
+            repo.updateTaskListCalls.last().tasks[0].subTasks.map {
+                it.id
+            } shouldBe listOf("other-open-sub", "open-sub", "done-sub")
         }
     }
 
@@ -757,7 +789,14 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-strip-empty",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Real task", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Real task",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
                 )
             )
             repo.addTaskList(existing)
@@ -906,7 +945,14 @@ internal class EditTaskListViewModelPropertyTest : FunSpec({
             val existing = taskList(
                 id = "task-list-keep-empty",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Real task", isDone = false, dueDate = "", recurrence = "", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Real task",
+                        isDone = false,
+                        dueDate = "",
+                        recurrence = "",
+                        subTasks = emptyList()
+                    )
                 )
             )
             repo.addTaskList(existing)

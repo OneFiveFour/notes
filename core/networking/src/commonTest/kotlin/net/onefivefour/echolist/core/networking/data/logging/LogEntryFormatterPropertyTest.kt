@@ -72,7 +72,10 @@ class LogEntryFormatterPropertyTest : FunSpec({
     }
 
     // Feature: network-request-logging, Property 2: Response log entry contains status code, headers, and elapsed time
-    test("Feature: network-request-logging, Property 2: Response log entry contains status code, headers, and elapsed time") {
+    test(
+        "Feature: network-request-logging, Property 2: Response log entry " +
+            "contains status code, headers, and elapsed time"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.int(100..599),

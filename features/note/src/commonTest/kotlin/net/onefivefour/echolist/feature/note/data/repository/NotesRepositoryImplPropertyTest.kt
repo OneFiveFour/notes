@@ -75,7 +75,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.createNoteResult = Result.success(CreateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.createNote(params)
 
@@ -98,7 +99,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.createNoteResult = Result.success(CreateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.createNote(params)
 
@@ -124,7 +126,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
                 ListNotesResponse(notes = protoNotes)
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.listNotes(parentDir)
 
@@ -149,7 +152,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.listNotesResult = Result.success(ListNotesResponse())
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.listNotes(parentDir)
 
@@ -171,7 +175,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.getNoteResult = Result.success(GetNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.getNote(noteId)
 
@@ -203,7 +208,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
                 )
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.getNote(noteId)
 
@@ -225,7 +231,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.updateNoteResult = Result.success(UpdateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.updateNote(params)
 
@@ -248,7 +255,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.updateNoteResult = Result.success(UpdateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.updateNote(params)
 
@@ -271,7 +279,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.deleteNote(noteId)
 
@@ -288,7 +297,8 @@ internal class NotesRepositoryImplPropertyTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.deleteNoteResult = Result.success(DeleteNoteResponse())
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.deleteNote(noteId)
 

@@ -50,7 +50,9 @@ class WasmJsNotificationScheduler : NotificationScheduler {
 
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         if (dueDate < today) {
-            println("[WasmJsNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping")
+            println(
+                "[WasmJsNotificationScheduler] WARNING: Due date $dueDateIso is before today for task $taskId, skipping"
+            )
             return
         }
 
@@ -61,7 +63,10 @@ class WasmJsNotificationScheduler : NotificationScheduler {
                 return
             }
             "default" -> {
-                println("[WasmJsNotificationScheduler] WARNING: Notification permission not yet granted for task $taskId, skipping")
+                println(
+                    "[WasmJsNotificationScheduler] WARNING: Notification " +
+                        "permission not yet granted for task $taskId, skipping"
+                )
                 return
             }
         }

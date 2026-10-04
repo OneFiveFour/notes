@@ -1,5 +1,9 @@
 package net.onefivefour.echolist.feature.tasksettings.ui
 
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
+
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -15,8 +19,6 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
-import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
 import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.RecurrenceInterval
 
 /**
@@ -127,7 +129,10 @@ internal class MainTaskSettingsViewModelNotificationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: notification-permission-toggle, Property 4: Berechtigungsverweigerung erzwingt Deaktivierung (onScreenLeaving)") {
+    test(
+        "Feature: notification-permission-toggle, Property 4: " +
+            "Berechtigungsverweigerung erzwingt Deaktivierung (onScreenLeaving)"
+    ) {
         // **Validates: Requirements 4.2, 4.3**
         checkAll(
             PropTestConfig(iterations = 100),

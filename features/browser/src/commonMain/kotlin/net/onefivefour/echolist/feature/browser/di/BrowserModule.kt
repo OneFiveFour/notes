@@ -16,7 +16,13 @@ val browserModule = module {
     single<FileRepository> {
         FileRepositoryImpl(networkDataSource = get(), directoryChangeNotifier = get(), dispatcher = Dispatchers.Default)
     }
-    viewModel { params -> BrowserViewModel(parentDir = params.get(), fileRepository = get(), directoryChangeNotifier = get()) }
+    viewModel { params ->
+        BrowserViewModel(
+            parentDir = params.get(),
+            fileRepository = get(),
+            directoryChangeNotifier = get()
+        )
+    }
     viewModel { params -> CreateFolderViewModel(parentDir = params.get(), fileRepository = get()) }
     viewModel { params -> RenameFolderViewModel(parentDir = params.get(), fileRepository = get()) }
 }

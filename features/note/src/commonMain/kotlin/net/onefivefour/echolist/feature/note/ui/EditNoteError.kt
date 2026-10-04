@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import net.onefivefour.echolist.core.designsystem.ui.theme.Dimensions
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable

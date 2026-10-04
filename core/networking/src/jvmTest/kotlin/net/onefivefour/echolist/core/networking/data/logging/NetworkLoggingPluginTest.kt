@@ -2,7 +2,6 @@ package net.onefivefour.echolist.core.networking.data.logging
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.string.shouldContain
-import io.kotest.matchers.string.shouldNotContain
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.mock.MockEngine
 import io.ktor.client.engine.mock.respond

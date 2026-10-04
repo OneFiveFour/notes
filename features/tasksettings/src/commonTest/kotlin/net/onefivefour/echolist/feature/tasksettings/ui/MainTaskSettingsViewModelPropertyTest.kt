@@ -1,5 +1,9 @@
 package net.onefivefour.echolist.feature.tasksettings.ui
 
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
+
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
@@ -53,10 +57,10 @@ internal class MainTaskSettingsViewModelPropertyTest : FunSpec({
             currentDueDate = dueDate,
             currentRecurrence = recurrence,
             currentIsNotificationEnabled = true,
-            permissionChecker = object : net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker {
+            permissionChecker = object : NotificationPermissionChecker {
                 override suspend fun isGranted(): Boolean = true
             },
-            permissionRequester = object : net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester {
+            permissionRequester = object : NotificationPermissionRequester {
                 override suspend fun request(): Boolean = true
             },
             resultBus = MainTaskSettingsResultBus()

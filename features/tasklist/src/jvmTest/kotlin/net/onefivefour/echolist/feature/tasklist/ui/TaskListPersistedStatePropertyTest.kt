@@ -6,10 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.boolean
-import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.feature.tasklist.ui.EditTaskListMode
-import net.onefivefour.echolist.feature.tasklist.ui.EditTaskListUiState
 
 // Feature: note-tasklist-editors, Property tests for editor UI state
 

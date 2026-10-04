@@ -13,14 +13,6 @@ import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 import io.kotest.property.exhaustive.collection
 import kotlinx.datetime.DayOfWeek
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.RecurrenceInterval
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.RecurrenceState
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.hasValidDetails
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.isEditableNumberInput
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.isValidDayOfMonth
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.isValidPositiveInt
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.monthlyFormatString
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.weeklyFormatString
 
 /**
  * Returns whether the given [state] treats the date as a base date (recurrence is active).
@@ -219,7 +211,10 @@ internal class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 7.2**
      */
-    test("Property 6: Monthly format string correctness — output matches 'Every n month(s) on the mth day' for any positive integer and day") {
+    test(
+        "Property 6: Monthly format string correctness — output matches 'Every n " +
+            "month(s) on the mth day' for any positive integer and day"
+    ) {
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..1000), Arb.int(1..31)) { n, m ->
             monthlyFormatString(n, m) shouldBe "Every $n month(s) on the ${m}th day"
         }

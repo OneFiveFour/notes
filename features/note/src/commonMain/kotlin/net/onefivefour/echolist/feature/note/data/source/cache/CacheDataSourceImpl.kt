@@ -10,7 +10,6 @@ internal class CacheDataSourceImpl(
     private val currentTimeMillis: () -> Long = { currentEpochMillis() }
 ) : CacheDataSource {
 
-
     override suspend fun saveNote(note: Note) {
         val database = databaseProvider.get()
         database.notesQueries.insertOrReplace(

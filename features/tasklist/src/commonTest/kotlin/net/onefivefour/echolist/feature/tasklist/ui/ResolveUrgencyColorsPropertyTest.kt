@@ -79,7 +79,10 @@ internal class ResolveUrgencyColorsPropertyTest : FunSpec({
         )
     }
 
-    test("Feature: recurrence-reminders, Property 3: color resolution returns correct pair for every DueDateUrgency value") {
+    test(
+        "Feature: recurrence-reminders, Property 3: color resolution returns " +
+            "correct pair for every DueDateUrgency value"
+    ) {
         checkAll(Exhaustive.enum<DueDateUrgency>()) { urgency ->
             val (backgroundColor, textColor) = resolveUrgencyColorsPure(
                 urgency,
@@ -130,7 +133,10 @@ internal class ResolveUrgencyColorsPropertyTest : FunSpec({
         results.distinct().size shouldBe 3
     }
 
-    test("Feature: recurrence-reminders, Property 3: color resolution contract matches composable implementation structure") {
+    test(
+        "Feature: recurrence-reminders, Property 3: color resolution contract " +
+            "matches composable implementation structure"
+    ) {
         // Verify that the pure function contract matches what resolveUrgencyColors
         // in MainTaskEditorCard.kt is expected to produce:
         // Normal uses materialColors (surfaceVariant family)

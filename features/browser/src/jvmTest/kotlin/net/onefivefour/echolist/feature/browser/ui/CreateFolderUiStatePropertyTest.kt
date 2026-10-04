@@ -16,7 +16,10 @@ import io.kotest.property.checkAll
  */
 internal class CreateFolderUiStatePropertyTest : FunSpec({
 
-    test("Feature: create-folder-dialog, Property 2: isConfirmEnabled iff folderName is non-blank after trim and not loading") {
+    test(
+        "Feature: create-folder-dialog, Property 2: isConfirmEnabled iff " +
+            "folderName is non-blank after trim and not loading"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.string(0..50),

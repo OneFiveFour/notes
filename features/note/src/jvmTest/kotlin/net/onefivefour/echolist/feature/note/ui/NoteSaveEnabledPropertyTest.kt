@@ -8,8 +8,6 @@ import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.feature.note.ui.EditNoteMode
-import net.onefivefour.echolist.feature.note.ui.EditNoteUiState
 
 // Feature: note-tasklist-editors, Property tests for editor UI state
 
@@ -38,5 +36,4 @@ internal class NoteSaveEnabledPropertyTest : FunSpec({
             uiState.isSaveEnabled shouldBe expected
         }
     }
-
 })

@@ -21,8 +21,6 @@ actual val databaseModule = module {
     single {
         EchoListDatabase(driver = get())
     }
-
-
 }
 
 private val expectedDesktopTables = setOf("Folder", "Note")

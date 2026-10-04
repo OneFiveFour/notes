@@ -34,7 +34,6 @@ internal fun EditNoteScreen(
     val contentFocusRequester = remember { FocusRequester() }
 
     Column(modifier = modifier.fillMaxSize().imePadding()) {
-
         EditTitle(
             textFieldState = uiState.titleState,
             requestFocus = uiState.isCreateMode,
@@ -52,9 +51,10 @@ internal fun EditNoteScreen(
                     shape = EchoListTheme.shapes.medium
                 )
         ) {
-            Box(modifier = Modifier
-                .padding(dimensions.m)
-                .fillMaxSize()
+            Box(
+                modifier = Modifier
+                    .padding(dimensions.m)
+                    .fillMaxSize()
             ) {
                 when {
                     uiState.isLoading -> EditNoteLoading()

@@ -58,7 +58,8 @@ internal class NotesRepositoryImplTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.createNoteResult = Result.success(CreateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.createNote(params)
 
@@ -87,7 +88,8 @@ internal class NotesRepositoryImplTest : FunSpec({
                 )
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.createNote(params)
 
@@ -229,7 +231,8 @@ internal class NotesRepositoryImplTest : FunSpec({
             val fakeNetwork = FakeNoteRemoteDataSource()
             fakeNetwork.updateNoteResult = Result.success(UpdateNoteResponse(note = protoNote))
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             val result = repo.updateNote(params)
 
@@ -258,7 +261,8 @@ internal class NotesRepositoryImplTest : FunSpec({
                 )
             )
             val fakeCache = FakeCacheDataSource()
-            val repo = NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
+            val repo =
+                NotesRepositoryImpl(fakeNetwork, fakeCache, FakeDirectoryChangeNotifier(), Dispatchers.Unconfined)
 
             repo.updateNote(params)
 

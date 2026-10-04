@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.echolist.feature.browser.resources.Res
 import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import net.onefivefour.echolist.core.designsystem.resources.ic_edit
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
@@ -48,7 +47,6 @@ internal fun BrowserScreen(
     onConfirmRenameFolder: () -> Unit = {},
     onDismissRenameFolder: () -> Unit = {}
 ) {
-
     Column {
         BreadcrumbBar(
             breadcrumbs = uiState.breadcrumbs,

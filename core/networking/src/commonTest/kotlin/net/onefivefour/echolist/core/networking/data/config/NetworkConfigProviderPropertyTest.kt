@@ -6,7 +6,6 @@ import io.kotest.property.Arb
 import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
 import net.onefivefour.echolist.core.networking.domain.BackendUrlStore
 
 /**

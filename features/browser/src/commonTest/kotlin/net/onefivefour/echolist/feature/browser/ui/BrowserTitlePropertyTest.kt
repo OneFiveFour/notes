@@ -18,7 +18,7 @@ import io.kotest.property.checkAll
  *
  * **Validates: Requirements 6.2**
  */
-internal class HomeTitlePropertyTest : FunSpec({
+internal class BrowserTitlePropertyTest : FunSpec({
 
     test("Property 1: Home title parameterization") {
         checkAll(

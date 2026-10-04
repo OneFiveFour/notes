@@ -10,7 +10,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
 import net.onefivefour.echolist.core.designsystem.ui.theme.colorscheme.EchoListClassicTheme
 import org.koin.compose.koinInject
 import org.koin.mp.KoinPlatform

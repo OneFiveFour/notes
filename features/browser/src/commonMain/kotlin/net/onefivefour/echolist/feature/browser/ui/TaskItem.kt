@@ -9,9 +9,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import net.onefivefour.echolist.feature.browser.domain.model.FileMetadata
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
-import org.koin.core.scope.ScopeID
 
 @Composable
 internal fun TaskItem(
@@ -43,7 +41,7 @@ internal fun TaskItem(
             )
 
             Text(
-                text = "${doneTaskCount}/${totalTaskCount}",
+                text = "$doneTaskCount/$totalTaskCount",
                 style = EchoListTheme.typography.labelSmall,
                 color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.6f),
                 modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)

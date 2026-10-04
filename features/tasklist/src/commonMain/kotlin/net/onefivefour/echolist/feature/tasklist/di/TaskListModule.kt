@@ -7,6 +7,11 @@ import org.koin.dsl.module
 
 val taskListModule = module {
     viewModel { params ->
-        EditTaskListViewModel(mode = params.get<EditTaskListMode>(), taskListRepository = get(), settingsResults = params.get(), notificationScheduler = get())
+        EditTaskListViewModel(
+            mode = params.get<EditTaskListMode>(),
+            taskListRepository = get(),
+            settingsResults = params.get(),
+            notificationScheduler = get()
+        )
     }
 }

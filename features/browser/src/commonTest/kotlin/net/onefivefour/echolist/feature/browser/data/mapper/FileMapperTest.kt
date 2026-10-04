@@ -43,7 +43,11 @@ internal class FileMapperTest : FunSpec({
 
     test("toDomain transforms ListFilesResponse with multiple entries") {
         val protoEntries = listOf(
-            `file`.v1.FileEntry(path = "/file1.txt", title = "file1.txt", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
+            `file`.v1.FileEntry(
+                path = "/file1.txt",
+                title = "file1.txt",
+                item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE
+            ),
             `file`.v1.FileEntry(path = "/file2.md", title = "file2.md", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE),
             `file`.v1.FileEntry(path = "/folder1", title = "folder1", item_type = `file`.v1.ItemType.ITEM_TYPE_FOLDER)
         )
@@ -143,7 +147,11 @@ internal class FileMapperTest : FunSpec({
     test("toDomain handles ListFilesResponse with single entry") {
         val response = `file`.v1.ListFilesResponse(
             entries = listOf(
-                `file`.v1.FileEntry(path = "/single.txt", title = "single.txt", item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE)
+                `file`.v1.FileEntry(
+                    path = "/single.txt",
+                    title = "single.txt",
+                    item_type = `file`.v1.ItemType.ITEM_TYPE_NOTE
+                )
             )
         )
 

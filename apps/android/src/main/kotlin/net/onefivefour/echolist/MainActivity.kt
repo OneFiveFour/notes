@@ -4,7 +4,6 @@ import android.Manifest
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
@@ -201,7 +200,8 @@ private fun NotificationRationaleDialog(
         },
         text = {
             Text(
-                text = "EchoList needs notification permission to remind you about upcoming tasks. Without it, task reminders will be silently disabled.",
+                text = "EchoList needs notification permission to remind you " +
+                    "about upcoming tasks. Without it, task reminders will be silently disabled.",
                 style = EchoListTheme.typography.bodyMedium
             )
         },
@@ -240,7 +240,8 @@ private fun NotificationSettingsDialog(
         },
         text = {
             Text(
-                text = "Notification permission was permanently denied. To enable task reminders, please allow notifications in the app settings.",
+                text = "Notification permission was permanently denied. To " +
+                    "enable task reminders, please allow notifications in the app settings.",
                 style = EchoListTheme.typography.bodyMedium
             )
         },

@@ -43,7 +43,7 @@ android {
         "storeFile",
         "storePassword",
         "keyAlias",
-        "keyPassword",
+        "keyPassword"
     ).all { releaseSigningProperty(it) != null }
 
     defaultConfig {

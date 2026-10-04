@@ -24,7 +24,6 @@ import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
-import net.onefivefour.echolist.feature.tasklist.ui.MainTaskSettingsResultBus
 
 /**
  * Validates: Requirements 4.1, 4.2, 4.3, 4.4
@@ -124,8 +123,22 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
             val existing = taskList(
                 id = "tl-delete",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "2027-06-01", recurrence = "FREQ=DAILY", subTasks = emptyList()),
-                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "2027-06-02", recurrence = "FREQ=WEEKLY", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Task 1",
+                        isDone = false,
+                        dueDate = "2027-06-01",
+                        recurrence = "FREQ=DAILY",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "t2",
+                        description = "Task 2",
+                        isDone = false,
+                        dueDate = "2027-06-02",
+                        recurrence = "FREQ=WEEKLY",
+                        subTasks = emptyList()
+                    )
                 )
             )
             repo.addTaskList(existing)
@@ -162,8 +175,22 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
             val existing = taskList(
                 id = "tl-remove",
                 tasks = listOf(
-                    MainTask(id = "t1", description = "Task 1", isDone = false, dueDate = "2027-06-01", recurrence = "FREQ=DAILY", subTasks = emptyList()),
-                    MainTask(id = "t2", description = "Task 2", isDone = false, dueDate = "2027-06-02", recurrence = "FREQ=WEEKLY", subTasks = emptyList())
+                    MainTask(
+                        id = "t1",
+                        description = "Task 1",
+                        isDone = false,
+                        dueDate = "2027-06-01",
+                        recurrence = "FREQ=DAILY",
+                        subTasks = emptyList()
+                    ),
+                    MainTask(
+                        id = "t2",
+                        description = "Task 2",
+                        isDone = false,
+                        dueDate = "2027-06-02",
+                        recurrence = "FREQ=WEEKLY",
+                        subTasks = emptyList()
+                    )
                 )
             )
             repo.addTaskList(existing)
@@ -281,7 +308,9 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
             scheduler.scheduleCalls.clear()
 
             // First sync: update due date
-            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-07-01", recurrence = "FREQ=WEEKLY"))
+            settingsFlow.emit(
+                TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-07-01", recurrence = "FREQ=WEEKLY")
+            )
             testScheduler.advanceUntilIdle()
 
             // Wait for first schedule call
@@ -290,7 +319,9 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
             }
 
             // Second sync: update due date again
-            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-08-01", recurrence = "FREQ=WEEKLY"))
+            settingsFlow.emit(
+                TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-08-01", recurrence = "FREQ=WEEKLY")
+            )
             testScheduler.advanceUntilIdle()
 
             // Wait for second schedule call

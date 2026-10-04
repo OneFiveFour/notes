@@ -44,7 +44,10 @@ class NotificationIdempotencyPropertyTest : FunSpec({
 
     // -- Property 6: Notification idempotency --
 
-    test("Feature: recurrence-reminders, Property 6: scheduling same task twice results in exactly one pending notification") {
+    test(
+        "Feature: recurrence-reminders, Property 6: scheduling same task twice " +
+            "results in exactly one pending notification"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,
@@ -73,7 +76,10 @@ class NotificationIdempotencyPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: recurrence-reminders, Property 6: scheduling same task with different due dates results in exactly one pending notification") {
+    test(
+        "Feature: recurrence-reminders, Property 6: scheduling same task with " +
+            "different due dates results in exactly one pending notification"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,
@@ -107,7 +113,10 @@ class NotificationIdempotencyPropertyTest : FunSpec({
 
     // -- Property 9: Permission denied is a no-op --
 
-    test("Feature: recurrence-reminders, Property 9: permission denied scheduler completes without exception and records nothing") {
+    test(
+        "Feature: recurrence-reminders, Property 9: permission denied scheduler " +
+            "completes without exception and records nothing"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,

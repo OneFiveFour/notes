@@ -249,7 +249,9 @@ internal class FileRepositoryImplPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: create-folder-dialog, Property 6: Repository does not emit directoryChanged on failed createFolder") {
+    test(
+        "Feature: create-folder-dialog, Property 6: Repository does not emit directoryChanged on failed createFolder"
+    ) {
         checkAll(
             PropTestConfig(iterations = 20),
             arbCreateFolderParams

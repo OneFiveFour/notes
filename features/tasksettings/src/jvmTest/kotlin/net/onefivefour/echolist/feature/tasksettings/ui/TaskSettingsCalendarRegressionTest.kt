@@ -24,8 +24,15 @@ class TaskSettingsCalendarRegressionTest : FunSpec({
         runTest(dispatcher) {
             var result: TaskSettingsChanges? = null
             val sink = TaskSettingsResultSink { result = it }
-            val settings = MainTaskSettingsViewModel("draft", "", "", true,
-                NoOpNotificationPermissionChecker(), NoOpNotificationPermissionRequester(), sink)
+            val settings = MainTaskSettingsViewModel(
+                "draft",
+                "",
+                "",
+                true,
+                NoOpNotificationPermissionChecker(),
+                NoOpNotificationPermissionRequester(),
+                sink
+            )
             val selected = dueDateToUtcMillis("2026-08-01")!!
             settings.onDateSelected(selected)
             settings.onRecurrenceDetailChanged(RecurrenceState.Weekly(everyNWeeks = 2))
@@ -34,8 +41,16 @@ class TaskSettingsCalendarRegressionTest : FunSpec({
             val saved = requireNotNull(result)
             saved.dueDate shouldBe "2026-08-01"
             saved.recurrence shouldBe "FREQ=WEEKLY;INTERVAL=2"
-            val reopened = MainTaskSettingsViewModel(saved.mainTaskId, saved.dueDate, saved.recurrence, saved.isNotificationEnabled,
-                NoOpNotificationPermissionChecker(), NoOpNotificationPermissionRequester(), sink)
+            val reopened =
+                MainTaskSettingsViewModel(
+                    saved.mainTaskId,
+                    saved.dueDate,
+                    saved.recurrence,
+                    saved.isNotificationEnabled,
+                    NoOpNotificationPermissionChecker(),
+                    NoOpNotificationPermissionRequester(),
+                    sink
+                )
             val state = reopened.uiState.value as MainTaskSettingsUiState.Ready
             state.initialDateMillis shouldBe selected
             state.selectedDueDate shouldBe saved.dueDate

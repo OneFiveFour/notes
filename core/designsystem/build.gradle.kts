@@ -4,4 +4,7 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(libs.koin.compose)
     implementation(libs.kotlinx.coroutines.core)
 }
-compose.resources { publicResClass = true; packageOfResClass = "net.onefivefour.echolist.core.designsystem.resources" }
+compose.resources {
+    publicResClass = true
+    packageOfResClass = "net.onefivefour.echolist.core.designsystem.resources"
+}

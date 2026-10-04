@@ -1,7 +1,5 @@
 package net.onefivefour.echolist.core.session.data.repository
 
-import net.onefivefour.echolist.core.session.domain.SecureStorage
-
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb

@@ -68,7 +68,6 @@ internal fun SubTaskRow(
     }
 }
 
-
 @Preview
 @Composable
 private fun SubTaskRowPreview() {

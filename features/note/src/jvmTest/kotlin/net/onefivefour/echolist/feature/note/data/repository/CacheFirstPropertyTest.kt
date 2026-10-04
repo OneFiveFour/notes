@@ -99,7 +99,8 @@ internal class CacheFirstPropertyTest : FunSpec({
     test("Property 18: For any cached note, getNote returns cached data immediately without waiting for network") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
+            val cache: CacheDataSource =
+                CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val delayedNetwork = DelayedNoteRemoteDataSource(delayMs = 5_000)
 
             // Seed cache with the note

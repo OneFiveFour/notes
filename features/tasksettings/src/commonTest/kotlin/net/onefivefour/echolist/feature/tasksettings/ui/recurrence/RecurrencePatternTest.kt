@@ -4,8 +4,6 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import kotlinx.datetime.DayOfWeek
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.RecurrenceInterval
-import net.onefivefour.echolist.feature.tasksettings.ui.recurrence.RecurrenceState
 
 internal class RecurrencePatternTest : FunSpec({
 

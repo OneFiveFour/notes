@@ -72,6 +72,7 @@ internal class EditTaskListViewModel(
 
     @OptIn(ExperimentalUuidApi::class)
     private fun nextDraftMainTaskId() = Uuid.random().toString()
+
     @OptIn(ExperimentalUuidApi::class)
     private fun nextDraftSubTaskId() = Uuid.random().toString()
 

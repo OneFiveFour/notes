@@ -34,7 +34,9 @@ class EditorRouteSerializationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: note-tasklist-editors, Property 5: EditTaskListRoute serialization round-trip produces equal object") {
+    test(
+        "Feature: note-tasklist-editors, Property 5: EditTaskListRoute serialization round-trip produces equal object"
+    ) {
         val route = EditTaskListRoute(
             parentDir = "folder-1",
             taskListId = "task-list-1"

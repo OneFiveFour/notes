@@ -329,7 +329,10 @@ class NotificationSchedulingPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: recurrence-reminders, Property 7: body is description (or taskListName if empty), truncated to 200 chars") {
+    test(
+        "Feature: recurrence-reminders, Property 7: body is description (or " +
+            "taskListName if empty), truncated to 200 chars"
+    ) {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,

@@ -19,7 +19,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import net.onefivefour.echolist.core.session.domain.AuthEvent
 import net.onefivefour.echolist.core.session.domain.AuthEventBus
-import net.onefivefour.echolist.core.session.data.auth.AuthInterceptor
 import net.onefivefour.echolist.core.session.domain.AuthRepository
 import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
 import net.onefivefour.echolist.core.session.domain.StorageKeys
@@ -193,7 +192,8 @@ class AuthInterceptorPropertyTest : FunSpec({
                 }
 
                 try {
-                    val emittedEvent = async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { authEventBus.events.first() }
+                    val emittedEvent =
+                        async(start = kotlinx.coroutines.CoroutineStart.UNDISPATCHED) { authEventBus.events.first() }
                     client.get("http://localhost:$port$path")
 
                     // Verify: tokens cleared

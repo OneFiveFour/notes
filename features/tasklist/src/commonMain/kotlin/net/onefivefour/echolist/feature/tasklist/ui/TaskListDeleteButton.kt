@@ -9,7 +9,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import net.onefivefour.echolist.feature.tasklist.resources.Res
 import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource

@@ -44,7 +44,10 @@ class DueDateUrgencyCalculatorPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: recurrence-reminders, Property 1: computeUrgency always returns exactly one of the three urgency values") {
+    test(
+        "Feature: recurrence-reminders, Property 1: computeUrgency always " +
+            "returns exactly one of the three urgency values"
+    ) {
         checkAll(PropTestConfig(iterations = 100), arbLocalDate, arbLocalDate) { dueDate, today ->
             val result = DueDateUrgencyCalculator.computeUrgency(dueDate, today)
             val isExactlyOne = (result == DueDateUrgency.Overdue) xor
@@ -56,7 +59,9 @@ class DueDateUrgencyCalculatorPropertyTest : FunSpec({
 
     // -- Property 2: Urgency monotonicity --
 
-    test("Feature: recurrence-reminders, Property 2: for fixed today, earlier due dates have equal or greater severity") {
+    test(
+        "Feature: recurrence-reminders, Property 2: for fixed today, earlier due dates have equal or greater severity"
+    ) {
         checkAll(PropTestConfig(iterations = 100), arbLocalDate, arbLocalDate, arbLocalDate) { date1, date2, today ->
             val dueDate1 = if (date1 <= date2) date1 else date2
             val dueDate2 = if (date1 <= date2) date2 else date1

@@ -13,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import net.onefivefour.echolist.feature.note.resources.Res
 import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import net.onefivefour.echolist.core.designsystem.resources.ic_edit
 import net.onefivefour.echolist.core.designsystem.resources.visibility_on
@@ -32,7 +31,6 @@ internal fun EditNoteToolbar(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(EchoListTheme.dimensions.m)
     ) {
-
         Icon(
             painter = painterResource(SharedRes.drawable.ic_delete),
             contentDescription = "Delete Note",

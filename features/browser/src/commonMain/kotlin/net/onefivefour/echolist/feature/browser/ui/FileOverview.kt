@@ -59,7 +59,8 @@ internal fun FileOverview(
                         }
                     }
 
-                    ItemType.UNSPECIFIED -> { /* skip */
+                    ItemType.UNSPECIFIED -> {
+                        /* skip */
                     }
                 }
             }

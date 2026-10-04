@@ -109,9 +109,9 @@ internal fun CreateFolderDialogPreview() {
                     isLoading = false,
                     error = null
                 ),
-                onNameChange = {  },
-                onConfirm = {  },
-                onDismiss = {  }
+                onNameChange = { },
+                onConfirm = { },
+                onDismiss = { }
             )
         }
     }
