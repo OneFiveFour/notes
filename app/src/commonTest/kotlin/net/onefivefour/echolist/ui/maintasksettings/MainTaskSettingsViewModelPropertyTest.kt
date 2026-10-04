@@ -53,10 +53,10 @@ class MainTaskSettingsViewModelPropertyTest : FunSpec({
             currentDueDate = dueDate,
             currentRecurrence = recurrence,
             currentIsNotificationEnabled = true,
-            permissionChecker = object : net.onefivefour.echolist.domain.NotificationPermissionChecker {
+            permissionChecker = object : net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker {
                 override suspend fun isGranted(): Boolean = true
             },
-            permissionRequester = object : net.onefivefour.echolist.domain.NotificationPermissionRequester {
+            permissionRequester = object : net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester {
                 override suspend fun request(): Boolean = true
             },
             resultBus = MainTaskSettingsResultBus()

@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.testutil
 
-import net.onefivefour.echolist.domain.NotificationScheduler
+import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
 
 /**
  * No-op implementation of [NotificationScheduler] for tests that don't exercise notification logic.

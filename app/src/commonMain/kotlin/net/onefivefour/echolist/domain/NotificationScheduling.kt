@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.domain
 
+import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
+
 import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone

@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.domain
 
+import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
+
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 

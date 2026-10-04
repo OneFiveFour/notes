@@ -25,7 +25,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import net.onefivefour.echolist.data.notification.PermissionResultBridge
+import net.onefivefour.echolist.core.notifications.data.PermissionResultBridge
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.koin.android.ext.android.inject
 

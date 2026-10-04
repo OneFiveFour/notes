@@ -15,8 +15,8 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.domain.NotificationPermissionChecker
-import net.onefivefour.echolist.domain.NotificationPermissionRequester
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 
 /**

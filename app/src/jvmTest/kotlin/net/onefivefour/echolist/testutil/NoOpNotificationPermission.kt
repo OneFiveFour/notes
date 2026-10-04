@@ -1,7 +1,7 @@
 package net.onefivefour.echolist.testutil
 
-import net.onefivefour.echolist.domain.NotificationPermissionChecker
-import net.onefivefour.echolist.domain.NotificationPermissionRequester
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
 
 /**
  * No-op implementations of notification permission interfaces for tests that

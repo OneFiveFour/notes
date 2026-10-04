@@ -59,6 +59,11 @@ val networkModule: Module = module {
 }
 
 val dataModule: Module = module {
+    single<net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler> {
+        net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler { taskListId, taskId ->
+            net.onefivefour.echolist.domain.completeRecurringTaskFromNotification(get(), get(), taskListId, taskId)
+        }
+    }
     single<CoroutineDispatcher> { Dispatchers.Default }
 
     single<CacheDataSource> {

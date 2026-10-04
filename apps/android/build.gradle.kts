@@ -9,6 +9,7 @@ plugins {
 kotlin { compilerOptions { jvmTarget.set(JvmTarget.JVM_11) } }
 dependencies {
     implementation(project(":app"))
+    implementation(project(":core:notifications"))
     implementation(project(":core:designsystem"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.compose.foundation)

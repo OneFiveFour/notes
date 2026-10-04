@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.domain.NotificationPermissionChecker
-import net.onefivefour.echolist.domain.NotificationPermissionRequester
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionRequester
 import net.onefivefour.echolist.ui.recurrence.RecurrenceInterval
 import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 import net.onefivefour.echolist.ui.recurrence.hasValidDetails

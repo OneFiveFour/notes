@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
+            implementation(project(":core:notifications"))
             implementation(project(":core:session"))
             implementation(project(":core:networking"))
             implementation(project(":core:database"))
