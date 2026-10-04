@@ -19,13 +19,13 @@ import kotlinx.coroutines.launch
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 import kotlinx.coroutines.Dispatchers
-import net.onefivefour.echolist.data.dto.CreateTaskListParams
-import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
+import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
 import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
-import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.TaskList
-import net.onefivefour.echolist.domain.repository.TaskListRepository
-import net.onefivefour.echolist.domain.scheduleTaskNotification
+import net.onefivefour.echolist.core.tasks.domain.model.MainTask
+import net.onefivefour.echolist.core.tasks.domain.model.TaskList
+import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
+import net.onefivefour.echolist.core.tasks.domain.scheduleTaskNotification
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 internal class EditTaskListViewModel(

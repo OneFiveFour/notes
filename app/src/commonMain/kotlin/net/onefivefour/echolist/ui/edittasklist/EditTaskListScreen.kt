@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.SubTask
+import net.onefivefour.echolist.core.tasks.domain.model.MainTask
+import net.onefivefour.echolist.core.tasks.domain.model.SubTask
 import net.onefivefour.echolist.core.designsystem.ui.components.EditTitle
 import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground

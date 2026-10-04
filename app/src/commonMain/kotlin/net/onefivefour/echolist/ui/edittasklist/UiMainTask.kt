@@ -5,7 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import net.onefivefour.echolist.domain.model.MainTask
+import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 
 internal class UiMainTask(
     val id: String,

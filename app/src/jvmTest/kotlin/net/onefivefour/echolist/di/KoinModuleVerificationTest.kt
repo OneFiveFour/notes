@@ -28,6 +28,7 @@ class KoinModuleVerificationTest : FunSpec({
     test("dataModule - all dependencies are satisfied") {
         dataModule.verify(
             extraTypes = listOf(
+                net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient::class,
                 // EchoListDatabase is provided by the platform-specific databaseModule
                 net.onefivefour.echolist.cache.EchoListDatabase::class
             )

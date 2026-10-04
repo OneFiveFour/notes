@@ -8,7 +8,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.property.Exhaustive
 import io.kotest.property.checkAll
 import io.kotest.property.exhaustive.enum
-import net.onefivefour.echolist.domain.model.DueDateUrgency
+import net.onefivefour.echolist.core.tasks.domain.model.DueDateUrgency
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListColorScheme
 
 /**

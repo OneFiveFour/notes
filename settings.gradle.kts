@@ -47,3 +47,5 @@ include(":core:session")
 include(":core:notifications")
 
 include(":core:recurrence")
+
+include(":core:tasks")

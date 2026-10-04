@@ -8,16 +8,13 @@ import net.onefivefour.echolist.core.session.domain.AuthRepository
 import net.onefivefour.echolist.domain.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
 import net.onefivefour.echolist.data.repository.FileRepositoryImpl
-import net.onefivefour.echolist.domain.repository.TaskListRepository
-import net.onefivefour.echolist.data.repository.TaskListRepositoryImpl
+import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
-import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
-import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
@@ -53,24 +50,16 @@ val networkModule: Module = module {
         FileRemoteDataSourceImpl(client = get())
     }
 
-    single<TaskListRemoteDataSource> {
-        TaskListRemoteDataSourceImpl(client = get())
-    }
 }
 
 val dataModule: Module = module {
-    single<net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler> {
-        net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler { taskListId, taskId ->
-            net.onefivefour.echolist.domain.completeRecurringTaskFromNotification(get(), get(), taskListId, taskId)
-        }
-    }
     single<CoroutineDispatcher> { Dispatchers.Default }
 
     single<CacheDataSource> {
         CacheDataSourceImpl(database = get())
     }
 
-    includes(filesModule)
+    includes(filesModule, net.onefivefour.echolist.core.tasks.di.tasksModule)
 
     single<NotesRepository> {
         NotesRepositoryImpl(
@@ -91,13 +80,6 @@ val dataModule: Module = module {
         )
     }
 
-    single<TaskListRepository> {
-        TaskListRepositoryImpl(
-            networkDataSource = get(),
-            dispatcher = get(),
-            directoryChangeNotifier = get()
-        )
-    }
 }
 
 

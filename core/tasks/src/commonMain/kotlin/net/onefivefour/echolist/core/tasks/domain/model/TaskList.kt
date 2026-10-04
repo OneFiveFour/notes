@@ -1,0 +1,10 @@
+package net.onefivefour.echolist.core.tasks.domain.model
+
+data class TaskList(
+    val id: String,
+    val parentDir: String,
+    val name: String,
+    val tasks: List<MainTask>,
+    val updatedAt: Long,
+    val isAutoDelete: Boolean
+)

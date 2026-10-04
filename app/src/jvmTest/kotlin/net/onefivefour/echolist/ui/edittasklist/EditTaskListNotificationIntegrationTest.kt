@@ -11,13 +11,13 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.dto.CreateTaskListParams
-import net.onefivefour.echolist.data.models.UpdateTaskListParams
+import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
+import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
 import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
-import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.TaskList
-import net.onefivefour.echolist.domain.model.TaskListEntry
-import net.onefivefour.echolist.domain.repository.TaskListRepository
+import net.onefivefour.echolist.core.tasks.domain.model.MainTask
+import net.onefivefour.echolist.core.tasks.domain.model.TaskList
+import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
+import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 

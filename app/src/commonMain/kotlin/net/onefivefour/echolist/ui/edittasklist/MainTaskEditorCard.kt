@@ -39,10 +39,10 @@ import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import net.onefivefour.echolist.domain.DueDateUrgencyCalculator
-import net.onefivefour.echolist.domain.model.DueDateUrgency
-import net.onefivefour.echolist.domain.model.MainTask
-import net.onefivefour.echolist.domain.model.SubTask
+import net.onefivefour.echolist.core.tasks.domain.DueDateUrgencyCalculator
+import net.onefivefour.echolist.core.tasks.domain.model.DueDateUrgency
+import net.onefivefour.echolist.core.tasks.domain.model.MainTask
+import net.onefivefour.echolist.core.tasks.domain.model.SubTask
 import net.onefivefour.echolist.core.designsystem.ui.components.ElTextField
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme

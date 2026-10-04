@@ -4,7 +4,7 @@ import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import net.onefivefour.echolist.domain.model.SubTask
+import net.onefivefour.echolist.core.tasks.domain.model.SubTask
 
 internal class UiSubTask(
     val id: String,
