@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.ui.edittasklist
 
+import net.onefivefour.echolist.core.designsystem.resources.Res as SharedRes
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.ic_delete
+import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 
@@ -19,7 +21,7 @@ internal fun TaskListDeleteButton(
 ) {
     if (uiState.isPersisted) {
         Icon(
-            painter = painterResource(Res.drawable.ic_delete),
+            painter = painterResource(SharedRes.drawable.ic_delete),
             contentDescription = "Delete task list",
             modifier = Modifier
                 .clip(RoundedCornerShape(50))

@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.ui.edittasklist
 
+import net.onefivefour.echolist.core.designsystem.resources.Res as SharedRes
+
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -34,7 +36,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.ic_delete
+import net.onefivefour.echolist.core.designsystem.resources.ic_delete
 import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -165,7 +167,7 @@ internal fun MainTaskCard(
 
                     if (!isAutoDelete) {
                         Icon(
-                            painter = painterResource(Res.drawable.ic_delete),
+                            painter = painterResource(SharedRes.drawable.ic_delete),
                             contentDescription = "Delete main task",
                             modifier = Modifier
                                 .clip(RoundedCornerShape(50))

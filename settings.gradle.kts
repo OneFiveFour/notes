@@ -51,3 +51,5 @@ include(":core:recurrence")
 include(":core:tasks")
 
 include(":features:login")
+
+include(":features:browser")

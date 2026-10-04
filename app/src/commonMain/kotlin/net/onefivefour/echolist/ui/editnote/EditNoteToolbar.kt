@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.ic_delete
-import echolist.composeapp.generated.resources.ic_edit
+import net.onefivefour.echolist.core.designsystem.resources.ic_delete
+import net.onefivefour.echolist.core.designsystem.resources.ic_edit
 import net.onefivefour.echolist.core.designsystem.resources.visibility_on
 import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
@@ -34,7 +34,7 @@ internal fun EditNoteToolbar(
     ) {
 
         Icon(
-            painter = painterResource(Res.drawable.ic_delete),
+            painter = painterResource(SharedRes.drawable.ic_delete),
             contentDescription = "Delete Note",
             modifier = Modifier
                 .clip(RoundedCornerShape(50))
@@ -59,7 +59,7 @@ internal fun EditNoteToolbar(
         Icon(
             painter = painterResource(
                 when (uiState.isPreview) {
-                    true -> Res.drawable.ic_edit
+                    true -> SharedRes.drawable.ic_edit
                     false -> SharedRes.drawable.visibility_on
                 }
             ),

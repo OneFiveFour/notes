@@ -1,0 +1,53 @@
+package net.onefivefour.echolist.feature.browser.ui
+
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import net.onefivefour.echolist.feature.browser.domain.model.FileMetadata
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
+import org.koin.core.scope.ScopeID
+
+@Composable
+internal fun TaskItem(
+    id: String,
+    title: String,
+    doneTaskCount: Int,
+    totalTaskCount: Int,
+    onClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier
+            .fillMaxWidth()
+            .border(
+                width = EchoListTheme.dimensions.borderWidth,
+                color = EchoListTheme.materialColors.secondary,
+                shape = EchoListTheme.shapes.small
+            )
+            .clickable { onClick(id) },
+        shape = EchoListTheme.shapes.small
+    ) {
+        Column(
+            modifier = Modifier.padding(EchoListTheme.dimensions.m)
+        ) {
+            Text(
+                text = title,
+                style = EchoListTheme.typography.titleSmall,
+                color = EchoListTheme.materialColors.onSurface
+            )
+
+            Text(
+                text = "${doneTaskCount}/${totalTaskCount}",
+                style = EchoListTheme.typography.labelSmall,
+                color = EchoListTheme.materialColors.onSurface.copy(alpha = 0.6f),
+                modifier = Modifier.padding(top = EchoListTheme.dimensions.xs)
+            )
+        }
+    }
+}

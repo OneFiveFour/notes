@@ -1,5 +1,7 @@
 package net.onefivefour.echolist
 
+import net.onefivefour.echolist.feature.browser.ui.BrowserFeature
+
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.togetherWith
@@ -33,11 +35,6 @@ import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackgrou
 import net.onefivefour.echolist.core.designsystem.ui.components.RoundIconButton
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
-import net.onefivefour.echolist.ui.home.CreateFolderViewModel
-import net.onefivefour.echolist.ui.home.CreateItemCallbacks
-import net.onefivefour.echolist.ui.home.HomeScreen
-import net.onefivefour.echolist.ui.home.HomeViewModel
-import net.onefivefour.echolist.ui.home.RenameFolderViewModel
 import net.onefivefour.echolist.feature.login.ui.LoginFeature
 import net.onefivefour.echolist.ui.editnote.EditNoteScreen
 import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
@@ -140,56 +137,8 @@ private fun AuthenticatedNavDisplay(
         predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         entryProvider = entryProvider {
             entry<HomeRoute> { route ->
-                val homeViewModel =
-                    koinViewModel<HomeViewModel>(key = route.parentDir) { parametersOf(route.parentDir) }
-
-                val homeUiState by homeViewModel.uiState.collectAsStateWithLifecycle()
-
-                LaunchedEffect(Unit) {
-                    homeViewModel.clearErrorAndReload()
-                }
-
-                LaunchedEffect(homeViewModel) {
-                    homeViewModel.navigateToFolder.collect { parentDir ->
-                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
-                        if (index >= 0) {
-                            while (backStack.size > index + 1) backStack.removeLast()
-                        } else {
-                            backStack.removeLastOrNull()
-                            backStack.add(HomeRoute(parentDir))
-                        }
-                    }
-                }
-
-                val createFolderViewModel =
-                    koinViewModel<CreateFolderViewModel>(
-                        key = "createFolder-${route.parentDir}"
-                    ) { parametersOf(route.parentDir) }
-
-                val createFolderUiState by createFolderViewModel.uiState.collectAsStateWithLifecycle()
-
-                val renameFolderViewModel =
-                    koinViewModel<RenameFolderViewModel>(
-                        key = "renameFolder-${route.parentDir}"
-                    ) { parametersOf(route.parentDir) }
-
-                val renameFolderUiState by renameFolderViewModel.uiState.collectAsStateWithLifecycle()
-
-                LaunchedEffect(renameFolderViewModel) {
-                    renameFolderViewModel.navigateToFolder.collect { newPath ->
-                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == newPath }
-                        if (index >= 0) {
-                            while (backStack.size > index + 1) backStack.removeLast()
-                        } else {
-                            backStack.removeLastOrNull()
-                            backStack.add(HomeRoute(newPath))
-                        }
-                    }
-                }
-
-                HomeScreen(
-                    uiState = homeUiState,
-                    createFolderUiState = createFolderUiState,
+                BrowserFeature(
+                    parentDir = route.parentDir,
                     onBreadcrumbClick = { parentDir ->
                         val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
                         if (index >= 0) {
@@ -198,40 +147,18 @@ private fun AuthenticatedNavDisplay(
                             backStack.add(HomeRoute(parentDir))
                         }
                     },
-                    onRefresh = homeViewModel::refresh,
-                    createItemCallbacks = CreateItemCallbacks(
-                        onCreateFolder = createFolderViewModel::showDialog,
-                        onCreateNote = { backStack.add(EditNoteRoute(parentDir = route.parentDir)) },
-                        onCreateTaskList = { backStack.add(EditTaskListRoute(parentDir = route.parentDir)) }
-                    ),
-                    onFolderClick = { folderPath ->
-                        backStack.add(HomeRoute(folderPath))
+                    onReplaceFolder = { parentDir ->
+                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
+                        if (index >= 0) {
+                            while (backStack.size > index + 1) backStack.removeLast()
+                        } else {
+                            backStack.removeLastOrNull()
+                            backStack.add(HomeRoute(parentDir))
+                        }
                     },
-                    onNoteClick = { noteId ->
-                        backStack.add(
-                            EditNoteRoute(
-                                parentDir = route.parentDir,
-                                noteId = noteId
-                            )
-                        )
-                    },
-                    onTaskClick = { taskListId ->
-                        backStack.add(
-                            EditTaskListRoute(
-                                parentDir = route.parentDir,
-                                taskListId = taskListId
-                            )
-                        )
-                    },
-                    onDeleteCurrentFolderClick = homeViewModel::onDeleteCurrentFolderClick,
-                    onRenameCurrentFolderClick = renameFolderViewModel::showDialog,
-                    onFolderNameChange = createFolderViewModel::onNameChange,
-                    onConfirmCreateFolder = createFolderViewModel::onConfirm,
-                    onDismissCreateFolder = createFolderViewModel::dismissDialog,
-                    renameFolderUiState = renameFolderUiState,
-                    onRenameFolderNameChange = renameFolderViewModel::onNameChange,
-                    onConfirmRenameFolder = renameFolderViewModel::onConfirm,
-                    onDismissRenameFolder = renameFolderViewModel::dismissDialog
+                    onOpenFolder = { backStack.add(HomeRoute(it)) },
+                    onOpenNote = { backStack.add(EditNoteRoute(route.parentDir, it)) },
+                    onOpenTaskList = { backStack.add(EditTaskListRoute(route.parentDir, it)) }
                 )
             }
 
