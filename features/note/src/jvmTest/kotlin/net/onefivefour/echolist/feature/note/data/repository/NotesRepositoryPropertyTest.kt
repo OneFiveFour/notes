@@ -19,6 +19,7 @@ import kotlinx.coroutines.delay
 import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import kotlinx.coroutines.supervisorScope
 import net.onefivefour.echolist.cache.EchoListDatabase
+import app.cash.sqldelight.async.coroutines.synchronous
 import net.onefivefour.echolist.feature.note.domain.model.CreateNoteParams
 import net.onefivefour.echolist.feature.note.domain.model.Note
 import net.onefivefour.echolist.feature.note.domain.model.UpdateNoteParams
@@ -78,7 +79,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
 
     fun createInMemoryDatabase(): EchoListDatabase {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        EchoListDatabase.Schema.create(driver)
+        EchoListDatabase.Schema.synchronous().create(driver)
         return EchoListDatabase(driver)
     }
 
@@ -148,7 +149,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 6: After creating a note, getNote returns matching title/content/path") {
         checkAll(PropTestConfig(iterations = 20), arbCreateNoteParams) { params ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             val createdId = "generated-${params.title}"
@@ -201,7 +202,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 7: After updating a note, getNote returns updated content with newer timestamp") {
         checkAll(PropTestConfig(iterations = 20), arbNote, Arb.string(1..200)) { originalNote, newContent ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             val updatedTimestamp = originalNote.updatedAt + 1000
@@ -250,7 +251,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 8: After deleting a note, getNote fails with an error") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             mockNetwork.deleteNoteHandler = { DeleteNoteResponse() }
@@ -277,7 +278,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 11: NetworkException from network layer is propagated with the same type through repository") {
         checkAll(PropTestConfig(iterations = 20), arbNetworkException) { exception ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             // Make getNote throw the exception and ensure no cache fallback
@@ -299,7 +300,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 14: When network fails, getNote returns cached data") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             // Seed cache
@@ -324,7 +325,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 14: When network fails, listNotes returns cached data") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             // Seed cache
@@ -348,7 +349,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 16: Queued offline operations are synced in FIFO order") {
         checkAll(PropTestConfig(iterations = 20), Arb.int(2..5)) { opCount ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             // First: network fails so operations get queued
@@ -401,7 +402,7 @@ internal class NotesRepositoryPropertyTest : FunSpec({
     test("Property 23: Cancelled repository operation cancels the underlying network request") {
         checkAll(PropTestConfig(iterations = 20), Arb.string(1..50)) { noteId ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val mockNetwork = MockNoteRemoteDataSource()
 
             var networkCallStarted = false

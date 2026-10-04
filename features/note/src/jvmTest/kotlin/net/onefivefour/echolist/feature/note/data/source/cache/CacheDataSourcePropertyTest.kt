@@ -11,6 +11,7 @@ import io.kotest.property.arbitrary.long
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
 import net.onefivefour.echolist.cache.EchoListDatabase
+import app.cash.sqldelight.async.coroutines.synchronous
 import net.onefivefour.echolist.feature.note.domain.model.Note
 
 /**
@@ -36,7 +37,7 @@ internal class CacheDataSourcePropertyTest : FunSpec({
 
     fun createInMemoryDatabase(): EchoListDatabase {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        EchoListDatabase.Schema.create(driver)
+        EchoListDatabase.Schema.synchronous().create(driver)
         return EchoListDatabase(driver)
     }
 
@@ -45,7 +46,7 @@ internal class CacheDataSourcePropertyTest : FunSpec({
     test("Property 13: For any note saved via saveNote, getNote with the same id returns an equivalent note") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
 
             cache.saveNote(note)
             val retrieved = cache.getNote(note.id)
@@ -68,16 +69,16 @@ internal class CacheDataSourcePropertyTest : FunSpec({
             val jdbcUrl = "jdbc:sqlite:file:prop17_${note.id.hashCode()}?mode=memory&cache=shared"
 
             val driver1 = JdbcSqliteDriver(jdbcUrl)
-            EchoListDatabase.Schema.create(driver1)
+            EchoListDatabase.Schema.synchronous().create(driver1)
             val db1 = EchoListDatabase(driver1)
-            val cache1: CacheDataSource = CacheDataSourceImpl(db1)
+            val cache1: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db1 })
 
             cache1.saveNote(note)
 
             // "Restart": open a new driver/database instance against the same shared memory DB
             val driver2 = JdbcSqliteDriver(jdbcUrl)
             val db2 = EchoListDatabase(driver2)
-            val cache2: CacheDataSource = CacheDataSourceImpl(db2)
+            val cache2: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db2 })
 
             val retrieved = cache2.getNote(note.id)
 

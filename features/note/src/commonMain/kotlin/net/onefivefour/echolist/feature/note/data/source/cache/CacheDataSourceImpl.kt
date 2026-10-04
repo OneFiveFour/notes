@@ -1,18 +1,19 @@
 package net.onefivefour.echolist.feature.note.data.source.cache
 
-import net.onefivefour.echolist.cache.EchoListDatabase
+import net.onefivefour.echolist.core.database.data.DatabaseProvider
+import app.cash.sqldelight.async.coroutines.awaitAsOneOrNull
+import app.cash.sqldelight.async.coroutines.awaitAsList
 import net.onefivefour.echolist.feature.note.domain.model.Note
 
 internal class CacheDataSourceImpl(
-    private val database: EchoListDatabase,
+    private val databaseProvider: DatabaseProvider,
     private val currentTimeMillis: () -> Long = { currentEpochMillis() }
 ) : CacheDataSource {
 
-    private val noteQueries get() = database.notesQueries
-    private val entryQueries get() = database.folderQueries
 
     override suspend fun saveNote(note: Note) {
-        noteQueries.insertOrReplace(
+        val database = databaseProvider.get()
+        database.notesQueries.insertOrReplace(
             id = note.id,
             parentDir = note.parentDir,
             title = note.title,
@@ -23,9 +24,10 @@ internal class CacheDataSourceImpl(
     }
 
     override suspend fun saveNotes(notes: List<Note>) {
+        val database = databaseProvider.get()
         database.transaction {
             notes.forEach { note ->
-                noteQueries.insertOrReplace(
+                database.notesQueries.insertOrReplace(
                     id = note.id,
                     parentDir = note.parentDir,
                     title = note.title,
@@ -38,27 +40,31 @@ internal class CacheDataSourceImpl(
     }
 
     override suspend fun getNote(id: String): Note? {
-        return noteQueries.selectById(id).executeAsOneOrNull()?.toDomain()
+        val database = databaseProvider.get()
+        return database.notesQueries.selectById(id).awaitAsOneOrNull()?.toDomain()
     }
 
     override suspend fun listNotes(parentDir: String): List<Note> {
+        val database = databaseProvider.get()
         return if (parentDir.isEmpty()) {
-            noteQueries.selectAll().executeAsList().map { it.toDomain() }
+            database.notesQueries.selectAll().awaitAsList().map { it.toDomain() }
         } else {
-            noteQueries.selectByParentDir(parentDir).executeAsList().map { it.toDomain() }
+            database.notesQueries.selectByParentDir(parentDir).awaitAsList().map { it.toDomain() }
         }
     }
 
     override suspend fun deleteNote(id: String) {
-        noteQueries.deleteById(id)
+        val database = databaseProvider.get()
+        database.notesQueries.deleteById(id)
     }
 
     override suspend fun saveEntries(parentDir: String, entries: List<String>) {
+        val database = databaseProvider.get()
         database.transaction {
-            entryQueries.deleteByParentPath(parentDir)
+            database.folderQueries.deleteByParentPath(parentDir)
             val now = currentTimeMillis()
             entries.forEach { entryPath ->
-                entryQueries.insertOrReplace(
+                database.folderQueries.insertOrReplace(
                     parentPath = parentDir,
                     entryPath = entryPath,
                     cachedAt = now
@@ -68,13 +74,15 @@ internal class CacheDataSourceImpl(
     }
 
     override suspend fun listEntries(parentDir: String): List<String> {
-        return entryQueries.selectByParentPath(parentDir).executeAsList()
+        val database = databaseProvider.get()
+        return database.folderQueries.selectByParentPath(parentDir).awaitAsList()
     }
 
     override suspend fun clear() {
+        val database = databaseProvider.get()
         database.transaction {
-            noteQueries.deleteAll()
-            entryQueries.deleteAll()
+            database.notesQueries.deleteAll()
+            database.folderQueries.deleteAll()
         }
     }
 }

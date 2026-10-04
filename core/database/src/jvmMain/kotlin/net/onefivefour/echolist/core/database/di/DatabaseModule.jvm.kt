@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.core.database.di
 
+import app.cash.sqldelight.async.coroutines.synchronous
+import net.onefivefour.echolist.core.database.data.DatabaseProvider
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import net.onefivefour.echolist.cache.EchoListDatabase
@@ -11,6 +13,7 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.sql.DriverManager
 
 actual val databaseModule = module {
+    single { DatabaseProvider { get<EchoListDatabase>() } }
     single<SqlDriver> {
         createDesktopSqlDriver()
     }
@@ -80,7 +83,7 @@ private fun initializeDesktopDatabase(
         0L -> adoptOrCreateUnversionedDatabase(driver, databaseUrl, targetVersion)
         targetVersion -> Unit
         in 1 until targetVersion -> {
-            EchoListDatabase.Schema.migrate(driver, currentVersion, targetVersion)
+            EchoListDatabase.Schema.synchronous().migrate(driver, currentVersion, targetVersion)
             writeUserVersion(databaseUrl, targetVersion)
         }
         else -> error(
@@ -90,7 +93,7 @@ private fun initializeDesktopDatabase(
 }
 
 private fun createSchema(driver: SqlDriver, databaseUrl: String, targetVersion: Long) {
-    EchoListDatabase.Schema.create(driver)
+    EchoListDatabase.Schema.synchronous().create(driver)
     writeUserVersion(databaseUrl, targetVersion)
 }
 

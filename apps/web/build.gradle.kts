@@ -11,4 +11,9 @@ kotlin {
         implementation(libs.compose.ui)
         implementation(libs.koin.core)
     }
+    listOf("jsMain", "wasmJsMain").forEach { target ->
+        sourceSets.getByName(target).dependencies {
+            implementation(devNpm("copy-webpack-plugin", libs.versions.copyWebpackPlugin.get()))
+        }
+    }
 }

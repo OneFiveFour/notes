@@ -14,7 +14,7 @@ class NoteModuleTest : FunSpec({
         noteModule.verify(
             extraTypes = listOf(
                 ConnectRpcClient::class,
-                EchoListDatabase::class,
+                net.onefivefour.echolist.core.database.data.DatabaseProvider::class,
                 DirectoryChangeNotifier::class,
                 EditNoteMode::class,
                 kotlinx.coroutines.CoroutineDispatcher::class

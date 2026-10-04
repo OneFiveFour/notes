@@ -30,6 +30,8 @@ navigation3-ui = "1.1.1"
 wire = "6.4.5"
 ktor = "3.5.2"
 sqldelight = "2.3.2"
+sqljs = "1.8.0"
+copyWebpackPlugin = "9.1.0"
 koin = "4.2.2"
 kotlinx-serialization = "1.11.0"
 kotest = "6.2.3"
@@ -70,6 +72,7 @@ ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
 
 # SQLDelight
 sqldelight-runtime = { module = "app.cash.sqldelight:runtime", version.ref = "sqldelight" }
+sqldelight-async = { module = "app.cash.sqldelight:async-extensions", version.ref = "sqldelight" }
 sqldelight-coroutines = { module = "app.cash.sqldelight:coroutines-extensions", version.ref = "sqldelight" }
 sqldelight-driver-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sqldelight" }
 sqldelight-driver-jvm = { module = "app.cash.sqldelight:sqlite-driver", version.ref = "sqldelight" }

@@ -13,6 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import net.onefivefour.echolist.data.FakeDirectoryChangeNotifier
 import net.onefivefour.echolist.cache.EchoListDatabase
+import app.cash.sqldelight.async.coroutines.synchronous
 import net.onefivefour.echolist.feature.note.domain.model.Note
 import net.onefivefour.echolist.feature.note.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.feature.note.data.source.cache.CacheDataSourceImpl
@@ -54,7 +55,7 @@ internal class CacheFirstPropertyTest : FunSpec({
 
     fun createInMemoryDatabase(): EchoListDatabase {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        EchoListDatabase.Schema.create(driver)
+        EchoListDatabase.Schema.synchronous().create(driver)
         return EchoListDatabase(driver)
     }
 
@@ -98,7 +99,7 @@ internal class CacheFirstPropertyTest : FunSpec({
     test("Property 18: For any cached note, getNote returns cached data immediately without waiting for network") {
         checkAll(PropTestConfig(iterations = 20), arbNote) { note ->
             val db = createInMemoryDatabase()
-            val cache: CacheDataSource = CacheDataSourceImpl(db)
+            val cache: CacheDataSource = CacheDataSourceImpl(net.onefivefour.echolist.core.database.data.DatabaseProvider { db })
             val delayedNetwork = DelayedNoteRemoteDataSource(delayMs = 5_000)
 
             // Seed cache with the note

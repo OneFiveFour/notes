@@ -5,6 +5,7 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import net.onefivefour.echolist.cache.EchoListDatabase
+import app.cash.sqldelight.async.coroutines.synchronous
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.DriverManager
@@ -44,7 +45,7 @@ class DesktopDatabaseDriverTest : FunSpec({
         val databaseUrl = desktopDatabaseUrl(databasePath)
 
         JdbcSqliteDriver(databaseUrl).use { driver ->
-            EchoListDatabase.Schema.create(driver)
+            EchoListDatabase.Schema.synchronous().create(driver)
         }
 
         readUserVersion(databasePath) shouldBe 0L

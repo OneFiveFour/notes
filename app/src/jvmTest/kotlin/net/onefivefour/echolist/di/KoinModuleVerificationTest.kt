@@ -6,6 +6,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.ktor.client.HttpClient
 import net.onefivefour.echolist.cache.EchoListDatabase
+import app.cash.sqldelight.async.coroutines.synchronous
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler
 import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
@@ -18,7 +19,7 @@ import org.koin.dsl.module
 class KoinModuleVerificationTest : FunSpec({
     test("application composition resolves shared services without touching real storage or a backend") {
         val driver = JdbcSqliteDriver(JdbcSqliteDriver.IN_MEMORY)
-        EchoListDatabase.Schema.create(driver)
+        EchoListDatabase.Schema.synchronous().create(driver)
         val application = koinApplication {
             modules(appModules)
             modules(module {
