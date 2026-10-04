@@ -1,66 +1,46 @@
-This is a Kotlin Multiplatform project targeting Android, Web (JS and WasmJS), and Desktop (JVM).
+# EchoList
 
-* [/app](./app/src) is for code that will be shared across your Compose Multiplatform applications.
-  It contains several subfolders:
-  - [commonMain](./app/src/commonMain/kotlin) is for code that’s common for all targets.
-  - Other folders are for Kotlin code that will be compiled for only the platform indicated in the folder name.
-    For example, if you want to edit the Desktop (JVM) specific part, the [jvmMain](./app/src/jvmMain/kotlin)
-    folder is the appropriate location.
+Kotlin Multiplatform productivity app for Android, Desktop/JVM and Web (JavaScript and WasmJS).
 
-### Build and Run Android Application
+The app browses folders and edits notes and task lists against a self-hosted backend.
 
-To build and run the development version of the Android app, use the run configuration from the run widget
-in your IDE’s toolbar or build it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :apps:android:assembleDebug
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :apps:android:assembleDebug
-  ```
+## Project layout
 
-### Build and Run Desktop (JVM) Application
+- `apps/android`, `apps/desktop`, `apps/web`: platform entrypoints and packaging.
+- `app`: shared composition root, authentication state and navigation.
+- `features/browser`, `features/tasklist`, `features/note`, `features/login`, `features/tasksettings`: independently buildable libraries.
+- `core`: focused shared libraries for tasks, recurrence, notifications, files, session, networking, protocol, database and design system.
+- `build-logic`: shared build conventions and automated architecture checks.
 
-To build and run the development version of the desktop app, use the run configuration from the run widget
-in your IDE’s toolbar or run it directly from the terminal:
-- on macOS/Linux
-  ```shell
-  ./gradlew :apps:desktop:run
-  ```
-- on Windows
-  ```shell
-  .\gradlew.bat :apps:desktop:run
-  ```
+See [ARCHITECTURE.md](ARCHITECTURE.md) for responsibilities, dependency rules, package layers and guidance for adding features.
 
-### Build and Run Web Application
+## Build and run
 
-To build and run the development version of the web app, use the run configuration from the run widget
-in your IDE's toolbar or run it directly from the terminal:
-- for the Wasm target (faster, modern browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :apps:web:wasmJsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :apps:web:wasmJsBrowserDevelopmentRun
-    ```
-- for the JS target (slower, supports older browsers):
-  - on macOS/Linux
-    ```shell
-    ./gradlew :apps:web:jsBrowserDevelopmentRun
-    ```
-  - on Windows
-    ```shell
-    .\gradlew.bat :apps:web:jsBrowserDevelopmentRun
-    ```
+Use `./gradlew` on Unix or `.\gradlew.bat` on Windows, followed by the tasks below.
 
----
+| Purpose | Task |
+|---|---|
+| Architecture boundaries | `verifyArchitecture` |
+| All module JVM tests | `jvmTest` |
+| Browser database tests (Chrome required) | `:core:database:jsBrowserTest :core:database:wasmJsBrowserTest` |
+| Build one feature and its core dependencies | `:features:browser:assemble` |
+| Test one feature | `:features:note:jvmTest` |
+| Android debug APK | `:apps:android:assembleDebug` |
+| Desktop application | `:apps:desktop:run` |
+| Desktop distributable | `:apps:desktop:createDistributable` |
+| Web development (JS) | `:apps:web:jsBrowserDevelopmentRun` |
+| Web development (WasmJS) | `:apps:web:wasmJsBrowserDevelopmentRun` |
+| Web production (JS) | `:apps:web:jsBrowserDistribution` |
+| Web production (WasmJS) | `:apps:web:wasmJsBrowserDistribution` |
 
-Learn more about [Kotlin Multiplatform](https://www.jetbrains.com/help/kotlin-multiplatform-dev/get-started.html),
-[Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/#compose-multiplatform),
-[Kotlin/Wasm](https://kotl.in/wasm/)…
+Android builds require a configured Android SDK. Desktop distributions require a JDK with `jpackage`; installer formats depend on the host OS. Web builds manage their Node/Yarn dependencies through Gradle and checked-in lockfiles.
 
-We would appreciate your feedback on Compose/Web and Kotlin/Wasm in the public Slack channel [#compose-web](https://slack-chats.kotlinlang.org/c/compose-web).
-If you face any issues, please report them on [YouTrack](https://youtrack.jetbrains.com/newIssue?project=CMP).
+Release helpers are `release-build.ps1` and `release-build.sh`. They run the architecture check and all JVM tests unless tests are explicitly skipped.
+
+## Development
+
+Feature packages follow `data`, `di`, `domain`, `ui`; create a layer only when it owns code. Domain contracts are independent of UI and infrastructure. Keep implementation classes internal and navigation in the app. Shared UI uses `EchoListTheme` from `core:designsystem`.
+
+Protocol schemas live in `proto`; generated Wire classes belong to `core:protocol`. SQLDelight schema and platform drivers belong to `core:database`. Never edit generated output.
+
+Historical requirements remain in `.kiro/specs`. Current architecture takes precedence over their former single-module layout. iOS is no longer a supported target.

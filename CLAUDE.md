@@ -7,7 +7,8 @@ This repository contains a Kotlin Multiplatform app built with Compose Multiplat
 - Product: cross-platform productivity app with hierarchical folders, notes, and task lists
 - Targets: Android, JVM desktop, JS web, WasmJS
 - Core user flow: authenticate against a self-hosted backend, browse folder contents, create and edit folders/notes/task lists
-- Main module: `composeApp/`
+- Composition: `app/`; launchers: `apps/android`, `apps/desktop`, `apps/web`
+- Feature and core libraries: see `ARCHITECTURE.md`, the canonical current module map
 - Protobuf schemas: `proto/`
 - Historical/spec context: `.kiro/steering/` and `.kiro/specs/`
 
@@ -43,11 +44,11 @@ Important cleanup note from `quality-review-cleanup`:
 
 Useful commands repeatedly referenced by the repo and Kiro notes:
 
-- `./gradlew :composeApp:assembleDebug`
-- `./gradlew :composeApp:run`
-- `./gradlew :composeApp:wasmJsBrowserDevelopmentRun`
-- `./gradlew test`
-- `./gradlew :composeApp:jvmTest`
+- `./gradlew :apps:android:assembleDebug`
+- `./gradlew :apps:desktop:run`
+- `./gradlew :apps:web:wasmJsBrowserDevelopmentRun`
+- `./gradlew verifyArchitecture`
+- `./gradlew jvmTest`
 - `./gradlew detekt`
 - `./gradlew ktlintCheck`
 
@@ -83,29 +84,19 @@ These specs describe the previous implementation process and are useful context:
 
 ## Verified Current Code State
 
-These points were checked directly in the repository and are more trustworthy than the spec history:
+- Each feature is an independently buildable Android/JVM/JS/WasmJS library; features never depend on each other.
+- `app` owns serializable routes and calls feature entrypoints. Feature ViewModels and implementation models are internal.
+- Browser replaces Home in source names; its serialized route name remains compatible.
+- Note and task-list routes support creating items and loading existing items by ID.
+- Task-list routes have unique editor IDs. Settings use editor-owned result queues, never a global production result bus.
+- Authentication/refresh use separate public and authenticated clients in `core:session`.
+- Task contracts and notification completion rules live in `core:tasks`, ready for a future due-date screen.
+- Core recurrence models represent valid rules; nullable form input belongs to tasksettings UI.
+- Notification infrastructure depends on a task-action port. Android receiver names remain stable for existing PendingIntents.
+- Theme, fonts and shared components live in `core:designsystem`. Feature resources and tests live with their owners.
+- Root `verifyArchitecture` checks module cycles, direction and source import boundaries.
 
-- `Routes.kt` currently defines `LoginRoute` and `HomeRoute(path)`, but `EditNoteRoute` and `EditTaskListRoute` are still parameterless `data object`s
-- `App.kt` injects `EditNoteViewModel` and `EditTaskListViewModel` with the current `HomeRoute.path` through Koin parameters instead of route parameters
-- `EditNoteViewModel` and `EditTaskListViewModel` currently create new items using `parentPath`; they are not loading existing note/task-list content by ID
-- `HomeScreen` still renders `CreateFolderDialog`
-- `CreateFolderDialog` and `CreateFolderViewModel` are actively wired in `App.kt`
-- `CreateItemPills` still uses simple `() -> Unit` callbacks for note/task-list/folder creation
-- `FileRepository.directoryChanged` exists and `HomeViewModel` observes it
-- `NetworkLoggingPlugin`, `AuthInterceptor`, `NetworkException`, and `NotesRepositoryImpl.pendingOperations` all exist in code
-- String resources are used in many screens, but there are still hardcoded strings in at least `CreateFolderDialog`
-
-## Important Spec vs Code Mismatches
-
-Preserve these mismatches in mind before changing navigation or creation flows:
-
-- `unified-edit-screens` expects `EditNoteRoute(noteId: String? = null)` and `EditTaskListRoute(taskListId: String? = null)`, but current code still uses parameterless route objects
-- `note-tasklist-editors` expects editor flows to receive `parentPath` through route parameters, but current code derives the path from the active `HomeRoute`
-- `add-new-item-inline` describes inline folder creation with `AddItemButton`, `InlineItemEditor`, and `InlineCreationState`, but current code still uses the older folder dialog flow
-- `inline-item-creation` planned callback signature changes for typed inline creation, but current code still shows the pre-change callback shape in `CreateItemPills` and `BottomNavigation`
-- `string-resource-extraction` aimed for no hardcoded UI strings, but the current folder dialog still contains literal strings
-
-When a spec and the code disagree, trust the code first and treat the spec as a roadmap or historical intent.
+Historical `.kiro/specs` may describe older behavior and package locations. Trust current code and `ARCHITECTURE.md` first.
 
 ## Still Open in Kiro Task Lists
 

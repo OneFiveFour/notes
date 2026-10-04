@@ -19,15 +19,19 @@
 
 ## Project Structure
 
+```text
+core/designsystem/src/commonMain/
+  kotlin/net/onefivefour/echolist/core/designsystem/
+    ui/theme/         # EchoListTheme, colors, typography, shapes, dimensions
+    ui/components/    # Shared composables
+    di/               # ThemeManager wiring
+  composeResources/   # Fonts and shared icons
+features/<feature>/src/commonMain/
+  kotlin/net/onefivefour/echolist/feature/<feature>/ui/
+  composeResources/   # Feature-owned resources
 ```
-composeApp/src/commonMain/kotlin/net/onefivefour/echolist/
-├── ui/
-│   ├── theme/          # Theme system (ColorTheme, ThemeManager, EchoListTheme, Typography, Shapes, Dimensions)
-│   └── home/           # Home screen composables (HomeScreen, Header, BreadcrumbNav, FolderCard, FileItem)
-├── data/               # Data layer (models, repository, sources)
-├── di/                 # Koin modules
-└── network/            # Network client (ConnectRPC)
-```
+
+See `ARCHITECTURE.md` for the complete module map. The former Home screen is now the browser feature.
 
 ## Color Tokens
 

@@ -25,17 +25,11 @@ Android, Desktop (JVM), Web (JS), Web (WasmJS) — all from a single Kotlin code
 
 ## Architecture
 
-The project follows a layered architecture inside a single Gradle module (`composeApp`):
+The current module map and dependency rules are documented in `ARCHITECTURE.md` at the repository root.
 
-```
-commonMain/
-├── data/          # DTOs, mappers, models, repositories, data sources (network + cache)
-├── domain/        # Domain model interfaces and repository contracts
-├── di/            # Koin module definitions
-└── ui/            # Compose screens, ViewModels, theme, navigation
-```
+`apps/* -> app -> features/* -> core/*`. Features never depend on each other; core never depends on features or app. Every feature uses `data`, `di`, `domain`, `ui` packages where it owns code. Libraries support Android, JVM, JS and WasmJS through build conventions in `build-logic`.
 
-Platform-specific source sets (`androidMain`, `jvmMain`, `jsMain`, `wasmJsMain`) provide expect/actual implementations for database drivers, HTTP engines, secure storage, etc.
+Shared responsibilities are split into focused core modules. In particular, task repositories are shared for the upcoming due-date screen, while note caching and browser folder operations belong to their features. `verifyArchitecture` enforces dependency direction, cycles and domain/UI boundaries.
 
 ### Data flow
 
@@ -57,10 +51,11 @@ Platform-specific source sets (`androidMain`, `jvmMain`, `jsMain`, `wasmJsMain`)
 ### Navigation
 
 Routes are `@Serializable` data classes/objects implementing `NavKey`:
-- `HomeRoute(path)` — folder browser at a given path
-- `EditNoteRoute(noteId?)` — note editor
-- `EditTaskListRoute(taskListId?)` — task list editor
-- `LoginRoute` — authentication screen
+- `BrowserRoute(parentDir)` — folder browser at a given path
+- `EditNoteRoute(parentDir, noteId?)` — note editor
+- `EditTaskListRoute(parentDir, taskListId?, editorId)` — task list editor
+- `MainTaskSettingsRoute(..., editorId)` — settings returning changes to the owning editor
+- Authentication is a top-level app state; features do not own app routes.
 
 The back stack is managed via `rememberNavBackStack` with a custom `SavedStateConfiguration`.
 
@@ -83,7 +78,7 @@ JWT-based. Tokens are stored in platform-specific `SecureStorage`. An `AuthInter
 - Screens are composed of small, focused composables (e.g., `FolderItem`, `NoteItem`, `BreadcrumbBar`).
 
 ### Dependency injection
-- One Koin module per concern: `authModule`, `networkModule`, `dataModule`, `uiModule`, `navigationModule`.
+- Each feature and shared concern exposes a Koin module; `app` aggregates them with platform bindings.
 - ViewModels are created via `koinViewModel<T>()` in composables.
 - Repositories are bound as interfaces → implementations (`single<FileRepository> { FileRepositoryImpl(...) }`).
 
@@ -107,4 +102,4 @@ JWT-based. Tokens are stored in platform-specific `SecureStorage`. An `AuthInter
 ### Build & quality
 - Gradle with Kotlin DSL and a version catalog (`libs.versions.toml`).
 - Detekt for static analysis, ktlint for formatting — both run on all source sets.
-- Build commands: `./gradlew :composeApp:assembleDebug` (Android), `./gradlew :composeApp:run` (Desktop), `./gradlew :composeApp:wasmJsBrowserDevelopmentRun` (Web).
+- Build commands: `./gradlew :apps:android:assembleDebug` (Android), `./gradlew :apps:desktop:run` (Desktop), `./gradlew :apps:web:wasmJsBrowserDevelopmentRun` (Web).
