@@ -1,5 +1,6 @@
 plugins { id("echolist.kmp.library") }
 kotlin.sourceSets.getByName("commonMain").dependencies {
+    api(libs.koin.core)
     api(libs.ktor.client.core)
     implementation(libs.ktor.client.logging)
     implementation(libs.kotlinx.coroutines.core)

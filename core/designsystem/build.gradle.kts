@@ -1,5 +1,6 @@
 plugins { id("echolist.compose.library") }
 kotlin.sourceSets.getByName("commonMain").dependencies {
+    api(libs.koin.core)
     implementation(libs.koin.compose)
     implementation(libs.kotlinx.coroutines.core)
 }

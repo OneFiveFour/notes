@@ -1,5 +1,6 @@
 plugins { id("echolist.compose.library") }
 kotlin.sourceSets.getByName("commonMain").dependencies {
+    api(libs.koin.core)
     implementation(project(":core:designsystem"))
     implementation(libs.androidx.lifecycle.viewmodelCompose)
     implementation(libs.androidx.lifecycle.runtimeCompose)

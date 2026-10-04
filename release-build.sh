@@ -44,7 +44,7 @@ ensure_android_signing() {
 
 quality_tasks=()
 if [[ "$skip_tests" == false ]]; then
-  quality_tasks=(":app:jvmTest")
+  quality_tasks=("verifyArchitecture" "jvmTest")
 fi
 
 android_tasks=(":apps:android:assembleRelease" ":apps:android:bundleRelease")

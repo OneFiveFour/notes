@@ -33,29 +33,7 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-include(":app", ":apps:android", ":apps:desktop", ":apps:web", ":core:protocol")
-include(":core:designsystem")
-
-include(":core:files")
-
-include(":core:database")
-
-include(":core:networking")
-
-include(":core:session")
-
-include(":core:notifications")
-
-include(":core:recurrence")
-
-include(":core:tasks")
-
-include(":features:login")
-
-include(":features:browser")
-
-include(":features:note")
-
-include(":features:tasksettings")
-
-include(":features:tasklist")
+include(":app", ":apps:android", ":apps:desktop", ":apps:web")
+include(":features:browser", ":features:tasklist", ":features:note", ":features:login", ":features:tasksettings")
+include(":core:designsystem", ":core:files", ":core:database", ":core:networking", ":core:protocol")
+include(":core:session", ":core:tasks", ":core:recurrence", ":core:notifications")

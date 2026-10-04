@@ -11,9 +11,9 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 
-private fun arbHomeRoute(): Arb<HomeRoute> =
+private fun arbBrowserRoute(): Arb<BrowserRoute> =
     Arb.int(0..50).map { index ->
-        if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
+        if (index == 0) BrowserRoute("") else BrowserRoute("folder-$index")
     }
 
 private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
@@ -42,7 +42,7 @@ private fun arbEditTaskListRoute(): Arb<EditTaskListRoute> =
 
 private fun arbNavKey(): Arb<NavKey> =
     Arb.choice(
-        arbHomeRoute(),
+        arbBrowserRoute(),
         arbEditNoteRoute(),
         arbEditTaskListRoute()
     )
@@ -59,16 +59,16 @@ class NavigationPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(arbNavKey(), 1..20),
-            arbHomeRoute()
-        ) { initial, currentHome ->
+            arbBrowserRoute()
+        ) { initial, currentBrowser ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            backStack.add(EditNoteRoute(parentDir = currentHome.parentDir))
+            backStack.add(EditNoteRoute(parentDir = currentBrowser.parentDir))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditNoteRoute(parentDir = currentHome.parentDir)
+            backStack.last() shouldBe EditNoteRoute(parentDir = currentBrowser.parentDir)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }
@@ -77,16 +77,16 @@ class NavigationPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(arbNavKey(), 1..20),
-            arbHomeRoute()
-        ) { initial, currentHome ->
+            arbBrowserRoute()
+        ) { initial, currentBrowser ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
 
-            backStack.add(EditTaskListRoute(parentDir = currentHome.parentDir))
+            backStack.add(EditTaskListRoute(parentDir = currentBrowser.parentDir))
 
             backStack.size shouldBe sizeBefore + 1
-            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentHome.parentDir
+            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentBrowser.parentDir
             (backStack.last() as EditTaskListRoute).taskListId shouldBe null
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
@@ -96,9 +96,9 @@ class NavigationPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(arbNavKey(), 1..20),
-            arbHomeRoute(),
+            arbBrowserRoute(),
             Arb.int(1..50)
-        ) { initial, currentHome, fileIndex ->
+        ) { initial, currentBrowser, fileIndex ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
@@ -106,13 +106,13 @@ class NavigationPropertyTest : FunSpec({
 
             backStack.add(
                 EditTaskListRoute(
-                    parentDir = currentHome.parentDir,
+                    parentDir = currentBrowser.parentDir,
                     taskListId = taskListId
                 )
             )
 
             backStack.size shouldBe sizeBefore + 1
-            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentHome.parentDir
+            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentBrowser.parentDir
             (backStack.last() as EditTaskListRoute).taskListId shouldBe taskListId
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
@@ -122,18 +122,18 @@ class NavigationPropertyTest : FunSpec({
         checkAll(
             PropTestConfig(iterations = 100),
             Arb.list(arbNavKey(), 1..20),
-            arbHomeRoute(),
+            arbBrowserRoute(),
             Arb.int(1..50)
-        ) { initial, currentHome, fileIndex ->
+        ) { initial, currentBrowser, fileIndex ->
             val backStack = initial.toMutableList()
             val sizeBefore = backStack.size
             val entriesBefore = backStack.toList()
             val noteId = "note-id-$fileIndex"
 
-            backStack.add(EditNoteRoute(parentDir = currentHome.parentDir, noteId = noteId))
+            backStack.add(EditNoteRoute(parentDir = currentBrowser.parentDir, noteId = noteId))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditNoteRoute(parentDir = currentHome.parentDir, noteId = noteId)
+            backStack.last() shouldBe EditNoteRoute(parentDir = currentBrowser.parentDir, noteId = noteId)
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }

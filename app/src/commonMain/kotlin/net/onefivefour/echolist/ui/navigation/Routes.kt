@@ -12,7 +12,8 @@ import kotlinx.serialization.modules.polymorphic
 data object LoginRoute : NavKey
 
 @Serializable
-data class HomeRoute(val parentDir: String = "") : NavKey
+@kotlinx.serialization.SerialName("net.onefivefour.echolist.ui.navigation.HomeRoute")
+data class BrowserRoute(val parentDir: String = "") : NavKey
 
 @Serializable
 data class EditNoteRoute(
@@ -39,7 +40,7 @@ data class MainTaskSettingsRoute(
 val navKeySerializersModule = SerializersModule {
     polymorphic(NavKey::class) {
         subclass(LoginRoute::class, LoginRoute.serializer())
-        subclass(HomeRoute::class, HomeRoute.serializer())
+        subclass(BrowserRoute::class, BrowserRoute.serializer())
         subclass(EditNoteRoute::class, EditNoteRoute.serializer())
         subclass(EditTaskListRoute::class, EditTaskListRoute.serializer())
         subclass(MainTaskSettingsRoute::class, MainTaskSettingsRoute.serializer())

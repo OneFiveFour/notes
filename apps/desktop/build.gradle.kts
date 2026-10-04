@@ -5,6 +5,28 @@ plugins {
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.composeHotReload)
 }
+
+compose.desktop {
+    application {
+        mainClass = "net.onefivefour.echolist.MainAppKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "net.onefivefour.echolist"
+            packageVersion = "1.0.0"
+        }
+    }
+}
+
+compose.desktop {
+    application {
+        mainClass = "net.onefivefour.echolist.MainAppKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageName = "net.onefivefour.echolist"
+            packageVersion = "1.0.0"
+        }
+    }
+}
 kotlin {
     jvm()
     sourceSets.jvmMain.dependencies {

@@ -6,5 +6,5 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(project(":core:notifications"))
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.datetime)
-    implementation(libs.koin.core)
+    api(libs.koin.core)
 }

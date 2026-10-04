@@ -17,18 +17,18 @@ class RouteSerializationPropertyTest : FunSpec({
         serializersModule = navKeySerializersModule
     }
 
-    test("Property 1: HomeRoute serialization round-trip") {
+    test("Property 1: BrowserRoute serialization round-trip") {
         checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { parentDir ->
-            val route = HomeRoute(parentDir)
-            val encoded = json.encodeToString(kotlinx.serialization.serializer<HomeRoute>(), route)
-            val decoded = json.decodeFromString(kotlinx.serialization.serializer<HomeRoute>(), encoded)
+            val route = BrowserRoute(parentDir)
+            val encoded = json.encodeToString(kotlinx.serialization.serializer<BrowserRoute>(), route)
+            val decoded = json.decodeFromString(kotlinx.serialization.serializer<BrowserRoute>(), encoded)
             decoded shouldBe route
         }
     }
 
-    test("Property 1: Polymorphic NavKey serialization round-trip for HomeRoute") {
+    test("Property 1: Polymorphic NavKey serialization round-trip for BrowserRoute") {
         checkAll(PropTestConfig(iterations = 25), Arb.string(0..200)) { parentDir ->
-            val route: NavKey = HomeRoute(parentDir)
+            val route: NavKey = BrowserRoute(parentDir)
             val encoded = json.encodeToString(kotlinx.serialization.serializer<NavKey>(), route)
             val decoded = json.decodeFromString(kotlinx.serialization.serializer<NavKey>(), encoded)
             decoded shouldBe route

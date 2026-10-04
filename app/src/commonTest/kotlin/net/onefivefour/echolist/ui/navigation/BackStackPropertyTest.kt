@@ -11,9 +11,9 @@ import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.map
 import io.kotest.property.checkAll
 
-private fun arbHomeRoute(): Arb<HomeRoute> =
+private fun arbBrowserRoute(): Arb<BrowserRoute> =
     Arb.int(0..50).map { index ->
-        if (index == 0) HomeRoute("") else HomeRoute("folder-$index")
+        if (index == 0) BrowserRoute("") else BrowserRoute("folder-$index")
     }
 
 private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
@@ -29,7 +29,7 @@ private fun arbEditNoteRoute(): Arb<EditNoteRoute> =
     }
 
 private fun arbNavKey(): Arb<NavKey> =
-    Arb.choice(arbHomeRoute(), arbEditNoteRoute())
+    Arb.choice(arbBrowserRoute(), arbEditNoteRoute())
 
 class BackStackPropertyTest : FunSpec({
 
@@ -51,12 +51,12 @@ class BackStackPropertyTest : FunSpec({
         }
     }
 
-    test("Property 3: breadcrumb navigation truncates to matching HomeRoute") {
+    test("Property 3: breadcrumb navigation truncates to matching BrowserRoute") {
         checkAll(
             PropTestConfig(iterations = 20),
             Arb.list(Arb.int(1..10).map { "folder-$it" }, 2..10)
         ) { paths ->
-            val stack = paths.map { HomeRoute(it) }.toMutableList()
+            val stack = paths.map { BrowserRoute(it) }.toMutableList()
             val targetIndex = (0 until stack.size).random()
             val targetPath = stack[targetIndex].parentDir
             val entriesBefore = stack.toList()
@@ -65,10 +65,10 @@ class BackStackPropertyTest : FunSpec({
             if (index >= 0) {
                 while (stack.size > index + 1) stack.removeLast()
             } else {
-                stack.add(HomeRoute(targetPath))
+                stack.add(BrowserRoute(targetPath))
             }
 
-            stack.last() shouldBe HomeRoute(targetPath)
+            stack.last() shouldBe BrowserRoute(targetPath)
             stack.size shouldBe index + 1
             stack shouldBe entriesBefore.subList(0, index + 1)
         }

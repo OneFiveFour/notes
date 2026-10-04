@@ -5,7 +5,7 @@ plugins {
 kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(project(":core:networking"))
     implementation(project(":core:protocol"))
-    implementation(libs.koin.core)
+    api(libs.koin.core)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
 }

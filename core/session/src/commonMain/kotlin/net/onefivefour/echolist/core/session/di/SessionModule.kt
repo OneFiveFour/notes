@@ -13,6 +13,8 @@ import net.onefivefour.echolist.core.session.domain.AuthEventBus
 import net.onefivefour.echolist.core.session.domain.AuthRepository
 import net.onefivefour.echolist.core.session.domain.SecureStorage
 import org.koin.core.module.Module
+import org.koin.core.module.dsl.onClose
+import org.koin.core.module.dsl.withOptions
 import org.koin.core.qualifier.named
 import org.koin.dsl.module
 
@@ -26,7 +28,7 @@ val sessionModule = module {
     single { AuthEventBus() }
     single { NetworkConfigProvider(secureStorage = get<SecureStorage>()) }
     // Login and refresh use a client without an auth interceptor: no dependency cycle or recursive refresh.
-    single(publicAuthHttp) { configuredHttpClient(get()) }
+    single(publicAuthHttp) { configuredHttpClient(get()) } withOptions { onClose { it?.close() } }
     single<ConnectRpcClient>(publicAuthClient) { createConnectRpcClient(get(publicAuthHttp), get()) }
     single<AuthRepository> { AuthRepositoryImpl(get(), get(publicAuthClient), get()) }
     single {
@@ -38,7 +40,7 @@ val sessionModule = module {
                 authEventBus = events
             }
         }
-    }
+    } withOptions { onClose { it?.close() } }
     single<ConnectRpcClient> { createConnectRpcClient(get<HttpClient>(), get()) }
 }
 

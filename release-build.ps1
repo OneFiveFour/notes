@@ -88,7 +88,7 @@ keyPassword=$keyPasswordText
 
 $qualityTasks = @()
 if (-not $SkipTests) {
-    $qualityTasks = @(":app:jvmTest")
+    $qualityTasks = @("verifyArchitecture", "jvmTest")
 }
 
 $androidTasks = @(":apps:android:assembleRelease", ":apps:android:bundleRelease")

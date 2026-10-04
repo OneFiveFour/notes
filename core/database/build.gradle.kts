@@ -4,7 +4,7 @@ plugins {
 }
 kotlin.sourceSets.getByName("commonMain").dependencies {
     api(libs.sqldelight.runtime)
-    implementation(libs.koin.core)
+    api(libs.koin.core)
 }
 
 kotlin.sourceSets {

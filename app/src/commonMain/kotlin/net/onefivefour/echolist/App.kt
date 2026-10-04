@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -32,10 +31,9 @@ import androidx.navigation3.ui.NavDisplay
 import androidx.navigationevent.NavigationEventInfo
 import androidx.navigationevent.compose.NavigationBackHandler
 import androidx.navigationevent.compose.rememberNavigationEventState
-import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.ic_arrow_back
-import echolist.composeapp.generated.resources.navigate_back
-import net.onefivefour.echolist.core.files.domain.normalizePath
+import net.onefivefour.echolist.app.resources.Res
+import net.onefivefour.echolist.app.resources.ic_arrow_back
+import net.onefivefour.echolist.app.resources.navigate_back
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
@@ -43,12 +41,12 @@ import net.onefivefour.echolist.core.designsystem.ui.components.RoundIconButton
 import net.onefivefour.echolist.feature.login.ui.LoginFeature
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
-import net.onefivefour.echolist.ui.navigation.HomeRoute
+import net.onefivefour.echolist.ui.navigation.TaskSettingsChannels
+import net.onefivefour.echolist.ui.navigation.BrowserRoute
 import net.onefivefour.echolist.ui.navigation.MainTaskSettingsRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
-import org.koin.core.parameter.parametersOf
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
@@ -57,7 +55,7 @@ fun App() {
         GradientBackground {
             val authViewModel = koinViewModel<AuthViewModel>()
             val authState by authViewModel.authState.collectAsStateWithLifecycle()
-            val settingsChannels = koinViewModel<net.onefivefour.echolist.ui.navigation.TaskSettingsChannels>()
+            val settingsChannels = koinViewModel<TaskSettingsChannels>()
             LaunchedEffect(authState) {
                 if (authState == AuthState.Unauthenticated) settingsChannels.clearEditors()
             }
@@ -78,9 +76,9 @@ private fun UnauthenticatedApp(authViewModel: AuthViewModel) {
 
 @Composable
 private fun AuthenticatedApp() {
-    val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
+    val backStack = rememberNavBackStack(echoListSavedStateConfig, BrowserRoute())
     val canNavigateBack = backStack.size > 1
-    val settingsChannels = koinViewModel<net.onefivefour.echolist.ui.navigation.TaskSettingsChannels>()
+    val settingsChannels = koinViewModel<TaskSettingsChannels>()
     val editorIds = backStack.filterIsInstance<EditTaskListRoute>().map { it.editorId }.toSet()
     LaunchedEffect(editorIds) { settingsChannels.retainEditors(editorIds) }
 
@@ -119,7 +117,7 @@ private fun AuthenticatedApp() {
 private fun AuthenticatedNavDisplay(
     backStack: NavBackStack<NavKey>,
     canNavigateBack: Boolean,
-    settingsChannels: net.onefivefour.echolist.ui.navigation.TaskSettingsChannels
+    settingsChannels: TaskSettingsChannels
 ) {
     NavDisplay(
         modifier = Modifier
@@ -144,27 +142,27 @@ private fun AuthenticatedNavDisplay(
         popTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         predictivePopTransitionSpec = { EnterTransition.None togetherWith ExitTransition.None },
         entryProvider = entryProvider {
-            entry<HomeRoute> { route ->
+            entry<BrowserRoute> { route ->
                 BrowserFeature(
                     parentDir = route.parentDir,
                     onBreadcrumbClick = { parentDir ->
-                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
+                        val index = backStack.indexOfLast { it is BrowserRoute && it.parentDir == parentDir }
                         if (index >= 0) {
                             while (backStack.size > index + 1) backStack.removeLast()
                         } else {
-                            backStack.add(HomeRoute(parentDir))
+                            backStack.add(BrowserRoute(parentDir))
                         }
                     },
                     onReplaceFolder = { parentDir ->
-                        val index = backStack.indexOfLast { it is HomeRoute && it.parentDir == parentDir }
+                        val index = backStack.indexOfLast { it is BrowserRoute && it.parentDir == parentDir }
                         if (index >= 0) {
                             while (backStack.size > index + 1) backStack.removeLast()
                         } else {
                             backStack.removeLastOrNull()
-                            backStack.add(HomeRoute(parentDir))
+                            backStack.add(BrowserRoute(parentDir))
                         }
                     },
-                    onOpenFolder = { backStack.add(HomeRoute(it)) },
+                    onOpenFolder = { backStack.add(BrowserRoute(it)) },
                     onOpenNote = { backStack.add(EditNoteRoute(route.parentDir, it)) },
                     onOpenTaskList = { backStack.add(EditTaskListRoute(route.parentDir, it)) }
                 )
