@@ -26,12 +26,13 @@ import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.core.tasks.domain.scheduleTaskNotification
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
+import kotlinx.coroutines.flow.Flow
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
 
 internal class EditTaskListViewModel(
     private val mode: EditTaskListMode,
     private val taskListRepository: TaskListRepository,
-    private val settingsResultBus: MainTaskSettingsResultBus,
+    private val settingsResults: Flow<TaskSettingsChanges>,
     private val notificationScheduler: NotificationScheduler
 ) : ViewModel() {
 
@@ -80,7 +81,7 @@ internal class EditTaskListViewModel(
         }
 
         viewModelScope.launch {
-            settingsResultBus.results.collect { result ->
+            settingsResults.collect { result ->
                 val task = uiMainTasks.firstOrNull { it.id == result.mainTaskId } ?: return@collect
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)

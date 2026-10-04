@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.uuid.ExperimentalUuidApi::class)
+
 package net.onefivefour.echolist.ui.navigation
 
 import androidx.navigation3.runtime.NavKey
@@ -21,7 +23,8 @@ data class EditNoteRoute(
 @Serializable
 data class EditTaskListRoute(
     val parentDir: String,
-    val taskListId: String? = null
+    val taskListId: String? = null,
+    val editorId: String = kotlin.uuid.Uuid.random().toString()
 ) : NavKey
 
 @Serializable
@@ -29,7 +32,8 @@ data class MainTaskSettingsRoute(
     val mainTaskId: String,
     val currentDueDate: String = "",
     val currentRecurrence: String = "",
-    val currentIsNotificationEnabled: Boolean = true
+    val currentIsNotificationEnabled: Boolean = true,
+    val editorId: String = ""
 ) : NavKey
 
 val navKeySerializersModule = SerializersModule {

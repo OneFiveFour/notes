@@ -86,7 +86,8 @@ class NavigationPropertyTest : FunSpec({
             backStack.add(EditTaskListRoute(parentDir = currentHome.parentDir))
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditTaskListRoute(parentDir = currentHome.parentDir)
+            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentHome.parentDir
+            (backStack.last() as EditTaskListRoute).taskListId shouldBe null
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }
@@ -111,10 +112,8 @@ class NavigationPropertyTest : FunSpec({
             )
 
             backStack.size shouldBe sizeBefore + 1
-            backStack.last() shouldBe EditTaskListRoute(
-                parentDir = currentHome.parentDir,
-                taskListId = taskListId
-            )
+            (backStack.last() as EditTaskListRoute).parentDir shouldBe currentHome.parentDir
+            (backStack.last() as EditTaskListRoute).taskListId shouldBe taskListId
             backStack.subList(0, sizeBefore) shouldBe entriesBefore
         }
     }

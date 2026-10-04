@@ -12,7 +12,6 @@ import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.onClose
@@ -37,12 +36,12 @@ val dataModule: Module = module {
 
 
 val navigationModule: Module = module {
-    single { MainTaskSettingsResultBus() }
+    viewModel { net.onefivefour.echolist.ui.navigation.TaskSettingsChannels() }
     viewModel { params ->
         EditTaskListViewModel(
             mode = params.get<EditTaskListMode>(),
             taskListRepository = get(),
-            settingsResultBus = get(),
+            settingsResults = params.get(),
             notificationScheduler = get()
         )
     }
@@ -54,7 +53,7 @@ val navigationModule: Module = module {
             currentIsNotificationEnabled = params.get(),
             permissionChecker = get(),
             permissionRequester = get(),
-            resultBus = get()
+            resultBus = params.get()
         )
     }
 }

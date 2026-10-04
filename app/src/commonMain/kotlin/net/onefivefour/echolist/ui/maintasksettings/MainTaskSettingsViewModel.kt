@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.ui.maintasksettings
 
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
+
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,7 +22,7 @@ internal class MainTaskSettingsViewModel(
     currentIsNotificationEnabled: Boolean,
     private val permissionChecker: NotificationPermissionChecker,
     private val permissionRequester: NotificationPermissionRequester,
-    private val resultBus: MainTaskSettingsResultBus
+    private val resultBus: net.onefivefour.echolist.core.tasks.domain.TaskSettingsResultSink
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<MainTaskSettingsUiState>(
@@ -109,7 +111,7 @@ internal class MainTaskSettingsViewModel(
 
         viewModelScope.launch {
             resultBus.emit(
-                MainTaskSettingsResult(
+                TaskSettingsChanges(
                     mainTaskId = mainTaskId,
                     dueDate = currentState.selectedDueDate,
                     recurrence = currentState.recurrenceState.toRrule(),
@@ -137,7 +139,7 @@ internal class MainTaskSettingsViewModel(
             updateReady { it.copy(isNotificationEnabled = false) }
 
             resultBus.emit(
-                MainTaskSettingsResult(
+                TaskSettingsChanges(
                     mainTaskId = mainTaskId,
                     dueDate = state.selectedDueDate,
                     recurrence = state.recurrenceState.toRrule(),

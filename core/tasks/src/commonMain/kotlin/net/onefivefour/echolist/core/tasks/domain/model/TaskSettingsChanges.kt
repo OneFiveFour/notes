@@ -1,6 +1,6 @@
-package net.onefivefour.echolist.ui.maintasksettings
+package net.onefivefour.echolist.core.tasks.domain.model
 
-data class MainTaskSettingsResult(
+data class TaskSettingsChanges(
     val mainTaskId: String,
     val dueDate: String,
     val recurrence: String,

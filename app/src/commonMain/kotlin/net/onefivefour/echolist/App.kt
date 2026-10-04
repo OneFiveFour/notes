@@ -57,6 +57,10 @@ fun App() {
         GradientBackground {
             val authViewModel = koinViewModel<AuthViewModel>()
             val authState by authViewModel.authState.collectAsStateWithLifecycle()
+            val settingsChannels = koinViewModel<net.onefivefour.echolist.ui.navigation.TaskSettingsChannels>()
+            LaunchedEffect(authState) {
+                if (authState == AuthState.Unauthenticated) settingsChannels.clearEditors()
+            }
 
             when (authState) {
                 AuthState.Loading -> Unit
@@ -76,6 +80,9 @@ private fun UnauthenticatedApp(authViewModel: AuthViewModel) {
 private fun AuthenticatedApp() {
     val backStack = rememberNavBackStack(echoListSavedStateConfig, HomeRoute())
     val canNavigateBack = backStack.size > 1
+    val settingsChannels = koinViewModel<net.onefivefour.echolist.ui.navigation.TaskSettingsChannels>()
+    val editorIds = backStack.filterIsInstance<EditTaskListRoute>().map { it.editorId }.toSet()
+    LaunchedEffect(editorIds) { settingsChannels.retainEditors(editorIds) }
 
     NavigationBackHandler(
         state = rememberNavigationEventState(NavigationEventInfo.None),
@@ -86,7 +93,8 @@ private fun AuthenticatedApp() {
     Box(modifier = Modifier.fillMaxSize()) {
         AuthenticatedNavDisplay(
             backStack = backStack,
-            canNavigateBack = canNavigateBack
+            canNavigateBack = canNavigateBack,
+            settingsChannels = settingsChannels
         )
 
         if (canNavigateBack) {
@@ -110,7 +118,8 @@ private fun AuthenticatedApp() {
 @Composable
 private fun AuthenticatedNavDisplay(
     backStack: NavBackStack<NavKey>,
-    canNavigateBack: Boolean
+    canNavigateBack: Boolean,
+    settingsChannels: net.onefivefour.echolist.ui.navigation.TaskSettingsChannels
 ) {
     NavDisplay(
         modifier = Modifier
@@ -174,7 +183,7 @@ private fun AuthenticatedNavDisplay(
 
                 val viewModel = koinViewModel<EditTaskListViewModel>(
                     key = "editTaskList-${route.parentDir}-${taskListId.orEmpty()}"
-                ) { parametersOf(mode) }
+                ) { parametersOf(mode, settingsChannels.resultsFor(route.editorId)) }
 
                 val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
@@ -207,7 +216,8 @@ private fun AuthenticatedNavDisplay(
                                 mainTaskId = mainTaskId,
                                 currentDueDate = currentDueDate,
                                 currentRecurrence = currentRecurrence,
-                                currentIsNotificationEnabled = currentIsNotificationEnabled
+                                currentIsNotificationEnabled = currentIsNotificationEnabled,
+                                editorId = route.editorId
                             )
                         )
                     },
@@ -223,7 +233,10 @@ private fun AuthenticatedNavDisplay(
                         route.mainTaskId,
                         route.currentDueDate,
                         route.currentRecurrence,
-                        route.currentIsNotificationEnabled
+                        route.currentIsNotificationEnabled,
+                        settingsChannels.sinkFor(route.editorId.ifBlank {
+                            backStack.filterIsInstance<EditTaskListRoute>().lastOrNull()?.editorId.orEmpty()
+                        })
                     )
                 }
 

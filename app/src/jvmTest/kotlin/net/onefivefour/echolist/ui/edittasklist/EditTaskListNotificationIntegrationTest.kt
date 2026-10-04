@@ -18,7 +18,7 @@ import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 /**
@@ -26,7 +26,7 @@ import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
  *
  * Validates: Requirements 5.3
  *
- * When the notification toggle changes from enabled to disabled via MainTaskSettingsResult,
+ * When the notification toggle changes from enabled to disabled via TaskSettingsChanges,
  * the EditTaskListViewModel must:
  * 1. Update the UiMainTask's isNotificationEnabled to false
  * 2. Trigger a sync (requestSync → repository updateTaskList call)
@@ -74,7 +74,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existingTaskList.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsResultBus,
+                settingsResults = settingsResultBus.results,
                 notificationScheduler = scheduler
             )
 
@@ -93,7 +93,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
 
             // Emit a settings result that disables notifications for the task
             settingsResultBus.emit(
-                MainTaskSettingsResult(
+                TaskSettingsChanges(
                     mainTaskId = "task-A",
                     dueDate = "2027-06-01",
                     recurrence = "FREQ=DAILY",
@@ -151,7 +151,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existingTaskList.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsResultBus,
+                settingsResults = settingsResultBus.results,
                 notificationScheduler = scheduler
             )
 
@@ -166,7 +166,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
 
             // Re-enable notifications
             settingsResultBus.emit(
-                MainTaskSettingsResult(
+                TaskSettingsChanges(
                     mainTaskId = "task-B",
                     dueDate = "2027-06-01",
                     recurrence = "FREQ=WEEKLY",
@@ -228,7 +228,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existingTaskList.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsResultBus,
+                settingsResults = settingsResultBus.results,
                 notificationScheduler = scheduler
             )
 
@@ -244,7 +244,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
 
             // Disable notifications only for task-X
             settingsResultBus.emit(
-                MainTaskSettingsResult(
+                TaskSettingsChanges(
                     mainTaskId = "task-X",
                     dueDate = "2027-06-01",
                     recurrence = "FREQ=DAILY",

@@ -109,7 +109,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus,
+                settingsResults = resultBus.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -179,7 +179,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-1"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus,
+                settingsResults = resultBus.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()
@@ -262,7 +262,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-1"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus,
+                settingsResults = resultBus.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()
@@ -326,7 +326,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             val editVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit("tl-2"),
                 taskListRepository = repo,
-                settingsResultBus = resultBus,
+                settingsResults = resultBus.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
             testScheduler.advanceUntilIdle()

@@ -23,7 +23,7 @@ import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 /**
@@ -81,7 +81,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = scheduler
             )
 
@@ -133,7 +133,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = scheduler
             )
 
@@ -171,7 +171,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = scheduler
             )
 
@@ -216,7 +216,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = scheduler
             )
 
@@ -227,7 +227,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             scheduler.cancelCalls.clear()
 
             // Remove recurrence by emitting settings result with empty recurrence
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "t1", dueDate = "2027-06-01", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-06-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             // After sync with empty recurrence, scheduleTaskNotification calls cancel
@@ -273,7 +273,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = scheduler
             )
 
@@ -281,7 +281,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             scheduler.scheduleCalls.clear()
 
             // First sync: update due date
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "t1", dueDate = "2027-07-01", recurrence = "FREQ=WEEKLY"))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-07-01", recurrence = "FREQ=WEEKLY"))
             testScheduler.advanceUntilIdle()
 
             // Wait for first schedule call
@@ -290,7 +290,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             }
 
             // Second sync: update due date again
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "t1", dueDate = "2027-08-01", recurrence = "FREQ=WEEKLY"))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-08-01", recurrence = "FREQ=WEEKLY"))
             testScheduler.advanceUntilIdle()
 
             // Wait for second schedule call
@@ -348,7 +348,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
                 val vm = EditTaskListViewModel(
                     mode = EditTaskListMode.Edit(existing.id),
                     taskListRepository = repo,
-                    settingsResultBus = settingsFlow,
+                    settingsResults = settingsFlow.results,
                     notificationScheduler = scheduler
                 )
 
@@ -357,7 +357,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
 
                 // Update due date to trigger a sync
                 settingsFlow.emit(
-                    MainTaskSettingsResult(mainTaskId = "stable-task-id", dueDate = dueDate2, recurrence = "FREQ=MONTHLY")
+                    TaskSettingsChanges(mainTaskId = "stable-task-id", dueDate = dueDate2, recurrence = "FREQ=MONTHLY")
                 )
                 testScheduler.advanceUntilIdle()
 

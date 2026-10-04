@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.ui.maintasksettings
 
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
+
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -9,12 +11,12 @@ import kotlinx.coroutines.flow.asSharedFlow
  * other generic MutableSharedFlow registrations after JVM type erasure.
  */
 internal class MainTaskSettingsResultBus(
-    private val resultFlow: MutableSharedFlow<MainTaskSettingsResult> = MutableSharedFlow()
-) {
+    private val resultFlow: MutableSharedFlow<TaskSettingsChanges> = MutableSharedFlow()
+) : net.onefivefour.echolist.core.tasks.domain.TaskSettingsResultSink {
 
-    val results: SharedFlow<MainTaskSettingsResult> = resultFlow.asSharedFlow()
+    val results: SharedFlow<TaskSettingsChanges> = resultFlow.asSharedFlow()
 
-    suspend fun emit(result: MainTaskSettingsResult) {
+    override suspend fun emit(result: TaskSettingsChanges) {
         resultFlow.emit(result)
     }
 }

@@ -20,7 +20,7 @@ import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.testutil.NoOpNotificationScheduler
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -141,7 +141,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -172,7 +172,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -206,7 +206,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -230,7 +230,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -259,7 +259,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -289,7 +289,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -333,7 +333,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -375,7 +375,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -399,7 +399,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -419,7 +419,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -448,7 +448,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -460,7 +460,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             }
 
             testScheduler.advanceUntilIdle()
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             repo.createTaskListCalls shouldHaveSize 1
@@ -478,14 +478,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
             testScheduler.advanceUntilIdle()
 
             val taskId = vm.uiState.value.uiMainTasks[0].id
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             repo.updateTaskListCalls shouldHaveSize 1
@@ -526,7 +526,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -586,7 +586,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -603,13 +603,13 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val sortingVm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
             testScheduler.advanceUntilIdle()
 
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = "none", dueDate = "2026-03-01", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = "none", dueDate = "2026-03-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             sortingVm.uiState.value.uiMainTasks.map { it.id } shouldBe listOf("none", "early", "late")
@@ -640,14 +640,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
             testScheduler.advanceUntilIdle()
 
             val taskId = vm.uiState.value.uiMainTasks[0].id
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-05-10", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = taskId, dueDate = "2026-05-10", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             repo.updateTaskListCalls shouldHaveSize 1
@@ -678,14 +678,14 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = settingsFlow,
+                settingsResults = settingsFlow.results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
             testScheduler.advanceUntilIdle()
 
             val taskId = vm.uiState.value.uiMainTasks[0].id
-            settingsFlow.emit(MainTaskSettingsResult(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
+            settingsFlow.emit(TaskSettingsChanges(mainTaskId = taskId, dueDate = "2026-04-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
             repo.updateTaskListCalls shouldHaveSize 0
@@ -701,7 +701,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -727,7 +727,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -765,7 +765,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -795,7 +795,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -841,7 +841,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -871,7 +871,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Create("home"),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -914,7 +914,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
@@ -942,7 +942,7 @@ class EditTaskListViewModelPropertyTest : FunSpec({
             val vm = EditTaskListViewModel(
                 mode = EditTaskListMode.Edit(existing.id),
                 taskListRepository = repo,
-                settingsResultBus = MainTaskSettingsResultBus(),
+                settingsResults = MainTaskSettingsResultBus().results,
                 notificationScheduler = NoOpNotificationScheduler()
             )
 
