@@ -1,11 +1,11 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.feature.login.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.error_backend_url_required
-import echolist.composeapp.generated.resources.error_password_required
-import echolist.composeapp.generated.resources.error_username_required
+import net.onefivefour.echolist.feature.login.resources.Res
+import net.onefivefour.echolist.feature.login.resources.error_backend_url_required
+import net.onefivefour.echolist.feature.login.resources.error_password_required
+import net.onefivefour.echolist.feature.login.resources.error_username_required
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -18,7 +18,7 @@ import net.onefivefour.echolist.core.session.domain.AuthRepository
 import net.onefivefour.echolist.core.session.domain.AuthError
 import org.jetbrains.compose.resources.getString
 
-class LoginViewModel(
+internal class LoginViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
 

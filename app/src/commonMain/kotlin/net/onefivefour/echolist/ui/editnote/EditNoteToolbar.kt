@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.ui.editnote
 
+import net.onefivefour.echolist.core.designsystem.resources.Res as SharedRes
+
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -14,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
 import echolist.composeapp.generated.resources.ic_edit
-import echolist.composeapp.generated.resources.visibility_on
+import net.onefivefour.echolist.core.designsystem.resources.visibility_on
 import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
@@ -58,7 +60,7 @@ internal fun EditNoteToolbar(
             painter = painterResource(
                 when (uiState.isPreview) {
                     true -> Res.drawable.ic_edit
-                    false -> Res.drawable.visibility_on
+                    false -> SharedRes.drawable.visibility_on
                 }
             ),
             contentDescription = when (uiState.isPreview) {

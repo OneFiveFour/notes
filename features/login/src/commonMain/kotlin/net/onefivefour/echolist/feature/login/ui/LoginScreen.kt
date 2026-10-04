@@ -1,4 +1,6 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.feature.login.ui
+
+import net.onefivefour.echolist.core.designsystem.resources.Res as SharedRes
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,16 +39,16 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.app_name
-import echolist.composeapp.generated.resources.hide_password
-import echolist.composeapp.generated.resources.login_backend_url_label
-import echolist.composeapp.generated.resources.login_button
-import echolist.composeapp.generated.resources.login_password_label
-import echolist.composeapp.generated.resources.login_username_label
-import echolist.composeapp.generated.resources.show_password
-import echolist.composeapp.generated.resources.visibility_off
-import echolist.composeapp.generated.resources.visibility_on
+import net.onefivefour.echolist.feature.login.resources.Res
+import net.onefivefour.echolist.feature.login.resources.app_name
+import net.onefivefour.echolist.feature.login.resources.hide_password
+import net.onefivefour.echolist.feature.login.resources.login_backend_url_label
+import net.onefivefour.echolist.feature.login.resources.login_button
+import net.onefivefour.echolist.feature.login.resources.login_password_label
+import net.onefivefour.echolist.feature.login.resources.login_username_label
+import net.onefivefour.echolist.feature.login.resources.show_password
+import net.onefivefour.echolist.feature.login.resources.visibility_off
+import net.onefivefour.echolist.core.designsystem.resources.visibility_on
 import net.onefivefour.echolist.core.session.domain.AuthError
 import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
 import net.onefivefour.echolist.core.designsystem.ui.components.ElOutlinedTextField
@@ -55,7 +57,7 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun LoginScreen(
+internal fun LoginScreen(
     uiState: LoginUiState,
     onBackendUrlChange: (String) -> Unit,
     onUsernameChange: (String) -> Unit,
@@ -159,7 +161,7 @@ fun LoginScreen(
             trailingIcon = {
                 val iconRes = when (showPassword) {
                     true -> Res.drawable.visibility_off
-                    else -> Res.drawable.visibility_on
+                    else -> SharedRes.drawable.visibility_on
                 }
                 val contentDescriptionRes = when (showPassword) {
                     true -> Res.string.hide_password

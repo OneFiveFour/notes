@@ -49,3 +49,5 @@ include(":core:notifications")
 include(":core:recurrence")
 
 include(":core:tasks")
+
+include(":features:login")

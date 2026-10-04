@@ -1,8 +1,8 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.feature.login.ui
 
 import net.onefivefour.echolist.core.session.domain.AuthError
 
-data class LoginUiState(
+internal data class LoginUiState(
     val backendUrl: String = "https://",
     val username: String = "",
     val password: String = "",

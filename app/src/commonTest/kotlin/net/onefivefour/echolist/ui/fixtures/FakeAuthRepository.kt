@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.ui.fixtures
 
 import net.onefivefour.echolist.core.session.domain.AuthRepository
 

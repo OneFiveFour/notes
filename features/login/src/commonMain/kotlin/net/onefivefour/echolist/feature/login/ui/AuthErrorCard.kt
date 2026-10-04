@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.feature.login.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,21 +17,21 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import echolist.composeapp.generated.resources.Res
-import echolist.composeapp.generated.resources.error_auth_invalid_credentials
-import echolist.composeapp.generated.resources.error_auth_invalid_credentials_description
-import echolist.composeapp.generated.resources.error_auth_network
-import echolist.composeapp.generated.resources.error_auth_network_description
-import echolist.composeapp.generated.resources.error_auth_server
-import echolist.composeapp.generated.resources.error_auth_server_description
-import echolist.composeapp.generated.resources.error_auth_unknown
-import echolist.composeapp.generated.resources.error_auth_unknown_description
+import net.onefivefour.echolist.feature.login.resources.Res
+import net.onefivefour.echolist.feature.login.resources.error_auth_invalid_credentials
+import net.onefivefour.echolist.feature.login.resources.error_auth_invalid_credentials_description
+import net.onefivefour.echolist.feature.login.resources.error_auth_network
+import net.onefivefour.echolist.feature.login.resources.error_auth_network_description
+import net.onefivefour.echolist.feature.login.resources.error_auth_server
+import net.onefivefour.echolist.feature.login.resources.error_auth_server_description
+import net.onefivefour.echolist.feature.login.resources.error_auth_unknown
+import net.onefivefour.echolist.feature.login.resources.error_auth_unknown_description
 import net.onefivefour.echolist.core.session.domain.AuthError
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.stringResource
 
 @Composable
-fun AuthErrorCard(
+internal fun AuthErrorCard(
     error: AuthError,
     modifier: Modifier = Modifier
 ) {

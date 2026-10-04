@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
+            implementation(project(":features:login"))
             implementation(project(":core:tasks"))
             implementation(project(":core:recurrence"))
             implementation(project(":core:notifications"))

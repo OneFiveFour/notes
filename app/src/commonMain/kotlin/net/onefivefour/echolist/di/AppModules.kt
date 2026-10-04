@@ -27,7 +27,6 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.home.RenameFolderViewModel
-import net.onefivefour.echolist.ui.login.LoginViewModel
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import org.koin.core.module.Module
@@ -38,7 +37,6 @@ import org.koin.dsl.module
 
 val authModule: Module = module {
     viewModel { AuthViewModel(authRepository = get(), authEventBus = get()) }
-    viewModel { LoginViewModel(authRepository = get()) }
 }
 
 val networkModule: Module = module {
@@ -134,6 +132,7 @@ val navigationModule: Module = module {
 val appModules: List<Module> = listOf(
     net.onefivefour.echolist.core.session.di.sessionModule,
     authModule,
+    net.onefivefour.echolist.feature.login.di.loginModule,
     networkModule,
     dataModule,
     designSystemModule,

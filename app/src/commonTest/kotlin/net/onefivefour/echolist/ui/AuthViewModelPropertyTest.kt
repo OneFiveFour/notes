@@ -47,7 +47,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.fixtures.FakeAuthRepository(storage), authEventBus)
 
                 vm.authState.value shouldBe AuthState.Authenticated
             }
@@ -61,7 +61,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 // No access token stored
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.fixtures.FakeAuthRepository(storage), authEventBus)
 
                 vm.authState.value shouldBe AuthState.Unauthenticated
             }
@@ -75,7 +75,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.fixtures.FakeAuthRepository(storage), authEventBus)
                 // Let the viewModelScope coroutine start collecting
                 testScheduler.advanceUntilIdle()
                 vm.authState.value shouldBe AuthState.Authenticated

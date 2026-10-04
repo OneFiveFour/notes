@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.ui.login
+package net.onefivefour.echolist.feature.login.ui
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.nulls.shouldBeNull

@@ -38,8 +38,7 @@ import net.onefivefour.echolist.ui.home.CreateItemCallbacks
 import net.onefivefour.echolist.ui.home.HomeScreen
 import net.onefivefour.echolist.ui.home.HomeViewModel
 import net.onefivefour.echolist.ui.home.RenameFolderViewModel
-import net.onefivefour.echolist.ui.login.LoginScreen
-import net.onefivefour.echolist.ui.login.LoginViewModel
+import net.onefivefour.echolist.feature.login.ui.LoginFeature
 import net.onefivefour.echolist.ui.editnote.EditNoteScreen
 import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
@@ -74,22 +73,7 @@ fun App() {
 
 @Composable
 private fun UnauthenticatedApp(authViewModel: AuthViewModel) {
-    val loginViewModel = koinViewModel<LoginViewModel>()
-    val loginState by loginViewModel.uiState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(loginViewModel) {
-        loginViewModel.loginSuccess.collect {
-            authViewModel.onAuthenticated()
-        }
-    }
-
-    LoginScreen(
-        uiState = loginState,
-        onBackendUrlChange = loginViewModel::onBackendUrlChanged,
-        onUsernameChange = loginViewModel::onUsernameChanged,
-        onPasswordChange = loginViewModel::onPasswordChanged,
-        onLoginClick = loginViewModel::onLoginClick
-    )
+    LoginFeature(onAuthenticated = authViewModel::onAuthenticated)
 }
 
 @Composable

@@ -13,3 +13,11 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(catalog.findLibrary("compose-components-resources").get())
     implementation(catalog.findLibrary("compose-uiToolingPreview").get())
 }
+
+kotlin {
+    sourceSets {
+        jvmTest.dependencies {
+            implementation(compose.desktop.currentOs)
+        }
+    }
+}
