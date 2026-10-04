@@ -14,17 +14,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.domain.repository.AuthRepository
-import net.onefivefour.echolist.data.source.SecureStorage
-import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.domain.model.AuthError
-import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
+import net.onefivefour.echolist.core.session.domain.AuthRepository
+import net.onefivefour.echolist.core.session.domain.AuthError
 import org.jetbrains.compose.resources.getString
 
 class LoginViewModel(
-    secureStorage: SecureStorage,
-    private val authRepository: AuthRepository,
-    private val networkConfigProvider: NetworkConfigProvider? = null
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(LoginUiState())
@@ -34,7 +29,7 @@ class LoginViewModel(
     val loginSuccess: SharedFlow<Unit> = _loginSuccess.asSharedFlow()
 
     init {
-        val storedUrl = secureStorage.get(StorageKeys.BACKEND_URL)
+        val storedUrl = authRepository.getBaseUrl()
         if (storedUrl != null) {
             _uiState.update { it.copy(backendUrl = storedUrl) }
         }
@@ -98,12 +93,12 @@ class LoginViewModel(
             )
             result.fold(
                 onSuccess = {
-                    networkConfigProvider?.updateBaseUrl(current.backendUrl.trim())
                     _uiState.update { it.copy(isLoading = false) }
                     _loginSuccess.emit(Unit)
                 },
                 onFailure = { throwable ->
-                    val authError = AuthError.fromNetworkException(throwable)
+                    val authError = (throwable as? net.onefivefour.echolist.core.session.domain.AuthFailure)?.error
+                        ?: AuthError.Unknown(throwable.message ?: "Unknown error occurred")
                     _uiState.update {
                         it.copy(
                             isLoading = false,

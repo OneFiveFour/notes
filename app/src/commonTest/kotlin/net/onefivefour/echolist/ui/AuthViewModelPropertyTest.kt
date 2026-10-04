@@ -13,10 +13,10 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.network.auth.AuthEvent
-import net.onefivefour.echolist.data.network.auth.AuthEventBus
-import net.onefivefour.echolist.data.source.FakeSecureStorage
-import net.onefivefour.echolist.data.source.StorageKeys
+import net.onefivefour.echolist.core.session.domain.AuthEvent
+import net.onefivefour.echolist.core.session.domain.AuthEventBus
+import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
+import net.onefivefour.echolist.core.session.domain.StorageKeys
 
 /**
  * Property 11: AuthState reflects storage
@@ -47,7 +47,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
 
                 vm.authState.value shouldBe AuthState.Authenticated
             }
@@ -61,7 +61,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 // No access token stored
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
 
                 vm.authState.value shouldBe AuthState.Unauthenticated
             }
@@ -75,7 +75,7 @@ class AuthViewModelPropertyTest : FunSpec({
                 storage.put(StorageKeys.ACCESS_TOKEN, token)
                 val authEventBus = AuthEventBus()
 
-                val vm = AuthViewModel(storage, authEventBus)
+                val vm = AuthViewModel(net.onefivefour.echolist.ui.login.FakeAuthRepository(storage), authEventBus)
                 // Let the viewModelScope coroutine start collecting
                 testScheduler.advanceUntilIdle()
                 vm.authState.value shouldBe AuthState.Authenticated

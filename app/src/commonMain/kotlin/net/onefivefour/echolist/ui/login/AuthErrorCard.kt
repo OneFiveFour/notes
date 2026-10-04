@@ -26,7 +26,7 @@ import echolist.composeapp.generated.resources.error_auth_server
 import echolist.composeapp.generated.resources.error_auth_server_description
 import echolist.composeapp.generated.resources.error_auth_unknown
 import echolist.composeapp.generated.resources.error_auth_unknown_description
-import net.onefivefour.echolist.domain.model.AuthError
+import net.onefivefour.echolist.core.session.domain.AuthError
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.stringResource
 

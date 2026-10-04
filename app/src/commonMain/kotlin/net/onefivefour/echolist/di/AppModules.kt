@@ -1,16 +1,10 @@
 package net.onefivefour.echolist.di
 
-import io.ktor.client.HttpClient
-import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.core.files.di.filesModule
-import net.onefivefour.echolist.data.network.auth.AuthEventBus
-import net.onefivefour.echolist.core.networking.data.logging.LogLevel
-import net.onefivefour.echolist.core.networking.data.logging.NetworkLoggingPlugin
-import net.onefivefour.echolist.domain.repository.AuthRepository
-import net.onefivefour.echolist.data.repository.AuthRepositoryImpl
-import net.onefivefour.echolist.data.network.auth.AuthInterceptor
+import net.onefivefour.echolist.core.session.domain.AuthEventBus
+import net.onefivefour.echolist.core.session.domain.AuthRepository
 import net.onefivefour.echolist.domain.repository.NotesRepository
 import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
 import net.onefivefour.echolist.data.repository.FileRepositoryImpl
@@ -27,8 +21,6 @@ import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
-import net.onefivefour.echolist.core.networking.di.createConnectRpcClient
-import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
 import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
@@ -48,57 +40,11 @@ import org.koin.core.module.dsl.withOptions
 import org.koin.dsl.module
 
 val authModule: Module = module {
-    single { AuthEventBus() }
-    single<AuthRepository> {
-        AuthRepositoryImpl(
-            secureStorage = get(),
-            lazyClient = lazy { get<ConnectRpcClient>() },
-            networkConfigProvider = get()
-        )
-    }
-    viewModel { AuthViewModel(secureStorage = get(), authEventBus = get()) }
-    viewModel {
-        LoginViewModel(
-            authRepository = get(),
-            secureStorage = get(),
-            networkConfigProvider = get()
-        )
-    }
+    viewModel { AuthViewModel(authRepository = get(), authEventBus = get()) }
+    viewModel { LoginViewModel(authRepository = get()) }
 }
 
 val networkModule: Module = module {
-    single<net.onefivefour.echolist.core.networking.domain.BackendUrlStore> {
-        get<net.onefivefour.echolist.data.source.SecureStorage>()
-    }
-    single { NetworkConfigProvider(secureStorage = get()) }
-
-    single {
-        val configProvider: NetworkConfigProvider = get()
-        val authRepository: AuthRepository = get()
-        val authEventBus: AuthEventBus = get()
-        HttpClient {
-            install(NetworkLoggingPlugin) {
-                minLogLevel = LogLevel.DEBUG
-            }
-            install(HttpTimeout) {
-                requestTimeoutMillis = configProvider.config.requestTimeoutMs
-                connectTimeoutMillis = configProvider.config.connectTimeoutMs
-            }
-            install(AuthInterceptor) {
-                this.authRepository = authRepository
-                this.authEventBus = authEventBus
-            }
-        }
-    }
-
-    single<ConnectRpcClient> {
-        val configProvider: NetworkConfigProvider = get()
-        createConnectRpcClient(
-            httpClient = get(),
-            configProvider = configProvider
-        )
-    }
-
     single<NoteRemoteDataSource> {
         NoteRemoteDataSourceImpl(client = get())
     }
@@ -199,6 +145,7 @@ val navigationModule: Module = module {
 }
 
 val appModules: List<Module> = listOf(
+    net.onefivefour.echolist.core.session.di.sessionModule,
     authModule,
     networkModule,
     dataModule,

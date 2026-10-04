@@ -6,13 +6,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.data.network.auth.AuthEvent
-import net.onefivefour.echolist.data.network.auth.AuthEventBus
-import net.onefivefour.echolist.data.source.SecureStorage
-import net.onefivefour.echolist.data.source.StorageKeys
+import net.onefivefour.echolist.core.session.domain.AuthEvent
+import net.onefivefour.echolist.core.session.domain.AuthEventBus
+import net.onefivefour.echolist.core.session.domain.AuthRepository
 
 class AuthViewModel(
-    private val secureStorage: SecureStorage,
+    private val authRepository: AuthRepository,
     private val authEventBus: AuthEventBus
 ) : ViewModel() {
 
@@ -21,8 +20,7 @@ class AuthViewModel(
 
     init {
         // Check storage for existing access token
-        val token = secureStorage.get(StorageKeys.ACCESS_TOKEN)
-        _authState.value = if (token != null) {
+        _authState.value = if (authRepository.isAuthenticated()) {
             AuthState.Authenticated
         } else {
             AuthState.Unauthenticated

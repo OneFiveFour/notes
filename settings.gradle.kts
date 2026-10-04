@@ -41,3 +41,5 @@ include(":core:files")
 include(":core:database")
 
 include(":core:networking")
+
+include(":core:session")

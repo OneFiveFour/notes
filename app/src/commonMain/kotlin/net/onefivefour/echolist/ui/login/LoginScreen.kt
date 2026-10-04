@@ -47,7 +47,7 @@ import echolist.composeapp.generated.resources.login_username_label
 import echolist.composeapp.generated.resources.show_password
 import echolist.composeapp.generated.resources.visibility_off
 import echolist.composeapp.generated.resources.visibility_on
-import net.onefivefour.echolist.domain.model.AuthError
+import net.onefivefour.echolist.core.session.domain.AuthError
 import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
 import net.onefivefour.echolist.core.designsystem.ui.components.ElOutlinedTextField
 import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme

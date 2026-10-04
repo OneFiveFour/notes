@@ -17,7 +17,7 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.source.FakeSecureStorage
+import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
 import org.jetbrains.compose.resources.getString
 
 /**
@@ -60,7 +60,7 @@ class LoginViewModelStringResourcePropertyTest : FunSpec({
                 val expectedPasswordError = getString(Res.string.error_password_required)
 
                 // Create ViewModel and set input values
-                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
+                val vm = LoginViewModel(FakeAuthRepository())
                 vm.onBackendUrlChanged(backendUrl)
                 vm.onUsernameChanged(username)
                 vm.onPasswordChanged(password)

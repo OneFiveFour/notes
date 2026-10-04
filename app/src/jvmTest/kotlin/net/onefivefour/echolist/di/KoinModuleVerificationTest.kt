@@ -3,7 +3,7 @@ package net.onefivefour.echolist.di
 import net.onefivefour.echolist.core.database.di.databaseModule
 
 import io.kotest.core.spec.style.FunSpec
-import net.onefivefour.echolist.domain.repository.AuthRepository
+import net.onefivefour.echolist.core.session.domain.AuthRepository
 import org.koin.core.annotation.KoinExperimentalAPI
 import org.koin.test.verify.verify
 
@@ -13,13 +13,14 @@ class KoinModuleVerificationTest : FunSpec({
     test("networkModule - all dependencies are satisfied") {
         networkModule.verify(
             extraTypes = listOf(
+                net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient::class,
                 // HttpClientEngine is provided internally by Ktor at runtime,
                 // not through Koin. It's selected based on the platform.
                 io.ktor.client.engine.HttpClientEngine::class,
                 // These are provided by authModule at runtime
-                net.onefivefour.echolist.data.source.SecureStorage::class,
+                net.onefivefour.echolist.core.session.domain.SecureStorage::class,
                 AuthRepository::class,
-                net.onefivefour.echolist.data.network.auth.AuthEventBus::class
+                net.onefivefour.echolist.core.session.domain.AuthEventBus::class
             )
         )
     }

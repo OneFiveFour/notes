@@ -16,8 +16,8 @@ import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.data.source.FakeSecureStorage
-import net.onefivefour.echolist.data.source.StorageKeys
+import net.onefivefour.echolist.core.session.data.storage.FakeSecureStorage
+import net.onefivefour.echolist.core.session.domain.StorageKeys
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class LoginViewModelPropertyTest : FunSpec({
@@ -48,7 +48,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), whitespaceArb, nonBlankArb, nonBlankArb) { blankUrl, user, pass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
+                val vm = LoginViewModel(FakeAuthRepository())
                 vm.onBackendUrlChanged(blankUrl)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
@@ -67,7 +67,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, whitespaceArb, nonBlankArb) { url, blankUser, pass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
+                val vm = LoginViewModel(FakeAuthRepository())
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(blankUser)
                 vm.onPasswordChanged(pass)
@@ -86,7 +86,7 @@ class LoginViewModelPropertyTest : FunSpec({
 
         checkAll(PropTestConfig(iterations = 20), nonBlankArb, nonBlankArb, whitespaceArb) { url, user, blankPass ->
             runTest(testDispatcher) {
-                val vm = LoginViewModel(FakeSecureStorage(), FakeAuthRepository())
+                val vm = LoginViewModel(FakeAuthRepository())
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(blankPass)
@@ -113,7 +113,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 val storage = FakeSecureStorage()
                 storage.put(StorageKeys.BACKEND_URL, url)
 
-                val vm = LoginViewModel(storage, FakeAuthRepository())
+                val vm = LoginViewModel(FakeAuthRepository(storage))
                 advanceUntilIdle()
 
                 vm.uiState.value.backendUrl shouldBe url
@@ -143,7 +143,7 @@ class LoginViewModelPropertyTest : FunSpec({
                     }
                 }
 
-                val vm = LoginViewModel(FakeSecureStorage(), repo)
+                val vm = LoginViewModel(repo)
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
@@ -180,7 +180,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 val repo = FakeAuthRepository()
                 repo.loginResult = Result.failure(RuntimeException(errorMsg))
 
-                val vm = LoginViewModel(FakeSecureStorage(), repo)
+                val vm = LoginViewModel(repo)
                 vm.onBackendUrlChanged(url)
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
