@@ -32,8 +32,10 @@ sqldelight = "2.3.2"
 koin = "4.2.2"
 kotlinx-serialization = "1.11.0"
 kotest = "6.2.3"
+icu4j = "78.1"
 
 [libraries]
+icu4j = { module = "com.ibm.icu:icu4j", version.ref = "icu4j" }
 detekt-rules-compose = { module = "ru.kode:detekt-rules-compose", version.ref = "detektRulesComposeVersion" }
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }

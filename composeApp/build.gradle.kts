@@ -113,6 +113,7 @@ kotlin {
             implementation(libs.sqldelight.driver.native)
         }
         jvmMain.dependencies {
+            implementation(libs.icu4j)
             implementation(compose.desktop.currentOs)
             implementation(libs.kotlinx.coroutinesSwing)
             implementation(libs.ktor.client.okhttp)

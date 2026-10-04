@@ -22,6 +22,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +35,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
+import kotlinx.coroutines.delay
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
@@ -45,6 +48,7 @@ import net.onefivefour.echolist.ui.common.GradientBackground
 import net.onefivefour.echolist.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -122,23 +126,22 @@ internal fun MainTaskCard(
                         focusRequester = mainTaskFocusRequester
                     )
 
-                    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-                    val urgency = remember(mainTask.dueDateState.text.toString(), today) {
-                        val dateStr = mainTask.dueDateState.text.toString().trim()
-                        if (dateStr.isBlank()) {
-                            DueDateUrgency.Normal
-                        } else {
-                            runCatching { LocalDate.parse(dateStr) }
-                                .map { DueDateUrgencyCalculator.computeUrgency(it, today) }
-                                .getOrDefault(DueDateUrgency.Normal)
-                        }
+                    val dueDate = remember(mainTask.dueDateState.text.toString()) {
+                        runCatching { LocalDate.parse(mainTask.dueDateState.text.toString().trim()) }
+                            .getOrNull()
                     }
 
-                    if (mainTask.dueDateState.text.isNotEmpty()) {
+                    if (dueDate != null) {
+                        val today by produceState(Clock.System.todayIn(TimeZone.currentSystemDefault())) {
+                            while (true) {
+                                value = Clock.System.todayIn(TimeZone.currentSystemDefault())
+                                delay(1.minutes)
+                            }
+                        }
                         DueDateTag(
-                            dueDate = mainTask.dueDateState.text.toString(),
+                            label = relativeDueDateText(dueDate, today),
                             isRecurring = mainTask.recurrenceState.text.isNotEmpty(),
-                            urgency = urgency,
+                            urgency = DueDateUrgencyCalculator.computeUrgency(dueDate, today),
                             onClick = onNavigateToSettings
                         )
                     }
@@ -224,7 +227,7 @@ internal fun resolveUrgencyColors(urgency: DueDateUrgency): Pair<Color, Color> {
 
 @Composable
 private fun DueDateTag(
-    dueDate: String,
+    label: String,
     isRecurring: Boolean,
     urgency: DueDateUrgency,
     onClick: () -> Unit
@@ -254,7 +257,7 @@ private fun DueDateTag(
                 )
             }
             Text(
-                text = dueDate,
+                text = label,
                 style = EchoListTheme.typography.labelMedium,
                 color = textColor
             )
