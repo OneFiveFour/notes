@@ -1,5 +1,7 @@
 package net.onefivefour.echolist
 
+import net.onefivefour.echolist.feature.note.ui.NoteFeature
+
 import net.onefivefour.echolist.feature.browser.ui.BrowserFeature
 
 import androidx.compose.animation.EnterTransition
@@ -33,11 +35,8 @@ import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
 import net.onefivefour.echolist.core.designsystem.ui.components.RoundIconButton
-import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.feature.login.ui.LoginFeature
-import net.onefivefour.echolist.ui.editnote.EditNoteScreen
-import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsScreen
@@ -163,27 +162,7 @@ private fun AuthenticatedNavDisplay(
             }
 
             entry<EditNoteRoute> { route ->
-                val noteId = route.noteId?.takeIf { it.isNotBlank() }
-
-                val mode = noteId?.let(EditNoteMode::Edit)
-                    ?: EditNoteMode.Create(normalizePath(route.parentDir))
-                val viewModel = koinViewModel<EditNoteViewModel>(
-                    key = "editNote-${route.parentDir}-${noteId.orEmpty()}"
-                ) { parametersOf(mode) }
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                LaunchedEffect(viewModel) {
-                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
-                }
-
-                EditNoteScreen(
-                    uiState = uiState,
-                    onPreviewToggle = viewModel::onPreviewToggle,
-                    onBeginEdit = viewModel::onBeginEdit,
-                    onToolbarAction = viewModel::onToolbarAction,
-                    onSaveClick = viewModel::onSaveClick,
-                    onDeleteClick = viewModel::onDeleteClick
-                )
+                NoteFeature(route.parentDir, route.noteId, onNavigateBack = { backStack.removeLastOrNull() })
             }
 
             entry<EditTaskListRoute> { route ->

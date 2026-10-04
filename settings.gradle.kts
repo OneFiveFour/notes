@@ -53,3 +53,5 @@ include(":core:tasks")
 include(":features:login")
 
 include(":features:browser")
+
+include(":features:note")

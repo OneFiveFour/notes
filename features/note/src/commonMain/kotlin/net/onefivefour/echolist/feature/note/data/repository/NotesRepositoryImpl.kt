@@ -1,0 +1,183 @@
+package net.onefivefour.echolist.feature.note.data.repository
+
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
+import net.onefivefour.echolist.feature.note.data.mapper.NoteMapper
+import net.onefivefour.echolist.feature.note.domain.model.CreateNoteParams
+import net.onefivefour.echolist.feature.note.domain.model.Note
+import net.onefivefour.echolist.feature.note.domain.model.UpdateNoteParams
+import net.onefivefour.echolist.feature.note.data.source.cache.CacheDataSource
+import net.onefivefour.echolist.feature.note.data.source.network.NoteRemoteDataSource
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.feature.note.domain.repository.NotesRepository
+import notes.v1.DeleteNoteRequest
+import notes.v1.GetNoteRequest
+import notes.v1.ListNotesRequest
+
+internal class NotesRepositoryImpl(
+    private val noteRemoteDataSource: NoteRemoteDataSource,
+    private val cacheDataSource: CacheDataSource,
+    private val directoryChangeNotifier: DirectoryChangeNotifier,
+    private val dispatcher: CoroutineDispatcher = Dispatchers.Default,
+    private val backgroundScope: CoroutineScope = CoroutineScope(SupervisorJob() + dispatcher)
+) : NotesRepository, AutoCloseable {
+
+    private val mutex = Mutex()
+    private val pendingOperations = mutableListOf<PendingOperation>()
+
+    override fun close() {
+        backgroundScope.coroutineContext[Job]?.cancel()
+    }
+
+    override suspend fun createNote(params: CreateNoteParams): Result<Note> = withContext(dispatcher) {
+        try {
+            val request = NoteMapper.toProto(params)
+            val response = noteRemoteDataSource.createNote(request)
+            val note = NoteMapper.toDomain(response)
+            cacheDataSource.saveNote(note)
+            directoryChangeNotifier.notifyChanged(params.parentDir)
+            Result.success(note)
+        } catch (e: NetworkException) {
+            // Queue for offline sync
+            mutex.withLock {
+                pendingOperations.add(PendingOperation.Create(params))
+            }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun listNotes(parentDir: String): Result<List<Note>> = withContext(dispatcher) {
+        val cachedNotes = cacheDataSource.listNotes(parentDir)
+        if (cachedNotes.isNotEmpty()) {
+            // Return cached data immediately, refresh in background
+            backgroundScope.launch {
+                try {
+                    val request = ListNotesRequest(parent_dir = parentDir)
+                    val response = noteRemoteDataSource.listNotes(request)
+                    val notes = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNotes(notes)
+                } catch (_: Exception) {
+                    // Background refresh failure is non-fatal
+                }
+            }
+            Result.success(cachedNotes)
+        } else {
+            // No cache — go to network directly
+            try {
+                val request = ListNotesRequest(parent_dir = parentDir)
+                val response = noteRemoteDataSource.listNotes(request)
+                val notes = NoteMapper.toDomain(response)
+                cacheDataSource.saveNotes(notes)
+                Result.success(notes)
+            } catch (e: NetworkException) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun getNote(noteId: String): Result<Note> = withContext(dispatcher) {
+        val cached = cacheDataSource.getNote(noteId)
+        if (cached != null) {
+            // Return cached data immediately, refresh in background
+            backgroundScope.launch {
+                try {
+                    val request = GetNoteRequest(id = noteId)
+                    val response = noteRemoteDataSource.getNote(request)
+                    val note = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNote(note)
+                } catch (_: Exception) {
+                    // Background refresh failure is non-fatal
+                }
+            }
+            Result.success(cached)
+        } else {
+            // No cache — go to network directly
+            try {
+                val request = GetNoteRequest(id = noteId)
+                val response = noteRemoteDataSource.getNote(request)
+                val note = NoteMapper.toDomain(response)
+                cacheDataSource.saveNote(note)
+                Result.success(note)
+            } catch (e: NetworkException) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun updateNote(params: UpdateNoteParams): Result<Note> = withContext(dispatcher) {
+        try {
+            val request = NoteMapper.toProto(params)
+            val response = noteRemoteDataSource.updateNote(request)
+            val note = NoteMapper.toDomain(response)
+            cacheDataSource.saveNote(note)
+            directoryChangeNotifier.notifyChanged(note.parentDir)
+            Result.success(note)
+        } catch (e: NetworkException) {
+            // Queue for offline sync
+            mutex.withLock {
+                pendingOperations.add(PendingOperation.Update(params))
+            }
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteNote(noteId: String): Result<Unit> = withContext(dispatcher) {
+        try {
+            val cached = cacheDataSource.getNote(noteId)
+            val request = DeleteNoteRequest(id = noteId)
+            noteRemoteDataSource.deleteNote(request)
+            cacheDataSource.deleteNote(noteId)
+            cached?.let {
+                directoryChangeNotifier.notifyChanged(it.parentDir)
+            }
+            Result.success(Unit)
+        } catch (e: NetworkException) {
+            Result.failure(e)
+        }
+    }
+
+    /**
+     * Returns a snapshot of pending offline operations.
+     */
+    internal suspend fun getPendingOperations(): List<PendingOperation> {
+        return mutex.withLock {
+            pendingOperations.toList()
+        }
+    }
+
+    /**
+     * Syncs all pending offline operations in FIFO order.
+     * Successfully synced operations are removed from the queue.
+     * Stops on the first failure and throws the exception.
+     */
+    internal suspend fun syncPendingOperations() = withContext(dispatcher) {
+        val ops = mutex.withLock { pendingOperations.toList() }
+        for (op in ops) {
+            when (op) {
+                is PendingOperation.Create -> {
+                    val request = NoteMapper.toProto(op.params)
+                    val response = noteRemoteDataSource.createNote(request)
+                    val note = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNote(note)
+                }
+                is PendingOperation.Update -> {
+                    val request = NoteMapper.toProto(op.params)
+                    val response = noteRemoteDataSource.updateNote(request)
+                    val note = NoteMapper.toDomain(response)
+                    cacheDataSource.saveNote(note)
+                }
+            }
+            mutex.withLock {
+                pendingOperations.remove(op)
+            }
+        }
+    }
+}

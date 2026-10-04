@@ -5,19 +5,11 @@ import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.core.files.di.filesModule
 import net.onefivefour.echolist.core.session.domain.AuthEventBus
 import net.onefivefour.echolist.core.session.domain.AuthRepository
-import net.onefivefour.echolist.domain.repository.NotesRepository
-import net.onefivefour.echolist.data.repository.NotesRepositoryImpl
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
-import net.onefivefour.echolist.data.source.cache.CacheDataSource
-import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
-import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
 import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
-import net.onefivefour.echolist.ui.editnote.EditNoteMode
-import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
@@ -32,33 +24,13 @@ val authModule: Module = module {
     viewModel { AuthViewModel(authRepository = get(), authEventBus = get()) }
 }
 
-val networkModule: Module = module {
-    single<NoteRemoteDataSource> {
-        NoteRemoteDataSourceImpl(client = get())
-    }
-
-
-}
 
 val dataModule: Module = module {
     single<CoroutineDispatcher> { Dispatchers.Default }
 
-    single<CacheDataSource> {
-        CacheDataSourceImpl(database = get())
-    }
 
     includes(filesModule, net.onefivefour.echolist.core.tasks.di.tasksModule)
 
-    single<NotesRepository> {
-        NotesRepositoryImpl(
-            noteRemoteDataSource = get(),
-            cacheDataSource = get(),
-            directoryChangeNotifier = get(),
-            dispatcher = Dispatchers.Default
-        )
-    } withOptions {
-        onClose { (it as? AutoCloseable)?.close() }
-    }
 
 
 }
@@ -66,12 +38,6 @@ val dataModule: Module = module {
 
 val navigationModule: Module = module {
     single { MainTaskSettingsResultBus() }
-    viewModel { params ->
-        EditNoteViewModel(
-            mode = params.get<EditNoteMode>(),
-            notesRepository = get()
-        )
-    }
     viewModel { params ->
         EditTaskListViewModel(
             mode = params.get<EditTaskListMode>(),
@@ -98,7 +64,7 @@ val appModules: List<Module> = listOf(
     authModule,
     net.onefivefour.echolist.feature.browser.di.browserModule,
     net.onefivefour.echolist.feature.login.di.loginModule,
-    networkModule,
+    net.onefivefour.echolist.feature.note.di.noteModule,
     dataModule,
     designSystemModule,
     navigationModule
