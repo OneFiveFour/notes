@@ -5,7 +5,7 @@ import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import net.onefivefour.echolist.cache.EchoListDatabase
 import net.onefivefour.echolist.data.source.JvmSecureStorage
 import net.onefivefour.echolist.data.source.SecureStorage
-import net.onefivefour.echolist.platform.echoListDatabasePath
+import net.onefivefour.echolist.core.files.platform.echoListDatabasePath
 import org.koin.dsl.module
 import java.nio.file.Files
 import java.nio.file.Path

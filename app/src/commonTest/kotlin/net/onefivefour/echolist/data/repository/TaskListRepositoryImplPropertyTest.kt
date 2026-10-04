@@ -34,7 +34,7 @@ import tasks.v1.UpdateTaskListResponse
  */
 class TaskListRepositoryImplPropertyTest : FunSpec({
 
-    class NoOpDirectoryChangeNotifier : net.onefivefour.echolist.domain.DirectoryChangeNotifier {
+    class NoOpDirectoryChangeNotifier : net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier {
         override val directoryChanged = kotlinx.coroutines.flow.MutableSharedFlow<String>()
 
         override suspend fun notifyChanged(path: String) = Unit

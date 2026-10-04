@@ -3,7 +3,7 @@ package net.onefivefour.echolist.data
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 
 class FakeDirectoryChangeNotifier : DirectoryChangeNotifier {
     private val _directoryChanged = MutableSharedFlow<String>()

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
-import net.onefivefour.echolist.data.repository.normalizePath
+import net.onefivefour.echolist.core.files.domain.normalizePath
 import net.onefivefour.echolist.domain.repository.FileRepository
 
 class RenameFolderViewModel(

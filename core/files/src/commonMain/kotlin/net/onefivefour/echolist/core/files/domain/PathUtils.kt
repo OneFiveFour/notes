@@ -1,6 +1,6 @@
-package net.onefivefour.echolist.data.repository
+package net.onefivefour.echolist.core.files.domain
 
-internal fun normalizePath(path: String): String {
+fun normalizePath(path: String): String {
     return path
         .replace('\\', '/')
         .trimStart('/')
@@ -9,7 +9,7 @@ internal fun normalizePath(path: String): String {
         .let { if (it == ".") "" else it }
 }
 
-internal fun joinPath(parentDir: String, childName: String): String {
+fun joinPath(parentDir: String, childName: String): String {
     val parent = normalizePath(parentDir)
     val child = normalizePath(childName)
     return when {

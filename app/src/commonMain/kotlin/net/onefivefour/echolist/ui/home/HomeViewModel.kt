@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import org.jetbrains.compose.resources.getString
 

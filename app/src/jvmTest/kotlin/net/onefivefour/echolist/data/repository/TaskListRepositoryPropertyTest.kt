@@ -17,7 +17,7 @@ import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest

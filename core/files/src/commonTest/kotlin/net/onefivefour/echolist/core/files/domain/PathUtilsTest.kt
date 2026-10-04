@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.data.repository
+package net.onefivefour.echolist.core.files.domain
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe

@@ -1,9 +1,9 @@
-package net.onefivefour.echolist.platform
+package net.onefivefour.echolist.core.files.platform
 
 import java.nio.file.Files
 import java.nio.file.Path
 
-internal fun echoListAppDirectory(): Path {
+fun echoListAppDirectory(): Path {
     val appData = System.getenv("APPDATA")?.takeIf { it.isNotBlank() }
     val directory = if (appData != null) {
         Path.of(appData, "EchoList")
@@ -15,6 +15,6 @@ internal fun echoListAppDirectory(): Path {
     return directory
 }
 
-internal fun echoListDatabasePath(): Path = echoListAppDirectory().resolve("echolist.db")
+fun echoListDatabasePath(): Path = echoListAppDirectory().resolve("echolist.db")
 
-internal fun echoListSecureStoragePath(): Path = echoListAppDirectory().resolve("secure-store.properties")
+fun echoListSecureStoragePath(): Path = echoListAppDirectory().resolve("secure-store.properties")

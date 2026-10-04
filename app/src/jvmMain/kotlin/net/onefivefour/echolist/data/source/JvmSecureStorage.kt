@@ -1,6 +1,6 @@
 package net.onefivefour.echolist.data.source
 
-import net.onefivefour.echolist.platform.echoListSecureStoragePath
+import net.onefivefour.echolist.core.files.platform.echoListSecureStoragePath
 import java.io.IOException
 import java.nio.file.Files
 import java.nio.file.Path

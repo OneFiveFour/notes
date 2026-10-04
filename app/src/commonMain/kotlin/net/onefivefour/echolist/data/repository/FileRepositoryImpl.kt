@@ -11,7 +11,7 @@ import net.onefivefour.echolist.data.models.FileEntry
 import net.onefivefour.echolist.domain.model.Folder
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.data.source.network.FileRemoteDataSource
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 
 internal class FileRepositoryImpl(

@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.data.repository
 
+import net.onefivefour.echolist.core.files.domain.normalizePath
+
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
@@ -17,7 +19,7 @@ import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.FakeTaskListRemoteDataSource
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.data.network.error.NetworkException
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListResponse

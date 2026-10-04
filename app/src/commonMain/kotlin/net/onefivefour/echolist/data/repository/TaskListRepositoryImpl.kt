@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.data.repository
 
+import net.onefivefour.echolist.core.files.domain.normalizePath
+
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import net.onefivefour.echolist.data.mapper.TaskListMapper
@@ -9,7 +11,7 @@ import net.onefivefour.echolist.domain.model.TaskList
 import net.onefivefour.echolist.domain.model.TaskListEntry
 import net.onefivefour.echolist.data.models.UpdateTaskListParams
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.TaskListRepository
 import tasks.v1.DeleteTaskListRequest
 import tasks.v1.GetMainTaskRequest

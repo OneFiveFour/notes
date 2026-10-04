@@ -1,4 +1,4 @@
-package net.onefivefour.echolist.domain
+package net.onefivefour.echolist.core.files.domain
 
 import kotlinx.coroutines.flow.SharedFlow
 

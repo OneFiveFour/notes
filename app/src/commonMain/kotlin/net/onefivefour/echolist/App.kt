@@ -26,7 +26,7 @@ import androidx.navigationevent.compose.rememberNavigationEventState
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_arrow_back
 import echolist.composeapp.generated.resources.navigate_back
-import net.onefivefour.echolist.data.repository.normalizePath
+import net.onefivefour.echolist.core.files.domain.normalizePath
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground

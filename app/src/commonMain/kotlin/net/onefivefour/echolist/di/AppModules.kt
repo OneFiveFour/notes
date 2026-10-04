@@ -4,7 +4,7 @@ import io.ktor.client.HttpClient
 import io.ktor.client.plugins.HttpTimeout
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import net.onefivefour.echolist.data.DirectoryChangeNotifierImpl
+import net.onefivefour.echolist.core.files.di.filesModule
 import net.onefivefour.echolist.data.network.auth.AuthEventBus
 import net.onefivefour.echolist.data.network.logging.LogLevel
 import net.onefivefour.echolist.data.network.logging.NetworkLoggingPlugin
@@ -24,7 +24,7 @@ import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSourceImpl
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
-import net.onefivefour.echolist.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 import net.onefivefour.echolist.data.network.client.ConnectRpcClientImpl
@@ -116,9 +116,7 @@ val dataModule: Module = module {
         CacheDataSourceImpl(database = get())
     }
 
-    single<DirectoryChangeNotifier> {
-        DirectoryChangeNotifierImpl()
-    }
+    includes(filesModule)
 
     single<NotesRepository> {
         NotesRepositoryImpl(

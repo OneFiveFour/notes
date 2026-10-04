@@ -19,6 +19,7 @@ kotlin {
             implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
+            implementation(project(":core:files"))
             implementation(project(":core:protocol"))
             implementation(project(":core:designsystem"))
             implementation(libs.compose.runtime)
