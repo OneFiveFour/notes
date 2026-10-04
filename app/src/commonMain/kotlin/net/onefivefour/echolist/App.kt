@@ -1,5 +1,8 @@
 package net.onefivefour.echolist
 
+import net.onefivefour.echolist.feature.tasksettings.ui.TaskSettingsFeature
+import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
+
 import net.onefivefour.echolist.feature.note.ui.NoteFeature
 
 import net.onefivefour.echolist.feature.browser.ui.BrowserFeature
@@ -39,8 +42,6 @@ import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.feature.login.ui.LoginFeature
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsScreen
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.HomeRoute
@@ -226,32 +227,11 @@ private fun AuthenticatedNavDisplay(
             }
 
             entry<MainTaskSettingsRoute> { route ->
-                val viewModel = koinViewModel<MainTaskSettingsViewModel>(
-                    key = "mainTaskSettings-${route.mainTaskId}"
-                ) {
-                    parametersOf(
-                        route.mainTaskId,
-                        route.currentDueDate,
-                        route.currentRecurrence,
-                        route.currentIsNotificationEnabled,
-                        settingsChannels.sinkFor(route.editorId.ifBlank {
-                            backStack.filterIsInstance<EditTaskListRoute>().lastOrNull()?.editorId.orEmpty()
-                        })
-                    )
-                }
-
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                DisposableEffect(viewModel) {
-                    onDispose { viewModel.onScreenLeaving() }
-                }
-
-                MainTaskSettingsScreen(
-                    uiState = uiState,
-                    onDateSelected = viewModel::onDateSelected,
-                    onRecurrenceIntervalSelected = viewModel::onRecurrenceIntervalSelected,
-                    onRecurrenceDetailChanged = viewModel::onRecurrenceDetailChanged,
-                    onNotificationToggleChanged = viewModel::onNotificationToggleChanged
+                TaskSettingsFeature(
+                    initial = TaskSettingsChanges(route.mainTaskId, route.currentDueDate, route.currentRecurrence, route.currentIsNotificationEnabled),
+                    onResult = settingsChannels.sinkFor(route.editorId.ifBlank {
+                        backStack.filterIsInstance<EditTaskListRoute>().lastOrNull()?.editorId.orEmpty()
+                    })
                 )
             }
         }

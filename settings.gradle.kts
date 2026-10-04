@@ -55,3 +55,5 @@ include(":features:login")
 include(":features:browser")
 
 include(":features:note")
+
+include(":features:tasksettings")

@@ -12,7 +12,6 @@ import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
-import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.viewModel
@@ -45,22 +44,13 @@ val navigationModule: Module = module {
             notificationScheduler = get()
         )
     }
-    viewModel { params ->
-        MainTaskSettingsViewModel(
-            mainTaskId = params.get(),
-            currentDueDate = params.get(),
-            currentRecurrence = params.get(),
-            currentIsNotificationEnabled = params.get(),
-            permissionChecker = get(),
-            permissionRequester = get(),
-            resultBus = params.get()
-        )
-    }
+
 }
 
 val appModules: List<Module> = listOf(
     net.onefivefour.echolist.core.session.di.sessionModule,
     authModule,
+    net.onefivefour.echolist.feature.tasksettings.di.taskSettingsModule,
     net.onefivefour.echolist.feature.browser.di.browserModule,
     net.onefivefour.echolist.feature.login.di.loginModule,
     net.onefivefour.echolist.feature.note.di.noteModule,
