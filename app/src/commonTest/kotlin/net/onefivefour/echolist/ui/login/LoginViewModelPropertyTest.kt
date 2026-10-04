@@ -148,7 +148,7 @@ class LoginViewModelPropertyTest : FunSpec({
                 vm.onUsernameChanged(user)
                 vm.onPasswordChanged(pass)
                 vm.onLoginClick()
-                // Don't advanceUntilIdle — we want to observe the loading state before login completes
+                // Don't advanceUntilIdle â€” we want to observe the loading state before login completes
 
                 vm.uiState.value.isLoading shouldBe true
                 vm.uiState.value.backendUrlError.shouldBeNull()

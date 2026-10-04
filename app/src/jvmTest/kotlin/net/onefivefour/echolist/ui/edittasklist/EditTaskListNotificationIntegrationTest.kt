@@ -22,14 +22,14 @@ import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResult
 import net.onefivefour.echolist.ui.maintasksettings.MainTaskSettingsResultBus
 
 /**
- * Integration tests verifying the toggle deactivation → sync → cancel flow.
+ * Integration tests verifying the toggle deactivation â†’ sync â†’ cancel flow.
  *
  * Validates: Requirements 5.3
  *
  * When the notification toggle changes from enabled to disabled via MainTaskSettingsResult,
  * the EditTaskListViewModel must:
  * 1. Update the UiMainTask's isNotificationEnabled to false
- * 2. Trigger a sync (requestSync → repository updateTaskList call)
+ * 2. Trigger a sync (requestSync â†’ repository updateTaskList call)
  * 3. Cancel the notification for that task via the scheduler
  */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -106,12 +106,12 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
             val uiTask = vm.uiState.value.uiMainTasks.first { it.id == "task-A" }
             uiTask.isNotificationEnabled shouldBe false
 
-            // 2. requestSync() was triggered — repository received an update call
+            // 2. requestSync() was triggered â€” repository received an update call
             repo.updateTaskListCalls shouldHaveSize 1
             repo.updateTaskListCalls[0].id shouldBe "tl-integration-1"
 
             // 3. Notification scheduler receives cancel for that task
-            // (scheduleTaskNotification sees isNotificationEnabled=false → calls cancel)
+            // (scheduleTaskNotification sees isNotificationEnabled=false â†’ calls cancel)
             // Notification scheduling happens on Dispatchers.Default (real thread pool)
             eventually(2.seconds) {
                 scheduler.cancelCalls.any { it.taskId == "task-A" } shouldBe true
@@ -182,7 +182,7 @@ class EditTaskListNotificationIntegrationTest : FunSpec({
             // Sync triggered
             repo.updateTaskListCalls shouldHaveSize 1
 
-            // Notification should be scheduled (not canceled) — the task has
+            // Notification should be scheduled (not canceled) â€” the task has
             // isNotificationEnabled=true, a valid dueDate, and recurrence
             eventually(2.seconds) {
                 scheduler.scheduleCalls.any { it.taskId == "task-B" } shouldBe true

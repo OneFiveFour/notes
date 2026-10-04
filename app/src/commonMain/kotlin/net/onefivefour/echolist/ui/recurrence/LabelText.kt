@@ -3,7 +3,7 @@ package net.onefivefour.echolist.ui.recurrence
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 /**
  * Consistent inline label text used by the recurrence detail rows

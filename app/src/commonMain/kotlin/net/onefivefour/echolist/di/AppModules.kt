@@ -29,9 +29,7 @@ import net.onefivefour.echolist.domain.repository.FileRepository
 import net.onefivefour.echolist.data.network.client.ConnectRpcClient
 import net.onefivefour.echolist.data.network.client.ConnectRpcClientImpl
 import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
-import net.onefivefour.echolist.ui.theme.colorscheme.EchoListClassicTheme
-import net.onefivefour.echolist.ui.theme.colorscheme.EchoListTheme2
-import net.onefivefour.echolist.ui.theme.ThemeManager
+import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.editnote.EditNoteViewModel
@@ -150,17 +148,6 @@ val dataModule: Module = module {
     }
 }
 
-val uiModule: Module = module {
-    single {
-        ThemeManager(
-            availableThemes = listOf(
-                EchoListClassicTheme,
-                EchoListTheme2
-            ),
-            initialTheme = EchoListClassicTheme
-        )
-    }
-}
 
 val navigationModule: Module = module {
     single { MainTaskSettingsResultBus() }
@@ -214,6 +201,6 @@ val appModules: List<Module> = listOf(
     authModule,
     networkModule,
     dataModule,
-    uiModule,
+    designSystemModule,
     navigationModule
 )

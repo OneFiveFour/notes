@@ -12,7 +12,7 @@ import net.onefivefour.echolist.data.models.UpdateTaskListParams
 /**
  * Unit tests for TaskListMapper transformations.
  * Tests specific examples, edge cases, field name conversions,
- * and bidirectional transformations (domain → proto → domain).
+ * and bidirectional transformations (domain â†’ proto â†’ domain).
  */
 class TaskListMapperTest : FunSpec({
 

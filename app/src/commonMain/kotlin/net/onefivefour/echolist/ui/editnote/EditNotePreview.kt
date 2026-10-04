@@ -10,7 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 internal fun EditNotePreview(

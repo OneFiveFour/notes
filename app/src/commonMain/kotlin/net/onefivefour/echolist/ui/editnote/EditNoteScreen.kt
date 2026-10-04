@@ -16,9 +16,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.echolist.ui.common.EditTitle
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.EditTitle
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 fun EditNoteScreen(

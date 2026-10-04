@@ -43,9 +43,9 @@ import net.onefivefour.echolist.domain.DueDateUrgencyCalculator
 import net.onefivefour.echolist.domain.model.DueDateUrgency
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
-import net.onefivefour.echolist.ui.common.ElTextField
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.ElTextField
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 import kotlin.time.Clock
 import kotlin.time.Duration.Companion.minutes

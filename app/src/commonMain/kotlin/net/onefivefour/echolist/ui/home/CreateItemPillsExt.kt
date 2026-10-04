@@ -3,7 +3,7 @@ package net.onefivefour.echolist.ui.home
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import net.onefivefour.echolist.data.models.ItemType
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 internal fun ItemType.pillColor(): Color = when (this) {

@@ -5,9 +5,9 @@ object BodyFormatter {
 
     /**
      * Formats [bytes] as a UTF-8 string for logging.
-     * - Empty array → "empty body"
-     * - ≤1024 bytes → decoded string + "(N bytes)"
-     * - >1024 bytes → first 1024 bytes decoded + "... (truncated, N bytes total)"
+     * - Empty array â†’ "empty body"
+     * - â‰¤1024 bytes â†’ decoded string + "(N bytes)"
+     * - >1024 bytes â†’ first 1024 bytes decoded + "... (truncated, N bytes total)"
      */
     fun format(bytes: ByteArray): String {
         if (bytes.isEmpty()) return "empty body"

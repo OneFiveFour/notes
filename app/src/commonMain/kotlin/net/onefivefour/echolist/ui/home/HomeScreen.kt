@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.ic_delete
 import echolist.composeapp.generated.resources.ic_edit
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalMaterial3Api::class)

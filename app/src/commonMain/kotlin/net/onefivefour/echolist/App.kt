@@ -29,8 +29,8 @@ import echolist.composeapp.generated.resources.navigate_back
 import net.onefivefour.echolist.data.repository.normalizePath
 import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.common.RoundIconButton
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.components.RoundIconButton
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
 import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.ui.home.CreateFolderViewModel
@@ -51,7 +51,7 @@ import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.HomeRoute
 import net.onefivefour.echolist.ui.navigation.MainTaskSettingsRoute
 import net.onefivefour.echolist.ui.navigation.echoListSavedStateConfig
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import org.jetbrains.compose.resources.stringResource

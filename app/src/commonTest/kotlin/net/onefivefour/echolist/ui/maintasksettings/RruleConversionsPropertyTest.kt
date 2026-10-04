@@ -39,7 +39,7 @@ class RruleConversionsPropertyTest : FunSpec({
         }
     }
 
-    test("Property 1: RRULE round-trip — toRrule then rruleToRecurrenceState returns original RecurrenceState") {
+    test("Property 1: RRULE round-trip â€” toRrule then rruleToRecurrenceState returns original RecurrenceState") {
         checkAll(PropTestConfig(iterations = 100), arbRecurrenceState) { state ->
             val rrule = state.toRrule()
             rruleToRecurrenceState(rrule) shouldBe state

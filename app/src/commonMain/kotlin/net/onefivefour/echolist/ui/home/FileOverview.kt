@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import net.onefivefour.echolist.data.models.FileEntry
 import net.onefivefour.echolist.data.models.FileMetadata
 import net.onefivefour.echolist.data.models.ItemType
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 internal fun FileOverview(

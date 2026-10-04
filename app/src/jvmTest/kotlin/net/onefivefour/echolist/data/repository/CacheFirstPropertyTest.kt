@@ -117,7 +117,7 @@ class CacheFirstPropertyTest : FunSpec({
             fetched.content shouldBe note.content
             fetched.updatedAt shouldBe note.updatedAt
 
-            // The network call should NOT have completed yet — proving cache-first behavior
+            // The network call should NOT have completed yet â€” proving cache-first behavior
             delayedNetwork.networkCompleted.get() shouldBe false
         }
     }

@@ -72,7 +72,7 @@ class WithRetryPropertyTest : FunSpec({
 
     // -- Property 21: Selective Retry by Error Type --
 
-    test("Property 21: ClientError (4xx) causes no retry — only 1 attempt") {
+    test("Property 21: ClientError (4xx) causes no retry â€” only 1 attempt") {
         checkAll(PropTestConfig(iterations = 20), arbClientError) { error ->
             var attemptCount = 0
 
@@ -86,7 +86,7 @@ class WithRetryPropertyTest : FunSpec({
         }
     }
 
-    test("Property 21: Transient errors cause retries — more than 1 attempt") {
+    test("Property 21: Transient errors cause retries â€” more than 1 attempt") {
         checkAll(PropTestConfig(iterations = 20), arbTransientError) { error ->
             var attemptCount = 0
 

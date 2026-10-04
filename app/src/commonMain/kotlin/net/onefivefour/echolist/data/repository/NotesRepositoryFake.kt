@@ -14,7 +14,7 @@ class NotesRepositoryFake : NotesRepository {
     private val notes = mutableMapOf<String, Note>()
     private var shouldFail: Exception? = null
 
-    /** All method invocations recorded as "methodName(args…)" strings. */
+    /** All method invocations recorded as "methodName(argsâ€¦)" strings. */
     val callLog = mutableListOf<String>()
 
     /**

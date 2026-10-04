@@ -15,8 +15,8 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 /**
  * A compact, bordered numeric input box used inside the recurrence detail rows

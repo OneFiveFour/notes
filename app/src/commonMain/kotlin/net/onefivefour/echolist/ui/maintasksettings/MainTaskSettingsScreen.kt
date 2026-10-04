@@ -32,7 +32,7 @@ import net.onefivefour.echolist.ui.recurrence.RecurrenceState
 import net.onefivefour.echolist.ui.recurrence.WeeklyDetailContent
 import net.onefivefour.echolist.ui.recurrence.isValidDayOfMonth
 import net.onefivefour.echolist.ui.recurrence.isValidPositiveInt
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 internal fun MainTaskSettingsScreen(
@@ -126,7 +126,7 @@ private fun MainTaskSettingsContent(
 
             AnimatedVisibility(visible = !uiState.isNotificationToggleEnabled) {
                 Text(
-                    text = "Notifications sind nur bei aktiver Wiederholung verfügbar.",
+                    text = "Notifications sind nur bei aktiver Wiederholung verfÃ¼gbar.",
                     style = EchoListTheme.typography.bodySmall,
                     color = EchoListTheme.materialColors.onSurfaceVariant
                 )

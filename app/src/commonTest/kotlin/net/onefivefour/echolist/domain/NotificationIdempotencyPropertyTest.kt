@@ -181,10 +181,10 @@ private class PermissionDeniedScheduler : NotificationScheduler {
         body: String,
         dueDateIso: String
     ) {
-        // Permission denied — no-op, no exception
+        // Permission denied â€” no-op, no exception
     }
 
     override suspend fun cancel(taskId: String) {
-        // Permission denied — no-op, no exception
+        // Permission denied â€” no-op, no exception
     }
 }

@@ -67,7 +67,7 @@ class HomeViewModelClearErrorTest : FunSpec({
                 directoryChangeNotifier = FakeDirectoryChangeNotifier()
             )
 
-            // Let init's loadData() complete — it should fail
+            // Let init's loadData() complete â€” it should fail
             advanceUntilIdle()
             vm.uiState.value.error.shouldNotBeNull()
             vm.uiState.value.error shouldBe "code Unauthenticated token expired"

@@ -9,7 +9,7 @@ import io.kotest.property.Exhaustive
 import io.kotest.property.checkAll
 import io.kotest.property.exhaustive.enum
 import net.onefivefour.echolist.domain.model.DueDateUrgency
-import net.onefivefour.echolist.ui.theme.EchoListColorScheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListColorScheme
 
 /**
  * Feature: recurrence-reminders
@@ -17,9 +17,9 @@ import net.onefivefour.echolist.ui.theme.EchoListColorScheme
  *
  * *For any* DueDateUrgency value, resolveUrgencyColors SHALL return the designated
  * (backgroundColor, textColor) pair:
- * - Normal → (materialColors.surfaceVariant, materialColors.onSurfaceVariant)
- * - Warning → (echoListColorScheme.warning, echoListColorScheme.onWarning)
- * - Overdue → (materialColors.error, materialColors.onError)
+ * - Normal â†’ (materialColors.surfaceVariant, materialColors.onSurfaceVariant)
+ * - Warning â†’ (echoListColorScheme.warning, echoListColorScheme.onWarning)
+ * - Overdue â†’ (materialColors.error, materialColors.onError)
  *
  * Since resolveUrgencyColors is a @Composable that reads from composition locals,
  * this test verifies the mapping logic using a pure function that mirrors the same
@@ -29,7 +29,7 @@ import net.onefivefour.echolist.ui.theme.EchoListColorScheme
  */
 class ResolveUrgencyColorsPropertyTest : FunSpec({
 
-    // Test color values — distinct values to verify correct mapping
+    // Test color values â€” distinct values to verify correct mapping
     val testSurfaceVariant = Color(0xFF111111)
     val testOnSurfaceVariant = Color(0xFF222222)
     val testWarning = Color(0xFF333333)

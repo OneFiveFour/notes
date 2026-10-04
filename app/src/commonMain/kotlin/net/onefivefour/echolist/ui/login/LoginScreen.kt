@@ -48,9 +48,9 @@ import echolist.composeapp.generated.resources.show_password
 import echolist.composeapp.generated.resources.visibility_off
 import echolist.composeapp.generated.resources.visibility_on
 import net.onefivefour.echolist.domain.model.AuthError
-import net.onefivefour.echolist.ui.common.ElButton
-import net.onefivefour.echolist.ui.common.ElOutlinedTextField
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
+import net.onefivefour.echolist.core.designsystem.ui.components.ElOutlinedTextField
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

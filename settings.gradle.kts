@@ -34,3 +34,4 @@ plugins {
 }
 
 include(":app", ":apps:android", ":apps:desktop", ":apps:web", ":core:protocol")
+include(":core:designsystem")

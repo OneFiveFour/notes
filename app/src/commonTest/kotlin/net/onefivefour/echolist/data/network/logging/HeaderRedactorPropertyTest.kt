@@ -77,7 +77,7 @@ class HeaderRedactorPropertyTest : FunSpec({
          *
          * For any map of headers that includes at least one sensitive header with a non-empty value,
          * after redaction, none of the original sensitive header values should appear anywhere in the
-         * redacted map — they should all be replaced with [REDACTED], and all non-sensitive header
+         * redacted map â€” they should all be replaced with [REDACTED], and all non-sensitive header
          * values should remain unchanged.
          */
 

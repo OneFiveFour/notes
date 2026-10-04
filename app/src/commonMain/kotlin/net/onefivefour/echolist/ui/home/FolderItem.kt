@@ -18,7 +18,7 @@ import echolist.composeapp.generated.resources.Res
 import echolist.composeapp.generated.resources.folder
 import echolist.composeapp.generated.resources.ic_arrow_right
 import net.onefivefour.echolist.data.models.FileMetadata
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 

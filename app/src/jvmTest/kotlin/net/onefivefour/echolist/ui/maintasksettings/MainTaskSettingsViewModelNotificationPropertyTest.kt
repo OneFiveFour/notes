@@ -95,7 +95,7 @@ class MainTaskSettingsViewModelNotificationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: notification-permission-toggle, Property 3: Berechtigungsprüfungs-Guard (onScreenLeaving)") {
+    test("Feature: notification-permission-toggle, Property 3: BerechtigungsprÃ¼fungs-Guard (onScreenLeaving)") {
         // **Validates: Requirements 3.1, 3.4**
         checkAll(PropTestConfig(iterations = 100), Arb.boolean(), Arb.boolean()) { notificationEnabled, recurrenceOff ->
             runTest(testDispatcher) {

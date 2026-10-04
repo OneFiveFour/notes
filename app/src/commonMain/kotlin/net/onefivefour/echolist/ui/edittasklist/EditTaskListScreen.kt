@@ -23,10 +23,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import net.onefivefour.echolist.domain.model.MainTask
 import net.onefivefour.echolist.domain.model.SubTask
-import net.onefivefour.echolist.ui.common.EditTitle
-import net.onefivefour.echolist.ui.common.ElButton
-import net.onefivefour.echolist.ui.common.GradientBackground
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.components.EditTitle
+import net.onefivefour.echolist.core.designsystem.ui.components.ElButton
+import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 
 @Composable
 internal fun EditTaskListScreen(

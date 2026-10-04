@@ -20,7 +20,7 @@ import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.domain.repository.NotesRepository
 
-// Feature: note-tasklist-editors, Property 1: Save guard — repository called if and only if trimmed text is non-blank
+// Feature: note-tasklist-editors, Property 1: Save guard â€” repository called if and only if trimmed text is non-blank
 
 @OptIn(ExperimentalCoroutinesApi::class, io.kotest.common.ExperimentalKotest::class)
 class EditNoteViewModelPropertyTest : FunSpec({
@@ -84,7 +84,7 @@ class EditNoteViewModelPropertyTest : FunSpec({
 
     // -- Property 1: Save guard --
 
-    test("Property 1: Save guard — repository called if and only if trimmed text is non-blank") {
+    test("Property 1: Save guard â€” repository called if and only if trimmed text is non-blank") {
         // Validates: Requirements 5.3, 5.7
         checkAll(
             PropTestConfig(iterations = 100),

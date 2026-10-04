@@ -267,7 +267,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             )
             testScheduler.advanceUntilIdle()
 
-            // First navigation — ViewModel is created
+            // First navigation â€” ViewModel is created
             val settingsVm = MainTaskSettingsViewModel(
                 mainTaskId = "task-1",
                 currentDueDate = "",
@@ -362,7 +362,7 @@ class MainTaskSettingsDueDateRoundTripTest : FunSpec({
             updatedTask.dueDate shouldBe "2026-08-01"
             updatedTask.recurrence shouldBe "FREQ=WEEKLY;INTERVAL=2"
 
-            // Second navigation — new ViewModel
+            // Second navigation â€” new ViewModel
             val settingsVm2 = MainTaskSettingsViewModel(
                 mainTaskId = "task-2",
                 currentDueDate = updatedTask.dueDate,

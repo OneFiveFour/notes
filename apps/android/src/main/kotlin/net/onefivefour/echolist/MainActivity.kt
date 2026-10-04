@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import net.onefivefour.echolist.data.notification.PermissionResultBridge
-import net.onefivefour.echolist.ui.theme.EchoListTheme
+import net.onefivefour.echolist.core.designsystem.ui.theme.EchoListTheme
 import org.koin.android.ext.android.inject
 
 class MainActivity : ComponentActivity() {
@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
             App()
 
             EchoListTheme {
-                // Rationale dialog — explains why notifications are needed
+                // Rationale dialog â€” explains why notifications are needed
                 if (showRationaleDialog) {
                     NotificationRationaleDialog(
                         onConfirm = {
@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                // Settings redirect dialog — user permanently denied permission
+                // Settings redirect dialog â€” user permanently denied permission
                 if (showSettingsDialog) {
                     NotificationSettingsDialog(
                         onOpenSettings = {

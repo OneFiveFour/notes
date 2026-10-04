@@ -26,7 +26,7 @@ class DateConversionsPropertyTest : FunSpec({
         LocalDate.fromEpochDays(epochDay).toString()
     }
 
-    test("Property 2: Date conversion round-trip — dueDateToUtcMillis then utcMillisToDueDate returns original date string") {
+    test("Property 2: Date conversion round-trip â€” dueDateToUtcMillis then utcMillisToDueDate returns original date string") {
         checkAll(PropTestConfig(iterations = 100), arbDateString) { dateString ->
             val millis = dueDateToUtcMillis(dateString)
             millis shouldBe dueDateToUtcMillis(dateString) // non-null check implicit
