@@ -65,7 +65,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "Shopping List")
+        scheduleTaskNotification(scheduler, task, "Shopping List", "list-1")
 
         scheduler.scheduleCalls shouldHaveSize 1
         scheduler.cancelCalls.shouldBeEmpty()
@@ -86,7 +86,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.cancelCalls shouldHaveSize 1
         scheduler.scheduleCalls.shouldBeEmpty()
@@ -104,7 +104,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.cancelCalls shouldHaveSize 1
         scheduler.scheduleCalls.shouldBeEmpty()
@@ -122,7 +122,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.cancelCalls shouldHaveSize 1
         scheduler.scheduleCalls.shouldBeEmpty()
@@ -139,7 +139,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.scheduleCalls.shouldBeEmpty()
         scheduler.cancelCalls.shouldBeEmpty()
@@ -157,7 +157,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "Today List")
+        scheduleTaskNotification(scheduler, task, "Today List", "list-1")
 
         scheduler.scheduleCalls shouldHaveSize 1
         scheduler.cancelCalls.shouldBeEmpty()
@@ -176,7 +176,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.scheduleCalls shouldHaveSize 1
         scheduler.scheduleCalls[0].body.length shouldBe 200
@@ -194,7 +194,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "Shopping List")
+        scheduleTaskNotification(scheduler, task, "Shopping List", "list-1")
 
         scheduler.scheduleCalls shouldHaveSize 1
         scheduler.scheduleCalls[0].body shouldBe "Shopping List"
@@ -211,7 +211,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
             subTasks = emptyList()
         )
 
-        scheduleTaskNotification(scheduler, task, "My List")
+        scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
         scheduler.cancelCalls shouldHaveSize 1
         scheduler.scheduleCalls.shouldBeEmpty()
@@ -239,7 +239,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.scheduleCalls shouldHaveSize 1
             scheduler.scheduleCalls[0].taskId shouldBe taskId
@@ -265,7 +265,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.cancelCalls shouldHaveSize 1
             scheduler.cancelCalls[0].taskId shouldBe taskId
@@ -291,7 +291,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.cancelCalls shouldHaveSize 1
             scheduler.cancelCalls[0].taskId shouldBe taskId
@@ -320,7 +320,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.scheduleCalls shouldHaveSize 1
             scheduler.scheduleCalls[0].title shouldBe "Task due: $taskListName"
@@ -346,7 +346,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.scheduleCalls shouldHaveSize 1
             val expectedBody = description.ifEmpty { taskListName }.take(200)
@@ -375,7 +375,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.scheduleCalls shouldHaveSize 1
             scheduler.scheduleCalls[0].dueDateIso shouldBe dueDate
@@ -403,7 +403,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.scheduleCalls.shouldBeEmpty()
             scheduler.cancelCalls.shouldBeEmpty()
@@ -458,7 +458,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
                 subTasks = emptyList()
             )
 
-            scheduleTaskNotification(scheduler, task, taskListName)
+            scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
             scheduler.cancelCalls shouldHaveSize 1
             scheduler.cancelCalls[0].taskId shouldBe taskId
@@ -477,7 +477,13 @@ private class FakeNotificationScheduler : NotificationScheduler {
     val scheduleCalls = mutableListOf<ScheduleCall>()
     val cancelCalls = mutableListOf<CancelCall>()
 
-    override suspend fun schedule(taskId: String, title: String, body: String, dueDateIso: String) {
+    override suspend fun schedule(
+        taskId: String,
+        taskListId: String,
+        title: String,
+        body: String,
+        dueDateIso: String
+    ) {
         scheduleCalls.add(ScheduleCall(taskId, title, body, dueDateIso))
     }
 

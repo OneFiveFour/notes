@@ -26,6 +26,7 @@ class AndroidNotificationScheduler(
 
     override suspend fun schedule(
         taskId: String,
+        taskListId: String,
         title: String,
         body: String,
         dueDateIso: String
@@ -43,6 +44,7 @@ class AndroidNotificationScheduler(
 
         val intent = Intent(context, TaskReminderReceiver::class.java).apply {
             putExtra(TaskReminderReceiver.EXTRA_TASK_ID, taskId)
+            putExtra(TaskReminderReceiver.EXTRA_TASK_LIST_ID, taskListId)
             putExtra(TaskReminderReceiver.EXTRA_TITLE, title)
             putExtra(TaskReminderReceiver.EXTRA_BODY, body)
         }

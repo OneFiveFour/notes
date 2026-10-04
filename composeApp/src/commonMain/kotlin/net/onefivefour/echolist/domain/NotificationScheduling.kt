@@ -19,11 +19,13 @@ import net.onefivefour.echolist.domain.model.MainTask
  * @param scheduler the platform notification scheduler implementation
  * @param task the task to evaluate for notification scheduling
  * @param taskListName the name of the containing task list (used in notification title/body)
+ * @param taskListId the id of the containing task list (needed for notification actions)
  */
 suspend fun scheduleTaskNotification(
     scheduler: NotificationScheduler,
     task: MainTask,
-    taskListName: String
+    taskListName: String,
+    taskListId: String
 ) {
     if (!task.isNotificationEnabled) {
         scheduler.cancel(task.id)
@@ -48,6 +50,7 @@ suspend fun scheduleTaskNotification(
 
     scheduler.schedule(
         taskId = task.id,
+        taskListId = taskListId,
         title = "Task due: $taskListName",
         body = task.description.ifEmpty { taskListName }.take(200),
         dueDateIso = task.dueDate

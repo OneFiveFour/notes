@@ -12,6 +12,8 @@ import platform.UserNotifications.UNAuthorizationStatusAuthorized
 import platform.UserNotifications.UNAuthorizationStatusProvisional
 import platform.UserNotifications.UNCalendarNotificationTrigger
 import platform.UserNotifications.UNMutableNotificationContent
+import platform.UserNotifications.UNNotificationAction
+import platform.UserNotifications.UNNotificationActionOptionNone
 import platform.UserNotifications.UNNotificationCategory
 import platform.UserNotifications.UNNotificationCategoryOptionHiddenPreviewsShowTitle
 import platform.UserNotifications.UNNotificationRequest
@@ -27,13 +29,9 @@ import platform.UserNotifications.UNUserNotificationCenter
  */
 class IosNotificationScheduler : NotificationScheduler {
 
-    private companion object {
-        const val CATEGORY_ID = "echolist_tasks"
-        const val HIDDEN_PREVIEW_PLACEHOLDER = "You have a task reminder"
-    }
-
     override suspend fun schedule(
         taskId: String,
+        taskListId: String,
         title: String,
         body: String,
         dueDateIso: String
@@ -62,21 +60,32 @@ class IosNotificationScheduler : NotificationScheduler {
 
         val center = UNUserNotificationCenter.currentNotificationCenter()
 
-        // Register notification category with hidden previews placeholder
+        // Register notification category with a "Done" action and hidden previews placeholder
+        val doneAction = UNNotificationAction.actionWithIdentifier(
+            identifier = IosNotificationConstants.DONE_ACTION_ID,
+            title = IosNotificationConstants.DONE_ACTION_TITLE,
+            options = UNNotificationActionOptionNone
+        )
         val category = UNNotificationCategory.categoryWithIdentifier(
-            identifier = CATEGORY_ID,
-            actions = emptyList<Any>(),
+            identifier = IosNotificationConstants.CATEGORY_ID,
+            actions = listOf(doneAction),
             intentIdentifiers = emptyList<Any>(),
-            hiddenPreviewsBodyPlaceholder = HIDDEN_PREVIEW_PLACEHOLDER,
+            hiddenPreviewsBodyPlaceholder = IosNotificationConstants.HIDDEN_PREVIEW_PLACEHOLDER,
             options = UNNotificationCategoryOptionHiddenPreviewsShowTitle
         )
         center.setNotificationCategories(setOf(category))
 
-        // Create notification content
+        // Create notification content, carrying the ids the "Done" action needs.
         val content = UNMutableNotificationContent().apply {
             setTitle(title)
             setBody(body)
-            setCategoryIdentifier(CATEGORY_ID)
+            setCategoryIdentifier(IosNotificationConstants.CATEGORY_ID)
+            setUserInfo(
+                mapOf(
+                    IosNotificationConstants.USER_INFO_TASK_ID to taskId,
+                    IosNotificationConstants.USER_INFO_TASK_LIST_ID to taskListId
+                )
+            )
         }
 
         // Create date components for midnight on the due date

@@ -321,6 +321,7 @@ internal class EditTaskListViewModel(
                     }
 
                     scheduleNotifications(
+                        taskListId = taskList.id,
                         taskListName = taskList.name,
                         domainTasks = tasksWithLocalNotificationState
                     )
@@ -434,10 +435,14 @@ internal class EditTaskListViewModel(
         return null
     }
 
-    private fun scheduleNotifications(taskListName: String, domainTasks: List<MainTask>) {
+    private fun scheduleNotifications(
+        taskListId: String,
+        taskListName: String,
+        domainTasks: List<MainTask>
+    ) {
         viewModelScope.launch(Dispatchers.Default) {
             for (task in domainTasks) {
-                scheduleTaskNotification(notificationScheduler, task, taskListName)
+                scheduleTaskNotification(notificationScheduler, task, taskListName, taskListId)
             }
         }
     }

@@ -392,7 +392,13 @@ private class RecordingNotificationScheduler : NotificationScheduler {
     val scheduleCalls = mutableListOf<ScheduleCallRecord>()
     val cancelCalls = mutableListOf<CancelCallRecord>()
 
-    override suspend fun schedule(taskId: String, title: String, body: String, dueDateIso: String) {
+    override suspend fun schedule(
+        taskId: String,
+        taskListId: String,
+        title: String,
+        body: String,
+        dueDateIso: String
+    ) {
         scheduleCalls.add(ScheduleCallRecord(taskId, title, body, dueDateIso))
     }
 

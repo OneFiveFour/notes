@@ -31,8 +31,10 @@ class JvmNotificationScheduler(
 
     private val scheduledJobs = ConcurrentHashMap<String, Job>()
 
+    // taskListId is unused: JVM SystemTray/dialog notifications cannot render action buttons.
     override suspend fun schedule(
         taskId: String,
+        taskListId: String,
         title: String,
         body: String,
         dueDateIso: String
