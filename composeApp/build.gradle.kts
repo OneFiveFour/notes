@@ -21,16 +21,6 @@ kotlin {
         }
     }
 
-    listOf(
-        iosArm64(),
-        iosSimulatorArm64()
-    ).forEach { iosTarget ->
-        iosTarget.binaries.framework {
-            baseName = "ComposeApp"
-            isStatic = true
-        }
-    }
-
     jvm()
 
     js {
@@ -107,10 +97,6 @@ kotlin {
             implementation(libs.kotest.assertions.core)
             implementation(libs.kotest.property)
             implementation(libs.ktor.client.mock)
-        }
-        iosMain.dependencies {
-            implementation(libs.ktor.client.darwin)
-            implementation(libs.sqldelight.driver.native)
         }
         jvmMain.dependencies {
             implementation(libs.icu4j)

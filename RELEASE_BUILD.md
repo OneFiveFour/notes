@@ -7,7 +7,6 @@ This project can build Android, Desktop, JS, and Wasm release artifacts from the
 - JDK 17 or newer on `PATH`
 - Android SDK installed and configured through `local.properties`
 - Gradle wrapper available as `gradlew.bat` or `gradlew`
-- For iOS releases: macOS with Xcode. iOS archive/export is handled from `iosApp` in Xcode.
 
 ## Android signing
 

@@ -61,11 +61,9 @@ private fun getDetektSourcePaths(): List<File> {
 
         sourceDirs.add(file("${it.projectDir}/src/commonMain/kotlin"))
         sourceDirs.add(file("${it.projectDir}/src/androidMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/iosMain/kotlin"))
         sourceDirs.add(file("${it.projectDir}/src/desktopMain/kotlin"))
         sourceDirs.add(file("${it.projectDir}/src/wasmJsMain/kotlin"))
         sourceDirs.add(file("${it.projectDir}/src/jvmMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/nativeMain/kotlin"))
     }
 
     return sourceDirs.filter { it.exists() }

@@ -39,26 +39,6 @@ captures/
 .idea/navEditor.xml
 !/gradle/wrapper/gradle-wrapper.jar
 
-### Xcode ###
-*.xcodeproj/*
-!*.xcodeproj/project.pbxproj
-!*.xcodeproj/xcshareddata/
-!*.xcworkspace/contents.xcworkspacedata/
-/*.gcno
-**/xcshareddata/WorkspaceSettings.xcsettings
-*.xcuserstate
-*.xcscheme
-*.xcworkspace
-xcuserdata/
-
-# CocoaPods
-Pods/
-
-## iOS App packaging
-*.ipa
-*.dSYM.zip
-*.dSYM
-
 # Android App packaging
 *.apk
 *.ap_

@@ -6,7 +6,7 @@ EchoList is a cross-platform productivity app for organizing notes and task list
 
 ## Target Platforms
 
-Android, iOS, Desktop (JVM), Web (JS), Web (WasmJS) — all from a single Kotlin codebase.
+Android, Desktop (JVM), Web (JS), Web (WasmJS) — all from a single Kotlin codebase.
 
 ## Technology Stack
 
@@ -35,7 +35,7 @@ commonMain/
 └── ui/            # Compose screens, ViewModels, theme, navigation
 ```
 
-Platform-specific source sets (`androidMain`, `iosMain`, `jvmMain`, `jsMain`, `wasmJsMain`) provide expect/actual implementations for database drivers, HTTP engines, secure storage, etc.
+Platform-specific source sets (`androidMain`, `jvmMain`, `jsMain`, `wasmJsMain`) provide expect/actual implementations for database drivers, HTTP engines, secure storage, etc.
 
 ### Data flow
 

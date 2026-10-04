@@ -5,10 +5,9 @@ This repository contains a Kotlin Multiplatform app built with Compose Multiplat
 ## Project Snapshot
 
 - Product: cross-platform productivity app with hierarchical folders, notes, and task lists
-- Targets: Android, iOS, JVM desktop, JS web, WasmJS
+- Targets: Android, JVM desktop, JS web, WasmJS
 - Core user flow: authenticate against a self-hosted backend, browse folder contents, create and edit folders/notes/task lists
 - Main module: `composeApp/`
-- Native iOS wrapper: `iosApp/`
 - Protobuf schemas: `proto/`
 - Historical/spec context: `.kiro/steering/` and `.kiro/specs/`
 

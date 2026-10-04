@@ -9,7 +9,7 @@
 ## Technology Stack
 
 - Language: Kotlin
-- Framework: Compose Multiplatform (Android, iOS, JVM, JS, WasmJS)
+- Framework: Compose Multiplatform (Android, JVM, JS, WasmJS)
 - UI Library: Material 3 (`compose.material3`)
 - Build: Gradle with Kotlin DSL, version catalog
 - Styling: Compose `MaterialTheme` with custom `ColorScheme`, `Typography`, `Shapes`
