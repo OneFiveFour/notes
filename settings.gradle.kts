@@ -37,3 +37,5 @@ include(":app", ":apps:android", ":apps:desktop", ":apps:web", ":core:protocol")
 include(":core:designsystem")
 
 include(":core:files")
+
+include(":core:database")

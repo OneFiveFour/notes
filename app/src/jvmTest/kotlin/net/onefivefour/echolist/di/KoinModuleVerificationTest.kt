@@ -1,5 +1,7 @@
 package net.onefivefour.echolist.di
 
+import net.onefivefour.echolist.core.database.di.databaseModule
+
 import io.kotest.core.spec.style.FunSpec
 import net.onefivefour.echolist.domain.repository.AuthRepository
 import org.koin.core.annotation.KoinExperimentalAPI

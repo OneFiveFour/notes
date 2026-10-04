@@ -1,10 +1,8 @@
-package net.onefivefour.echolist.di
+package net.onefivefour.echolist.core.database.di
 
 import app.cash.sqldelight.db.SqlDriver
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.source.JvmSecureStorage
-import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.core.files.platform.echoListDatabasePath
 import org.koin.dsl.module
 import java.nio.file.Files
@@ -12,7 +10,7 @@ import java.nio.file.Path
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.sql.DriverManager
 
-val databaseModule = module {
+actual val databaseModule = module {
     single<SqlDriver> {
         createDesktopSqlDriver()
     }
@@ -21,7 +19,7 @@ val databaseModule = module {
         EchoListDatabase(driver = get())
     }
 
-    single<SecureStorage> { JvmSecureStorage() }
+
 }
 
 private val expectedDesktopTables = setOf("Folder", "Note")

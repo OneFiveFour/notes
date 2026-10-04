@@ -1,12 +1,10 @@
-package net.onefivefour.echolist.di
+package net.onefivefour.echolist.core.database.di
 
 import app.cash.sqldelight.driver.jdbc.sqlite.JdbcSqliteDriver
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.test.runTest
 import net.onefivefour.echolist.cache.EchoListDatabase
-import net.onefivefour.echolist.data.source.cache.CacheDataSourceImpl
-import net.onefivefour.echolist.domain.model.Note
 import java.nio.file.Files
 import java.nio.file.Path
 import java.sql.DriverManager
@@ -23,23 +21,18 @@ class DesktopDatabaseDriverTest : FunSpec({
 
     test("existing desktop databases reopen without recreating the schema") {
         val databasePath = Files.createTempDirectory("desktop-db").resolve("echolist.db")
-        val note = Note(
-            id = "note-1",
-            parentDir = "projects",
-            title = "Desktop note",
-            content = "Persistence matters",
-            updatedAt = 1234L
-        )
-
         runTest {
             createDesktopSqlDriver(databasePath).use { driver ->
-                val cache = CacheDataSourceImpl(EchoListDatabase(driver))
-                cache.saveNote(note)
+                EchoListDatabase(driver).notesQueries.insertOrReplace(
+                    "note-1", "projects", "Desktop note", "Persistence matters", 1234L, 1234L
+                )
             }
-
             createDesktopSqlDriver(databasePath).use { driver ->
-                val cache = CacheDataSourceImpl(EchoListDatabase(driver))
-                cache.getNote(note.id) shouldBe note
+                val saved = EchoListDatabase(driver).notesQueries.selectById("note-1").executeAsOne()
+                saved.content shouldBe "Persistence matters"
+                saved.title shouldBe "Desktop note"
+                saved.parentDir shouldBe "projects"
+                saved.updatedAt shouldBe 1234L
             }
         }
 

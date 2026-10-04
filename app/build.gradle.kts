@@ -1,6 +1,5 @@
 plugins {
     id("echolist.compose.library")
-    alias(libs.plugins.sqldelight)
     alias(libs.plugins.kotlinSerialization)
 }
 kotlin {
@@ -19,6 +18,7 @@ kotlin {
             implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
+            implementation(project(":core:database"))
             implementation(project(":core:files"))
             implementation(project(":core:protocol"))
             implementation(project(":core:designsystem"))
@@ -95,8 +95,3 @@ kotlin {
 
 
 compose.resources { packageOfResClass = "echolist.composeapp.generated.resources" }
-sqldelight {
-    databases {
-        create("EchoListDatabase") { packageName.set("net.onefivefour.echolist.cache") }
-    }
-}
