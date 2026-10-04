@@ -45,3 +45,5 @@ include(":core:networking")
 include(":core:session")
 
 include(":core:notifications")
+
+include(":core:recurrence")
