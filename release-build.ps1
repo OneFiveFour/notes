@@ -88,13 +88,13 @@ keyPassword=$keyPasswordText
 
 $qualityTasks = @()
 if (-not $SkipTests) {
-    $qualityTasks = @(":composeApp:jvmTest")
+    $qualityTasks = @(":app:jvmTest")
 }
 
-$androidTasks = @(":composeApp:assembleRelease", ":composeApp:bundleRelease")
-$desktopTasks = @(":composeApp:packageReleaseDistributionForCurrentOS")
-$jsTasks = @(":composeApp:jsBrowserDistribution")
-$wasmTasks = @(":composeApp:wasmJsBrowserDistribution")
+$androidTasks = @(":apps:android:assembleRelease", ":apps:android:bundleRelease")
+$desktopTasks = @(":apps:desktop:packageReleaseDistributionForCurrentOS")
+$jsTasks = @(":apps:web:jsBrowserDistribution")
+$wasmTasks = @(":apps:web:wasmJsBrowserDistribution")
 
 switch ($Target) {
     "android" {

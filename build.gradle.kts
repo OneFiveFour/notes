@@ -4,7 +4,7 @@ plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
     alias(libs.plugins.androidApplication) apply false
-    alias(libs.plugins.androidLibrary) apply false
+    alias(libs.plugins.kotlinAndroid) apply false
     alias(libs.plugins.composeHotReload) apply false
     alias(libs.plugins.composeMultiplatform) apply false
     alias(libs.plugins.composeCompiler) apply false
@@ -49,22 +49,5 @@ allprojects {
     }
 }
 
-private fun getDetektSourcePaths(): List<File> {
-    val sourceDirs = mutableListOf<File>()
-
-    subprojects.forEach {
-        sourceDirs.add(file("${it.projectDir}/src/main/java"))
-        sourceDirs.add(file("${it.projectDir}/src/test/java"))
-        sourceDirs.add(file("${it.projectDir}/src/main/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/test/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/androidTest/java"))
-
-        sourceDirs.add(file("${it.projectDir}/src/commonMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/androidMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/desktopMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/wasmJsMain/kotlin"))
-        sourceDirs.add(file("${it.projectDir}/src/jvmMain/kotlin"))
-    }
-
-    return sourceDirs.filter { it.exists() }
-}
+private fun Project.getDetektSourcePaths(): List<File> =
+    file("src").listFiles()?.map { it.resolve("kotlin") }?.filter { it.exists() }.orEmpty()

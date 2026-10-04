@@ -50,17 +50,17 @@ Use `-UnsignedAndroid` in PowerShell or `--unsigned-android` in Bash only for lo
 
 ## Output locations
 
-- Android APK: `composeApp/build/outputs/apk/release/`
-- Android AAB: `composeApp/build/outputs/bundle/release/`
-- Desktop packages: `composeApp/build/compose/binaries/main/`
-- JS distribution: `composeApp/build/dist/js/productionExecutable/`
-- Wasm distribution: `composeApp/build/dist/wasmJs/productionExecutable/`
+- Android APK: `apps/android/build/outputs/apk/release/`
+- Android AAB: `apps/android/build/outputs/bundle/release/`
+- Desktop packages: `apps/desktop/build/compose/binaries/main/`
+- JS distribution: `apps/web/build/dist/js/productionExecutable/`
+- Wasm distribution: `apps/web/build/dist/wasmJs/productionExecutable/`
 
 ## Direct Gradle tasks
 
 ```powershell
-.\gradlew.bat :composeApp:assembleRelease :composeApp:bundleRelease
-.\gradlew.bat :composeApp:packageReleaseDistributionForCurrentOS
-.\gradlew.bat :composeApp:jsBrowserDistribution
-.\gradlew.bat :composeApp:wasmJsBrowserDistribution
+.\gradlew.bat :apps:android:assembleRelease :apps:android:bundleRelease
+.\gradlew.bat :apps:desktop:packageReleaseDistributionForCurrentOS
+.\gradlew.bat :apps:web:jsBrowserDistribution
+.\gradlew.bat :apps:web:wasmJsBrowserDistribution
 ```

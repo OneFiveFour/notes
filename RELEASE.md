@@ -45,23 +45,23 @@ RELEASE_KEY_PASSWORD=dein_key_passwort
 ## 3. Release APK bauen
 
 ```bash
-./gradlew :composeApp:assembleRelease
+./gradlew :apps:android:assembleRelease
 ```
 
 Die signierte APK liegt unter:
 ```
-composeApp/build/outputs/apk/release/composeApp-release.apk
+apps/android/build/outputs/apk/release/composeApp-release.apk
 ```
 
 ## 4. Release AAB bauen (für Play Store)
 
 ```bash
-./gradlew :composeApp:bundleRelease
+./gradlew :apps:android:bundleRelease
 ```
 
 Das signierte Bundle liegt unter:
 ```
-composeApp/build/outputs/bundle/release/composeApp-release.aab
+apps/android/build/outputs/bundle/release/composeApp-release.aab
 ```
 
 ## 5. Desktop Release

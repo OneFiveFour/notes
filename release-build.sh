@@ -44,13 +44,13 @@ ensure_android_signing() {
 
 quality_tasks=()
 if [[ "$skip_tests" == false ]]; then
-  quality_tasks=(":composeApp:jvmTest")
+  quality_tasks=(":app:jvmTest")
 fi
 
-android_tasks=(":composeApp:assembleRelease" ":composeApp:bundleRelease")
-desktop_tasks=(":composeApp:packageReleaseDistributionForCurrentOS")
-js_tasks=(":composeApp:jsBrowserDistribution")
-wasm_tasks=(":composeApp:wasmJsBrowserDistribution")
+android_tasks=(":apps:android:assembleRelease" ":apps:android:bundleRelease")
+desktop_tasks=(":apps:desktop:packageReleaseDistributionForCurrentOS")
+js_tasks=(":apps:web:jsBrowserDistribution")
+wasm_tasks=(":apps:web:wasmJsBrowserDistribution")
 
 case "$target" in
   android)
