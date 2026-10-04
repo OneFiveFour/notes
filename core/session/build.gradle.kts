@@ -3,10 +3,10 @@ plugins {
     alias(libs.plugins.kotlinSerialization)
 }
 kotlin.sourceSets.getByName("commonMain").dependencies {
-    implementation(project(":core:networking"))
+    api(project(":core:networking"))
     implementation(project(":core:protocol"))
     api(libs.koin.core)
-    implementation(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.coroutines.core)
     implementation(libs.kotlinx.serialization.json)
 }
 

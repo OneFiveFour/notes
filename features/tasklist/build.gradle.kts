@@ -6,7 +6,7 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(libs.androidx.lifecycle.runtimeCompose)
     implementation(libs.koin.compose)
     implementation(libs.koin.compose.viewmodel)
-    implementation(libs.kotlinx.coroutines.core)
+    api(libs.kotlinx.coroutines.core)
     api(project(":core:tasks"))
     implementation(project(":core:notifications"))
     implementation(project(":core:files"))

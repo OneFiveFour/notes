@@ -3,8 +3,8 @@ kotlin.sourceSets.getByName("commonMain").dependencies {
     implementation(project(":core:networking"))
     implementation(project(":core:protocol"))
     implementation(project(":core:files"))
-    implementation(project(":core:notifications"))
+    api(project(":core:notifications"))
     implementation(libs.kotlinx.coroutines.core)
-    implementation(libs.kotlinx.datetime)
+    api(libs.kotlinx.datetime)
     api(libs.koin.core)
 }
