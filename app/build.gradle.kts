@@ -18,6 +18,7 @@ kotlin {
             implementation(libs.androidx.security.crypto)
         }
         commonMain.dependencies {
+            implementation(project(":features:tasklist"))
             implementation(project(":features:tasksettings"))
             implementation(project(":features:note"))
             implementation(project(":features:browser"))

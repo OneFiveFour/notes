@@ -57,3 +57,5 @@ include(":features:browser")
 include(":features:note")
 
 include(":features:tasksettings")
+
+include(":features:tasklist")

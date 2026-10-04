@@ -10,8 +10,6 @@ import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
 import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.onClose
 import org.koin.core.module.dsl.viewModel
@@ -36,20 +34,14 @@ val dataModule: Module = module {
 
 val navigationModule: Module = module {
     viewModel { net.onefivefour.echolist.ui.navigation.TaskSettingsChannels() }
-    viewModel { params ->
-        EditTaskListViewModel(
-            mode = params.get<EditTaskListMode>(),
-            taskListRepository = get(),
-            settingsResults = params.get(),
-            notificationScheduler = get()
-        )
-    }
+
 
 }
 
 val appModules: List<Module> = listOf(
     net.onefivefour.echolist.core.session.di.sessionModule,
     authModule,
+    net.onefivefour.echolist.feature.tasklist.di.taskListModule,
     net.onefivefour.echolist.feature.tasksettings.di.taskSettingsModule,
     net.onefivefour.echolist.feature.browser.di.browserModule,
     net.onefivefour.echolist.feature.login.di.loginModule,

@@ -1,5 +1,7 @@
 package net.onefivefour.echolist
 
+import net.onefivefour.echolist.feature.tasklist.ui.TaskListFeature
+
 import net.onefivefour.echolist.feature.tasksettings.ui.TaskSettingsFeature
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
 
@@ -38,10 +40,7 @@ import net.onefivefour.echolist.ui.AuthState
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.core.designsystem.ui.components.GradientBackground
 import net.onefivefour.echolist.core.designsystem.ui.components.RoundIconButton
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListMode
 import net.onefivefour.echolist.feature.login.ui.LoginFeature
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListScreen
-import net.onefivefour.echolist.ui.edittasklist.EditTaskListViewModel
 import net.onefivefour.echolist.ui.navigation.EditNoteRoute
 import net.onefivefour.echolist.ui.navigation.EditTaskListRoute
 import net.onefivefour.echolist.ui.navigation.HomeRoute
@@ -176,53 +175,20 @@ private fun AuthenticatedNavDisplay(
             }
 
             entry<EditTaskListRoute> { route ->
-
-                val taskListId = route.taskListId?.takeIf { it.isNotBlank() }
-
-                val mode = taskListId?.let(EditTaskListMode::Edit)
-                    ?: EditTaskListMode.Create(normalizePath(route.parentDir))
-
-                val viewModel = koinViewModel<EditTaskListViewModel>(
-                    key = "editTaskList-${route.parentDir}-${taskListId.orEmpty()}"
-                ) { parametersOf(mode, settingsChannels.resultsFor(route.editorId)) }
-
-                val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
-                LaunchedEffect(viewModel) {
-                    viewModel.navigateBack.collect { backStack.removeLastOrNull() }
-                }
-
-                DisposableEffect(viewModel) {
-                    onDispose { viewModel.onScreenLeft() }
-                }
-
-                EditTaskListScreen(
-                    uiState = uiState,
-                    onAddMainTask = viewModel::onAddMainTask,
-                    onRemoveMainTask = viewModel::onRemoveMainTask,
-                    onAddSubTask = viewModel::onAddSubTask,
-                    onRemoveSubTask = viewModel::onRemoveSubTask,
-                    onMainTaskCheckedChange = viewModel::onMainTaskCheckedChange,
-                    onSubTaskCheckedChange = viewModel::onSubTaskCheckedChange,
-                    onToggleAutoDelete = viewModel::onToggleAutoDelete,
-                    onFieldFocusLost = viewModel::onFieldFocusLost,
-                    onNavigateToSettings = {
-                            mainTaskId,
-                            currentDueDate,
-                            currentRecurrence,
-                            currentIsNotificationEnabled ->
-                        viewModel.onSettingsNavigationStarted()
-                        backStack.add(
-                            MainTaskSettingsRoute(
-                                mainTaskId = mainTaskId,
-                                currentDueDate = currentDueDate,
-                                currentRecurrence = currentRecurrence,
-                                currentIsNotificationEnabled = currentIsNotificationEnabled,
-                                editorId = route.editorId
-                            )
-                        )
+                TaskListFeature(
+                    parentDir = route.parentDir,
+                    taskListId = route.taskListId,
+                    settingsResults = settingsChannels.resultsFor(route.editorId),
+                    onOpenSettings = { initial ->
+                        backStack.add(MainTaskSettingsRoute(
+                            mainTaskId = initial.mainTaskId,
+                            currentDueDate = initial.dueDate,
+                            currentRecurrence = initial.recurrence,
+                            currentIsNotificationEnabled = initial.isNotificationEnabled,
+                            editorId = route.editorId
+                        ))
                     },
-                    onDeleteClick = viewModel::onDeleteClick
+                    onNavigateBack = { backStack.removeLastOrNull() }
                 )
             }
 
