@@ -2,8 +2,8 @@ package net.onefivefour.echolist.data.repository
 
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
-import net.onefivefour.echolist.data.network.client.ConnectRpcClient
-import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
+import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
 import net.onefivefour.echolist.domain.repository.AuthRepository
 
 internal class AuthRepositoryImpl(

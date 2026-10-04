@@ -14,7 +14,7 @@ import net.onefivefour.echolist.data.dto.CreateNoteParams
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.FakeCacheDataSource
 import net.onefivefour.echolist.data.source.network.FakeNoteRemoteDataSource
-import net.onefivefour.echolist.data.network.error.NetworkException
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
 import notes.v1.CreateNoteResponse
 import notes.v1.DeleteNoteResponse
 import notes.v1.GetNoteResponse

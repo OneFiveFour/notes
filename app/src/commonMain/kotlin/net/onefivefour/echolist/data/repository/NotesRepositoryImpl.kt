@@ -15,7 +15,7 @@ import net.onefivefour.echolist.domain.model.Note
 import net.onefivefour.echolist.data.dto.UpdateNoteParams
 import net.onefivefour.echolist.data.source.cache.CacheDataSource
 import net.onefivefour.echolist.data.source.network.NoteRemoteDataSource
-import net.onefivefour.echolist.data.network.error.NetworkException
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.NotesRepository
 import notes.v1.DeleteNoteRequest

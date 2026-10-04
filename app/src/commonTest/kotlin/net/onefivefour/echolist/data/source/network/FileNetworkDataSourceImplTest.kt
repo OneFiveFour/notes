@@ -16,8 +16,8 @@ import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
-import net.onefivefour.echolist.data.network.client.ConnectRpcClient
-import net.onefivefour.echolist.data.network.error.NetworkException
+import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
 
 class FileNetworkDataSourceImplTest : FunSpec({
 

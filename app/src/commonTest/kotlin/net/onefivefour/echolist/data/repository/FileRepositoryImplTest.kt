@@ -17,7 +17,7 @@ import net.onefivefour.echolist.data.dto.CreateFolderParams
 import net.onefivefour.echolist.data.dto.DeleteFolderParams
 import net.onefivefour.echolist.data.dto.UpdateFolderParams
 import net.onefivefour.echolist.data.source.network.FakeFileRemoteDataSource
-import net.onefivefour.echolist.data.network.error.NetworkException
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
 
 class FileRepositoryImplTest : FunSpec({
 

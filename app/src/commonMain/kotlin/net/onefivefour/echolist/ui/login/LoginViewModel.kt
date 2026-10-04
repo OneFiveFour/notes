@@ -18,7 +18,7 @@ import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.source.SecureStorage
 import net.onefivefour.echolist.data.source.StorageKeys
 import net.onefivefour.echolist.domain.model.AuthError
-import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
 import org.jetbrains.compose.resources.getString
 
 class LoginViewModel(

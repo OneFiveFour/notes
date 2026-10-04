@@ -39,3 +39,5 @@ include(":core:designsystem")
 include(":core:files")
 
 include(":core:database")
+
+include(":core:networking")

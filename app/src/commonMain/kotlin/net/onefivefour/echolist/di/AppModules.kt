@@ -6,8 +6,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import net.onefivefour.echolist.core.files.di.filesModule
 import net.onefivefour.echolist.data.network.auth.AuthEventBus
-import net.onefivefour.echolist.data.network.logging.LogLevel
-import net.onefivefour.echolist.data.network.logging.NetworkLoggingPlugin
+import net.onefivefour.echolist.core.networking.data.logging.LogLevel
+import net.onefivefour.echolist.core.networking.data.logging.NetworkLoggingPlugin
 import net.onefivefour.echolist.domain.repository.AuthRepository
 import net.onefivefour.echolist.data.repository.AuthRepositoryImpl
 import net.onefivefour.echolist.data.network.auth.AuthInterceptor
@@ -26,9 +26,9 @@ import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.data.source.network.TaskListRemoteDataSourceImpl
 import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.domain.repository.FileRepository
-import net.onefivefour.echolist.data.network.client.ConnectRpcClient
-import net.onefivefour.echolist.data.network.client.ConnectRpcClientImpl
-import net.onefivefour.echolist.data.network.config.NetworkConfigProvider
+import net.onefivefour.echolist.core.networking.data.client.ConnectRpcClient
+import net.onefivefour.echolist.core.networking.di.createConnectRpcClient
+import net.onefivefour.echolist.core.networking.data.config.NetworkConfigProvider
 import net.onefivefour.echolist.core.designsystem.di.designSystemModule
 import net.onefivefour.echolist.ui.AuthViewModel
 import net.onefivefour.echolist.ui.editnote.EditNoteMode
@@ -67,6 +67,9 @@ val authModule: Module = module {
 }
 
 val networkModule: Module = module {
+    single<net.onefivefour.echolist.core.networking.domain.BackendUrlStore> {
+        get<net.onefivefour.echolist.data.source.SecureStorage>()
+    }
     single { NetworkConfigProvider(secureStorage = get()) }
 
     single {
@@ -90,7 +93,7 @@ val networkModule: Module = module {
 
     single<ConnectRpcClient> {
         val configProvider: NetworkConfigProvider = get()
-        ConnectRpcClientImpl(
+        createConnectRpcClient(
             httpClient = get(),
             configProvider = configProvider
         )
