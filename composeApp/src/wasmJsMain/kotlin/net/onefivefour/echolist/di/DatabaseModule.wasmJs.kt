@@ -8,13 +8,12 @@ import net.onefivefour.echolist.data.source.WasmJsSecureStorage
 import org.koin.dsl.module
 import org.w3c.dom.Worker
 
+private fun createDatabaseWorker(): Worker =
+    js("""new Worker(new URL("@cashapp/sqldelight-sqljs-worker/sqljs.worker.js", import.meta.url))""")
+
 val databaseModule = module {
     single<SqlDriver> {
-        WebWorkerDriver(
-            Worker(
-                js("""new URL("@cashapp/sqldelight-sqljs-worker/sqljs.worker.js", import.meta.url)""")
-            )
-        ).also { EchoListDatabase.Schema.create(it) }
+        WebWorkerDriver(createDatabaseWorker()).also { EchoListDatabase.Schema.create(it) }
     }
 
     single {

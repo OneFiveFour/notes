@@ -1,5 +1,5 @@
 package net.onefivefour.echolist.data.source.cache
 
-import kotlin.js.Date
+import kotlin.time.Clock
 
-internal actual fun currentEpochMillis(): Long = Date.now().toLong()
+internal actual fun currentEpochMillis(): Long = Clock.System.now().toEpochMilliseconds()
