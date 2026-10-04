@@ -414,7 +414,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
     /**
      * Feature: notification-permission-toggle
-     * Property 5: isNotificationEnabled=false â†’ immer cancel
+     * Property 5: isNotificationEnabled=false → immer cancel
      *
      * For all MainTask instances with isNotificationEnabled = false, regardless of
      * dueDate and recurrence values, scheduleTaskNotification MUST call
@@ -422,7 +422,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
      *
      * Validates: Requirements 5.1
      */
-    test("Feature: notification-permission-toggle, Property 5: isNotificationEnabled=false â†’ immer cancel") {
+    test("Feature: notification-permission-toggle, Property 5: isNotificationEnabled=false → immer cancel") {
         // Generator for dueDate: mix of future dates, past dates, blank strings, and invalid strings
         val arbAnyDueDate = Arb.choice(
             arbFutureDateString,

@@ -40,7 +40,7 @@ class RecurrencePatternTest : FunSpec({
         val off = RecurrenceState.Off
         off.shouldBeInstanceOf<RecurrenceState.Off>()
         off.interval shouldBe RecurrenceInterval.Off
-        // Off is a data object â€” no constructor parameters, no mutable config
+        // Off is a data object — no constructor parameters, no mutable config
         off shouldBe RecurrenceState.Off
     }
 
@@ -48,7 +48,7 @@ class RecurrencePatternTest : FunSpec({
         val yearly = RecurrenceState.Yearly
         yearly.shouldBeInstanceOf<RecurrenceState.Yearly>()
         yearly.interval shouldBe RecurrenceInterval.Yearly
-        // Yearly is a data object â€” no constructor parameters, no mutable config
+        // Yearly is a data object — no constructor parameters, no mutable config
         yearly shouldBe RecurrenceState.Yearly
     }
 

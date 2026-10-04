@@ -53,8 +53,8 @@ internal fun toggleDay(days: Set<DayOfWeek>, day: DayOfWeek): Set<DayOfWeek> {
  * Feature: recurrence-pattern-picker, Property 1: Label mapping correctness
  *
  * *For any* `RecurrenceInterval` in the entries list, its `shortLabel` and `fullLabel` must match
- * the specification: Offâ†’("Off","Off"), Dailyâ†’("D","Daily"), Weeklyâ†’("W","Weekly"),
- * Monthlyâ†’("M","Monthly"), Yearlyâ†’("Y","Yearly").
+ * the specification: Off→("Off","Off"), Daily→("D","Daily"), Weekly→("W","Weekly"),
+ * Monthly→("M","Monthly"), Yearly→("Y","Yearly").
  *
  * **Validates: Requirements 2.1, 2.2, 2.3, 2.4, 2.5**
  */
@@ -68,7 +68,7 @@ class RecurrencePatternPropertyTest : FunSpec({
         RecurrenceInterval.Yearly to ("Y" to "Yearly")
     )
 
-    test("Property 1: Label mapping correctness â€” shortLabel and fullLabel match spec for every interval") {
+    test("Property 1: Label mapping correctness — shortLabel and fullLabel match spec for every interval") {
         checkAll(Exhaustive.collection(RecurrenceInterval.entries)) { interval ->
             val (expectedShort, expectedFull) = expectedLabels.getValue(interval)
             interval.shortLabel shouldBe expectedShort
@@ -85,7 +85,7 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 1.2, 1.3**
      */
-    test("Property 2: Selected vs unselected label display â€” fullLabel for selected, shortLabel for others") {
+    test("Property 2: Selected vs unselected label display — fullLabel for selected, shortLabel for others") {
         checkAll(Exhaustive.collection(RecurrenceInterval.entries)) { selected ->
             RecurrenceInterval.entries.forEach { interval ->
                 val expected = if (interval == selected) interval.fullLabel else interval.shortLabel
@@ -98,24 +98,24 @@ class RecurrencePatternPropertyTest : FunSpec({
      * Feature: recurrence-pattern-picker, Property 7: Positive integer validation
      *
      * *For any* string input, the validator [isValidPositiveInt] accepts it if and only if
-     * the string parses to an integer â‰¥ 1. This validator is shared by the week interval
+     * the string parses to an integer ≥ 1. This validator is shared by the week interval
      * and month interval inputs.
      *
      * **Validates: Requirements 6.3, 7.3**
      */
-    test("Property 7: Positive integer validation â€” accepts iff string parses to integer >= 1") {
-        // 1. Random positive integers (as strings) â†’ should return true
+    test("Property 7: Positive integer validation — accepts iff string parses to integer >= 1") {
+        // 1. Random positive integers (as strings) → should return true
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..Int.MAX_VALUE)) { n ->
             isValidPositiveInt(n) shouldBe true
         }
 
-        // 2. Random non-positive integers (0, negatives as strings) â†’ should return false
+        // 2. Random non-positive integers (0, negatives as strings) → should return false
         checkAll(PropTestConfig(iterations = 100), Arb.int(Int.MIN_VALUE..0)) { n ->
             isValidPositiveInt(n) shouldBe false
         }
 
-        // 3. Random non-numeric strings â†’ should return false
-        // 4. Empty string â†’ should return false
+        // 3. Random non-numeric strings → should return false
+        // 4. Empty string → should return false
         isValidPositiveInt(null) shouldBe false
     }
 
@@ -149,13 +149,13 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 7.4**
      */
-    test("Property 8: Day-of-month range validation â€” accepts iff value is in [1, 31]") {
-        // 1. Integers in [1, 31] (as strings) â†’ should return true
+    test("Property 8: Day-of-month range validation — accepts iff value is in [1, 31]") {
+        // 1. Integers in [1, 31] (as strings) → should return true
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..31)) { n ->
             isValidDayOfMonth(n) shouldBe true
         }
 
-        // 2. Integers outside [1, 31] (negatives, 0, 32+) â†’ should return false
+        // 2. Integers outside [1, 31] (negatives, 0, 32+) → should return false
         checkAll(PropTestConfig(iterations = 100), Arb.int(Int.MIN_VALUE..0)) { n ->
             isValidDayOfMonth(n) shouldBe false
         }
@@ -163,8 +163,8 @@ class RecurrencePatternPropertyTest : FunSpec({
             isValidDayOfMonth(n) shouldBe false
         }
 
-        // 3. Non-numeric strings â†’ should return false
-        // 4. Empty string â†’ should return false
+        // 3. Non-numeric strings → should return false
+        // 4. Empty string → should return false
         isValidDayOfMonth(null) shouldBe false
     }
 
@@ -177,7 +177,7 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 5.3**
      */
-    test("Property 4: Weekday toggle symmetric set operation â€” presence is flipped and size differs by exactly 1") {
+    test("Property 4: Weekday toggle symmetric set operation — presence is flipped and size differs by exactly 1") {
         val arbDayOfWeek = Arb.of(DayOfWeek.entries)
         val arbDaySet = Arb.set(arbDayOfWeek, 0..7)
 
@@ -185,10 +185,10 @@ class RecurrencePatternPropertyTest : FunSpec({
             val toggled = toggleDay(days, day)
 
             if (day in days) {
-                // Day was present â†’ should now be absent
+                // Day was present → should now be absent
                 (day in toggled) shouldBe false
             } else {
-                // Day was absent â†’ should now be present
+                // Day was absent → should now be present
                 (day in toggled) shouldBe true
             }
 
@@ -205,7 +205,7 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 6.2**
      */
-    test("Property 5: Weekly format string correctness â€” output matches 'Every n week(s)' for any positive integer") {
+    test("Property 5: Weekly format string correctness — output matches 'Every n week(s)' for any positive integer") {
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..1000)) { n ->
             weeklyFormatString(n) shouldBe "Every $n week(s)"
         }
@@ -219,7 +219,7 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 7.2**
      */
-    test("Property 6: Monthly format string correctness â€” output matches 'Every n month(s) on the mth day' for any positive integer and day") {
+    test("Property 6: Monthly format string correctness — output matches 'Every n month(s) on the mth day' for any positive integer and day") {
         checkAll(PropTestConfig(iterations = 100), Arb.int(1..1000), Arb.int(1..31)) { n, m ->
             monthlyFormatString(n, m) shouldBe "Every $n month(s) on the ${m}th day"
         }
@@ -234,7 +234,7 @@ class RecurrencePatternPropertyTest : FunSpec({
      *
      * **Validates: Requirements 3.3, 3.4**
      */
-    test("Property 3: Date semantics depend on recurrence state â€” Off means due date, non-Off means base date") {
+    test("Property 3: Date semantics depend on recurrence state — Off means due date, non-Off means base date") {
         val arbDayOfWeek = Arb.of(DayOfWeek.entries)
         val arbDaySet = Arb.set(arbDayOfWeek, 0..7)
 
@@ -254,14 +254,14 @@ class RecurrencePatternPropertyTest : FunSpec({
         checkAll(PropTestConfig(iterations = 100), arbRecurrenceState) { state ->
             when (state) {
                 is RecurrenceState.Off -> {
-                    // Off â†’ date is a due date, not a base date
+                    // Off → date is a due date, not a base date
                     isBaseDate(state) shouldBe false
                 }
                 is RecurrenceState.Daily,
                 is RecurrenceState.Weekly,
                 is RecurrenceState.Monthly,
                 is RecurrenceState.Yearly -> {
-                    // Non-Off â†’ date is a base date for recurrence
+                    // Non-Off → date is a base date for recurrence
                     isBaseDate(state) shouldBe true
                 }
             }

@@ -70,7 +70,7 @@ internal class NotesRepositoryImpl(
             }
             Result.success(cachedNotes)
         } else {
-            // No cache â€” go to network directly
+            // No cache — go to network directly
             try {
                 val request = ListNotesRequest(parent_dir = parentDir)
                 val response = noteRemoteDataSource.listNotes(request)
@@ -99,7 +99,7 @@ internal class NotesRepositoryImpl(
             }
             Result.success(cached)
         } else {
-            // No cache â€” go to network directly
+            // No cache — go to network directly
             try {
                 val request = GetNoteRequest(id = noteId)
                 val response = noteRemoteDataSource.getNote(request)

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.asSharedFlow
  *
  * The ViewModel (via [AndroidNotificationPermissionRequester]) calls [awaitPermission]
  * which suspends. The Activity observes [requests], handles the full permission flow
- * (rationale â†’ system dialog â†’ settings redirect if needed), then delivers the result.
+ * (rationale → system dialog → settings redirect if needed), then delivers the result.
  */
 class PermissionResultBridge {
     private var pendingResult: CompletableDeferred<Boolean>? = null

@@ -126,7 +126,7 @@ private fun MainTaskSettingsContent(
 
             AnimatedVisibility(visible = !uiState.isNotificationToggleEnabled) {
                 Text(
-                    text = "Notifications sind nur bei aktiver Wiederholung verfÃ¼gbar.",
+                    text = "Notifications sind nur bei aktiver Wiederholung verfügbar.",
                     style = EchoListTheme.typography.bodySmall,
                     color = EchoListTheme.materialColors.onSurfaceVariant
                 )

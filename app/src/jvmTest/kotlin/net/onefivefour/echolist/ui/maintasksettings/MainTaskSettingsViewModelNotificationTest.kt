@@ -168,7 +168,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 6: onScreenLeaving: permission already granted â†’ no re-emit ---
+    // --- Test 6: onScreenLeaving: permission already granted → no re-emit ---
 
     test("onScreenLeaving: permission already granted does not re-emit") {
         runTest(testDispatcher) {
@@ -188,7 +188,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
 
             // Collect the initial confirm() emission so the bus is clear
             val initialResult = async { resultBus.results.first() }
-            // The VM constructor calls confirm() via initial state emission â€” actually it doesn't
+            // The VM constructor calls confirm() via initial state emission — actually it doesn't
             // but onNotificationToggleChanged or other actions do. Let's trigger one first:
             vm.onNotificationToggleChanged(true)
             testScheduler.advanceUntilIdle()
@@ -201,7 +201,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
             // Permission checker was called (to verify permission)
             checkerCallCount shouldBe 1
 
-            // No additional emission expected â€” if there was one, the test would
+            // No additional emission expected — if there was one, the test would
             // have captured it. We verify by checking state hasn't changed.
             val state = vm.uiState.value
             state.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
@@ -209,7 +209,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 7: onScreenLeaving: permission denied â†’ requester called â†’ granted â†’ no re-emit ---
+    // --- Test 7: onScreenLeaving: permission denied → requester called → granted → no re-emit ---
 
     test("onScreenLeaving: permission not granted but requester succeeds does not re-emit") {
         runTest(testDispatcher) {
@@ -238,7 +238,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 8: onScreenLeaving: permission denied â†’ requester denied â†’ re-emit with false ---
+    // --- Test 8: onScreenLeaving: permission denied → requester denied → re-emit with false ---
 
     test("onScreenLeaving: permission denied and requester denied re-emits with false") {
         runTest(testDispatcher) {
@@ -269,7 +269,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 9: onScreenLeaving: requester throws â†’ re-emit with false ---
+    // --- Test 9: onScreenLeaving: requester throws → re-emit with false ---
 
     test("onScreenLeaving: requester throws RuntimeException re-emits with false and no crash") {
         runTest(testDispatcher) {
@@ -301,7 +301,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 10: onScreenLeaving: isNotificationEnabled=false â†’ no permission check ---
+    // --- Test 10: onScreenLeaving: isNotificationEnabled=false → no permission check ---
 
     test("onScreenLeaving: isNotificationEnabled=false skips permission check") {
         runTest(testDispatcher) {
@@ -324,7 +324,7 @@ class MainTaskSettingsViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test 11: onScreenLeaving: recurrence Off â†’ no permission check ---
+    // --- Test 11: onScreenLeaving: recurrence Off → no permission check ---
 
     test("onScreenLeaving: recurrence Off skips permission check even if notifications enabled") {
         runTest(testDispatcher) {

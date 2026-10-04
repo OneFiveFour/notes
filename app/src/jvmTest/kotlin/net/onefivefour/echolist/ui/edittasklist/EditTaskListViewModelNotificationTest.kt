@@ -146,7 +146,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             navigateBackDeferred.await() shouldBe Unit
             repo.deleteTaskListCalls shouldBe listOf("tl-delete")
 
-            // Cancel happens on Dispatchers.Default â€” wait for it
+            // Cancel happens on Dispatchers.Default — wait for it
             eventually(2.seconds) {
                 scheduler.cancelCalls.map { it.taskId }.toSet() shouldBe setOf("t1", "t2")
             }
@@ -184,7 +184,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
             vm.onRemoveMainTask(0)
             testScheduler.advanceUntilIdle()
 
-            // Cancel happens on Dispatchers.Default â€” wait for it
+            // Cancel happens on Dispatchers.Default — wait for it
             eventually(2.seconds) {
                 scheduler.cancelCalls.any { it.taskId == "t1" } shouldBe true
             }
@@ -243,7 +243,7 @@ class EditTaskListViewModelNotificationTest : FunSpec({
         /**
          * **Validates: Requirements 4.2**
          *
-         * Property 6: Notification idempotency â€” scheduling a notification twice with
+         * Property 6: Notification idempotency — scheduling a notification twice with
          * the same or different due dates results in exactly one pending notification
          * for that taskId (the most recent scheduling replaces the previous).
          *

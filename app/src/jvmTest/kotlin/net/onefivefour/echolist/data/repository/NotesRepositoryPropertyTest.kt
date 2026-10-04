@@ -266,7 +266,7 @@ class NotesRepositoryPropertyTest : FunSpec({
             val deleteResult = repo.deleteNote(note.id)
             deleteResult.isSuccess shouldBe true
 
-            // getNote should fail â€” network returns 404 and cache was cleared by delete
+            // getNote should fail — network returns 404 and cache was cleared by delete
             val getResult = repo.getNote(note.id)
             getResult.isFailure shouldBe true
         }

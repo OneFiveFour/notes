@@ -86,7 +86,7 @@ class MainActivity : ComponentActivity() {
             App()
 
             EchoListTheme {
-                // Rationale dialog â€” explains why notifications are needed
+                // Rationale dialog — explains why notifications are needed
                 if (showRationaleDialog) {
                     NotificationRationaleDialog(
                         onConfirm = {
@@ -100,7 +100,7 @@ class MainActivity : ComponentActivity() {
                     )
                 }
 
-                // Settings redirect dialog â€” user permanently denied permission
+                // Settings redirect dialog — user permanently denied permission
                 if (showSettingsDialog) {
                     NotificationSettingsDialog(
                         onOpenSettings = {

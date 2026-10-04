@@ -12,8 +12,8 @@ object DueDateUrgencyCalculator {
     /**
      * Computes the urgency for a given [dueDate] relative to [today].
      *
-     * @return [DueDateUrgency.Overdue] when the difference is â‰¤ 0 days,
-     *         [DueDateUrgency.Warning] when 1â€“3 days,
+     * @return [DueDateUrgency.Overdue] when the difference is ≤ 0 days,
+     *         [DueDateUrgency.Warning] when 1–3 days,
      *         [DueDateUrgency.Normal] when > 3 days.
      */
     fun computeUrgency(dueDate: LocalDate, today: LocalDate): DueDateUrgency {

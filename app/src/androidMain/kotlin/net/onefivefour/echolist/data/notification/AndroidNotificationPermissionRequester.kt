@@ -26,7 +26,7 @@ class AndroidNotificationPermissionRequester(
             return true
         }
 
-        // Already granted â€” no need to ask
+        // Already granted — no need to ask
         if (isGranted()) return true
 
         // Delegate to the Activity via the bridge.

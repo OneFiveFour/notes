@@ -96,7 +96,7 @@ class NetworkLoggingPluginTest : FunSpec({
             try {
                 client.get("http://localhost/timeout-test")
             } catch (_: Throwable) {
-                // Expected â€” the mock throws
+                // Expected — the mock throws
             }
         } finally {
             System.setOut(originalOut)
