@@ -99,13 +99,13 @@ class HeaderRedactorPropertyTest : FunSpec({
             .map { it.filter { c -> c.isLetterOrDigit() || c == '-' } }
             .map { if (it.isEmpty()) "val" else it }
 
-        // Build a header map with at least one sensitive and some non-sensitive headers
+        // Use disjoint values: a public header must stay unchanged even if a secret has the same value.
         checkAll(
             PropTestConfig(iterations = 100),
             sensitiveNameArb,
-            valueArb,
+            valueArb.map { "secret-$it" },
             nonSensitiveNameArb,
-            valueArb
+            valueArb.map { "public-$it" }
         ) { sensName, sensValue, nonSensName, nonSensValue ->
             val headers = mapOf(
                 sensName to listOf(sensValue),
