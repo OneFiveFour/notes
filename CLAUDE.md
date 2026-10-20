@@ -14,15 +14,19 @@ This repository contains a Kotlin Multiplatform app built with Compose Multiplat
 
 ## Canonical Architecture Rules
 
-Treat `.kiro/steering/*.md` as the best source for long-lived rules:
+Use `ARCHITECTURE.md` and current code for module ownership and dependency rules. `.kiro/steering/*.md` provides additional long-lived product and design rules; historical specs may be outdated:
 
 - `ui -> domain/repository contracts -> data/repository implementations -> remote/cache data sources`
 - Networking uses Ktor plus a custom ConnectRPC client over protobuf
 - Wire-generated message classes are build output; never hand-edit generated code
 - SQLDelight is the cache layer, with platform-specific drivers provided through Koin
+- Note cache orchestration lives in `features:note`; shared task data access lives in `core:tasks` and currently has no task cache
 - JWT auth drives top-level app state; tokens live in platform-specific `SecureStorage`
 - Repositories should return `Result<T>` instead of throwing across layer boundaries
 - In common code prefer `Dispatchers.Default`; do not rely on `Dispatchers.IO`
+- Preserve coroutine cancellation when converting operation failures to `Result.failure`
+- Feature packages use `net.onefivefour.echolist.feature.<feature>`; core packages use `net.onefivefour.echolist.core.<concern>`
+- `composeApp/` is not an included Gradle module; remaining build artifacts are not current sources. iOS is no longer supported
 
 ## UI and Design System Rules
 
@@ -100,7 +104,7 @@ Historical `.kiro/specs` may describe older behavior and package locations. Trus
 
 ## Still Open in Kiro Task Lists
 
-The most relevant unfinished items from the Kiro backlog:
+Historical unchecked items from the Kiro backlog (verify against current code before acting; these are not a current implementation plan):
 
 - `inline-item-creation`
   - propagate callback signature changes through `BottomNavigation` and `HomeScreen`
@@ -117,12 +121,10 @@ The most relevant unfinished items from the Kiro backlog:
 
 ## Practical Guidance For Future Work
 
-- Use `.kiro/steering/echolist-overview.md` for architecture decisions
+- Use `ARCHITECTURE.md`, `settings.gradle.kts` and the owning module's code for architecture decisions; `.kiro/steering/echolist-overview.md` adds product context
 - Use `.kiro/steering/design-system.md` for all UI styling decisions
 - Treat older route specs (`compose-navigation-3`, `file-add-button`) as historical unless you are intentionally studying the app's evolution
-- Before editing navigation, verify whether the goal is:
-  - keep the current object-route plus injected-parent-path approach
-  - move toward the later Kiro unified-edit-route design
-- Before editing folder creation UX, verify whether we want to keep the current dialog flow or revive the later inline-editor design
-- For networking and repository work, preserve `Result<T>` boundaries, redaction in logs, and offline/cache-first patterns
+- Navigation belongs to `app`; features receive values, callbacks and typed result streams/sinks. Preserve unified edit routes and editor-owned settings result queues
+- Check `features:browser` for current folder creation behavior before consulting historical dialog or inline-editor specs
+- For networking and repository work, preserve `Result<T>` boundaries and redaction in logs; preserve offline/cache-first behavior where implemented, without assuming every repository has a cache
 - For UI work, prefer extending existing shared `commonMain` composables and theme tokens instead of introducing platform-specific variants
