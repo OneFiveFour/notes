@@ -126,7 +126,7 @@ private fun MainTaskSettingsContent(
 
             AnimatedVisibility(visible = !uiState.isNotificationToggleEnabled) {
                 Text(
-                    text = "Notifications sind nur bei aktiver Wiederholung verfügbar.",
+                    text = "Zum Erinnern bitte ein Fälligkeitsdatum wählen.",
                     style = EchoListTheme.typography.bodySmall,
                     color = EchoListTheme.materialColors.onSurfaceVariant
                 )

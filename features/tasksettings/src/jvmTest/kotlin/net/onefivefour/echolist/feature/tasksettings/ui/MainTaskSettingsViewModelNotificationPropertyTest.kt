@@ -68,7 +68,7 @@ internal class MainTaskSettingsViewModelNotificationPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: notification-permission-toggle, Property 2: Recurrence.Off erzwingt Deaktivierung") {
+    test("Feature: notification-permission-toggle, Property 2: Recurrence.Off erhält die Notification-Einstellung") {
         // **Validates: Requirements 1.4, 1.5**
         checkAll(PropTestConfig(iterations = 100), Arb.boolean()) { initialNotificationEnabled ->
             runTest(testDispatcher) {
@@ -91,8 +91,8 @@ internal class MainTaskSettingsViewModelNotificationPropertyTest : FunSpec({
 
                 val state = vm.uiState.value
                 state.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
-                state.isNotificationEnabled shouldBe false
-                state.isNotificationToggleEnabled shouldBe false
+                state.isNotificationEnabled shouldBe initialNotificationEnabled
+                state.isNotificationToggleEnabled shouldBe true
             }
         }
     }
@@ -123,7 +123,7 @@ internal class MainTaskSettingsViewModelNotificationPropertyTest : FunSpec({
                 vm.onScreenLeaving()
                 testScheduler.advanceUntilIdle()
 
-                val shouldCallChecker = notificationEnabled && !recurrenceOff
+                val shouldCallChecker = notificationEnabled
                 checkerCalled shouldBe shouldCallChecker
             }
         }

@@ -125,7 +125,7 @@ internal class MainTaskSettingsViewModelNotificationTest : FunSpec({
 
     // --- Test 4: Recurrence Off disables toggle and forces isNotificationEnabled=false ---
 
-    test("recurrence Off disables toggle and forces isNotificationEnabled=false") {
+    test("turning recurrence off preserves a dated task notification preference") {
         runTest(testDispatcher) {
             val vm = createViewModel(
                 currentIsNotificationEnabled = true,
@@ -136,27 +136,27 @@ internal class MainTaskSettingsViewModelNotificationTest : FunSpec({
 
             val state = vm.uiState.value
             state.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
-            state.isNotificationEnabled shouldBe false
-            state.isNotificationToggleEnabled shouldBe false
+            state.isNotificationEnabled shouldBe true
+            state.isNotificationToggleEnabled shouldBe true
         }
     }
 
     // --- Test 5: Recurrence reactivation re-enables toggle but doesn't auto-enable notifications ---
 
-    test("recurrence reactivation re-enables toggle but keeps notifications disabled") {
+    test("recurrence changes preserve the dated task notification preference") {
         runTest(testDispatcher) {
             val vm = createViewModel(
                 currentIsNotificationEnabled = true,
                 currentRecurrence = "FREQ=DAILY"
             )
 
-            // First, turn off recurrence (which forces notification off)
+            // Turn off recurrence while retaining the notification preference
             vm.onRecurrenceIntervalSelected(RecurrenceInterval.Off)
 
             val stateAfterOff = vm.uiState.value
             stateAfterOff.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
-            stateAfterOff.isNotificationEnabled shouldBe false
-            stateAfterOff.isNotificationToggleEnabled shouldBe false
+            stateAfterOff.isNotificationEnabled shouldBe true
+            stateAfterOff.isNotificationToggleEnabled shouldBe true
 
             // Then, re-enable recurrence
             vm.onRecurrenceIntervalSelected(RecurrenceInterval.Daily)
@@ -164,7 +164,7 @@ internal class MainTaskSettingsViewModelNotificationTest : FunSpec({
             val stateAfterDaily = vm.uiState.value
             stateAfterDaily.shouldBeInstanceOf<MainTaskSettingsUiState.Ready>()
             stateAfterDaily.isNotificationToggleEnabled shouldBe true
-            stateAfterDaily.isNotificationEnabled shouldBe false
+            stateAfterDaily.isNotificationEnabled shouldBe true
         }
     }
 
@@ -326,7 +326,7 @@ internal class MainTaskSettingsViewModelNotificationTest : FunSpec({
 
     // --- Test 11: onScreenLeaving: recurrence Off → no permission check ---
 
-    test("onScreenLeaving: recurrence Off skips permission check even if notifications enabled") {
+    test("onScreenLeaving: one-time tasks check permission when notifications are enabled") {
         runTest(testDispatcher) {
             var checkerCalled = false
             val vm = createViewModel(
@@ -343,7 +343,7 @@ internal class MainTaskSettingsViewModelNotificationTest : FunSpec({
             vm.onScreenLeaving()
             testScheduler.advanceUntilIdle()
 
-            checkerCalled shouldBe false
+            checkerCalled shouldBe true
         }
     }
 

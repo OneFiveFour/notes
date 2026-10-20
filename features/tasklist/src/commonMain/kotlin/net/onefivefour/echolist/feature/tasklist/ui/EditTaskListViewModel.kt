@@ -87,6 +87,7 @@ internal class EditTaskListViewModel(
                 task.dueDateState.setTextAndPlaceCursorAtEnd(result.dueDate)
                 task.recurrenceState.setTextAndPlaceCursorAtEnd(result.recurrence)
                 task.isNotificationEnabled = result.isNotificationEnabled
+                notificationScheduler.setEnabled(task.id, result.isNotificationEnabled)
                 sortTasks()
                 _uiState.update { it.copy(error = null) }
                 requestSync()

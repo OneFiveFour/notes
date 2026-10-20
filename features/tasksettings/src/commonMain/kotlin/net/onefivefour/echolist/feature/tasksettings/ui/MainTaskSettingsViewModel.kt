@@ -31,7 +31,7 @@ internal class MainTaskSettingsViewModel(
             recurrenceState = rruleToRecurrenceState(currentRecurrence),
             initialDateMillis = dueDateToUtcMillis(currentDueDate),
             isNotificationEnabled = currentIsNotificationEnabled,
-            isNotificationToggleEnabled = rruleToRecurrenceState(currentRecurrence) != RecurrenceState.Off
+            isNotificationToggleEnabled = currentDueDate.isNotBlank()
         )
     )
     val uiState: StateFlow<MainTaskSettingsUiState> = _uiState.asStateFlow()
@@ -41,6 +41,7 @@ internal class MainTaskSettingsViewModel(
         updateReady { state ->
             state.copy(
                 selectedDueDate = dueDate,
+                isNotificationToggleEnabled = dueDate.isNotBlank(),
                 initialDateMillis = dateMillis,
                 showRecurrenceValidationErrors = false,
                 showDueDateRequiredError = false
@@ -50,7 +51,7 @@ internal class MainTaskSettingsViewModel(
     }
 
     fun onNotificationToggleChanged(enabled: Boolean) {
-        updateReady { it.copy(isNotificationEnabled = enabled) }
+        updateReady { it.copy(isNotificationEnabled = enabled && it.isNotificationToggleEnabled) }
         confirm()
     }
 
@@ -67,14 +68,11 @@ internal class MainTaskSettingsViewModel(
             if (interval == RecurrenceInterval.Off) {
                 state.copy(
                     recurrenceState = newRecurrenceState,
-                    isNotificationEnabled = false,
-                    isNotificationToggleEnabled = false,
                     showRecurrenceValidationErrors = false
                 )
             } else {
                 state.copy(
                     recurrenceState = newRecurrenceState,
-                    isNotificationToggleEnabled = true,
                     showRecurrenceValidationErrors = false
                 )
             }
@@ -126,7 +124,7 @@ internal class MainTaskSettingsViewModel(
         viewModelScope.launch {
             val state = _uiState.value as? MainTaskSettingsUiState.Ready ?: return@launch
 
-            if (!state.isNotificationEnabled || state.recurrenceState == RecurrenceState.Off) {
+            if (!state.isNotificationEnabled || state.selectedDueDate.isBlank()) {
                 return@launch
             }
 
