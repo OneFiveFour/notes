@@ -9,6 +9,7 @@ service TaskListService {
   rpc GetTaskList (GetTaskListRequest) returns (GetTaskListResponse);
   rpc GetMainTask (GetMainTaskRequest) returns (GetMainTaskResponse);
   rpc ListTaskLists (ListTaskListsRequest) returns (ListTaskListsResponse);
+  rpc ListUpcomingMainTasks (ListUpcomingMainTasksRequest) returns (ListUpcomingMainTasksResponse);
   rpc UpdateTaskList (UpdateTaskListRequest) returns (UpdateTaskListResponse);
   rpc DeleteTaskList (DeleteTaskListRequest) returns (DeleteTaskListResponse);
 }
@@ -79,6 +80,12 @@ message UpdateTaskListResponse {
   TaskList task_list = 1;
 }
 
+message DeleteTaskListRequest {
+  string id = 1;
+}
+
+message DeleteTaskListResponse {}
+
 message GetMainTaskRequest {
   string id = 1;
 }
@@ -87,8 +94,19 @@ message GetMainTaskResponse {
   MainTask main_task = 1;
 }
 
-message DeleteTaskListRequest {
-  string id = 1;
+message ListUpcomingMainTasksRequest {
+  // Required inclusive cutoff: a UTC calendar date in YYYY-MM-DD format.
+  // Clients should send today's UTC date to retrieve upcoming tasks.
+  string from_date = 1;
 }
 
-message DeleteTaskListResponse {}
+message UpcomingMainTask {
+  string task_id = 1;
+  string title = 2;
+  // Stored UTC calendar date in YYYY-MM-DD format; no timezone conversion.
+  string due_date = 3;
+}
+
+message ListUpcomingMainTasksResponse {
+  repeated UpcomingMainTask tasks = 1;
+}
