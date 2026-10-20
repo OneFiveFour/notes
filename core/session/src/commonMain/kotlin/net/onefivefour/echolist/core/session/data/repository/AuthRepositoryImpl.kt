@@ -31,9 +31,11 @@ internal class AuthRepositoryImpl(
             requestSerializer = { auth.v1.LoginRequest.ADAPTER.encode(it) },
             responseDeserializer = { auth.v1.LoginResponse.ADAPTER.decode(it) }
         ).map { response ->
-            secureStorage.put(StorageKeys.ACCESS_TOKEN, response.access_token)
             secureStorage.put(StorageKeys.REFRESH_TOKEN, response.refresh_token)
             secureStorage.put(StorageKeys.BACKEND_URL, baseUrl)
+            secureStorage.put(StorageKeys.NOTIFICATION_ACCOUNT_ID, "${baseUrl.trimEnd('/')}\n$username")
+            // Publish authentication only after its backend/account scope is available to background workers.
+            secureStorage.put(StorageKeys.ACCESS_TOKEN, response.access_token)
         }.fold(
             onSuccess = { Result.success(it) },
             onFailure = { Result.failure(AuthFailure(AuthErrorMapper.fromNetworkException(it))) }

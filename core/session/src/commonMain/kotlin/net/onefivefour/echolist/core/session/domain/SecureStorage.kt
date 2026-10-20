@@ -11,4 +11,5 @@ object StorageKeys {
     const val ACCESS_TOKEN = "access_token"
     const val REFRESH_TOKEN = "refresh_token"
     const val BACKEND_URL = "backend_url"
+    const val NOTIFICATION_ACCOUNT_ID = "notification_account_id"
 }

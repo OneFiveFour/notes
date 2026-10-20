@@ -14,8 +14,10 @@ import net.onefivefour.echolist.ui.navigation.TaskSettingsChannels
 import org.koin.core.module.Module
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import net.onefivefour.echolist.core.notifications.domain.NotificationAccountProvider
 
 private val compositionModule = module {
+    single<NotificationAccountProvider> { NotificationAccount(get()) }
     viewModel { AuthViewModel(authRepository = get(), authEventBus = get()) }
     viewModel { TaskSettingsChannels() }
 }
