@@ -16,6 +16,7 @@
 - `core:protocol` generates Wire messages from root `proto/`; never edit generated output or introduce generated service clients. `core:networking` owns Ktor/ConnectRPC, while `core:session` owns authentication and authenticated client wiring.
 - SQLDelight schema and platform drivers belong to `core:database`; note cache orchestration belongs to `features:note`. Task repositories currently use remote access without a task cache.
 - `core:notifications` calls a task-action port implemented by `core:tasks`. Preserve the legacy Android receiver class names documented in `ARCHITECTURE.md`.
+- Reminder preferences/history live in `core:notifications`, separate from the note cache. Use its coordinator for scheduling and changes; preserve account isolation, occurrence deduplication and offline catch-up. Due-date reminders do not require recurrence.
 - Supported targets are Android, JVM desktop, JS and WasmJS. There is no active iOS target. `composeApp/` is not an included Gradle module; do not use leftover build output as source.
 
 ## Boundaries and verification
