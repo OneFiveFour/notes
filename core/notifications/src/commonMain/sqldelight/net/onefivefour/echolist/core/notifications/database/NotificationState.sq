@@ -1,0 +1,10 @@
+CREATE TABLE NotificationState (
+    id INTEGER NOT NULL PRIMARY KEY CHECK (id = 1),
+    payload TEXT NOT NULL
+);
+
+readState:
+SELECT payload FROM NotificationState WHERE id = 1;
+
+writeState:
+INSERT OR REPLACE INTO NotificationState(id, payload) VALUES (1, ?);

@@ -2,12 +2,19 @@ package net.onefivefour.echolist.core.notifications.domain
 
 /**
  * Platform-agnostic contract for scheduling and canceling local notifications
- * tied to recurring tasks.
+ * tied to tasks with a due date, including non-recurring tasks.
  */
 interface NotificationScheduler {
+    /** Device-local preference; independent of recurrence and the backend task payload. */
+    suspend fun setEnabled(taskId: String, enabled: Boolean) {}
+
+    /** A policy observation may be stale; persistent implementations check their authoritative state first. */
+    suspend fun cancelWhenIneligible(taskId: String) = cancel(taskId)
+
     /**
      * Schedule a local notification for the given task.
-     * If a notification already exists for this [taskId], it is replaced.
+     * Persistent implementations reconcile the authoritative task metadata before scheduling;
+     * task-list mutations must update the coordinator so delayed UI callbacks cannot roll them back.
      *
      * @param taskId unique identifier for the task (used as notification ID)
      * @param taskListId identifier of the owning task list, needed so notification
