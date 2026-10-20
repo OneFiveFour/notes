@@ -1,16 +1,20 @@
 package net.onefivefour.echolist.core.tasks.data.mapper
 
+import kotlinx.datetime.LocalDate
+import net.onefivefour.echolist.core.networking.data.error.NetworkException
 import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.SubTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
+import net.onefivefour.echolist.core.tasks.domain.model.UpcomingMainTask
 import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.GetMainTaskResponse
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsResponse
+import tasks.v1.ListUpcomingMainTasksResponse
 import tasks.v1.UpdateTaskListRequest
 import tasks.v1.UpdateTaskListResponse
 
@@ -65,6 +69,21 @@ internal object TaskListMapper {
 
     fun toDomain(proto: ListTaskListsResponse): List<TaskListEntry> =
         proto.task_lists.map { toEntry(it) }
+
+    fun toDomain(proto: tasks.v1.UpcomingMainTask): UpcomingMainTask {
+        val dueDate = try {
+            require(Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}").matches(proto.due_date)) {
+                "Expected YYYY-MM-DD"
+            }
+            LocalDate.parse(proto.due_date)
+        } catch (e: IllegalArgumentException) {
+            throw NetworkException.SerializationError("UpcomingMainTask.due_date is not a valid YYYY-MM-DD date", e)
+        }
+        return UpcomingMainTask(taskId = proto.task_id, title = proto.title, dueDate = dueDate)
+    }
+
+    fun toDomain(proto: ListUpcomingMainTasksResponse): List<UpcomingMainTask> =
+        proto.tasks.map { toDomain(it) }
 
     fun toEntry(proto: tasks.v1.TaskList): TaskListEntry = TaskListEntry(
         id = proto.id,

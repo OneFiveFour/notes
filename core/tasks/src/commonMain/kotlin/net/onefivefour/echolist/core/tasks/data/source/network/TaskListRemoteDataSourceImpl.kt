@@ -11,6 +11,8 @@ import tasks.v1.GetTaskListRequest
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsRequest
 import tasks.v1.ListTaskListsResponse
+import tasks.v1.ListUpcomingMainTasksRequest
+import tasks.v1.ListUpcomingMainTasksResponse
 import tasks.v1.UpdateTaskListRequest
 import tasks.v1.UpdateTaskListResponse
 
@@ -51,6 +53,15 @@ internal class TaskListRemoteDataSourceImpl(
             request = request,
             requestSerializer = { ListTaskListsRequest.ADAPTER.encode(it) },
             responseDeserializer = { ListTaskListsResponse.ADAPTER.decode(it) }
+        ).getOrThrow()
+    }
+
+    override suspend fun listUpcomingMainTasks(request: ListUpcomingMainTasksRequest): ListUpcomingMainTasksResponse {
+        return client.call(
+            path = "/tasks.v1.TaskListService/ListUpcomingMainTasks",
+            request = request,
+            requestSerializer = { ListUpcomingMainTasksRequest.ADAPTER.encode(it) },
+            responseDeserializer = { ListUpcomingMainTasksResponse.ADAPTER.decode(it) }
         ).getOrThrow()
     }
 

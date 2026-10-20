@@ -1,22 +1,25 @@
 package net.onefivefour.echolist.core.tasks.data.repository
 
-import net.onefivefour.echolist.core.files.domain.normalizePath
-
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.LocalDate
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.files.domain.normalizePath
 import net.onefivefour.echolist.core.tasks.data.mapper.TaskListMapper
+import net.onefivefour.echolist.core.tasks.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
+import net.onefivefour.echolist.core.tasks.domain.model.UpcomingMainTask
 import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
-import net.onefivefour.echolist.core.tasks.data.source.network.TaskListRemoteDataSource
-import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import tasks.v1.DeleteTaskListRequest
 import tasks.v1.GetMainTaskRequest
 import tasks.v1.GetTaskListRequest
 import tasks.v1.ListTaskListsRequest
+import tasks.v1.ListUpcomingMainTasksRequest
 
 internal class TaskListRepositoryImpl(
     private val networkDataSource: TaskListRemoteDataSource,
@@ -65,6 +68,24 @@ internal class TaskListRepositoryImpl(
                 val request = ListTaskListsRequest(parent_dir = parentDir)
                 val response = networkDataSource.listTaskLists(request)
                 Result.success(TaskListMapper.toDomain(response))
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
+    override suspend fun listUpcomingMainTasks(fromDate: LocalDate): Result<List<UpcomingMainTask>> =
+        withContext(dispatcher) {
+            try {
+                val date = fromDate.toString()
+                require(Regex("[0-9]{4}-[0-9]{2}-[0-9]{2}").matches(date)) {
+                    "fromDate must be representable as YYYY-MM-DD"
+                }
+                val response = networkDataSource.listUpcomingMainTasks(
+                    ListUpcomingMainTasksRequest(from_date = date)
+                )
+                Result.success(TaskListMapper.toDomain(response))
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
                 Result.failure(e)
             }

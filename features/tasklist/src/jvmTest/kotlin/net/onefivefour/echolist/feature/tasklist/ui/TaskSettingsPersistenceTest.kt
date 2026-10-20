@@ -4,16 +4,18 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.datetime.LocalDate
+import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
-import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
-import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
+import net.onefivefour.echolist.core.tasks.domain.model.UpcomingMainTask
+import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.testutil.NoOpNotificationScheduler
 
@@ -57,6 +59,9 @@ internal class TaskSettingsPersistenceTest : FunSpec({
 
         override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
             Result.success(emptyList())
+
+        override suspend fun listUpcomingMainTasks(fromDate: LocalDate): Result<List<UpcomingMainTask>> =
+            error("Upcoming tasks are not used by this test fixture")
 
         override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> {
             val existing = taskLists[params.id]

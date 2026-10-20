@@ -8,22 +8,24 @@ import io.kotest.property.Arb
 import io.kotest.property.arbitrary.int
 import io.kotest.property.checkAll
 import kotlin.time.Duration.Companion.seconds
+import kotlinx.coroutines.async
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
-import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.datetime.LocalDate
 import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
+import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.TaskList
 import net.onefivefour.echolist.core.tasks.domain.model.TaskListEntry
-import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import net.onefivefour.echolist.core.tasks.domain.model.TaskSettingsChanges
+import net.onefivefour.echolist.core.tasks.domain.model.UpcomingMainTask
+import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
+import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 
 /**
  * Validates: Requirements 4.1, 4.2, 4.3, 4.4
@@ -483,6 +485,9 @@ private class FakeNotificationTestRepository : TaskListRepository {
 
     override suspend fun listTaskLists(parentDir: String): Result<List<TaskListEntry>> =
         Result.success(emptyList())
+
+    override suspend fun listUpcomingMainTasks(fromDate: LocalDate): Result<List<UpcomingMainTask>> =
+        error("Upcoming tasks are not used by this test fixture")
 
     override suspend fun updateTaskList(params: UpdateTaskListParams): Result<TaskList> {
         updateTaskListCalls.add(params)

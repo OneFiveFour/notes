@@ -74,7 +74,7 @@ Notification code calls `TaskCompletionHandler`; `core:tasks` supplies its imple
 
 Every task-list navigation entry has a persistent `editorId`. The app's `TaskSettingsChannels` ViewModel owns one queue per editor, surviving configuration changes. Settings send `TaskSettingsChanges` to the calling editor's sink. This supports unsaved task IDs, queues results while the editor is covered, and isolates two editors of the same task. Popping an editor or logging out closes its queue; a late permission response cannot recreate it. The former application-wide result bus exists only as a local test fixture.
 
-The upcoming screen listing all MainTasks with a due date is intentionally not implemented. It can use `core:tasks` contracts and shared recurrence/notification infrastructure and open tasksettings through the app. It must not depend on `features:tasklist`. A backend query for all due tasks can be added to the shared repository when that feature is implemented.
+The upcoming screen listing MainTasks with a due date is intentionally not implemented. It can use `core:tasks` contracts and shared recurrence/notification infrastructure and open tasksettings through the app. It must not depend on `features:tasklist`. The shared `TaskListRepository.listUpcomingMainTasks(fromDate)` query returns task summaries with a typed `LocalDate`, using an inclusive UTC calendar-date cutoff. Callers supply the date explicitly; the data layer preserves the server's order and fails the whole query on invalid due dates. The response has no task-list ID or folder path, so opening the existing task-list editor requires additional backend information.
 
 ## Platform and persistence boundaries
 

@@ -10,6 +10,8 @@ import tasks.v1.GetTaskListRequest
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsRequest
 import tasks.v1.ListTaskListsResponse
+import tasks.v1.ListUpcomingMainTasksRequest
+import tasks.v1.ListUpcomingMainTasksResponse
 import tasks.v1.UpdateTaskListRequest
 import tasks.v1.UpdateTaskListResponse
 
@@ -18,6 +20,7 @@ internal interface TaskListRemoteDataSource {
     suspend fun getTaskList(request: GetTaskListRequest): GetTaskListResponse
     suspend fun getMainTask(request: GetMainTaskRequest): GetMainTaskResponse
     suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse
+    suspend fun listUpcomingMainTasks(request: ListUpcomingMainTasksRequest): ListUpcomingMainTasksResponse
     suspend fun updateTaskList(request: UpdateTaskListRequest): UpdateTaskListResponse
     suspend fun deleteTaskList(request: DeleteTaskListRequest): DeleteTaskListResponse
 }

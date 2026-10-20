@@ -4,20 +4,20 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.result.shouldBeFailure
 import io.kotest.matchers.shouldBe
 import io.kotest.property.Arb
-import io.kotest.property.PropTestConfig
 import io.kotest.property.arbitrary.arbitrary
 import io.kotest.property.arbitrary.boolean
 import io.kotest.property.arbitrary.list
 import io.kotest.property.arbitrary.string
 import io.kotest.property.checkAll
+import io.kotest.property.PropTestConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
+import net.onefivefour.echolist.core.tasks.data.source.network.TaskListRemoteDataSource
 import net.onefivefour.echolist.core.tasks.domain.model.CreateTaskListParams
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 import net.onefivefour.echolist.core.tasks.domain.model.SubTask
 import net.onefivefour.echolist.core.tasks.domain.model.UpdateTaskListParams
-import net.onefivefour.echolist.core.tasks.data.source.network.TaskListRemoteDataSource
-import net.onefivefour.echolist.core.files.domain.DirectoryChangeNotifier
 import tasks.v1.CreateTaskListRequest
 import tasks.v1.CreateTaskListResponse
 import tasks.v1.DeleteTaskListRequest
@@ -106,6 +106,9 @@ class TaskListRepositoryPropertyTest : FunSpec({
             throw exception
         override suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse =
             throw exception
+        override suspend fun listUpcomingMainTasks(
+            request: tasks.v1.ListUpcomingMainTasksRequest
+        ): tasks.v1.ListUpcomingMainTasksResponse = throw exception
         override suspend fun updateTaskList(request: UpdateTaskListRequest): UpdateTaskListResponse =
             throw exception
         override suspend fun deleteTaskList(request: DeleteTaskListRequest): DeleteTaskListResponse =

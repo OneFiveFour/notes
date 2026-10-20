@@ -10,6 +10,8 @@ import tasks.v1.GetTaskListRequest
 import tasks.v1.GetTaskListResponse
 import tasks.v1.ListTaskListsRequest
 import tasks.v1.ListTaskListsResponse
+import tasks.v1.ListUpcomingMainTasksRequest
+import tasks.v1.ListUpcomingMainTasksResponse
 import tasks.v1.UpdateTaskListRequest
 import tasks.v1.UpdateTaskListResponse
 
@@ -19,6 +21,8 @@ internal class FakeTaskListRemoteDataSource : TaskListRemoteDataSource {
     var getTaskListResult: Result<GetTaskListResponse> = Result.success(GetTaskListResponse())
     var getMainTaskResult: Result<GetMainTaskResponse> = Result.success(GetMainTaskResponse())
     var listTaskListsResult: Result<ListTaskListsResponse> = Result.success(ListTaskListsResponse())
+    var listUpcomingMainTasksResult: Result<ListUpcomingMainTasksResponse> =
+        Result.success(ListUpcomingMainTasksResponse())
     var updateTaskListResult: Result<UpdateTaskListResponse> = Result.success(UpdateTaskListResponse())
     var deleteTaskListResult: Result<DeleteTaskListResponse> = Result.success(DeleteTaskListResponse())
 
@@ -26,6 +30,7 @@ internal class FakeTaskListRemoteDataSource : TaskListRemoteDataSource {
     var lastGetRequest: GetTaskListRequest? = null
     var lastGetMainTaskRequest: GetMainTaskRequest? = null
     var lastListRequest: ListTaskListsRequest? = null
+    var lastUpcomingRequest: ListUpcomingMainTasksRequest? = null
     var lastUpdateRequest: UpdateTaskListRequest? = null
     var lastDeleteRequest: DeleteTaskListRequest? = null
 
@@ -47,6 +52,11 @@ internal class FakeTaskListRemoteDataSource : TaskListRemoteDataSource {
     override suspend fun listTaskLists(request: ListTaskListsRequest): ListTaskListsResponse {
         lastListRequest = request
         return listTaskListsResult.getOrThrow()
+    }
+
+    override suspend fun listUpcomingMainTasks(request: ListUpcomingMainTasksRequest): ListUpcomingMainTasksResponse {
+        lastUpcomingRequest = request
+        return listUpcomingMainTasksResult.getOrThrow()
     }
 
     override suspend fun updateTaskList(request: UpdateTaskListRequest): UpdateTaskListResponse {
