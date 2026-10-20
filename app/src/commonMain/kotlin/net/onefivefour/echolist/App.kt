@@ -17,6 +17,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LifecycleEventEffect
+import kotlinx.coroutines.launch
+import net.onefivefour.echolist.core.notifications.domain.NotificationCoordinator
+import net.onefivefour.echolist.core.notifications.domain.ReminderBackgroundScheduler
+import org.koin.compose.koinInject
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,8 +63,21 @@ fun App() {
             val authViewModel = koinViewModel<AuthViewModel>()
             val authState by authViewModel.authState.collectAsStateWithLifecycle()
             val settingsChannels = koinViewModel<TaskSettingsChannels>()
+            val notifications = koinInject<NotificationCoordinator>()
+            val reminderWork = koinInject<ReminderBackgroundScheduler>()
+            val reminderScope = rememberCoroutineScope()
+            LifecycleEventEffect(Lifecycle.Event.ON_RESUME) {
+                reminderScope.launch {
+                    notifications.refreshSession()
+                    notifications.restore()
+                    if (authState == AuthState.Authenticated) reminderWork.requestSync()
+                }
+            }
             LaunchedEffect(authState) {
                 if (authState == AuthState.Unauthenticated) settingsChannels.clearEditors()
+                notifications.refreshSession()
+                notifications.restore()
+                if (authState == AuthState.Authenticated) reminderWork.requestSync()
             }
 
             when (authState) {

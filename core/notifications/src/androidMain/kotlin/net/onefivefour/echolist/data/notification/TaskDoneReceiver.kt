@@ -4,42 +4,33 @@ import android.app.NotificationManager
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
+import androidx.work.await
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import net.onefivefour.echolist.core.notifications.domain.TaskCompletionHandler
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import net.onefivefour.echolist.core.notifications.data.AndroidReminderBackgroundScheduler
+import net.onefivefour.echolist.core.notifications.domain.reminderKey
 
-/**
- * BroadcastReceiver that handles the "Done" action on a task reminder notification.
- *
- * Dismisses the notification immediately, then marks the recurring task as done via
- * [TaskCompletionHandler], letting the backend compute the next due
- * date and rescheduling the notification accordingly.
- */
-// Keep the class name stable for notifications scheduled before modularization.
-class TaskDoneReceiver : BroadcastReceiver(), KoinComponent {
-
-    private val taskCompletionHandler: TaskCompletionHandler by inject()
-
+/** The persistent worker survives process death and waits for connectivity. */
+class TaskDoneReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         if (intent.action != ACTION_MARK_DONE) return
-        val taskId = intent.getStringExtra(EXTRA_TASK_ID) ?: return
-        val taskListId = intent.getStringExtra(EXTRA_TASK_LIST_ID) ?: return
-
-        // Dismiss the notification right away for a responsive feel.
-        val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.cancel(taskId.hashCode())
-
-        // Keep the receiver alive while the suspend work runs.
-        val pendingResult = goAsync()
+        val account = intent.getStringExtra(TaskReminderReceiver.EXTRA_ACCOUNT_ID) ?: return
+        val date = intent.getStringExtra(TaskReminderReceiver.EXTRA_DUE_DATE) ?: return
+        val task = intent.getStringExtra(EXTRA_TASK_ID) ?: return
+        val list = intent.getStringExtra(EXTRA_TASK_LIST_ID) ?: return
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val pending = goAsync()
         CoroutineScope(Dispatchers.Default).launch {
             try {
-                taskCompletionHandler.complete(taskListId, taskId)
+                AndroidReminderBackgroundScheduler.complete(context, account, task, list, date).await()
+                // Dismiss only after the action is durably enqueued; a failed enqueue remains actionable.
+                manager.cancel(reminderKey(account, task), 0)
+            } catch (_: Exception) {
+                Log.w("EchoListReminders", "Unable to enqueue task completion")
             } finally {
-                pendingResult.finish()
+                pending.finish()
             }
         }
     }

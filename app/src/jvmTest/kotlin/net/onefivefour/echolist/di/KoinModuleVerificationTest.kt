@@ -15,6 +15,14 @@ import net.onefivefour.echolist.core.session.domain.SecureStorage
 import net.onefivefour.echolist.core.tasks.domain.repository.TaskListRepository
 import org.koin.dsl.koinApplication
 import org.koin.dsl.module
+import net.onefivefour.echolist.core.notifications.domain.NotificationCoordinator
+import net.onefivefour.echolist.core.notifications.domain.NotificationAccountProvider
+import net.onefivefour.echolist.core.notifications.domain.NotificationPermissionChecker
+import net.onefivefour.echolist.core.notifications.domain.ReminderStore
+import net.onefivefour.echolist.core.notifications.domain.ReminderState
+import net.onefivefour.echolist.core.notifications.domain.ReminderPlatform
+import net.onefivefour.echolist.core.notifications.domain.Reminder
+import net.onefivefour.echolist.core.notifications.domain.ReminderBackgroundScheduler
 
 class KoinModuleVerificationTest : FunSpec({
     test("application composition resolves shared services without touching real storage or a backend") {
@@ -26,6 +34,32 @@ class KoinModuleVerificationTest : FunSpec({
                 module {
                     single<SecureStorage> { FakeSecureStorage() }
                     single { EchoListDatabase(driver) }
+                    single {
+                        NotificationCoordinator(
+                            object : ReminderStore {
+                                var state = ReminderState()
+                                override suspend fun read() = state
+                                override suspend fun write(state: ReminderState) {
+                                    this.state = state
+                                }
+                            },
+                            object : ReminderPlatform {
+                                override suspend fun schedule(reminder: Reminder) = Unit
+                                override suspend fun cancelPending(reminder: Reminder) = Unit
+                                override suspend fun dismiss(reminder: Reminder) = Unit
+                                override suspend fun show(reminder: Reminder) = false
+                            },
+                            object : NotificationPermissionChecker {
+                                override suspend fun isGranted() = false
+                            },
+                            get<NotificationAccountProvider>(),
+                            object : ReminderBackgroundScheduler {
+                                override fun start() = Unit
+                                override fun requestSync() = Unit
+                                override fun stop() = Unit
+                            }
+                        )
+                    }
                 }
             )
         }
