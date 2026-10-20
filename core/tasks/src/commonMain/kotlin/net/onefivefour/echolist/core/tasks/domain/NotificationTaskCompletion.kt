@@ -27,7 +27,8 @@ suspend fun completeRecurringTaskFromNotification(
     taskListRepository: TaskListRepository,
     notificationScheduler: NotificationScheduler,
     taskListId: String,
-    taskId: String
+    taskId: String,
+    expectedDueDate: String? = null
 ): Result<Unit> {
     // Dismiss the currently shown notification immediately.
     notificationScheduler.cancel(taskId)
@@ -36,10 +37,17 @@ suspend fun completeRecurringTaskFromNotification(
         return Result.failure(it)
     }
 
-    if (taskList.tasks.none { it.id == taskId }) {
+    val current = taskList.tasks.firstOrNull { it.id == taskId }
+    if (current == null) {
+        if (expectedDueDate != null) return Result.success(Unit)
         return Result.failure(
             IllegalStateException("Task $taskId not found in task list $taskListId")
         )
+    }
+
+    if (current.isDone || (expectedDueDate != null && current.dueDate != expectedDueDate)) {
+        scheduleTaskNotification(notificationScheduler, current, taskList.name, taskList.id)
+        return Result.success(Unit)
     }
 
     val updatedTasks = taskList.tasks.map { task ->

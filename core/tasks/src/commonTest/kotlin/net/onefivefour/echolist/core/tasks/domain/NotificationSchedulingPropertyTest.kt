@@ -77,7 +77,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
         scheduler.scheduleCalls[0].dueDateIso shouldBe "2095-06-15"
     }
 
-    test("cancel is called when recurrence is empty") {
+    test("one-time tasks with a due date are scheduled") {
         val scheduler = FakeNotificationScheduler()
         val task = MainTask(
             id = "task-2",
@@ -90,9 +90,9 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
         scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
-        scheduler.cancelCalls shouldHaveSize 1
-        scheduler.scheduleCalls.shouldBeEmpty()
-        scheduler.cancelCalls[0].taskId shouldBe "task-2"
+        scheduler.scheduleCalls shouldHaveSize 1
+        scheduler.cancelCalls.shouldBeEmpty()
+        scheduler.scheduleCalls[0].taskId shouldBe "task-2"
     }
 
     test("cancel is called when dueDate is empty") {
@@ -130,7 +130,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
         scheduler.scheduleCalls.shouldBeEmpty()
     }
 
-    test("past dates skip scheduling - no schedule AND no cancel") {
+    test("past dates are forwarded for catch-up delivery") {
         val scheduler = FakeNotificationScheduler()
         val task = MainTask(
             id = "task-5",
@@ -143,7 +143,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
         scheduleTaskNotification(scheduler, task, "My List", "list-1")
 
-        scheduler.scheduleCalls.shouldBeEmpty()
+        scheduler.scheduleCalls shouldHaveSize 1
         scheduler.cancelCalls.shouldBeEmpty()
     }
 
@@ -249,7 +249,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
         }
     }
 
-    test("Feature: recurrence-reminders, Property 5: empty recurrence triggers cancel") {
+    test("Feature: recurrence-reminders, Property 5: empty recurrence still schedules a dated task") {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,
@@ -269,9 +269,9 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
             scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
-            scheduler.cancelCalls shouldHaveSize 1
-            scheduler.cancelCalls[0].taskId shouldBe taskId
-            scheduler.scheduleCalls.shouldBeEmpty()
+            scheduler.scheduleCalls shouldHaveSize 1
+            scheduler.scheduleCalls[0].taskId shouldBe taskId
+            scheduler.cancelCalls.shouldBeEmpty()
         }
     }
 
@@ -389,7 +389,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
     // -- Property 10: Past date skips scheduling --
 
-    test("Feature: recurrence-reminders, Property 10: past dueDate triggers neither schedule nor cancel") {
+    test("Feature: recurrence-reminders, Property 10: past dueDate is forwarded for catch-up delivery") {
         checkAll(
             PropTestConfig(iterations = 100),
             arbTaskId,
@@ -410,7 +410,7 @@ class NotificationSchedulingPropertyTest : FunSpec({
 
             scheduleTaskNotification(scheduler, task, taskListName, "list-1")
 
-            scheduler.scheduleCalls.shouldBeEmpty()
+            scheduler.scheduleCalls shouldHaveSize 1
             scheduler.cancelCalls.shouldBeEmpty()
         }
     }

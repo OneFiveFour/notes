@@ -2,10 +2,7 @@ package net.onefivefour.echolist.core.tasks.domain
 
 import net.onefivefour.echolist.core.notifications.domain.NotificationScheduler
 
-import kotlin.time.Clock
 import kotlinx.datetime.LocalDate
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.todayIn
 import net.onefivefour.echolist.core.tasks.domain.model.MainTask
 
 /**
@@ -13,9 +10,9 @@ import net.onefivefour.echolist.core.tasks.domain.model.MainTask
  *
  * Scheduling rules:
  * - If the task has isNotificationEnabled set to false, any existing notification is canceled immediately.
- * - If the task has a blank dueDate or blank recurrence, any existing notification is canceled.
+ * - Tasks without a due date and completed tasks are canceled, independently of recurrence.
  * - If the dueDate cannot be parsed as a valid ISO-8601 date, the notification is canceled.
- * - If the dueDate is strictly before today, scheduling is skipped (no schedule, no cancel).
+ * - Past due dates are forwarded to the persistent scheduler for one-time catch-up delivery.
  * - Otherwise, a notification is scheduled with the appropriate title and body.
  *
  * @param scheduler the platform notification scheduler implementation
@@ -30,23 +27,18 @@ suspend fun scheduleTaskNotification(
     taskListId: String
 ) {
     if (!task.isNotificationEnabled) {
-        scheduler.cancel(task.id)
+        scheduler.cancelWhenIneligible(task.id)
         return
     }
 
-    if (task.dueDate.isBlank() || task.recurrence.isBlank()) {
-        scheduler.cancel(task.id)
+    if (task.dueDate.isBlank() || task.isDone) {
+        scheduler.cancelWhenIneligible(task.id)
         return
     }
 
     val dueDate = runCatching { LocalDate.parse(task.dueDate) }.getOrNull()
     if (dueDate == null) {
-        scheduler.cancel(task.id)
-        return
-    }
-
-    val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
-    if (dueDate < today) {
+        scheduler.cancelWhenIneligible(task.id)
         return
     }
 

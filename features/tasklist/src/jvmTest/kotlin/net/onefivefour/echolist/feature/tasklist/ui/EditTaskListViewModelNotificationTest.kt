@@ -220,9 +220,9 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
         }
     }
 
-    // --- Test: Removing recurrence triggers cancel ---
+    // --- Test: Removing recurrence preserves the optional reminder ---
 
-    test("removing recurrence from a task triggers cancel via scheduleTaskNotification") {
+    test("removing recurrence preserves scheduling for a dated one-time task") {
         runTest(testDispatcher) {
             val repo = FakeNotificationTestRepository()
             val scheduler = RecordingNotificationScheduler()
@@ -259,9 +259,9 @@ internal class EditTaskListViewModelNotificationTest : FunSpec({
             settingsFlow.emit(TaskSettingsChanges(mainTaskId = "t1", dueDate = "2027-06-01", recurrence = ""))
             testScheduler.advanceUntilIdle()
 
-            // After sync with empty recurrence, scheduleTaskNotification calls cancel
+            // A due date remains sufficient after recurrence is removed.
             eventually(2.seconds) {
-                scheduler.cancelCalls.any { it.taskId == "t1" } shouldBe true
+                scheduler.scheduleCalls.any { it.taskId == "t1" } shouldBe true
             }
         }
     }
