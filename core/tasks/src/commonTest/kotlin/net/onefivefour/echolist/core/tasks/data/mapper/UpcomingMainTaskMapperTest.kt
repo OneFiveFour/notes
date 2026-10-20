@@ -13,14 +13,19 @@ class UpcomingMainTaskMapperTest : FunSpec({
     test("maps summaries without changing titles or server order") {
         val response = ListUpcomingMainTasksResponse(
             tasks = listOf(
-                ProtoUpcomingMainTask(task_id = "second", title = "  Einkaufen 🛒  ", due_date = "2028-02-29"),
-                ProtoUpcomingMainTask(task_id = "first", title = "", due_date = "2026-01-01")
+                ProtoUpcomingMainTask(
+                    tasklist_id = "list-1",
+                    task_id = "second",
+                    title = "  Einkaufen 🛒  ",
+                    due_date = "2028-02-29"
+                ),
+                ProtoUpcomingMainTask(tasklist_id = "list-1", task_id = "first", title = "", due_date = "2026-01-01")
             )
         )
 
         TaskListMapper.toDomain(response) shouldBe listOf(
-            UpcomingMainTask("second", "  Einkaufen 🛒  ", LocalDate(2028, 2, 29)),
-            UpcomingMainTask("first", "", LocalDate(2026, 1, 1))
+            UpcomingMainTask("second", "  Einkaufen 🛒  ", LocalDate(2028, 2, 29), "list-1"),
+            UpcomingMainTask("first", "", LocalDate(2026, 1, 1), "list-1")
         )
     }
 
@@ -30,7 +35,8 @@ class UpcomingMainTaskMapperTest : FunSpec({
 
     test("accepts four-digit calendar year boundaries") {
         listOf("0000-01-01", "9999-12-31").forEach { date ->
-            TaskListMapper.toDomain(ProtoUpcomingMainTask(due_date = date)).dueDate shouldBe LocalDate.parse(date)
+            val task = TaskListMapper.toDomain(ProtoUpcomingMainTask(tasklist_id = "list-1", due_date = date))
+            task.dueDate shouldBe LocalDate.parse(date)
         }
     }
 
@@ -41,7 +47,7 @@ class UpcomingMainTaskMapperTest : FunSpec({
             "2026-01-01T00:00:00Z", "+10000-01-01", "-0001-01-01"
         ).forEach { date ->
             val error = shouldThrow<NetworkException.SerializationError> {
-                TaskListMapper.toDomain(ProtoUpcomingMainTask(due_date = date))
+                TaskListMapper.toDomain(ProtoUpcomingMainTask(tasklist_id = "list-1", due_date = date))
             }
             error.message shouldBe "UpcomingMainTask.due_date is not a valid YYYY-MM-DD date"
             (error.cause is IllegalArgumentException) shouldBe true
@@ -53,8 +59,8 @@ class UpcomingMainTaskMapperTest : FunSpec({
             TaskListMapper.toDomain(
                 ListUpcomingMainTasksResponse(
                     tasks = listOf(
-                        ProtoUpcomingMainTask(task_id = "valid", due_date = "2026-10-20"),
-                        ProtoUpcomingMainTask(task_id = "invalid", due_date = "")
+                        ProtoUpcomingMainTask(tasklist_id = "list-1", task_id = "valid", due_date = "2026-10-20"),
+                        ProtoUpcomingMainTask(tasklist_id = "list-1", task_id = "invalid", due_date = "")
                     )
                 )
             )

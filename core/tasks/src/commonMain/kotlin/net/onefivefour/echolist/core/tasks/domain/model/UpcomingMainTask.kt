@@ -5,5 +5,6 @@ import kotlinx.datetime.LocalDate
 data class UpcomingMainTask(
     val taskId: String,
     val title: String,
-    val dueDate: LocalDate
+    val dueDate: LocalDate,
+    val taskListId: String
 )

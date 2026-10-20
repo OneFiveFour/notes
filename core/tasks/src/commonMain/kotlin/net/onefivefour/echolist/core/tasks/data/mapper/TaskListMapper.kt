@@ -79,7 +79,12 @@ internal object TaskListMapper {
         } catch (e: IllegalArgumentException) {
             throw NetworkException.SerializationError("UpcomingMainTask.due_date is not a valid YYYY-MM-DD date", e)
         }
-        return UpcomingMainTask(taskId = proto.task_id, title = proto.title, dueDate = dueDate)
+        return UpcomingMainTask(
+            taskId = proto.task_id,
+            title = proto.title,
+            dueDate = dueDate,
+            taskListId = proto.tasklist_id
+        )
     }
 
     fun toDomain(proto: ListUpcomingMainTasksResponse): List<UpcomingMainTask> =

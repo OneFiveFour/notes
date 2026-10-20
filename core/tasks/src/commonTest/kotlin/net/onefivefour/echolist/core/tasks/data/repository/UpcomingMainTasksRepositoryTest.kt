@@ -20,8 +20,12 @@ class UpcomingMainTasksRepositoryTest : FunSpec({
         source.listUpcomingMainTasksResult = Result.success(
             ListUpcomingMainTasksResponse(
                 tasks = listOf(
-                    ProtoUpcomingMainTask(task_id = "later", title = "Later", due_date = "2028-03-01"),
-                    ProtoUpcomingMainTask(task_id = "cutoff", title = "Leap day", due_date = "2028-02-29")
+                    ProtoUpcomingMainTask(
+                        tasklist_id = "list-1", task_id = "later", title = "Later", due_date = "2028-03-01"
+                    ),
+                    ProtoUpcomingMainTask(
+                        tasklist_id = "list-1", task_id = "cutoff", title = "Leap day", due_date = "2028-02-29"
+                    )
                 )
             )
         )
@@ -29,8 +33,8 @@ class UpcomingMainTasksRepositoryTest : FunSpec({
         val repository = TaskListRepositoryImpl(source, Dispatchers.Unconfined, notifier)
 
         repository.listUpcomingMainTasks(LocalDate(2028, 2, 29)).getOrThrow() shouldBe listOf(
-            UpcomingMainTask("later", "Later", LocalDate(2028, 3, 1)),
-            UpcomingMainTask("cutoff", "Leap day", LocalDate(2028, 2, 29))
+            UpcomingMainTask("later", "Later", LocalDate(2028, 3, 1), "list-1"),
+            UpcomingMainTask("cutoff", "Leap day", LocalDate(2028, 2, 29), "list-1")
         )
         source.lastUpcomingRequest?.from_date shouldBe "2028-02-29"
         notifier.emissions shouldBe emptyList()
@@ -74,8 +78,8 @@ class UpcomingMainTasksRepositoryTest : FunSpec({
         source.listUpcomingMainTasksResult = Result.success(
             ListUpcomingMainTasksResponse(
                 tasks = listOf(
-                    ProtoUpcomingMainTask(task_id = "valid", due_date = "2026-10-20"),
-                    ProtoUpcomingMainTask(task_id = "invalid", due_date = "2026-02-30")
+                    ProtoUpcomingMainTask(tasklist_id = "list-1", task_id = "valid", due_date = "2026-10-20"),
+                    ProtoUpcomingMainTask(tasklist_id = "list-1", task_id = "invalid", due_date = "2026-02-30")
                 )
             )
         )

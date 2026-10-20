@@ -12,7 +12,14 @@ import tasks.v1.UpcomingMainTask
 class UpcomingMainTasksRemoteDataSourceTest : FunSpec({
     test("uses the upcoming RPC path and real Wire request and response adapters") {
         val response = ListUpcomingMainTasksResponse(
-            tasks = listOf(UpcomingMainTask(task_id = "task-1", title = "Übermorgen", due_date = "2026-10-22"))
+            tasks = listOf(
+                UpcomingMainTask(
+                    tasklist_id = "list-1",
+                    task_id = "task-1",
+                    title = "Übermorgen",
+                    due_date = "2026-10-22"
+                )
+            )
         )
         val client = RecordingUpcomingClient(Result.success(ListUpcomingMainTasksResponse.ADAPTER.encode(response)))
         val source = TaskListRemoteDataSourceImpl(client)
